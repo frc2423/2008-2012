@@ -6,6 +6,7 @@ public:
 
 	   
     virtual void Drive(float robot_Compass, float joystick_x, float joystick_y, float joystick2_y);
+
 	float angleChange(float robot_Compass, float joystick_x, float joystick_y);
     float turnRate(float robot_Compass, float joystick_x, float joystick_y);
     float motorSpeedDuel(float joystick_y);
@@ -16,3 +17,4 @@ private:
   
     float controllerCompass(float joystick_x, float joystick_y);	
 };
+

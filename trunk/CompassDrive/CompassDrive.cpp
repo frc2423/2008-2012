@@ -16,9 +16,6 @@ void CompassDrive::Drive(float robot_Compass, float joystick_x, float joystick_y
 	
 	printf("Left Motor value: %f, Right Motor value: %f\n", left_Motors, right_Motors);
 	
-	
-
-		
 }
 
 
@@ -68,6 +65,16 @@ float CompassDrive::angleChange(float robot_Compass, float joystick_x, float joy
 {
 	float angleChange;
 	float controller_Compass = controllerCompass(joystick_x, joystick_y);
+	
+	if ((robot_Compass > 360) || (robot_Compass < -360))
+	{
+		robot_Compass = fmod(robot_Compass, 360);
+	}
+	
+	if (robot_Compass < 0)
+	{
+		robot_Compass = robot_Compass + 360;
+	}
 	
 	if (robot_Compass - controller_Compass > 180)		                           
 	{

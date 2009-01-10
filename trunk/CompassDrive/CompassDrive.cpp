@@ -11,10 +11,10 @@ void CompassDrive::Drive(float robot_Compass, float joystick_x, float joystick_y
 	float left_Motors = motorSpeedDuel(joystick2_y);
 	float right_Motors = motorSpeedDuel(joystick2_y);
 
-	left_Motors = tankLeftMotors(left_Motors, angleChange, turn_Rate, left_Motors);
-	right_Motors = tankRightMotors(right_Motors, angleChange, turn_Rate, right_Motors);
+	left_Motors = tankLeftMotors(left_Motors, angle_Change, turn_Rate, left_Motors);
+	right_Motors = tankRightMotors(right_Motors, angle_Change, turn_Rate, right_Motors);
 	
-	printf("Left Motor value: %f, Right Motor value: %f\n\n", left_Motors, right_Motors);
+	printf("Left Motor value: %f, Right Motor value: %f\n", left_Motors, right_Motors);
 	
 	
 

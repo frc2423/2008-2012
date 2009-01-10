@@ -20,8 +20,8 @@ SRC = main.cpp CompassDrive.cpp
 
 OBJ = $(addsuffix .o, $(basename $(SRC)))
 
-usepix: $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $@ $(OBJ) -lm $(TLIB) -lg++
+CompassDrive: $(OBJ)
+	$(CXX) $(CXXFLAGS) -o $@ $(OBJ) -lm $(TLIB)
 
 #-----Other stuff----------------------------
 depend:

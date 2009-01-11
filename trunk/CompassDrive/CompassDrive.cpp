@@ -2,9 +2,10 @@
 #include "CompassDrive.h"
 #include <cmath>
 
-CompassDrive::CompassDrive()
+CompassDrive::CompassDrive(SpeedController * leftMotor, SpeedController * rightMotor) :
+	m_leftMotor(leftMotor),
+	m_rightMotor(rightMotor)
 {
-
 }
 
 
@@ -19,8 +20,9 @@ void CompassDrive::Drive(float robot_Compass, float joystick_x, float joystick_y
 	left_Motors = tankLeftMotors(left_Motors, angle_Change, turn_Rate, left_Motors);
 	right_Motors = tankRightMotors(right_Motors, angle_Change, turn_Rate, right_Motors);
 	
-	printf("Left Motor value: %f, Right Motor value: %f\n", left_Motors, right_Motors);
 	
+	m_leftMotor->Set(left_Motors);
+	m_rightMotor->Set(right_Motors);
 }
 
 
@@ -32,19 +34,19 @@ float CompassDrive::controllerCompass(float joystick_x, float joystick_y)       
 	
 	if ((joystick_y > 0) && (joystick_x > 0))
 	{
-		controller_Compass = (atan(joystick_y/joystick_x) * 57.29577951);
+		controller_Compass = (atan(joystick_y/joystick_x) * 57.29577951) + 270;
 	}
 	else if ((joystick_y < 0) && (joystick_x < 0))
 	{
-        controller_Compass = (atan((joystick_y * -1)/(joystick_x * -1)) * 57.29577951) + 180;
+        controller_Compass = (atan((joystick_y * -1)/(joystick_x * -1)) * 57.29577951) + 90;
     }
 	else if ((joystick_y > 0) && (joystick_x < 0))
 	{
-		controller_Compass = (atan((joystick_x * -1)/joystick_y) * 57.29577851) + 90;
+		controller_Compass = (atan((joystick_x * -1)/joystick_y)) * 57.29577851;
 	}
 	else if ((joystick_y < 0) && (joystick_x > 0))
 	{
-         controller_Compass = (atan(joystick_x/(joystick_y * -1)) * 57.29577851) + 270;
+         controller_Compass = (atan(joystick_x/(joystick_y * -1)) * 57.29577851) + 180;
     }
 	else if ((joystick_y == 0) && (joystick_x > 0))
 	{

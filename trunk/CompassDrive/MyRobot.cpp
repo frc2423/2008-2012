@@ -1,4 +1,5 @@
 #include "WPILib.h"
+#include "CompassDrive.h"
 
 /**
  * This is a demo program showing the use of the RobotBase class.
@@ -6,15 +7,25 @@
  * Autonomous and OperatorControl methods at the right time as controlled by the switches on
  * the driver station or the field controls.
  */ 
+
+
 class RobotDemo : public SimpleRobot
 {
-	RobotDrive myRobot; // robot drive system
-	Joystick stick; // only joystick
+	Joystick stick1; // only joystick
+	Joystick stick2;
+	Jaguar leftMotor;
+	Jaguar rightMotor;
+	CompassDrive drive;
+	Gyro gyro;
 
 public:
-	RobotDemo(void):
-		myRobot(1, 2),	// these must be initialized in the same order
-		stick(1)		// as they are declared above.
+	RobotDemo():
+		stick1(1),
+		stick2(2),
+		leftMotor(1),
+		rightMotor(2),
+		drive(&leftMotor, &rightMotor),
+		gyro(1)
 	{
 		GetWatchdog().SetExpiration(100);
 	}
@@ -25,9 +36,7 @@ public:
 	void Autonomous(void)
 	{
 		GetWatchdog().SetEnabled(false);
-		myRobot.Drive(0.5, 0.0); 	// drive forwards half speed
-		Wait(2.0); 				//    for 2 seconds
-		myRobot.Drive(0.0, 0.0); 	// stop robot
+		
 	}
 
 	/**
@@ -39,7 +48,7 @@ public:
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
-			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
+			drive.Drive(gyro.GetAngle(), stick1.GetAxis(Joystick::kXAxis), stick1.GetAxis(Joystick::kYAxis), stick2.GetAxis(Joystick::kYAxis));
 		}
 	}
 };

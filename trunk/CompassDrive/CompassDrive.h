@@ -1,10 +1,10 @@
-#include "RobotDrive.h"
+#include <WPILib.h>
 
 class CompassDrive
 {
 public:
 
-	CompassDrive(); 
+	CompassDrive( SpeedController * leftMotor, SpeedController * rightMotor); 
 	 
     virtual void Drive(float robot_Compass, float joystick_x, float joystick_y, float joystick2_y);
 
@@ -16,6 +16,10 @@ public:
     
 private:
   
-    float controllerCompass(float joystick_x, float joystick_y);	
+    float controllerCompass(float joystick_x, float joystick_y);
+    
+    SpeedController * m_leftMotor;
+    SpeedController * m_rightMotor;
+    
 };
 

@@ -26,11 +26,11 @@
  */
 
 
-
 #include <WPILib.h>
 #include <VisionAPI.h>
 
 #include "Recorder.h"
+
 
 Recorder::Recorder() :
 	m_ds(DriverStation::GetInstance()),
@@ -45,6 +45,7 @@ Recorder::~Recorder()
 		free(m_filename);
 }
 
+// begins playback of the recorded file if present
 bool Recorder::StartPlayback()
 {
 	if (m_recording)
@@ -129,6 +130,7 @@ bool Recorder::Playback()
 	return true;
 }
 
+// begins a recording
 bool Recorder::StartRecording()
 {
 	if (m_recording)
@@ -150,7 +152,8 @@ bool Recorder::StartRecording()
 	return true;
 }
 
-
+// if record mode is enabled, this records the values needed
+// to play back the movements/actions of the bot
 void Recorder::Record()
 {
 	if (!m_recording)
@@ -185,6 +188,7 @@ void Recorder::Record()
 	}
 }
 
+// internal routine: writes the recorded data to file
 void Recorder::FinishRecording()
 {
 	uint32_t sz = m_values.size();
@@ -203,11 +207,11 @@ void Recorder::FinishRecording()
 	
 	fclose(file);
 	
+	printf("Recording complete (%zd sets of data written).\n", m_values.size());
+	
 	// clear the array, free the memory
 	m_values.clear();
 	
 	m_recording = false;
-	
-	printf("Recording complete.\n");
 }
 

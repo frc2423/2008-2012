@@ -49,9 +49,8 @@ public:
 		{
 			GetWatchdog().Feed();
 			
-			// need to encapsulate this in a class.. ideally, around
-			// one of the speed controllers or something to that effect
-
+			// use the trigger to start recording.. at the moment,
+			// it just gets ignored if you call it more than once
 			if (stick.GetTrigger())
 				recorder.StartRecording();
 	

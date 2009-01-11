@@ -1,10 +1,11 @@
 #include "RobotDrive.h"
 
-class CompassDrive : public RobotDrive
+class CompassDrive
 {
 public:
 
-	   
+	CompassDrive(); 
+	 
     virtual void Drive(float robot_Compass, float joystick_x, float joystick_y, float joystick2_y);
 
 	float angleChange(float robot_Compass, float joystick_x, float joystick_y);

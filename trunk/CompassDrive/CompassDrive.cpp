@@ -2,6 +2,11 @@
 #include "CompassDrive.h"
 #include <cmath>
 
+CompassDrive::CompassDrive()
+{
+
+}
+
 
 void CompassDrive::Drive(float robot_Compass, float joystick_x, float joystick_y, float joystick2_y)
 {

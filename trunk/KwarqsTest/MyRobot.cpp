@@ -23,6 +23,9 @@ public:
 		servo(9)
 	{
 		GetWatchdog().SetExpiration(100);
+		
+		// rate for the gyro
+		gyro.SetSensitivity(0.007);
 	}
 
 	/**
@@ -45,8 +48,6 @@ public:
 	{
 		double time = GetTime();
 		GetWatchdog().SetEnabled(true);
-      
-		gyro.SetSensitivity(0.007);
 		
 		while (IsOperatorControl())
 		{
@@ -63,14 +64,13 @@ public:
 			
 			servo.SetAngle(angle);
 			
-			if (GetTime() - time > 1.0)
+			// only print messages every once in awhile, don't overload the system
+			if (GetTime() - time > 0.25)
 			{
-				printf("Gyro: %f, servo: %f\n", gyro.GetAngle(), angle);
+				//printf("Gyro: %f, servo: %f\r", gyro.GetAngle(), angle);
+				printf("JoyX: %5.3f JoyY: %5.3f\r", stick.GetX(), stick.GetY());
 				time = GetTime();
 			}
-			
-
-			
 		}
 	}
 };

@@ -28,6 +28,9 @@ public:
 		gyro(1)
 	{
 		GetWatchdog().SetExpiration(100);
+		
+		// rate for the gyro
+		gyro.SetSensitivity(0.007);
 	}
 
 	/**

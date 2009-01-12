@@ -11,6 +11,9 @@ CompassDrive::CompassDrive(SpeedController * leftMotor, SpeedController * rightM
 
 void CompassDrive::Drive(float robot_Compass, float joystick_x, float joystick_y, float joystick2_y)
 {
+	// we expect the joystick axis to be inverted (does that apply
+	// to all axis?)
+	joystick2_y *= -1;
 	
 	float angle_Change = angleChange(robot_Compass, joystick_x, joystick_y);
 	float turn_Rate = turnRate(robot_Compass, joystick_x, joystick_y);
@@ -21,7 +24,7 @@ void CompassDrive::Drive(float robot_Compass, float joystick_x, float joystick_y
 	right_Motors = tankRightMotors(right_Motors, angle_Change, turn_Rate, right_Motors);
 	
 	
-	m_leftMotor->Set(left_Motors);
+	m_leftMotor->Set(left_Motors*-1);
 	m_rightMotor->Set(right_Motors);
 }
 

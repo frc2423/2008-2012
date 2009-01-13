@@ -139,12 +139,17 @@ bool Recorder::StartRecording()
 	// allow writing to file system
 	Priv_SetWriteFileAllowed(1);
 	
+	// allow writing to file system
+	Priv_SetWriteFileAllowed(1);
+	
 	file = fopen(m_filename, "w+");
 	if (!file)
 	{
 		fprintf(stderr, "Recording could not start\n");
 		return false;
 	}
+	
+	printf("Recording started.\n");
 	
 	m_startTime = m_nextActionTime = GetTime();
 	m_recording = true;
@@ -207,7 +212,7 @@ void Recorder::FinishRecording()
 	
 	fclose(file);
 	
-	printf("Recording complete (%zd sets of data written).\n", m_values.size());
+	printf("Recording complete (%d sets of data written).\n", m_values.size());
 	
 	// clear the array, free the memory
 	m_values.clear();

@@ -11,6 +11,8 @@ class RobotDemo : public SimpleRobot
 {
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
+	
+	AnalogChannel encoder;
 
 	Gyro gyro;
 	Servo servo;
@@ -20,7 +22,8 @@ public:
 		myRobot(1, 2),	// these must be initialized in the same order
 		stick(1),		// as they are declared above.
 		gyro(1),
-		servo(9)
+		servo(9),
+		encoder(7)
 	{
 		GetWatchdog().SetExpiration(100);
 		
@@ -49,10 +52,25 @@ public:
 		double time = GetTime();
 		GetWatchdog().SetEnabled(true);
 		
+		
+		FILE * file = fopen("file.out","w");
+		fprintf(file, "stuff\n");
+		fclose(file);
+		
+		file = fopen("file.out", "r");
+		char buf[128];
+		
+		buf[0] = 0;
+		
+		size_t sz = fread(&buf, 128, 1, file);
+		printf("sz: %d, str: %s\n", sz, buf);
+		
+		fclose(file);
+		
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
-			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
+			//myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			
 			
 			double angle = 360 - fabs(fmod(gyro.GetAngle(), 360));
@@ -68,7 +86,10 @@ public:
 			if (GetTime() - time > 0.25)
 			{
 				//printf("Gyro: %f, servo: %f\r", gyro.GetAngle(), angle);
-				printf("JoyX: %5.3f JoyY: %5.3f\r", stick.GetX(), stick.GetY());
+				printf("voltage: %f\r", encoder.GetVoltage());
+				//printf("JoyX: %5.3f JoyY: %5.3f Trig: %s\r", 
+				//	stick.GetX(), stick.GetY(), 
+				//	stick.GetTrigger() == true ? "1" : "0");
 				time = GetTime();
 			}
 		}

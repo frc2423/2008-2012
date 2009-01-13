@@ -11,9 +11,6 @@ CompassDrive::CompassDrive(SpeedController * leftMotor, SpeedController * rightM
 
 void CompassDrive::Drive(float robot_Compass, float joystick_x, float joystick_y, float joystick2_y)
 {
-	// we expect the joystick axis to be inverted (does that apply
-	// to all axis?)
-	joystick2_y *= -1;
 	
 	float angle_Change = angleChange(robot_Compass, joystick_x, joystick_y);
 	float turn_Rate = turnRate(robot_Compass, joystick_x, joystick_y);
@@ -35,38 +32,43 @@ float CompassDrive::controllerCompass(float joystick_x, float joystick_y)       
 {
 	float controller_Compass;
 	
-	if ((joystick_y > 0) && (joystick_x > 0))
+	if ((joystick_x > 0) && (joystick_y > 0))
 	{
-		controller_Compass = (atan(joystick_y/joystick_x) * 57.29577951) + 270;
+		controller_Compass = (atan(joystick_x/joystick_y) * 57.29577951);
 	}
-	else if ((joystick_y < 0) && (joystick_x < 0))
+	else if ((joystick_x > 0) && (joystick_y < 0))
 	{
-        controller_Compass = (atan((joystick_y * -1)/(joystick_x * -1)) * 57.29577951) + 90;
+        controller_Compass = (atan((joystick_y * -1)/(joystick_x)) * 57.29577951) + 90;
     }
-	else if ((joystick_y > 0) && (joystick_x < 0))
+	else if ((joystick_x < 0) && (joystick_y < 0))
 	{
-		controller_Compass = (atan((joystick_x * -1)/joystick_y)) * 57.29577851;
+		controller_Compass = (atan((joystick_x * -1)/(joystick_y * -1))) * 57.29577851 +180;
 	}
-	else if ((joystick_y < 0) && (joystick_x > 0))
+	else if ((joystick_x < 0) && (joystick_y > 0))
 	{
-         controller_Compass = (atan(joystick_x/(joystick_y * -1)) * 57.29577851) + 180;
+         controller_Compass = (atan(joystick_y/(joystick_x * -1)) * 57.29577851) + 270;
     }
-	else if ((joystick_y == 0) && (joystick_x > 0))
+	else if ((joystick_x == 0) && (joystick_y > 0))
 	{
 		controller_Compass = 0;
 	}
-	else if ((joystick_y == 0) && (joystick_x < 0))
-	{
-		controller_Compass = 180;
-	}
-	else if ((joystick_y > 0) && (joystick_x == 0))
+	else if ((joystick_x > 0) && (joystick_y == 0))
 	{
 		controller_Compass = 90;
 	}
-	else if ((joystick_y < 0) && (joystick_x == 0))
+	else if ((joystick_x == 0) && (joystick_y < 0))
+	{
+		controller_Compass = 180;
+	}
+	else if ((joystick_x < 0) && (joystick_y == 0))
 	{
 		controller_Compass = 270;
 	}
+	else
+	{
+		controller_Compass = 0;
+	}
+	
 	
 	return controller_Compass;
 }
@@ -119,24 +121,29 @@ float CompassDrive::turnRate(float robot_Compass, float joystick_x, float joysti
 	
 	if (abs_angleChange <= 10)
 	{
-		turn_Rate = .9;
+		turn_Rate = .8;
 	}
 	else if (abs_angleChange <= 20)
 	{
-		turn_Rate = .8;
+		turn_Rate = .6;
 	}
 	else if (abs_angleChange <= 45)
 	{
-		turn_Rate = .7;
+		turn_Rate = .35;
 	}
 	else if (abs_angleChange <= 90)
 	{
-		turn_Rate = .6;
+		turn_Rate = .3;
 	}
 	else if (abs_angleChange <= 180)
 	{
-		turn_Rate = .5;
+		turn_Rate = .20;
 	}
+	else
+	{
+		turn_Rate = .25;
+	}
+	
 	return turn_Rate;
 }
 
@@ -152,7 +159,7 @@ float CompassDrive::motorSpeedDuel(float joystick2_y)                           
 
 float CompassDrive::tankLeftMotors(float left_Motors, float angleChange, float turn_Rate, float speed)
 {	
-	if (angleChange < 0)
+	if (angleChange > 0)
 	{
 		left_Motors = speed * turn_Rate;
 	}
@@ -161,7 +168,7 @@ float CompassDrive::tankLeftMotors(float left_Motors, float angleChange, float t
 
 float CompassDrive::tankRightMotors(float right_Motors, float angleChange, float turn_Rate, float speed)
 {	
-	if (angleChange > 0)
+	if (angleChange < 0)
 	{
 		right_Motors = speed * turn_Rate;
 	}

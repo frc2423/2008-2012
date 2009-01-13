@@ -51,7 +51,11 @@ public:
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
-			drive.Drive(gyro.GetAngle(), stick1.GetAxis(Joystick::kXAxis), stick1.GetAxis(Joystick::kYAxis), stick2.GetAxis(Joystick::kYAxis));
+			drive.Drive(
+					gyro.GetAngle(), 
+					stick1.GetAxis(Joystick::kXAxis), 
+					stick1.GetAxis(Joystick::kYAxis)*-1, 
+					stick2.GetAxis(Joystick::kYAxis)*-1);
 		}
 	}
 };

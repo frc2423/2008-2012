@@ -79,13 +79,16 @@ bool Recorder::StartPlayback()
 	}
 	
 	// do this stupidly, it will work	
-	for (size_t i = 0; i < sz; i++)
+	for (size_t i = 0; i < sz && !feof(file); i++)
 	{
 		m_values.push_back(RecordedBlock(m_motors.size()));
 		
 		for (size_t j = 0; j < m_motors.size(); ++j)
 			if (fread(&m_values.back().motors[j], sizeof(float), 1, file) != 1)
 			{
+				if (feof(file))
+					break;
+
 				fprintf(stderr, "Error reading from file\n");
 				return false;
 			}

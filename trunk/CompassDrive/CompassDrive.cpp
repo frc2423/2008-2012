@@ -135,7 +135,7 @@ float CompassDrive::tankLeftMotors(float angleChange, float turn_Rate, float spe
 {	
 	if (angleChange > 0)
 	{
-		left_Motors = turn_Rate;
+		left_Motors = (turn_Rate * 2) -1;
 	}
 	else
 	{
@@ -149,7 +149,7 @@ float CompassDrive::tankRightMotors(float angleChange, float turn_Rate, float sp
 {	
 	if (angleChange < 0)
 	{
-		right_Motors = turn_Rate;
+		right_Motors = (turn_Rate * 2) - 1;
 	}
 	else
 	{

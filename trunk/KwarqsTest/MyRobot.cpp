@@ -30,7 +30,7 @@ public:
 		GetWatchdog().SetExpiration(100);
 		
 		DigitalModule *dModule = DigitalModule::GetInstance(4);
-		lcd = dModule->GetI2C(0);
+		lcd = dModule->GetI2C(80);
 		// rate for the gyro
 		gyro.SetSensitivity(0.007);
 	}
@@ -54,12 +54,11 @@ public:
 	void OperatorControl(void)
 	{
 		//Clear screen
-		lcd->Write(80, 0xFE);
-		lcd->Write(80, 0x51);
-		
-		// write an a
-		lcd->Write(80, 0xFE);
-		lcd->Write(80, 'a');
+		lcd->Write(0xFE, 0x51);
+	
+		// write two 'a' characters, twice
+		lcd->Write('a', 'a');
+		lcd->Write('a', 'a');
 		
 		double time = GetTime();
 		GetWatchdog().SetEnabled(true);

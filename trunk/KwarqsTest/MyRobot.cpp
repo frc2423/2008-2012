@@ -16,17 +16,21 @@ class RobotDemo : public SimpleRobot
 
 	Gyro gyro;
 	Servo servo;
+	I2C *lcd;
+
 	
 public:
 	RobotDemo(void):
 		myRobot(1, 2),	// these must be initialized in the same order
 		stick(1),		// as they are declared above.
+		encoder(7),
 		gyro(1),
-		servo(9),
-		encoder(7)
+		servo(9)
 	{
 		GetWatchdog().SetExpiration(100);
 		
+		DigitalModule *dModule = DigitalModule::GetInstance(4);
+		lcd = dModule->GetI2C(0);
 		// rate for the gyro
 		gyro.SetSensitivity(0.007);
 	}
@@ -49,11 +53,19 @@ public:
 	 */
 	void OperatorControl(void)
 	{
+		//Clear screen
+		lcd->Write(80, 0xFE);
+		lcd->Write(80, 0x51);
+		
+		// write an a
+		lcd->Write(80, 0xFE);
+		lcd->Write(80, 'a');
+		
 		double time = GetTime();
 		GetWatchdog().SetEnabled(true);
 		
 		
-		FILE * file = fopen("file.out","w");
+		/*FILE * file = fopen("file.out","w");
 		fprintf(file, "stuff\n");
 		fclose(file);
 		
@@ -65,7 +77,8 @@ public:
 		size_t sz = fread(&buf, 128, 1, file);
 		printf("sz: %d, str: %s\n", sz, buf);
 		
-		fclose(file);
+		fclose(file); */
+		
 		
 		while (IsOperatorControl())
 		{
@@ -86,10 +99,10 @@ public:
 			if (GetTime() - time > 0.25)
 			{
 				//printf("Gyro: %f, servo: %f\r", gyro.GetAngle(), angle);
-				printf("voltage: %f\r", encoder.GetVoltage());
-				//printf("JoyX: %5.3f JoyY: %5.3f Trig: %s\r", 
-				//	stick.GetX(), stick.GetY(), 
-				//	stick.GetTrigger() == true ? "1" : "0");
+				//printf("voltage: %f\r", encoder.GetVoltage());
+				printf("JoyX: %5.3f JoyY: %5.3f Trig: %s\r", 
+				stick.GetX(), stick.GetY(), 
+		    	stick.GetTrigger() == true ? "1" : "0");
 				time = GetTime();
 			}
 		}

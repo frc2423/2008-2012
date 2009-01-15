@@ -48,6 +48,8 @@ public:
 	void OperatorControl(void)
 	{
 		GetWatchdog().SetEnabled(true);
+		printf("Entered OperatorControl\n");
+		
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();

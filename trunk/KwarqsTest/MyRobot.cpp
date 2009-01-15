@@ -17,6 +17,8 @@ class RobotDemo : public SimpleRobot
 	Gyro gyro;
 	Servo servo;
 	I2C *lcd;
+	
+	Accelerometer accelerometer;
 
 	
 public:
@@ -25,9 +27,11 @@ public:
 		stick(1),		// as they are declared above.
 		encoder(7),
 		gyro(1),
-		servo(9)
+		servo(9),
+		accelerometer(5)
 	{
 		GetWatchdog().SetExpiration(100);
+		printf("Entered OperatorControl\n");
 		
 		DigitalModule *dModule = DigitalModule::GetInstance(4);
 		lcd = dModule->GetI2C(80);
@@ -53,12 +57,16 @@ public:
 	 */
 	void OperatorControl(void)
 	{
+		printf("Entered OperatorControl\n");
+		
+		lcd->Write(0xFE, 0x70);
+		
 		//Clear screen
-		lcd->Write(0xFE, 0x51);
+		//lcd->Write(0xFE, 0x51);
 	
 		// write two 'a' characters, twice
-		lcd->Write('a', 'a');
-		lcd->Write('a', 'a');
+		//lcd->Write('a', 'a');
+		//lcd->Write('a', 'a');
 		
 		double time = GetTime();
 		GetWatchdog().SetEnabled(true);
@@ -82,7 +90,7 @@ public:
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
-			//myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
+			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			
 			
 			double angle = 360 - fabs(fmod(gyro.GetAngle(), 360));
@@ -99,9 +107,15 @@ public:
 			{
 				//printf("Gyro: %f, servo: %f\r", gyro.GetAngle(), angle);
 				//printf("voltage: %f\r", encoder.GetVoltage());
-				printf("JoyX: %5.3f JoyY: %5.3f Trig: %s\r", 
-				stick.GetX(), stick.GetY(), 
-		    	stick.GetTrigger() == true ? "1" : "0");
+				//printf("JoyX: %5.3f JoyY: %5.3f Trig: %s\r", 
+				//stick.GetX(), stick.GetY(), 
+		    	//stick.GetTrigger() == true ? "1" : "0");
+				
+				float acc = accelerometer.GetAcceleration();
+				float velocity  = (acc * acc) / 2;
+				
+				printf("Acc: %f Velocity: %f\r", acc, velocity);
+				
 				time = GetTime();
 			}
 		}

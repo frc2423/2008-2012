@@ -26,14 +26,13 @@
  */
 
 
-#include <WPILib.h>
+#include "WPILib.h"
 #include <VisionAPI.h>
 
 #include "Recorder.h"
 
 
 Recorder::Recorder() :
-	m_ds(DriverStation::GetInstance()),
 	m_playing(false),
 	m_recording(false),
 	m_filename(strdup(RECORDER_DEFAULT_FILENAME))
@@ -44,6 +43,18 @@ Recorder::~Recorder()
 	if (m_filename)
 		free(m_filename);
 }
+
+void Recorder::SetFilename(const char * filename) 
+{ 
+	if (m_filename) free(m_filename);
+	m_filename = strdup(filename); 
+}
+
+void Recorder::AddMotor(SpeedController * controller)
+{
+	m_motors.push_back(controller);
+}
+
 
 // begins playback of the recorded file if present
 bool Recorder::StartPlayback()
@@ -66,13 +77,13 @@ bool Recorder::StartPlayback()
 		
 	UINT32 sz = 0;
 	
-	if (fread(&sz, sizeof(uint32_t), 1, file) != 1)
+	if (fread(&sz, sizeof(UINT32), 1, file) != 1)
 	{
 		fprintf(stderr, "Error reading file count\n");
 		return false;
 	}
 	
-	if (sz > 0)
+	if (sz <= 0)
 	{
 		fprintf(stderr, "No elements found in file\n");
 		return false;
@@ -93,9 +104,12 @@ bool Recorder::StartPlayback()
 				return false;
 			}
 	}
+
+	// get rid of the last one, its tricky to get right
+	m_values.pop_back();
 	
-	m_playbackPosition = 0;
 	m_playing = true;
+	m_startTime = GetTime();
 	
 	// do less memory allocation later
 	m_values.reserve((size_t)(RECORDER_TIME_LENGTH / RECORDER_PERIOD)); 
@@ -114,23 +128,24 @@ bool Recorder::Playback()
 	wpi_assert(m_playing);
 	
 	double now = GetTime();
+	size_t position = (size_t)((now - m_startTime) * RECORDER_TIME_LENGTH);
 	
-	if (now - m_startTime > RECORDER_TIME_LENGTH) 
-		return false;
-	
-	if (now > m_nextActionTime)
+	if (now - m_startTime > RECORDER_TIME_LENGTH || position >= m_values.size()) 
+		m_playing = false;
+
+	else if (now > m_nextActionTime)
 	{	
 		// playback the motor speeds
 		for (size_t i = 0; i < m_motors.size(); ++i)
-			m_motors[i]->Set(m_values[m_playbackPosition].motors[i]);
-		
-		if (++m_playbackPosition >= m_values.size())
-			return false;
-		
-		m_nextActionTime += RECORDER_PERIOD;
+			m_motors[i]->Set(m_values[ position ].motors[i]);
+
+		m_nextActionTime += PLAYBACK_PERIOD;
 	}
 	
-	return true;
+	if (!m_playing)
+		printf("Playback complete.\n");
+
+	return m_playing;
 }
 
 // begins a recording
@@ -199,12 +214,12 @@ void Recorder::Record()
 // internal routine: writes the recorded data to file
 void Recorder::FinishRecording()
 {
-	uint32_t sz = m_values.size();
+	size_t sz = m_values.size();
 	
 	if (sz > 0)
 	{
 		// do this stupidly, but it will work	
-		if (fwrite(&sz, sizeof(uint32_t), 1, file) != 1)
+		if (fwrite(&sz, sizeof(UINT32), 1, file) != 1)
 			fprintf(stderr, "Error writing recording\n");
 		
 		const BlockIterator end = m_values.end();

@@ -25,26 +25,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _RECORDER_H
-#define _RECORDER_H
+#ifndef _KWARQS_RECORDER_H
+#define _KWARQS_RECORDER_H
 
-#define RECORDER_TIME_LENGTH 15
+#define RECORDER_TIME_LENGTH 15.0
 #define RECORDER_PERIOD 0.05
+#define PLAYBACK_PERIOD 0.025
 #define RECORDER_DEFAULT_FILENAME "playback.log"
-
 
 // holds recorded values, add more types
 // as necessary
 struct RecordedBlock {
 	float * motors;
-	
+	int * ref;		// refcount for copy constructor
+
 	RecordedBlock(size_t msz)
 	{
+		ref = new int(1);
 		motors = new float[msz];
+	}
+
+	RecordedBlock(const RecordedBlock &r)
+	{
+		motors = r.motors;
+		ref = r.ref;
+		*ref += 1;
 	}
 	
 	~RecordedBlock() {
-		delete [] motors;
+		if (!--(*ref))
+		{
+			delete [] motors;
+			delete ref;
+		}
 	}
 };
 
@@ -69,16 +82,11 @@ public:
 	Recorder();
 	~Recorder();
 	
-	void SetFilename(const char * filename) 
-	{ 
-		if (m_filename) free(m_filename);
-		m_filename = strdup(filename); 
-	}
+	// set the filename
+	void SetFilename(const char * filename);
 	
-	void AddMotor(SpeedController * controller)
-	{
-		m_motors.push_back(controller);
-	}
+	// add a speed controller to be recorded
+	void AddMotor(SpeedController * controller);
 	
 	// begins playback
 	bool StartPlayback();
@@ -91,20 +99,22 @@ public:
 	
 	// writes stored device values to file
 	void Record();
+
+	bool IsRecording() const { return m_recording; }
+	bool IsPlaying() const { return m_playing; }
 	
 private:
 	
 	void FinishRecording();
 	
-	typedef vector<SpeedController *> 	MotorContainer;
-	typedef MotorContainer::iterator	MotorIterator;
+	typedef std::vector<SpeedController *> 	MotorContainer;
+	typedef MotorContainer::iterator		MotorIterator;
 	
-	typedef vector<RecordedBlock> 		RecordedBlocks;
-	typedef RecordedBlocks::iterator 	BlockIterator;
+	typedef std::vector<RecordedBlock>		RecordedBlocks;
+	typedef RecordedBlocks::iterator 		BlockIterator;
 	
 	RecordedBlocks m_values;
 	
-	DriverStation * m_ds;
 	MotorContainer m_motors;
 	
 	bool m_playing;
@@ -112,8 +122,6 @@ private:
 	
 	double m_startTime;
 	double m_nextActionTime;
-	
-	size_t m_playbackPosition;
 	
 	char * m_filename;
 	

@@ -244,12 +244,12 @@
         </mapAttribute>
     </attributes>
     <buildtargets>
-        <buildtarget buildtool="Linker" name="SimpleTemplate" passed="false" targetname="SimpleTemplate">
+        <buildtarget buildtool="Linker" name="PIDCompassDrive" passed="false" targetname="PIDCompassDrive">
             <contents>
-                <buildtargetreference name="/PIDCompassDrive/SimpleTemplate_partialImage"/>
+                <buildtargetreference name="/PIDCompassDrive/PIDCompassDrive_partialImage"/>
             </contents>
         </buildtarget>
-        <buildtarget buildtool="Partial Image Linker" name="SimpleTemplate_partialImage" passed="true" targetname="SimpleTemplate_partialImage">
+        <buildtarget buildtool="Partial Image Linker" name="PIDCompassDrive_partialImage" passed="true" targetname="PIDCompassDrive_partialImage">
             <contents>
                 <folder name="/PIDCompassDrive" recursive="true"/>
             </contents>

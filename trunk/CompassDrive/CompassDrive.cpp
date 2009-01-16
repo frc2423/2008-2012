@@ -104,25 +104,45 @@ float CompassDrive::angleChange(float robot_Compass, float joystick_x, float joy
 float CompassDrive::turnRate(float robot_Compass, float joystick_x, float joystick_y, float speed)                              //Finds how fast robot must turn based on angleChange().
 {
     float angleChange_ = angleChange(robot_Compass, joystick_x, joystick_y);
- 
-    
-	float max_Turn_Point = 180;
-	//float speed_Limit = 1.0;
+	float angleChange_H = .7;
+	float angleChange_L = .1;
+	float speed_H = .7;
+	float speed_L = .1;
 	
 	float turn_Rate;
+    
+	//float max_Turn_Point = 180;
+	//float speed_Limit = 1.0;
+	
+	angleChange_ =  1.0 - (angleChange_ / 180.0);
 	
 	if (angleChange_ < 0)
     {
         angleChange_ = angleChange_ * -1;
-    }							                    
+    }
 	
-	if (angleChange_ > max_Turn_Point)
+	if (angleChange_ >= angleChange_H)
+	{
+		angleChange_ = angleChange_H;
+	}
+	else if (angleChange_ <= angleChange_L)
+	{
+		angleChange_ = angleChange_L;
+	}
+	
+	turn_Rate = (((angleChange_ - angleChange_L) * (speed_H - speed_L)) / 
+			(angleChange_H - angleChange_L)) + angleChange_L;
+	
+	turn_Rate = (1.0 - turn_Rate) * speed;
+		
+	
+	/*if (angleChange_ > max_Turn_Point)
 	{
 		angleChange_ = max_Turn_Point; //speed_Limit;
 	}
 	
 	turn_Rate = ((speed * angleChange_) / max_Turn_Point); // + 1 - speed_Limit;
-	
+	*/
 	
 
 	
@@ -139,9 +159,9 @@ float CompassDrive::tankLeftMotors(float angleChange, float turn_Rate, float spe
 		left_Motors = 0.0;
 	}
 	
-	else if (angleChange > 10.0)
+	else if (angleChange > 0.0)
 	{
-		left_Motors = (turn_Rate * 1.5) -.5;
+		left_Motors = turn_Rate; //(turn_Rate * 1.5) -.5;
 	}
 	else
 	{
@@ -160,9 +180,9 @@ float CompassDrive::tankRightMotors(float angleChange, float turn_Rate, float sp
 		right_Motors = 0.0;
 	}
 	
-	else if (angleChange < -10.0)
+	else if (angleChange < 0.0)
 	{
-		right_Motors = (turn_Rate * 1.5) - .5;
+		right_Motors = turn_Rate;//(turn_Rate * 1.5) - .5;
 	}
 	else
 	{

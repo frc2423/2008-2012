@@ -57,7 +57,7 @@ public:
 			
 			// convert rectangular coordinates to polar
 			float speed = hypot(x, y) * M_SQRT1_2;
-			float desired_heading = (atan2( y , x ) * (180 / M_PI)) + 90;
+			float desired_heading = ((atan2( y , x ) * (180 / M_PI)) + 90) * -1;
 			if (desired_heading < 0) desired_heading = 360 - desired_heading;
 			
 			// get the robot heading (0 to 360 degrees)
@@ -78,7 +78,7 @@ public:
 			if (GetTime() - time > 0.25)
 			{
 				printf("X: %.3f, Y: %.3f S: %.3f DH: %.3f, H: %.3f rt: %.3f\r", 
-						x, y
+						x, y,
 						speed, desired_heading,
 						heading,
 						rate_of_turn);

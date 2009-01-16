@@ -9,6 +9,8 @@
  */ 
 class RobotDemo : public SimpleRobot
 {
+	DriverStation * ds;
+	
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
 	
@@ -33,10 +35,10 @@ public:
 		GetWatchdog().SetExpiration(100);
 		printf("Entered OperatorControl\n");
 		
-		DigitalModule *dModule = DigitalModule::GetInstance(4);
-		lcd = dModule->GetI2C(80);
 		// rate for the gyro
 		gyro.SetSensitivity(0.007);
+		
+		ds = DriverStation::GetInstance();
 	}
 
 	/**
@@ -59,33 +61,8 @@ public:
 	{
 		printf("Entered OperatorControl\n");
 		
-		lcd->Write(0xFE, 0x70);
-		
-		//Clear screen
-		//lcd->Write(0xFE, 0x51);
-	
-		// write two 'a' characters, twice
-		//lcd->Write('a', 'a');
-		//lcd->Write('a', 'a');
-		
 		double time = GetTime();
 		GetWatchdog().SetEnabled(true);
-		
-		
-		/*FILE * file = fopen("file.out","w");
-		fprintf(file, "stuff\n");
-		fclose(file);
-		
-		file = fopen("file.out", "r");
-		char buf[128];
-		
-		buf[0] = 0;
-		
-		size_t sz = fread(&buf, 128, 1, file);
-		printf("sz: %d, str: %s\n", sz, buf);
-		
-		fclose(file); */
-		
 		
 		while (IsOperatorControl())
 		{
@@ -111,10 +88,17 @@ public:
 				//stick.GetX(), stick.GetY(), 
 		    	//stick.GetTrigger() == true ? "1" : "0");
 				
-				float acc = accelerometer.GetAcceleration();
-				float velocity  = (acc * acc) / 2;
+				// convert g's to units of meters/sec
+				//float acc = accelerometer.GetAcceleration() * (1/9.81);
 				
-				printf("Acc: %f Velocity: %f\r", acc, velocity);
+				//float velocity  = (acc * acc) / 2;
+				
+				//printf("Acc: %f Velocity: %f\r", acc, velocity);
+				
+				printf("1: %f 2: %f 3: %f\r", 
+						ds->GetAnalogIn(1),
+						ds->GetAnalogIn(2),
+						ds->GetAnalogIn(3));
 				
 				time = GetTime();
 			}

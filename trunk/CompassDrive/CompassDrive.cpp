@@ -13,10 +13,12 @@ void CompassDrive::Drive(float robot_Compass, float joystick_x, float joystick_y
 {
 	
 	float angle_Change = angleChange(robot_Compass, joystick_x, joystick_y);
-	float turn_Rate = turnRate(robot_Compass, joystick_x, joystick_y, joystick2_y);
-
-	float left_Motors = tankLeftMotors(angle_Change, turn_Rate, joystick2_y);
-	float right_Motors = tankRightMotors(angle_Change, turn_Rate, joystick2_y);
+	
+	float speed = oneJoystick(joystick_x, joystick_y);
+	float turn_Rate = turnRate(robot_Compass, joystick_x, joystick_y, speed);
+	
+	float left_Motors = tankLeftMotors(angle_Change, turn_Rate, speed);
+	float right_Motors = tankRightMotors(angle_Change, turn_Rate, speed);
 	
 	
 	m_leftMotor->Set(left_Motors*-1);
@@ -105,9 +107,9 @@ float CompassDrive::turnRate(float robot_Compass, float joystick_x, float joysti
 {
     float angleChange_ = angleChange(robot_Compass, joystick_x, joystick_y);
 	float angleChange_H = .7;
-	float angleChange_L = .1;
+	float angleChange_L = .3;
 	float speed_H = .7;
-	float speed_L = .1;
+	float speed_L = .3;
 	
 	float turn_Rate;
     
@@ -149,6 +151,11 @@ float CompassDrive::turnRate(float robot_Compass, float joystick_x, float joysti
 	return turn_Rate;
 }
 
+float CompassDrive::oneJoystick(float joystick_x, float joystick_y)
+{
+	float speed = sqrt((joystick_x * joystick_x) + (joystick_y * joystick_y));
+	return speed;
+}
 
 float CompassDrive::tankLeftMotors(float angleChange, float turn_Rate, float speed)
 {	
@@ -182,7 +189,7 @@ float CompassDrive::tankRightMotors(float angleChange, float turn_Rate, float sp
 	
 	else if (angleChange < 0.0)
 	{
-		right_Motors = turn_Rate;//(turn_Rate * 1.5) - .5;
+		right_Motors = turn_Rate;
 	}
 	else
 	{

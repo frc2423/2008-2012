@@ -1,5 +1,10 @@
 #include "WPILib.h"
 #include <cmath>
+#include <VisionAPI.h>
+
+#include "UDPClient.h"
+
+
 
 /**
  * This is a demo program showing the use of the RobotBase class.
@@ -9,36 +14,31 @@
  */ 
 class RobotDemo : public SimpleRobot
 {
-	DriverStation * ds;
+	Jaguar leftMotor;
+	Jaguar rightMotor;
 	
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
 	
-	AnalogChannel encoder;
-
 	Gyro gyro;
-	Servo servo;
-	I2C *lcd;
 	
-	Accelerometer accelerometer;
+	Accelerometer accelerometerX;
+	Accelerometer accelerometerY;
+	
+	// moving right is positive
 
-	
 public:
 	RobotDemo(void):
-		myRobot(1, 2),	// these must be initialized in the same order
-		stick(1),		// as they are declared above.
-		encoder(7),
+		leftMotor(1),
+		rightMotor(2),
+		myRobot(&leftMotor, &rightMotor),
+		stick(1),
 		gyro(1),
-		servo(9),
-		accelerometer(5)
+		accelerometerX(3),
+		accelerometerY(4)
 	{
-		GetWatchdog().SetExpiration(100);
-		printf("Entered OperatorControl\n");
-		
-		// rate for the gyro
+		GetWatchdog().SetEnabled(false);
 		gyro.SetSensitivity(0.007);
-		
-		ds = DriverStation::GetInstance();
 	}
 
 	/**
@@ -61,26 +61,52 @@ public:
 	{
 		printf("Entered OperatorControl\n");
 		
-		double time = GetTime();
+		double time = GetTime(), start = GetTime();
 		GetWatchdog().SetEnabled(true);
+		
+		// allow writing to file system
+		Priv_SetWriteFileAllowed(1);
+		
+		char fname[128];
+		sprintf(fname, "accelerationX-%d.out", (int)time );
+		
+		FILE * fileX = fopen(fname, "w+");
+		if (!fileX)
+		{
+			fprintf(stderr, "File could not be opened\n");
+		}
+		
+		sprintf(fname, "accelerationY-%d.out", (int)time );
+		
+		FILE * fileY = fopen(fname, "w+");
+		if (!fileY)
+		{
+			fprintf(stderr, "File could not be opened\n");
+		}
 		
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
 			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			
+			float accX = accelerometerX.GetAcceleration() * 9.81;
+			float accY = accelerometerY.GetAcceleration() * 9.81;	
 			
-			double angle = 360 - fabs(fmod(gyro.GetAngle(), 360));
-			
-			if (angle > 180)
-			{
-				angle = angle - 180;
-			}
-			
-			servo.SetAngle(angle);
 			
 			// only print messages every once in awhile, don't overload the system
-			if (GetTime() - time > 0.25)
+			if (GetTime() - start > 30)
+			{
+				if (fileX)
+				{
+					printf("Done writing file.\n");
+					fclose(fileX);
+					fclose(fileY);
+				}
+				
+				fileX = NULL;
+				fileY = NULL;
+			}
+			else if (GetTime() - time > 0.1)
 			{
 				//printf("Gyro: %f, servo: %f\r", gyro.GetAngle(), angle);
 				//printf("voltage: %f\r", encoder.GetVoltage());
@@ -88,17 +114,10 @@ public:
 				//stick.GetX(), stick.GetY(), 
 		    	//stick.GetTrigger() == true ? "1" : "0");
 				
-				// convert g's to units of meters/sec
-				//float acc = accelerometer.GetAcceleration() * (1/9.81);
+				// convert g's to units of meters/sec	
 				
-				//float velocity  = (acc * acc) / 2;
-				
-				//printf("Acc: %f Velocity: %f\r", acc, velocity);
-				
-				printf("1: %f 2: %f 3: %f\r", 
-						ds->GetAnalogIn(1),
-						ds->GetAnalogIn(2),
-						ds->GetAnalogIn(3));
+				fwrite((const char *)&accX, 4, 1, fileX);
+				fwrite((const char *)&accY, 4, 1, fileY);		
 				
 				time = GetTime();
 			}

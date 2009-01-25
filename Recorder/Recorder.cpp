@@ -128,7 +128,7 @@ bool Recorder::Playback()
 	wpi_assert(m_playing);
 	
 	double now = GetTime();
-	size_t position = (size_t)((now - m_startTime) * RECORDER_TIME_LENGTH);
+	size_t position = (size_t)((now - m_startTime) * RECORDER_PERIOD);
 	
 	if (now - m_startTime > RECORDER_TIME_LENGTH || position >= m_values.size()) 
 		m_playing = false;

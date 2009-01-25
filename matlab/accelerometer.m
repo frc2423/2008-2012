@@ -6,12 +6,12 @@ alpha = .05;
 a=[1 -(1-alpha)];
 b=[alpha];
 
-x_accel=readbinfile(fnamex,'float','ieee-be');
+x_accel=readBinFile(fnamex,'float','ieee-be');
 % filter the x acceleration and subtract the mean
 mx=mean(x_accel(150:end));
 xf=filter(b,a,x_accel-mx);
 
-y_accel=readbinfile(fnamey,'float','ieee-be');
+y_accel=readBinFile(fnamey,'float','ieee-be');
 % filter the y acceleration and subtract the mean
 my=mean(y_accel(150:end));
 yf=filter(b,a,y_accel-my);
@@ -78,12 +78,12 @@ end
 figure(1);
 plot(t,x_accel,t,x_velocity,'r',t,x_position,'g');
 grid on;  
-Legend('Acc','Vel','Pos');
+%Legend('Acc','Vel','Pos');
 title('X Axis Accelerometer');
 figure(2);
 plot(t,y_accel,t,y_velocity,'r',t,y_position,'g');
 grid on;
-Legend('Acc','Vel','Pos');
+%Legend('Acc','Vel','Pos');
 title('Y Axis Accelerometer');
 
 

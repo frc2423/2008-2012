@@ -97,7 +97,7 @@ public:
 		// it doesn't make any sense to allow it to change in the middle!
 		KwarqsMovementControl * movementControl = GetAutonomousMovementControl();
 		
-		while (IsAutonomousControl())
+		while (IsAutonomous())
 		{
 			movementControl->Move();
 			driveController.EndMove();

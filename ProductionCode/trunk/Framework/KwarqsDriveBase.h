@@ -77,6 +77,9 @@ public:
 	virtual const char * Name() = 0;
 	
 	/// @}
+	
+	// virtual destructor
+	virtual ~KwarqsDriveBase(){}
 };
 
 #endif

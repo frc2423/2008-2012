@@ -7,7 +7,7 @@
 
 
 #ifndef FRAMEWORK_KWARQS_MOVEMENTCONTROL_H
-#ifndef FRAMEWORK_KWARQS_MOVEMENTCONTROL_H
+#define FRAMEWORK_KWARQS_MOVEMENTCONTROL_H
 
 #include "KwarqsDriveController.h"
 
@@ -50,6 +50,9 @@ public:
 	virtual const char * Name() = 0;
 	
 	/// @}
+	
+	// virtual destructor
+	virtual ~KwarqsMovementControl(){}
 	
 protected:
 

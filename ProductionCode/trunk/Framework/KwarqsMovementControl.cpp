@@ -11,6 +11,6 @@
 KwarqsMovementControl::KwarqsMovementControl(
 	KwarqsDriveController * driveController
 ) :
-	m_driveController(driveController);
+	m_driveController(driveController)
 {}
 

@@ -11,11 +11,11 @@
 
 void KwarqsDriveController::AddDrive(KwarqsDriveBase * drive, DriveEnabledType enabled)
 {
-	m_driveTypes->push_back(drive);
+	m_driveTypes.push_back(drive);
 	
 	if (enabled == DriveEnabled)
 	{
-		m_driveTypes->push_back(drive);
+		m_driveTypes.push_back(drive);
 		drive->Enable();
 	}
 }
@@ -37,10 +37,12 @@ void KwarqsDriveController::DisableDrive(KwarqsDriveBase * drive)
 
 void KwarqsDriveController::EnableDrive(KwarqsDriveBase * drive)
 {
-	DriveIterator i = m_enabledDrives.begin();
-	const DriveIterator end = m_enabledDrives.end();
+	//DriveIterator i = m_enabledDrives.begin();
+	//const DriveIterator end = m_enabledDrives.end();
 
-	for (; i != end; i++)
+	//for (; i != end; i++)
+	
+	wpi_assert(0 && "not implemented");
 }
 
 

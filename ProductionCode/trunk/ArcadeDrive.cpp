@@ -35,42 +35,55 @@
 #include "WPILib.h"
 #include "ArcadeDrive.h"
 
-#define max(x, y) (((x) > (y)) ? (x) : (y))
+#include "Framework/KwarqsDevices.h"
 
+// default constructor
+ArcadeDrive::ArcadeDrive()
+{
+	m_leftMotor = new Jaguar(LEFT_MOTOR_PWM);
+	m_rightMotor = new Jaguar(RIGHT_MOTOR_PWM);
+}
 
-void ArcadeDrive::Move(float &speed, float &rotation)
+// destructor
+ArcadeDrive::~ArcadeDrive()
+{
+	delete m_leftMotor;
+	delete m_rightMotor;
+}
+
+void ArcadeDrive::Move(float &speed, float &rotateValue)
 {
 	// local variables to hold the computed PWM values for the motors
 	float leftMotorSpeed;
 	float rightMotorSpeed;
 
-	moveValue = Limit(moveValue);
+	speed = Limit(speed);
 	rotateValue = Limit(rotateValue);
 
-	if (moveValue > 0.0)
+	if (speed > 0.0)
 	{
 		if (rotateValue > 0.0)
 		{
-			leftMotorSpeed = moveValue - rotateValue;
-			rightMotorSpeed = max(moveValue, rotateValue);
+			leftMotorSpeed = speed - rotateValue;
+			rightMotorSpeed = max(speed, rotateValue);
 		}
 		else
 		{
-			leftMotorSpeed = max(moveValue, -rotateValue);
-			rightMotorSpeed = moveValue + rotateValue;
+			leftMotorSpeed = max(speed, -rotateValue);
+			rightMotorSpeed = speed + rotateValue;
 		}
 	}
 	else
 	{
 		if (rotateValue > 0.0)
 		{
-			leftMotorSpeed = - max(-moveValue, rotateValue);
-			rightMotorSpeed = moveValue + rotateValue;
+			leftMotorSpeed = - max(-speed, rotateValue);
+			rightMotorSpeed = speed + rotateValue;
 		}
 		else
 		{
-			leftMotorSpeed = moveValue - rotateValue;
-			rightMotorSpeed = - max(-moveValue, -rotateValue);
+			leftMotorSpeed = speed - rotateValue;
+			rightMotorSpeed = - max(-speed, -rotateValue);
 		}
 	}
 	

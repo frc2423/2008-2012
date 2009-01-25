@@ -9,6 +9,7 @@
 #define FRAMEWORK_KWARQS_DRIVECONTROLLER_H
 
 #include <vector>
+#include "KwarqsDriveBase.h"
 
 enum DriveEnabledType {
 	DriveEnabled,
@@ -41,7 +42,7 @@ public:
 	
 private:
 
-	typedef std::vector<KwarqsDrive *> 		DriveContainer;
+	typedef std::vector<KwarqsDriveBase *> 	DriveContainer;
 	typedef DriveContainer::iterator		DriveIterator;
 
 	// all drive types

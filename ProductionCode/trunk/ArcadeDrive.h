@@ -12,8 +12,15 @@
 
 class ArcadeDrive : public KwarqsDriveBase {
 public:
+	
+	// constructor/destructors
+	ArcadeDrive();
+	~ArcadeDrive();
+	
+	void Disable(){}
+	void Enable(){}
 
-	virtual bool IsPhysicalDrive() = 0;
+	bool IsPhysicalDrive() { return true; }
 	
 	/**
 		\brief Performs a movement of the robot
@@ -27,13 +34,18 @@ public:
 		@param speed	Speed of the robot (-1 to 1)
 		@param rotation	Rotational speed of the robot (-1 to 1)
 	*/
-	virtual void Move(float &speed, float &rotation) = 0;
+	void Move(float &speed, float &rotation);
 
 	/// Return the name of the class
-	virtual const char * Name() = 0;
+	const char * Name() { return "ArcadeDrive"; }
 
 
 private:
+	
+	float Limit(float num);
+	
+	SpeedController * m_leftMotor;
+	SpeedController * m_rightMotor;
 
 };
 

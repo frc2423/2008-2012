@@ -3,8 +3,9 @@
 #include <VisionAPI.h>
 
 #include "UDPClient.h"
+#include "positionTracking.h"
 
-
+#define MY_PI 3.14
 
 /**
  * This is a demo program showing the use of the RobotBase class.
@@ -25,6 +26,9 @@ class RobotDemo : public SimpleRobot
 	Accelerometer accelerometerX;
 	Accelerometer accelerometerY;
 	
+	Encoder encoderRight;
+	Encoder encoderLeft;
+	
 	// moving right is positive
 
 public:
@@ -35,7 +39,9 @@ public:
 		stick(1),
 		gyro(1),
 		accelerometerX(3),
-		accelerometerY(4)
+		accelerometerY(4),
+		encoderRight(3,4, false),
+		encoderLeft(5,6,false)
 	{
 		GetWatchdog().SetEnabled(false);
 		gyro.SetSensitivity(0.007);
@@ -68,43 +74,40 @@ public:
 		Priv_SetWriteFileAllowed(1);
 		
 		char fname[128];
-		sprintf(fname, "accelerationX-%d.out", (int)time );
+		sprintf(fname, "sensors-%d.out", (int)time );
 		
-		FILE * fileX = fopen(fname, "w+");
-		if (!fileX)
+		FILE * fSensor = fopen(fname, "w");
+		if (!fSensor)
 		{
-			fprintf(stderr, "File could not be opened\n");
+			fprintf(stderr, "%s could not be opened\n", fname);
 		}
+		fprintf(fSensor,"AccelX VelX PosX AccelY PosY Gyro EncoderLR Encoder RR\n");
 		
-		sprintf(fname, "accelerationY-%d.out", (int)time );
 		
-		FILE * fileY = fopen(fname, "w+");
-		if (!fileY)
-		{
-			fprintf(stderr, "File could not be opened\n");
-		}
+		// reset the accelerometer object and set the acceleromter biases
+	    AccelerationReset();
+	    AccelerationSetBias( .9511, .6285);
+	    
+	    //start the encoders
+	    encoderLeft.Start();
+	    encoderRight.Start();
 		
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
 			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			
-			float accX = accelerometerX.GetAcceleration() * 9.81;
-			float accY = accelerometerY.GetAcceleration() * 9.81;	
 			
 			
 			// only print messages every once in awhile, don't overload the system
 			if (GetTime() - start > 30)
 			{
-				if (fileX)
+				if (fSensor)
 				{
-					printf("Done writing file.\n");
-					fclose(fileX);
-					fclose(fileY);
+					printf("Done writing %s.\n", fname);
+					fclose(fSensor);
 				}
 				
-				fileX = NULL;
-				fileY = NULL;
 			}
 			else if (GetTime() - time > 0.1)
 			{
@@ -116,8 +119,29 @@ public:
 				
 				// convert g's to units of meters/sec	
 				
-				fwrite((const char *)&accX, 4, 1, fileX);
-				fwrite((const char *)&accY, 4, 1, fileY);		
+				//read the sensor data
+				float velX, velY, posX, posY;
+				float accX = accelerometerX.GetAcceleration() * 9.81;
+				float accY = accelerometerY.GetAcceleration() * 9.81;
+				float gyroAngle = gyro.GetAngle()*180/MY_PI;
+				
+				//update the tracking object
+				AccelerationUpdate( accX, accY, .1);
+				
+				//get the filtered acceleration, velocity and position
+				GetAcceleration( &accX, &accY);
+				GetVelocity( &velX, &velY );
+				GetPosition( &posX, &posY );
+				
+				//read the encoders
+				
+				//log the sensor values
+				fprintf(fSensor,"%f %f %f %f %f %f %f %f %f\n",
+						accX, velX, posX, 
+						accY, velY, posY,
+						gyroAngle, 
+						encoderLeft.Get(), encoderRight.Get());
+				
 				
 				time = GetTime();
 			}

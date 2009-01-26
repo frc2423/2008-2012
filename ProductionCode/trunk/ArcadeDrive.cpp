@@ -89,7 +89,7 @@ void ArcadeDrive::Move(float &speed, float &rotateValue)
 	
 	// set the motor speeds after limiting them
 	leftMotorSpeed = Limit(leftMotorSpeed);
-	rightMotorSpeed = Limit(leftMotorSpeed);
+	rightMotorSpeed = -Limit(rightMotorSpeed);
 	
 	m_leftMotor->Set(leftMotorSpeed);
 	m_rightMotor->Set(rightMotorSpeed);

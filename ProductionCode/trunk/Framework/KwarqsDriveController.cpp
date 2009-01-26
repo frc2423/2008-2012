@@ -15,7 +15,7 @@ void KwarqsDriveController::AddDrive(KwarqsDriveBase * drive, DriveEnabledType e
 	
 	if (enabled == DriveEnabled)
 	{
-		m_driveTypes.push_back(drive);
+		m_enabledDrives.push_back(drive);
 		drive->Enable();
 	}
 }

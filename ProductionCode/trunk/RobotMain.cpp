@@ -55,7 +55,7 @@ public:
 		// be called last
 		
 		// todo: need a better way to do this, not satisfied with this
-		driveController.AddDrive(&speedLimiter, DriveEnabled);
+		//driveController.AddDrive(&speedLimiter, DriveEnabled);
 		driveController.AddDrive(&arcadeDrive, DriveEnabled);
 	}
 
@@ -111,7 +111,9 @@ public:
 	*/
 	void OperatorControl()
 	{
+		printf("Entered OperatorControl()\n");
 		GetWatchdog().SetEnabled(true);
+		
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();

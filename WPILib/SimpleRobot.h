@@ -4,18 +4,26 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef PID_SOURCE_H
-#define PID_SOURCE_H
+#ifndef SIMPLE_ROBOT_H
+#define SIMPLE_ROBOT_H
+
+#include "RobotBase.h"
 
 /**
- * PIDSource interface is a generic sensor source for the PID class.
- * All sensors that can be used with the PID class will implement the PIDSource that
- * returns a standard value that will be used in the PID code.
+ * @todo If this is going to last until release, it needs a better name.
  */
-class PIDSource
+class SimpleRobot: public RobotBase
 {
 public:
-	virtual double PIDGet() = 0;
+	SimpleRobot();
+	virtual ~SimpleRobot() {}
+	virtual void Autonomous();
+	virtual void OperatorControl();
+	virtual void RobotMain();
+	void StartCompetition();
+
+private:
+	bool m_robotMainOverridden;
 };
 
 #endif

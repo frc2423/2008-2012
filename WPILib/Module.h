@@ -4,18 +4,24 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef PID_SOURCE_H
-#define PID_SOURCE_H
+#ifndef MODULE_H_
+#define MODULE_H_
 
-/**
- * PIDSource interface is a generic sensor source for the PID class.
- * All sensors that can be used with the PID class will implement the PIDSource that
- * returns a standard value that will be used in the PID code.
- */
-class PIDSource
+#include "SensorBase.h"
+
+class Module: public SensorBase
 {
 public:
-	virtual double PIDGet() = 0;
+	UINT32 GetSlot() {return m_slot;}
+
+protected:
+	explicit Module(UINT32 slot);
+	virtual ~Module();
+
+	UINT32 m_slot; ///< Slot number where the module is plugged into the chassis.
+
+	// Slots are 1 based, so ignore element 0.
+	static Module* m_modules[kChassisSlots + 1];
 };
 
 #endif

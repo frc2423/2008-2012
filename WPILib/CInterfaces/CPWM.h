@@ -4,18 +4,15 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef PID_SOURCE_H
-#define PID_SOURCE_H
+#ifndef C_PWM_H
+#define C_PWM_H
 
-/**
- * PIDSource interface is a generic sensor source for the PID class.
- * All sensors that can be used with the PID class will implement the PIDSource that
- * returns a standard value that will be used in the PID code.
- */
-class PIDSource
-{
-public:
-	virtual double PIDGet() = 0;
-};
+#include <VxWorks.h>
+#include "CWrappers.h"
+#include "PWM.h"
+
+PWM *AllocatePWM(UINT32 slot, UINT32 channel, SensorCreator creator);
+PWM *AllocatePWM(UINT32 channel, SensorCreator creator);
+void DeletePWM(UINT32 slot, UINT32 channel);
 
 #endif

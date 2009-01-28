@@ -4,18 +4,27 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef PID_SOURCE_H
-#define PID_SOURCE_H
+#ifndef VICTOR_H
+#define VICTOR_H
+
+#include "PWM.h"
+#include "SpeedController.h"
 
 /**
- * PIDSource interface is a generic sensor source for the PID class.
- * All sensors that can be used with the PID class will implement the PIDSource that
- * returns a standard value that will be used in the PID code.
+ * IFI Victor Speed Controller
  */
-class PIDSource
+class Victor : public PWM, public SpeedController
 {
 public:
-	virtual double PIDGet() = 0;
+	explicit Victor(UINT32 channel);
+	Victor(UINT32 slot, UINT32 channel);
+	virtual ~Victor();
+	void Set(float value);
+	float Get();
+
+private:
+	void InitVictor();
 };
 
 #endif
+

@@ -4,18 +4,11 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef PID_SOURCE_H
-#define PID_SOURCE_H
+#include "DigitalSource.h"
 
 /**
- * PIDSource interface is a generic sensor source for the PID class.
- * All sensors that can be used with the PID class will implement the PIDSource that
- * returns a standard value that will be used in the PID code.
+ * DigitalSource destructor.
  */
-class PIDSource
+DigitalSource::~DigitalSource()
 {
-public:
-	virtual double PIDGet() = 0;
-};
-
-#endif
+}

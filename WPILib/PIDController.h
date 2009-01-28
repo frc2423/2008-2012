@@ -34,7 +34,7 @@ private:
 	bool m_enabled; 			//is the pid controller enabled
 	float m_prevError;	// the prior sensor input (used to compute velocity)
 	double m_totalError; //the sum of the errors for use in the integral calc
-	float m_tolerance;	//the percetage error that is considered on target
+	float m_tolerence;	//the percetage error that is considered on target
 	float m_setpoint;
 	float m_error;
 	float m_result;
@@ -47,21 +47,21 @@ private:
 	void Calculate();
 	DISALLOW_COPY_AND_ASSIGN(PIDController);
 public:
-	PIDController(float p, float i, float d,
-					PIDSource *source, PIDOutput *output,
-					float period = 0.05);
+	PIDController(float p, float i, float d, float period = 0.05);
 	~PIDController();
 	float Get();
 	void SetContinuous(bool continuous = true);
-	void SetInputRange(float minimumInput, float maximumInput);
-	void SetOutputRange(float mimimumOutput, float maximumOutput);
+	void SetInput(PIDSource *pidInput);
+	void SetInput(PIDSource *pidInput, float minimumInput, float maximumInput);
+	void SetOutput(PIDOutput *pidOutput);
+	void SetOutput(PIDOutput *pidOutput, float mimimumOutput, float maximumOutput);
 	
 	void SetSetpoint(float setpoint);
 	float GetSetpoint();
 
 	float GetError();
 	
-	void SetTolerance(float percent);
+	void SetTolerence(float percent);
 	bool OnTarget();
 	
 	void Enable();

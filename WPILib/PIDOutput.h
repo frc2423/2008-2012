@@ -4,18 +4,21 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef PID_SOURCE_H
-#define PID_SOURCE_H
+#ifndef PID_OUTPUT_H
+#define PID_OUTPUT_H
+
+#include "Base.h"
 
 /**
- * PIDSource interface is a generic sensor source for the PID class.
- * All sensors that can be used with the PID class will implement the PIDSource that
- * returns a standard value that will be used in the PID code.
+ * PIDOutput interface is a generic output for the PID class.
+ * PWMs use this class.
+ * Users implement this interface to allow for a PIDController to 
+ * read directly from the inputs
  */
-class PIDSource
+class PIDOutput
 {
 public:
-	virtual double PIDGet() = 0;
+	virtual void PIDWrite(float output) = 0;
 };
 
 #endif

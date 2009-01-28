@@ -4,18 +4,12 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef PID_SOURCE_H
-#define PID_SOURCE_H
+#ifndef _C_DIGITAL_OUTPUT_H
+#define _C_DIGITIL_OUTPUT_H
 
-/**
- * PIDSource interface is a generic sensor source for the PID class.
- * All sensors that can be used with the PID class will implement the PIDSource that
- * returns a standard value that will be used in the PID code.
- */
-class PIDSource
-{
-public:
-	virtual double PIDGet() = 0;
-};
-
+void SetDigitalOutput(UINT32 slot, UINT32 channel, UINT32 value);
+void SetDigitalOutput(UINT32 channel, UINT32 value);
+void DeleteDigitalOutput(UINT32 slot, UINT32 channel);
+void DeleteDigitalOutput(UINT32 channel);
 #endif
+

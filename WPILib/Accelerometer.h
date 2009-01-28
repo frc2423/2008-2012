@@ -9,6 +9,7 @@
 
 #include "AnalogChannel.h"
 #include "SensorBase.h"
+#include "PIDSource.h"
 
 /** 
  * Handle operation of the accelerometer.
@@ -16,7 +17,7 @@
  * multiple axis and can be treated as multiple devices. Each is calibrated by finding
  * the center value over a period of time.
  */
-class Accelerometer : public SensorBase {
+class Accelerometer : public SensorBase, public PIDSource {
 public:
 	explicit Accelerometer(UINT32 channel);
 	Accelerometer(UINT32 slot, UINT32 channel);
@@ -26,6 +27,7 @@ public:
 	float GetAcceleration();
 	void SetSensitivity(float sensitivity);
 	void SetZero(float zero);
+	double PIDGet();
 
 private:
 	void InitAccelerometer();

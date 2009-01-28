@@ -5,6 +5,8 @@
 /*----------------------------------------------------------------------------*/
 
 #include "IterativeRobot.h"
+#include "NetworkCommunication/FRCComm.h"
+#include "Utility.h"
 
 /**
  * Constructor for RobotIterativeBase
@@ -13,6 +15,7 @@
  * the status of initialization for disabled, autonomous, and teleop code.
  */
 IterativeRobot::IterativeRobot()
+	: m_packetDataAvailableSem (0)
 {
 	printf("RobotIterativeBase Constructor Start\n");
 	// set status for initialization of disabled, autonomous, and teleop code.
@@ -24,11 +27,17 @@ IterativeRobot::IterativeRobot()
 	m_disabledLoops = 0;
 	m_autonomousLoops = 0;
 	m_teleopLoops = 0;
-	
+
+	// Create a new semaphore
+	m_packetDataAvailableSem = semBCreate (SEM_Q_PRIORITY, SEM_EMPTY);
+
+	// Register that semaphore with the network communications task.
+	// It will signal when new packet data is available. 
+	setNewDataSem(m_packetDataAvailableSem);
+
 	m_period = kDefaultPeriod;
 
 	// Start the timer for the main loop
-	m_mainLoopTimer.Start();
 
 	printf("RobotIterativeBase Constructor Finish\n");
 }
@@ -38,17 +47,18 @@ IterativeRobot::IterativeRobot()
  */
 IterativeRobot::~IterativeRobot()
 {
+	// Unregister our semaphore.
+	setNewDataSem(0);
 }
 
 /**
  * Set the period for the periodic functions.
  * 
- * The period is set in seconds for the length of time between calls to the
- * periodic functions.  Default period is 0.005 seconds (200Hz iteration loop).
+ * @deprecated The periodic functions are now synchronized with the receipt of packets from the Driver Station.
  */
 void IterativeRobot::SetPeriod(double period)
 {
-	m_period = period;
+	wpi_assert(false);
 }
 
 /**
@@ -155,19 +165,10 @@ void IterativeRobot::StartCompetition()
 
 bool IterativeRobot::NextPeriodReady()
 {
-	static double adjustment = 0.0;	
-	double elapsed_time = m_mainLoopTimer.Get();
-	
-	if ((elapsed_time + adjustment) >= m_period)
+	int success = semTake(m_packetDataAvailableSem, 0);
+
+	if(success == OK)
 	{
-		// immediately reset the timer and calculate the next adjustment
-		m_mainLoopTimer.Reset();
-		adjustment = (elapsed_time + adjustment) - m_period;
-		// check for slippage of more than one cycle
-		// TODO:  Should really notify the user somehow when this happens
-		if (adjustment > m_period) {
-			adjustment = 0.0;
-		}
 		return true;
 	}
 	return false;

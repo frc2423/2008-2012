@@ -8,6 +8,7 @@
 #include "DriverStation.h"
 #include "Utility.h"
 #include "WPIStatus.h"
+#include <math.h>
 
 static Joystick *joysticks[DriverStation::kJoystickPorts];
 static bool joySticksInitialized = false;
@@ -258,4 +259,37 @@ UINT32 Joystick::GetAxisChannel(AxisType axis)
 void Joystick::SetAxisChannel(AxisType axis, UINT32 channel)
 {
 	m_axes[axis] = channel;
+}
+
+/**
+ * Get the magnitude of the direction vector formed by the joystick's
+ * current position relative to its origin
+ * 
+ * @return The magnitude of the direction vector
+ */
+float Joystick::GetMagnitude(){
+	return sqrt(pow(GetX(),2) + pow(GetY(),2) );
+}
+
+/**
+ * Get the direction of the vector formed by the joystick and its origin
+ * in radians
+ * 
+ * @return The direction of the vector in radians
+ */
+float Joystick::GetDirectionRadians(){
+	return atan2(GetX(), -GetY());
+}
+
+/**
+ * Get the direction of the vector formed by the joystick and its origin
+ * in degrees
+ * 
+ * uses acos(-1) to represent Pi due to absence of readily accessable Pi 
+ * constant in C++
+ * 
+ * @return The direction of the vector in degrees
+ */
+float Joystick::GetDirectionDegrees(){
+	return (180/acos(-1))*GetDirectionRadians();
 }

@@ -75,12 +75,14 @@ void Ultrasonic::Initialize()
  * the ping.
  * @param echoChannel The digital input channel that receives the echo. The length of time that the
  * echo is high represents the round trip time of the ping, and the distance.
+ * @param units The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(UINT32 pingChannel, UINT32 echoChannel)
+Ultrasonic::Ultrasonic(UINT32 pingChannel, UINT32 echoChannel, DistanceUnit units)
 {
 	m_pingChannel = new DigitalOutput(pingChannel);
 	m_echoChannel = new DigitalInput(echoChannel);
 	m_allocatedChannels = true;
+	m_units = units;
 	Initialize();
 }
 
@@ -89,8 +91,9 @@ Ultrasonic::Ultrasonic(UINT32 pingChannel, UINT32 echoChannel)
  * for the ping channel.
  * @param pingChannel The digital output object that starts the sensor doing a ping. Requires a 10uS pulse to start.
  * @param echoChannel The digital input object that times the return pulse to determine the range.
+ * @param units The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel)
+Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel, DistanceUnit units)
 {
 	if (pingChannel == NULL || echoChannel == NULL)
 	{
@@ -100,6 +103,7 @@ Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel)
 	m_allocatedChannels = false;
 	m_pingChannel = pingChannel;
 	m_echoChannel = echoChannel;
+	m_units = units;
 	Initialize();
 }
 
@@ -108,12 +112,14 @@ Ultrasonic::Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel)
  * for the ping channel.
  * @param pingChannel The digital output object that starts the sensor doing a ping. Requires a 10uS pulse to start.
  * @param echoChannel The digital input object that times the return pulse to determine the range.
+ * @param units The units returned in either kInches or kMilliMeters
  */
-Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel)
+Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel, DistanceUnit units)
 {
 	m_allocatedChannels = false;
 	m_pingChannel = &pingChannel;
 	m_echoChannel = &echoChannel;
+	m_units = units;
 	Initialize();
 }
 
@@ -127,13 +133,15 @@ Ultrasonic::Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel)
  * @param echoSlot The digital module that the echoChannel is in.
  * @param echoChannel The digital input channel that receives the echo. The length of time
  * that the echo is high represents the round trip time of the ping, and the distance.
+ * @param units The units returned in either kInches or kMilliMeters
  */
 Ultrasonic::Ultrasonic(UINT32 pingSlot, UINT32 pingChannel,
-		UINT32 echoSlot, UINT32 echoChannel)
+		UINT32 echoSlot, UINT32 echoChannel, DistanceUnit units)
 {
 	m_pingChannel = new DigitalOutput(pingSlot, pingChannel);
 	m_echoChannel = new DigitalInput(echoSlot, echoChannel);
 	m_allocatedChannels = true;
+	m_units = units;
 	Initialize();
 }
 
@@ -272,3 +280,40 @@ double Ultrasonic::GetRangeMM()
 	return GetRangeInches() * 25.4;
 }
 
+/**
+ * Get the range in the current DistanceUnit for the PIDSource base object.
+ * 
+ * @return The range in DistanceUnit
+ */
+double Ultrasonic::PIDGet()
+{
+	switch(m_units) 
+	{
+	case Ultrasonic::kInches:
+		return GetRangeInches();
+	case Ultrasonic::kMilliMeters:
+		return GetRangeMM();
+	default:
+		return 0.0;
+	}
+}
+
+/**
+ * Set the current DistanceUnit that should be used for the PIDSource base object.
+ * 
+ * @param units The DistanceUnit that should be used.
+ */
+void Ultrasonic::SetDistanceUnits(DistanceUnit units)
+{
+	m_units = units;
+}
+
+/**
+ * Get the current DistanceUnit that is used for the PIDSource base object.
+ * 
+ * @return The type of DistanceUnit that is being used.
+ */
+Ultrasonic::DistanceUnit Ultrasonic::GetDistanceUnits()
+{
+	return m_units;
+}

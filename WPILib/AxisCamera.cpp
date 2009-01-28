@@ -40,8 +40,6 @@
 int AxisCamera_debugFlag = 0;
 #define DPRINTF if(AxisCamera_debugFlag)dprintf
 
-/* define size of image buffer */
-
 /** @brief Camera data to be accessed globally */
 struct {
 	int readerPID; // Set to taskID for signaling
@@ -54,11 +52,11 @@ struct {
 		// To find the latest image timestamp, access:
 		// globalCamera.data[globalCamera.index].timestamp
 		//
-		double timestamp;
-		char*	cameraImage;
-		int cameraImageSize;
-		Image* decodedImage;
-		int decodedImageSize;
+		double timestamp;       // when image was taken
+		char*	cameraImage;    // jpeg image string
+		int cameraImageSize;    // image size
+		Image* decodedImage;    // image decoded to NI Image object
+		int decodedImageSize;   // size of decoded image
 	}data[2];
 	int cameraMetrics[CAM_NUM_METRICS];
 }globalCamera;
@@ -107,6 +105,7 @@ int GetImageBlocking(Image* image, double *timestamp, double lastImageTimestamp)
  */
 int CameraInitialized()
 {
+	char funcName[]="CameraInitialized";
 	int success = 0;
 	/* check to see if camera is initialized */
 	if (!globalCamera.cameraReady)  {
@@ -185,7 +184,7 @@ int GetImage(Image* image, double *timestamp)
 }
 
 /**
- * @brief Internal method to get a raw image from the buffer
+ * @brief Method to get a raw image from the buffer
  * @param imageData returned image data
  * @param numBytes returned number of bytes in buffer
  * @param currentImageTimestamp returned buffer time of image data
@@ -193,7 +192,6 @@ int GetImage(Image* image, double *timestamp)
  */
 int GetImageData(char** imageData, int* numBytes, double* currentImageTimestamp)
 {
-	char funcName[]="GetImageData";
 	int success = 0;
 	int readIndex;
 	int	readCount = 10;
@@ -238,11 +236,12 @@ int GetImageData(char** imageData, int* numBytes, double* currentImageTimestamp)
  * @param numBytes number of bytes in buffer
  * @param timestamp timestamp of buffer returned
  * @param lastImageTimestamp buffer time of last image data sent to PC
+ * @return 0 if failure; 1 if success
  */
 int GetImageDataBlocking(char** imageData, int* numBytes, double* timestamp, double lastImageTimestamp)
 {
 
-	//char funcName[]="GetImageDataBlocking";
+	char funcName[]="GetImageDataBlocking";
 	int success;
 	double startTime = GetTime();
 	
@@ -282,18 +281,311 @@ int GetCameraMetric(FrcvCameraMetric metric)
  * @param socket Socket to close
  * @return error
  */
-int cameraCloseSocket(char *errstring, int socket)
+int CameraCloseSocket(char *errstring, int socket)
 {
-	char funcName[]="cameraCloseSocket";
-	DPRINTF (LOG_CRITICAL, "CAMERA ERROR: %s", errstring );
+	DPRINTF (LOG_CRITICAL, "Closing socket - CAMERA ERROR: %s", errstring );
 	close (socket);
 	return (ERROR);
 }
+
+
+/**
+ * @brief Reads one line from the TCP stream.
+ * @param camSock         The socket.
+ * @param buffer          A buffer with bufSize allocated for it. 
+ *                        On return, bufSize-1 amount of data or data upto first line ending
+ *                        whichever is smaller, null terminated.
+ * @param bufSize         The size of buffer.
+ * @param stripLineEnding If true, strips the line ending chacters from the buffer before return.
+ * @return 0 if failure; 1 if success
+*/
+static int CameraReadLine(int camSock, char* buffer, int bufSize, bool stripLineEnding) {
+	char funcName[]="CameraReadLine";
+    // Need at least 3 bytes in the buffer to pull this off.
+	if (bufSize < 3) {
+		imaqSetError(ERR_CAMERA_FAILURE, funcName);
+		return 0;
+	}
+    //  Reduce size by 1 to allow for null terminator.
+    --bufSize;
+    //  Read upto bufSize characters.
+    for (int i=0;i < bufSize;++i, ++buffer) {
+        //  Read one character.
+        if (read (camSock, buffer, 1) <= 0) {
+    		imaqSetError(ERR_CAMERA_FAILURE, funcName);
+            return 0;
+        }
+        //  Line endings can be "\r\n" or just "\n". So always 
+        //  look for a "\n". If you got just a "\n" and 
+        //  stripLineEnding is false, then convert it into a \r\n
+        //  because callers expect a \r\n.
+        //  If the combination of the previous character and the current character
+        //  is "\r\n", the line ending
+        if (*buffer=='\n') {
+            //  If asked to strip the line ending, then set the buffer to the previous 
+            //  character.
+            if (stripLineEnding) {
+                if (i > 0 && *(buffer-1)=='\r') {
+                    --buffer;
+                }
+            }
+            else {
+                //  If the previous character was not a '\r', 
+                if (i == 0 || *(buffer-1)!='\r') {
+                    //  Make the current character a '\r'.
+                    *buffer = '\r';
+                    //  If space permits, add back the '\n'.
+                    if (i < bufSize-1) {
+                        ++buffer;
+                        *buffer = '\n';
+                    }
+                }
+                //  Set the buffer past the current character ('\n')
+                ++buffer;
+            }
+            break;
+        }
+    }
+    //  Null terminate.
+    *buffer = '\0';
+    return 1;
+}
+
+/**
+@brief Skips read data until the first empty line.
+
+@param camSock An open tcp socket to the camera to read the data from.
+@return sucess 0 if failure; 1 if success
+*/
+static int CameraSkipUntilEmptyLine(int camSock) {
+    char buffer[1024];
+    int success = 0;
+    while(1) {
+        success = CameraReadLine(camSock, buffer, sizeof(buffer), true);
+        if (*buffer == '\0') {
+            return success;
+        }
+    }
+    return success;
+}
+
+/**
+@brief Opens a socket.
+
+Issues the given http request with the required added information 
+and authentication. It  cycles through an array of predetermined 
+encrypted username, password combinations that we expect the users 
+to have at any point in time. If none of the username, password 
+combinations work, it outputs a "Unknown user or password" error.
+If the request succeeds, it returns the socket number.
+
+@param serverName The information about the host from which this request originates
+@param request   The request to send to the camera not including boilerplate or 
+                 authentication. This is usually in the form of "GET <string>"
+@return int - failure = ERROR; success = socket number;     
+*/
+static int CameraOpenSocketAndIssueAuthorizedRequest(const char* serverName, const char* request) 
+{
+    char funcName[]="cameraOpenSocketAndIssueAuthorizedRequest";
+	
+	struct sockaddr_in cameraAddr;
+	int sockAddrSize;  
+	int camSock = ERROR;    
+
+    // The camera is expected to have one of the following username, password combinations.
+    // This routine will return an error if it does not find one of these.
+    static const char* authenticationStrings[] = {
+        "RlJDOkZSQw==",     /* FRC, FRC */
+        "cm9vdDpwYXNz",     /* root, admin*/
+        "cm9vdDphZG1pbg=="  /* root, pass*/
+    };
+
+    static const int numAuthenticationStrings = sizeof(authenticationStrings)/sizeof(authenticationStrings[0]);
+	
+	static const char *requestTemplate = "%s "                              \
+                                         "HTTP/1.1\n"                       \
+                                         "User-Agent: HTTPStreamClient\n"   \
+                                         "Connection: Keep-Alive\n"         \
+                                         "Cache-Control: no-cache\n"        \
+                                         "Authorization: Basic %s\n\n";
+
+	int i = 0;
+    for (;i < numAuthenticationStrings;++i) {
+        char buffer[1024];
+
+        sprintf(buffer, requestTemplate, request, authenticationStrings[i]);
+
+        /* create camera socket */
+        //DPRINTF (LOG_DEBUG, "creating camSock" ); 
+        if ((camSock = socket (AF_INET, SOCK_STREAM, 0)) == ERROR) {
+    		imaqSetError(ERR_CAMERA_SOCKET_CREATE_FAILED, funcName);
+    		perror ("Failed to create socket");
+    		return (ERROR);
+        }
+
+        sockAddrSize = sizeof (struct sockaddr_in);
+        bzero ((char *) &cameraAddr, sockAddrSize);
+        cameraAddr.sin_family = AF_INET;
+        cameraAddr.sin_len = (u_char) sockAddrSize;
+        cameraAddr.sin_port = htons (CAMERA_PORT);
+
+        if (( (int)(cameraAddr.sin_addr.s_addr = inet_addr (const_cast<char*>(serverName)) ) == ERROR) &&
+            ( (int)(cameraAddr.sin_addr.s_addr = hostGetByName (const_cast<char*>(serverName)) ) == ERROR)) 
+        {
+    		imaqSetError(ERR_CAMERA_CONNECT_FAILED, funcName);
+            return CameraCloseSocket("Failed to get IP, check hostname or IP", camSock);
+        }
+
+        //DPRINTF (LOG_INFO, "connecting camSock" ); 
+        if (connect (camSock, (struct sockaddr *) &cameraAddr, sockAddrSize) == ERROR) 	{
+    		imaqSetError(ERR_CAMERA_CONNECT_FAILED, funcName);
+            return CameraCloseSocket("Failed to connect to camera - check networ", camSock);
+        }
+
+        //DPRINTF (LOG_DEBUG, "writing GET request to camSock" ); 
+        if (write (camSock, buffer, strlen(buffer) ) == ERROR) {
+    		imaqSetError(ERR_CAMERA_CONNECT_FAILED, funcName);
+            return CameraCloseSocket("Failed to send GET request", camSock);
+        }
+
+        //  Read one line with the line ending removed.
+        if (!CameraReadLine(camSock, buffer, 1024, true)) {
+            return CameraCloseSocket("Bad response to GET request", camSock);
+        }
+
+        //  Check if the response is of the format HTTP/<version> 200 OK.
+        float discard;
+        if (sscanf(buffer, "HTTP/%f 200 OK", &discard) == 1) {
+            break;
+        }
+
+        //  We have to close the connection because in the case of failure
+        //  the server closes the connection.
+        close(camSock);
+    }
+    //  If none of the attempts were successful, then let the caller know.
+    if (numAuthenticationStrings == i) {
+		imaqSetError(ERR_CAMERA_AUTHORIZATION_FAILED, funcName);
+        perror("Expected username/password combination not found on camera");
+        return ERROR;
+    }
+    return camSock;
+}
+
+
+/**
+ * @brief Sends a configuration message to the camera
+ * @param configString configuration message to the camera
+ * @return success: 0=failure; 1=success
+ */
+int ConfigureCamera(char *configString){
+	char funcName[]="ConfigureCamera";
+	char *serverName = "192.168.0.90";		/* camera @ */ 
+	int success = 0;
+	int camSock = 0;    
+	
+	/* Generate camera configuration string */
+	char * getStr1 = 
+		"GET /axis-cgi/admin/param.cgi?action=update&ImageSource.I0.Sensor.";
+	
+	char cameraRequest[strlen(getStr1) + strlen(configString)];
+    sprintf (cameraRequest, "%s%s",	getStr1, configString);
+	DPRINTF(LOG_DEBUG, "camera configuration string: \n%s", cameraRequest);
+	camSock = CameraOpenSocketAndIssueAuthorizedRequest(serverName, cameraRequest);
+	DPRINTF(LOG_DEBUG, "camera socket# = %i", camSock);
+	
+    //read response
+    success = CameraSkipUntilEmptyLine(camSock);
+	//DPRINTF(LOG_DEBUG, "succcess from CameraSkipUntilEmptyLine: %i", success);
+    char buffer[3];	// set property - 3
+    success = CameraReadLine(camSock, buffer, 3, true);
+	//DPRINTF(LOG_DEBUG, "succcess from CameraReadLine: %i", success);
+	DPRINTF(LOG_DEBUG, "line read from camera \n%s", buffer);
+    if (strcmp(buffer, "OK") != 0) {
+		imaqSetError(ERR_CAMERA_COMMAND_FAILURE, funcName);
+		DPRINTF(LOG_DEBUG, "setting ERR_CAMERA_COMMAND_FAILURE - OK not found");
+    }
+	DPRINTF (LOG_INFO, "\nConfigureCamera ENDING  success = %i\n", success );	
+
+	/* clean up */
+	close (camSock);
+	return (1);
+}
+
+
+/**
+ * @brief Sends a request message to the camera
+ * @param configString request message to the camera
+ * @param cameraResponse response from camera
+ * @return success: 0=failure; 1=success
+ */
+int GetCameraSetting(char *configString, char *cameraResponse){
+	char *serverName = "192.168.0.90";		/* camera @ */ 
+	int success = 0;
+	int camSock = 0;    
+	
+	/* Generate camera request string */
+	char * getStr1 = 
+		"GET /axis-cgi/admin/param.cgi?action=list&group=ImageSource.I0.Sensor.";
+	char cameraRequest[strlen(getStr1) + strlen(configString)];
+    sprintf (cameraRequest, "%s%s",	getStr1, configString);
+	DPRINTF(LOG_DEBUG, "camera configuration string: \n%s", cameraRequest);
+	camSock = CameraOpenSocketAndIssueAuthorizedRequest(serverName, cameraRequest);
+	DPRINTF(LOG_DEBUG, "return from CameraOpenSocketAndIssueAuthorizedRequest %i", camSock);
+	
+    //read response
+    success = CameraSkipUntilEmptyLine(camSock);
+    success = CameraReadLine(camSock, cameraResponse, 1024, true);
+	DPRINTF(LOG_DEBUG, "succcess from CameraReadLine: %i", success);
+	DPRINTF(LOG_DEBUG, "line read from camera \n%s", cameraResponse);
+	DPRINTF (LOG_INFO, "\nGetCameraSetting ENDING  success = %i\n", success );	
+
+	/* clean up */
+	close (camSock);
+	return (1);
+}
+
+/**
+ * @brief Sends a request message to the camera for image appearance property
+ * (resolution, compression, rotation)
+ * @param configString request message to the camera
+ * @param cameraResponse response from camera
+ * @return success: 0=failure; 1=success
+ */
+int GetImageSetting(char *configString, char *cameraResponse){
+	char *serverName = "192.168.0.90";		/* camera @ */ 
+	int success = 0;
+	int camSock = 0;    
+	
+	/* Generate camera request string */
+	char *getStr1 = "GET /axis-cgi/admin/param.cgi?action=list&group=Image.I0.Appearance.";
+	char cameraRequest[strlen(getStr1) + strlen(configString)];
+    sprintf (cameraRequest, "%s%s",	getStr1, configString);
+	DPRINTF(LOG_DEBUG, "camera configuration string: \n%s", cameraRequest);
+	camSock = CameraOpenSocketAndIssueAuthorizedRequest(serverName, cameraRequest);
+	DPRINTF(LOG_DEBUG, "return from CameraOpenSocketAndIssueAuthorizedRequest %i", camSock);
+	
+    //read response
+    success = CameraSkipUntilEmptyLine(camSock);
+    success = CameraReadLine(camSock, cameraResponse, 1024, true);
+	DPRINTF(LOG_DEBUG, "succcess from CameraReadLine: %i", success);
+	DPRINTF(LOG_DEBUG, "line read from camera \n%s", cameraResponse);
+	DPRINTF (LOG_INFO, "\nGetCameraSetting ENDING  success = %i\n", success );	
+
+	/* clean up */
+	close (camSock);
+	return (1);
+}
+
 
 #define MEASURE_SOCKET_TIME 1   
 
 /**
  * @brief Manage access to the camera. Sets up sockets and reads images
+ * @param frames Frames per second 
+ * @param compression Camera image compression 
+ * @param resolution Camera image size 
+ * @param rotation Camera image rotation 
  * @return error
  */
 int cameraJPEGServer(int frames, int compression, ImageSize resolution, ImageRotation rotation)
@@ -387,14 +679,14 @@ Authorization: Basic %s;\n\n";
 	  if (( (int)(cameraAddr.sin_addr.s_addr = inet_addr (serverName) ) == ERROR) &&
 		( (int)(cameraAddr.sin_addr.s_addr = hostGetByName (serverName) ) == ERROR)) 
 	  {	
-		cameraCloseSocket("Failed to get IP, check hostname or IP", camSock);
+		  CameraCloseSocket("Failed to get IP, check hostname or IP", camSock);
 		continue;
 	  }
 	  
 	  DPRINTF (LOG_INFO, "Attempting to connect to camSock" ); 
 	  if (connect (camSock, (struct sockaddr *) &cameraAddr, sockAddrSize) == ERROR) 	{
 		imaqSetError(ERR_CAMERA_CONNECT_FAILED, funcName);
-		cameraCloseSocket("Failed to connect to camera - check network", camSock);
+		CameraCloseSocket("Failed to connect to camera - check network", camSock);
 		continue;
 	  }	  
 
@@ -410,7 +702,7 @@ Authorization: Basic %s;\n\n";
 
 	DPRINTF (LOG_DEBUG, "writing GET request to camSock" ); 
 	if (write (camSock, tempBuffer , strlen(tempBuffer) ) == ERROR) {
-		return cameraCloseSocket("Failed to send GET request", camSock);
+		return CameraCloseSocket("Failed to send GET request", camSock);
 	}
 
 	//DPRINTF (LOG_DEBUG, "reading header" ); 
@@ -459,7 +751,7 @@ Authorization: Basic %s;\n\n";
 
 		while (counter) {
 			if (read (camSock, intermediateBuffer, 1) <= 0) {
-				cameraCloseSocket("Failed to read image header", camSock);
+				CameraCloseSocket("Failed to read image header", camSock);
 				globalCamera.cameraMetrics[ERR_CAMERA_HEADER_ERROR]++;
 				goto RETRY;
 			}
@@ -477,7 +769,7 @@ Authorization: Basic %s;\n\n";
 					  }
 					  else
 					  {
-						  cameraCloseSocket("Not authorized to connect to camera", camSock);
+						  CameraCloseSocket("Not authorized to connect to camera", camSock);
 						  authorizeCount++;
 				  goto RETRY;
 					  }
@@ -493,7 +785,7 @@ Authorization: Basic %s;\n\n";
 		char *contentLength = strstr(initialReadBuffer, contentString);
 		if (contentLength == NULL) {
 			globalCamera.cameraMetrics[ERR_CAMERA_HEADER_ERROR]++;
-			cameraCloseSocket("No content-length token found in packet", camSock);
+			CameraCloseSocket("No content-length token found in packet", camSock);
 			goto RETRY;
 		}
 		/* get length of image content */
@@ -505,7 +797,7 @@ Authorization: Basic %s;\n\n";
 		//globalCamera.data[writeIndex].cameraImage = (Image *) malloc(globalCamera.data[writeIndex].cameraImageSize);
 		globalCamera.data[writeIndex].cameraImage = (char*)malloc(globalCamera.data[writeIndex].cameraImageSize);
 		if (NULL == globalCamera.data[writeIndex].cameraImage) {
-			return cameraCloseSocket("Failed to allocate space for imageString", camSock);
+			return CameraCloseSocket("Failed to allocate space for imageString", camSock);
 		}
 		globalCamera.cameraMetrics[CAM_BUFFERS_WRITTEN]++;
 		
@@ -523,7 +815,7 @@ Authorization: Basic %s;\n\n";
 		
 		//DPRINTF (LOG_DEBUG, "Completed fioRead function - bytes read:%d", bytesRead);
 		if (bytesRead <= 0) {
-			cameraCloseSocket("Failed to read image data", camSock);
+			CameraCloseSocket("Failed to read image data", camSock);
 			goto RETRY;
 		} else if (bytesRead != globalCamera.data[writeIndex].cameraImageSize){
 			perror ("ERROR: Failed to read entire image: readLength does not match bytes read");
@@ -595,7 +887,6 @@ void StartImageSignal(int taskId) // Start issuing a SIGUSR1 signal to the speci
  */
 void StartImageAcquisition()
 {	
-	char funcName[]="StartImageAcquisition";
 	globalCamera.cameraMetrics[CAM_STARTS]++;  
 	globalCamera.acquire = 1; 
 	DPRINTF(LOG_DEBUG, "starting acquisition");
@@ -611,10 +902,15 @@ void StopImageAcquisition()
 
 /**
  * @brief This is the routine that is run when the task is spawned
+ * It initializes the camera with the image settings passed in, and
+ * starts image acquisition.
+ * @param frames Frames per second 
+ * @param compression Camera image compression 
+ * @param resolution Camera image size 
+ * @param rotation Camera image rotation 
  */
-static int initCamera(int frames, int compression, ImageSize resolution, ImageRotation rotation) {
-	char funcName[]="initCamera";
-	//let user code determine debug level
+static int initCamera(int frames, int compression, ImageSize resolution, ImageRotation rotation) 
+{
 	//SetDebugFlag ( DEBUG_SCREEN_AND_FILE  ) ;
 	
 	DPRINTF(LOG_DEBUG, "\n+++++ camera task starting: rotation = %i", (int)rotation);
@@ -630,19 +926,13 @@ static int initCamera(int frames, int compression, ImageSize resolution, ImageRo
 	/* allow writing to vxWorks target */
 	Priv_SetWriteFileAllowed(1); 
 	
-	/* TEST - start acquisition immediately */
+	/* start acquisition immediately */
 	StartImageAcquisition();
 	
-	/* Call this if you want the camera to auto start on bootup 
-	 * otherwise, frcStartJPEGServer must be called from your program
-	 */
+	/*  cameraJPEGServer runs until camera is stopped */
 	DPRINTF (LOG_DEBUG, "calling cameraJPEGServer" ); 
-	// cameraJPEGServer runs until camera is stopped
 	errorCode = cameraJPEGServer(frames, compression, resolution, rotation);	
 	DPRINTF (LOG_INFO, "errorCode from cameraJPEGServer = %i\n", errorCode ); 
-	
-	/* Now, before obtaining images, frcStartImageAcquisition must be called 
-	 */
 	return (OK);
 }
 
@@ -664,9 +954,9 @@ int StartCameraTask(int frames, int compression, ImageSize resolution, ImageRota
 {
 	char funcName[]="startCameraTask";
 	DPRINTF(LOG_DEBUG, "starting camera");
-	
+
 	int cameraTaskID = 0;
-	
+
 	//range check
 	if (frames < 1) frames = 1;
 	else if (frames > 30) frames = 30;
@@ -674,16 +964,17 @@ int StartCameraTask(int frames, int compression, ImageSize resolution, ImageRota
 	else if (compression > 100) compression = 100;
 
 	// stop any prior copy of running task
-    StopCameraTask(); 
+	StopCameraTask(); 
 
 	// spawn camera task
-    bool started = g_axisCameraTask.Start(frames, compression, resolution, rotation);
-    cameraTaskID = g_axisCameraTask.GetID();
+	bool started = g_axisCameraTask.Start(frames, compression, resolution, rotation);
+	cameraTaskID = g_axisCameraTask.GetID();
 	DPRINTF(LOG_DEBUG, "spawned task id %i", cameraTaskID);
 
 	if (!started)	{
 		DPRINTF(LOG_DEBUG, "camera task failed to start");
 		imaqSetError(ERR_CAMERA_TASK_SPAWN_FAILED, funcName);
+		return -1;
 	}
 	return cameraTaskID;
 }
@@ -704,19 +995,18 @@ int StopCameraTask()
 #if 0
 /* if you want to run this task by itself to debug  
  * enable this code and make RunProgram the entry point 
- * and change to compile as a .out instead of .a
  */
 extern "C"
 {
 void RunProgram();
-int frcvision_StartupLibraryInit();
+int AxisCamera_StartupLibraryInit();
 }
 /** * @brief Start point of the program */
 void RunProgram()
 {	StartCameraTask();}
 
 /** * @brief This is the main program that is run by the debugger or the robot on boot. */
-int frcvision_StartupLibraryInit()
+int AxisCamera_StartupLibraryInit()
 	{		RunProgram();		return 0;	}
 
 #endif

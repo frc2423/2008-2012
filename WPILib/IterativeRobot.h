@@ -44,7 +44,7 @@
 
 class IterativeRobot : public RobotBase {
 public:
-	static const double kDefaultPeriod = 5e-3;	/** default period for periodic functions **/
+	static const double kDefaultPeriod = 2e-2;	/** default period for periodic functions **/
 	virtual void StartCompetition();
 
 	virtual void RobotInit();
@@ -78,7 +78,7 @@ private:
 	UINT32 m_teleopLoops;
 	double m_period;
 	
-	Timer m_mainLoopTimer;
+	SEM_ID m_packetDataAvailableSem;
 };
 
 #endif

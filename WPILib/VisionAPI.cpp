@@ -49,7 +49,7 @@ int frcDispose(void* object)  { return imaqDispose(object);	}
 /**
 * @brief Dispose of a list of objects. Supports any object created on the heap.
 * 
-* @param funcName The name of the function
+* @param functionName The name of the function
 * @param ... A list of pointers to structures that need to be disposed of. 
 * The last pointer in the list should always be set to NULL.
 * 
@@ -204,7 +204,6 @@ HistogramReport* frcHistogram(const Image* image, int numClasses, float min, flo
 }
 HistogramReport* frcHistogram(const Image* image, int numClasses, float min, float max, Rect rect)
 {
-	char funcName[]="frcHistogram";
 	int success; 
 	int fillValue = 1;
 	
@@ -218,7 +217,7 @@ HistogramReport* frcHistogram(const Image* image, int numClasses, float min, flo
 	success = imaqROIToMask(pMask, pRoi, fillValue, NULL, NULL);
 	if ( !success )	{ 
 		GetLastVisionError(); 
-		frcDispose(funcName, pRoi, NULL); 
+		frcDispose(__FUNCTION__, pRoi, NULL); 
 		return NULL; 
 	}	
 	
@@ -227,7 +226,7 @@ HistogramReport* frcHistogram(const Image* image, int numClasses, float min, flo
 	pHr = imaqHistogram(image, numClasses, min, max, pMask); 
 	
 	/* clean up */
-	frcDispose(funcName, pRoi, pMask, NULL); 
+	frcDispose(__FUNCTION__, pRoi, pMask, NULL); 
 	
 	return pHr;
 }

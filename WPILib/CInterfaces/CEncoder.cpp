@@ -103,10 +103,14 @@ void StartEncoder(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel)
 }
 
 /**
- * Return the count from the encoder object.
- * Return the count from the encoder. The encoder object returns 4x the number of "ticks"
- * since it counts all four edges.
+ * Gets the current count.
+ * Returns the current count on the Encoder.
+ * This method compensates for the decoding type.
  *
+ * @deprecated Use GetEncoderDistance() in favor of this method.  This returns unscaled pulses and GetDistance() scales using value from SetEncoderDistancePerPulse().
+ *
+ * @return Current count from the Encoder.
+ * 
  * @param aChannel The channel on the digital module for the A Channel of the encoder
  * @param bChannel The channel on the digital module for the B Channel of the encoder
  */
@@ -120,10 +124,14 @@ INT32 GetEncoder(UINT32 aChannel, UINT32 bChannel)
 }
 
 /**
- * Return the count from the encoder object.
- * Return the count from the encoder. The encoder object returns 4x the number of "ticks"
- * since it counts all four edges.
+ * Gets the current count.
+ * Returns the current count on the Encoder.
+ * This method compensates for the decoding type.
+ * 
+ * @deprecated Use GetEncoderDistance() in favor of this method.  This returns unscaled pulses and GetDistance() scales using value from SetEncoderDistancePerPulse().
  *
+ * @return Current count from the Encoder.
+ * 
  * @param aSlot The digital module slot for the A Channel on the encoder
  * @param aChannel The channel on the digital module for the A Channel of the encoder
  * @param bSlot The digital module slot for the B Channel on the encoder
@@ -201,12 +209,16 @@ void StopEncoder(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel)
 }
 
 /**
- * Get the encoder period.
- * Return the time between the last two counts in seconds. The value has microsecond accuracy.
+ * Returns the period of the most recent pulse.
+ * Returns the period of the most recent Encoder pulse in seconds.
+ * This method compenstates for the decoding type.
+ * 
+ * @deprecated Use GetEncoderRate() in favor of this method.  This returns unscaled periods and GetEncoderRate() scales using value from SetEncoderDistancePerPulse().
  *
+ * @return Period in seconds of the most recent pulse.
+ * 
  * @param aChannel The channel on the digital module for the A Channel of the encoder
  * @param bChannel The channel on the digital module for the B Channel of the encoder
- * @returns The time in seconds between the last two counts.
  */
 double GetEncoderPeriod(UINT32 aChannel, UINT32 bChannel)
 {
@@ -218,14 +230,18 @@ double GetEncoderPeriod(UINT32 aChannel, UINT32 bChannel)
 }
 
 /**
- * Get the encoder period.
- * Return the time between the last two counts in seconds. The value has microsecond accuracy.
+ * Returns the period of the most recent pulse.
+ * Returns the period of the most recent Encoder pulse in seconds.
+ * This method compenstates for the decoding type.
+ * 
+ * @deprecated Use GetEncoderRate() in favor of this method.  This returns unscaled periods and GetEncoderRate() scales using value from SetEncoderDistancePerPulse().
  *
+ * @return Period in seconds of the most recent pulse.
+ * 
  * @param aSlot The digital module slot for the A Channel on the encoder
  * @param aChannel The channel on the digital module for the A Channel of the encoder
  * @param bSlot The digital module slot for the B Channel on the encoder
  * @param bChannel The channel on the digital module for the B Channel of the encoder
- * @returns The time in seconds between the last two counts.
  */
 double GetEncoderPeriod(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel)
 {
@@ -239,16 +255,20 @@ double GetEncoderPeriod(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bCha
 
 /**
  * Sets the maximum period for stopped detection.
- * Sets the value that represents the maximum period of the QuadEncoder before it will assume
+ * Sets the value that represents the maximum period of the Encoder before it will assume
  * that the attached device is stopped. This timeout allows users to determine if the wheels or
  * other shaft has stopped rotating.
- *
+ * This method compensates for the decoding type.
+ * 
+ * @deprecated Use SetEncoderMinRate() in favor of this method.  This takes unscaled periods and SetMinEncoderRate() scales using value from SetEncoderDistancePerPulse().
+ * 
+ * @param maxPeriod The maximum time between rising and falling edges before the FPGA will
+ * report the device stopped. This is expressed in seconds.
+ * 
  * @param aChannel The channel on the digital module for the A Channel of the encoder
  * @param bChannel The channel on the digital module for the B Channel of the encoder
- * @param maxPeriod The maximum time between rising and falling edges before the FPGA will
- * consider the device stopped. This is expressed in seconds.
  */
-void SetMaxEncoderPeriod(UINT32 aChannel, UINT32 bChannel, UINT32 maxPeriod)
+void SetMaxEncoderPeriod(UINT32 aChannel, UINT32 bChannel, double maxPeriod)
 {
 	Encoder *encoder = AllocateEncoder(aChannel, bChannel);
 	if (encoder != NULL)
@@ -257,18 +277,22 @@ void SetMaxEncoderPeriod(UINT32 aChannel, UINT32 bChannel, UINT32 maxPeriod)
 
 /**
  * Sets the maximum period for stopped detection.
- * Sets the value that represents the maximum period of the QuadEncoder before it will assume
+ * Sets the value that represents the maximum period of the Encoder before it will assume
  * that the attached device is stopped. This timeout allows users to determine if the wheels or
  * other shaft has stopped rotating.
- *
+ * This method compensates for the decoding type.
+ * 
+ * @deprecated Use SetEncoderMinRate() in favor of this method.  This takes unscaled periods and SetMinEncoderRate() scales using value from SetEncoderDistancePerPulse().
+ * 
+ * @param maxPeriod The maximum time between rising and falling edges before the FPGA will
+ * report the device stopped. This is expressed in seconds.
+ * 
  * @param aSlot The digital module slot for the A Channel on the encoder
  * @param aChannel The channel on the digital module for the A Channel of the encoder
  * @param bSlot The digital module slot for the B Channel on the encoder
  * @param bChannel The channel on the digital module for the B Channel of the encoder
- * @param maxPeriod The maximum time between rising and falling edges before the FPGA will
- * consider the device stopped. This is expressed in seconds.
  */
-void SetMaxEncoderPeriod(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel, UINT32 maxPeriod)
+void SetMaxEncoderPeriod(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel, double maxPeriod)
 {
 	Encoder *encoder = AllocateEncoder(aSlot, aChannel, bSlot, bChannel);
 	if (encoder != NULL)
@@ -350,16 +374,14 @@ bool GetEncoderDirection(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bCh
 }
 
 /**
- * Get the distance the robot has driven since the last reset
- * @return The distance driven since the last reset based on the distance per tick
- * variable being set by SetDistancePerTick(). It is just a simple multiplication, but
- * makes the bookkeeping a little easier since the encoder remembers the scale factor.
+ * Get the distance the robot has driven since the last reset.
+ * 
+ * @return The distance driven since the last reset as scaled by the value from SetEncoderDistancePerPulse().
  *
  * @param aChannel The channel on the digital module for the A Channel of the encoder
  * @param bChannel The channel on the digital module for the B Channel of the encoder
- * @returns The distance traveled based on the distance per tick.
  */
-float GetEncoderDistance(UINT32 aChannel, UINT32 bChannel)
+double GetEncoderDistance(UINT32 aChannel, UINT32 bChannel)
 {
 	Encoder *encoder = AllocateEncoder(aChannel, bChannel);
 	if (encoder != NULL)
@@ -369,17 +391,16 @@ float GetEncoderDistance(UINT32 aChannel, UINT32 bChannel)
 }
 
 /**
- * Get the distance the robot has driven since the last reset
- * @return The distance driven since the last reset based on the distance per tick
- * variable being set by SetDistancePerTick(). It is just a simple multiplication, but
- * makes the bookkeeping a little easier since the encoder remembers the scale factor.
+ * Get the distance the robot has driven since the last reset.
+ * 
+ * @return The distance driven since the last reset as scaled by the value from SetEncoderDistancePerPulse().
  *
  * @param aSlot The digital module slot for the A Channel on the encoder
  * @param aChannel The channel on the digital module for the A Channel of the encoder
  * @param bSlot The digital module slot for the B Channel on the encoder
  * @param bChannel The channel on the digital module for the B Channel of the encoder
   */
-float GetEncoderDistance(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel)
+double GetEncoderDistance(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel)
 {
 	Encoder *encoder = AllocateEncoder(aSlot, aChannel, bSlot, bChannel);
 	if (encoder != NULL)
@@ -389,39 +410,117 @@ float GetEncoderDistance(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bCh
 }
 
 /**
- * Set the distance per tick for this encoder.
- * This sets the multiplier used to determine the distance driven based on the count value
- * from the encoder. Reseting the encoder also resets the distance since it's just a simple
- * multiply.
+ * Get the current rate of the encoder.
+ * Units are distance per second as scaled by the value from SetEncoderDistancePerPulse().
+ * 
+ * @return The current rate of the encoder.
  *
  * @param aChannel The channel on the digital module for the A Channel of the encoder
  * @param bChannel The channel on the digital module for the B Channel of the encoder
- * @param distancePerTick The distance traveled per tick of the encoder
  */
-void SetEncoderDistancePerTick(UINT32 aChannel, UINT32 bChannel, float distancePerTick)
+double GetEncoderRate(UINT32 aChannel, UINT32 bChannel)
 {
 	Encoder *encoder = AllocateEncoder(aChannel, bChannel);
 	if (encoder != NULL)
-		encoder->SetDistancePerTick(distancePerTick);
+		return encoder->GetRate();
+	else
+		return 0.0;
 }
 
 /**
- * Set the distance per tick for this encoder.
- * This sets the multiplier used to determine the distance driven based on the count value
- * from the encoder. Reseting the encoder also resets the distance since it's just a simple
- * multiply.
+ * Get the current rate of the encoder.
+ * Units are distance per second as scaled by the value from SetEncoderDistancePerPulse().
+ * 
+ * @return The current rate of the encoder.
  *
  * @param aSlot The digital module slot for the A Channel on the encoder
  * @param aChannel The channel on the digital module for the A Channel of the encoder
  * @param bSlot The digital module slot for the B Channel on the encoder
  * @param bChannel The channel on the digital module for the B Channel of the encoder
- * @param distancePerTick The multiplier used to return the distance traveled
- */
-void SetEncoderDistancePerTick(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel, float distancePerTick)
+  */
+double GetEncoderRate(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel)
 {
 	Encoder *encoder = AllocateEncoder(aSlot, aChannel, bSlot, bChannel);
 	if (encoder != NULL)
-		encoder->SetDistancePerTick(distancePerTick);
+		return encoder->GetRate();
+	else
+		return 0.0;
+}
+
+/**
+ * Set the minimum rate of the device before the hardware reports it stopped.
+ * 
+ * @param minRate The minimum rate.  The units are in distance per second as scaled by the value from SetEncoderDistancePerPulse().
+ *
+ * @param aChannel The channel on the digital module for the A Channel of the encoder
+ * @param bChannel The channel on the digital module for the B Channel of the encoder
+ */
+void SetMinEncoderRate(UINT32 aChannel, UINT32 bChannel, double minRate)
+{
+	Encoder *encoder = AllocateEncoder(aChannel, bChannel);
+	if (encoder != NULL)
+		encoder->SetMinRate(minRate);
+}
+
+/**
+ * Set the minimum rate of the device before the hardware reports it stopped.
+ * 
+ * @param minRate The minimum rate.  The units are in distance per second as scaled by the value from SetEncoderDistancePerPulse().
+ *
+ * @param aSlot The digital module slot for the A Channel on the encoder
+ * @param aChannel The channel on the digital module for the A Channel of the encoder
+ * @param bSlot The digital module slot for the B Channel on the encoder
+ * @param bChannel The channel on the digital module for the B Channel of the encoder
+ */
+void SetMinEncoderRate(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel, double minRate)
+{
+	Encoder *encoder = AllocateEncoder(aSlot, aChannel, bSlot, bChannel);
+	if (encoder != NULL)
+		encoder->SetMinRate(minRate);
+}
+
+/**
+ * Set the distance per pulse for this encoder.
+ * This sets the multiplier used to determine the distance driven based on the count value
+ * from the encoder.
+ * Do not include the decoding type in this scale.  The library already compensates for the decoding type.
+ * Set this value based on the encoder's rated Pulses per Revolution and
+ * factor in gearing reductions following the encoder shaft.
+ * This distance can be in any units you like, linear or angular.
+ * 
+ * @param distancePerPulse The scale factor that will be used to convert pulses to useful units.
+ * 
+ * @param aChannel The channel on the digital module for the A Channel of the encoder
+ * @param bChannel The channel on the digital module for the B Channel of the encoder
+ */
+void SetEncoderDistancePerPulse(UINT32 aChannel, UINT32 bChannel, double distancePerPulse)
+{
+	Encoder *encoder = AllocateEncoder(aChannel, bChannel);
+	if (encoder != NULL)
+		encoder->SetDistancePerPulse(distancePerPulse);
+}
+
+/**
+ * Set the distance per pulse for this encoder.
+ * This sets the multiplier used to determine the distance driven based on the count value
+ * from the encoder.
+ * Do not include the decoding type in this scale.  The library already compensates for the decoding type.
+ * Set this value based on the encoder's rated Pulses per Revolution and
+ * factor in gearing reductions following the encoder shaft.
+ * This distance can be in any units you like, linear or angular.
+ * 
+ * @param distancePerPulse The scale factor that will be used to convert pulses to useful units.
+ * 
+ * @param aSlot The digital module slot for the A Channel on the encoder
+ * @param aChannel The channel on the digital module for the A Channel of the encoder
+ * @param bSlot The digital module slot for the B Channel on the encoder
+ * @param bChannel The channel on the digital module for the B Channel of the encoder
+ */
+void SetEncoderDistancePerPulse(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel, double distancePerPulse)
+{
+	Encoder *encoder = AllocateEncoder(aSlot, aChannel, bSlot, bChannel);
+	if (encoder != NULL)
+		encoder->SetDistancePerPulse(distancePerPulse);
 }
 
 /**

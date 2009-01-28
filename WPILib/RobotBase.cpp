@@ -138,7 +138,14 @@ void RobotBase::robotTask(FUNCPTR factory, Task *task)
  */
 void RobotBase::startRobotTask(FUNCPTR factory)
 {
-	printf("WPILib was compiled from SVN revision %s\n", SVN_REV);
+	if (strlen(SVN_REV))
+	{
+		printf("WPILib was compiled from SVN revision %s\n", SVN_REV);
+	}
+	else
+	{
+		printf("WPILib was compiled from a location that is not source controlled.\n");
+	}
 
 	// Check for startup code already running
 	INT32 oldId = taskNameToId("FRC_RobotTask");

@@ -15,7 +15,7 @@
 class PIDSource
 {
 public:
-	virtual float PIDGet() = 0;
+	virtual double PIDGet() = 0;
 };
 
 #endif

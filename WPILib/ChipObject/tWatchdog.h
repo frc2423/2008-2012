@@ -8,7 +8,7 @@
 
 namespace nFPGA
 {
-namespace n306F586FB5ADD059CDB0429821CA506D
+namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D
 {
 
 class tWatchdog : public tSystem
@@ -54,12 +54,12 @@ public:
 private:
    unsigned char _SystemIndex;
 
-   #define Watchdog_Status_ADDRESS 0x84EC
-   #define Watchdog_Feed_ADDRESS 0x84E8
-   #define Watchdog_Kill_ADDRESS 0x84E4
-   #define Watchdog_Immortal_ADDRESS 0x84D8
-   #define Watchdog_Expiration_ADDRESS 0x84DC
-   #define Watchdog_Timer_ADDRESS 0x84E0
+   #define Watchdog_Status_ADDRESS 0x84E4
+   #define Watchdog_Feed_ADDRESS 0x84E0
+   #define Watchdog_Kill_ADDRESS 0x84DC
+   #define Watchdog_Immortal_ADDRESS 0x84D0
+   #define Watchdog_Expiration_ADDRESS 0x84D4
+   #define Watchdog_Timer_ADDRESS 0x84D8
 
 
 };

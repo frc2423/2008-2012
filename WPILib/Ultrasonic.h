@@ -9,6 +9,7 @@
 
 #include "SensorBase.h"
 #include "Task.h"
+#include "PIDSource.h"
 
 class Counter;
 class DigitalInput;
@@ -24,14 +25,19 @@ class DigitalOutput;
  * the echo is received. The time that the line is high determines the round trip distance
  * (time of flight).
  */
-class Ultrasonic: public SensorBase
+class Ultrasonic: public SensorBase, public PIDSource
 {
 public:
-	Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel);
-	Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel);
-	Ultrasonic(UINT32 pingChannel, UINT32 echoChannel);
+	typedef enum {
+		kInches = 0,
+		kMilliMeters = 1
+	} DistanceUnit;
+	
+	Ultrasonic(DigitalOutput *pingChannel, DigitalInput *echoChannel, DistanceUnit units = kInches);
+	Ultrasonic(DigitalOutput &pingChannel, DigitalInput &echoChannel, DistanceUnit units = kInches);
+	Ultrasonic(UINT32 pingChannel, UINT32 echoChannel, DistanceUnit units = kInches);
 	Ultrasonic(UINT32 pingSlot, UINT32 pingChannel,
-							UINT32 echoSlot, UINT32 echoChannel);
+							UINT32 echoSlot, UINT32 echoChannel, DistanceUnit units = kInches);
 	virtual ~Ultrasonic();
 
 	void Ping();
@@ -41,6 +47,10 @@ public:
 	double GetRangeMM();
 	bool IsEnabled() { return m_enabled; }
 	void SetEnabled(bool enable) { m_enabled = enable; }
+	
+	double PIDGet();
+	void SetDistanceUnits(DistanceUnit units);
+	DistanceUnit GetDistanceUnits();
 
 private:
 	void Initialize();
@@ -63,6 +73,8 @@ private:
 	bool m_enabled;
 	Counter *m_counter;
 	Ultrasonic *m_nextSensor;
+	
+	DistanceUnit m_units;
 };
 
 #endif

@@ -28,10 +28,17 @@ public:
 	void SetPWMPeriodScale(UINT32 channel, UINT32 squelchMask);
 	void SetRelayForward(UINT32 channel, bool on);
 	void SetRelayReverse(UINT32 channel, bool on);
+	bool GetRelayForward(UINT32 channel);
+	UINT8 GetRelayForward(void);
+	bool GetRelayReverse(UINT32 channel);
+	UINT8 GetRelayReverse(void);
 	bool AllocateDIO(UINT32 channel, bool input);
 	void FreeDIO(UINT32 channel);
 	void SetDIO(UINT32 channel, short value);
-	UINT32 GetDIO(UINT32 channel);
+	bool GetDIO(UINT32 channel);
+	UINT16 GetDIO(void);
+	bool GetDIODirection(UINT32 channel);
+	UINT16 GetDIODirection(void);
 	void Pulse(UINT32 channel, UINT8 pulseLength);
 	bool IsPulsing(UINT32 channel);
 	bool IsPulsing();

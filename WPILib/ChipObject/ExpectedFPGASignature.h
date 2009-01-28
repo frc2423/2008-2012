@@ -8,13 +8,13 @@ namespace nFPGA
 {
 
    static const unsigned short g_ExpectedFPGAVersion = 2009;
-   static const unsigned int g_ExpectedFPGARevision = 0x0000100B;
+   static const unsigned int g_ExpectedFPGARevision = 0x00100000;
    static const unsigned int g_ExpectedFPGASignature[] = 
    {
-      0x306F586F,
-      0xB5ADD059,
-      0xCDB04298,
-      0x21CA506D,
+      0x6F0EA7B8,
+      0x8ADB8E3F,
+      0xD4127A39,
+      0xE3502C6D,
    };
 
 }

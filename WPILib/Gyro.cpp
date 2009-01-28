@@ -168,3 +168,12 @@ void Gyro::SetSensitivity( float voltsPerDegreePerSecond )
 	m_voltsPerDegreePerSecond = voltsPerDegreePerSecond;
 }
 
+/**
+ * Get the angle in degrees for the PIDSource base object.
+ * 
+ * @return The angle in degrees.
+ */
+double Gyro::PIDGet()
+{
+	return GetAngle();
+}

@@ -8,6 +8,7 @@
 #define GYRO_H_
 
 #include "SensorBase.h"
+#include "PIDSource.h"
 
 class AnalogChannel;
 class AnalogModule;
@@ -20,11 +21,11 @@ class AnalogModule;
  * where it samples the gyro while at rest to determine the default offset. This is
  * subtracted from each sample to determine the heading.
  */
-class Gyro : public SensorBase
+class Gyro : public SensorBase, public PIDSource
 {
 public:
-	static const UINT32 kOversampleBits = 7;
-	static const UINT32 kAverageBits = 3;
+	static const UINT32 kOversampleBits = 10;
+	static const UINT32 kAverageBits = 0;
 	static const float kSamplesPerSecond = 50.0;
 	static const float kCalibrationSampleTime = 5.0;
 	static const float kDefaultVoltsPerDegreePerSecond = 0.0125;
@@ -37,6 +38,8 @@ public:
 	float GetAngle();
 	void SetSensitivity(float voltsPerDegreePerSecond);
 	void Reset();
+	
+	double PIDGet();
 
 private:
 	void InitGyro();

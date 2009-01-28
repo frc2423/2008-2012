@@ -17,16 +17,17 @@ static Resource *counters = NULL;
  * Create an instance of a counter object.
  * This creates a ChipObject counter and initializes status variables appropriately
  */
-void Counter::InitCounter()
+void Counter::InitCounter(Mode mode)
 {
 	Resource::CreateResourceObject(&counters, tCounter::kNumSystems);
 	m_index = counters->Allocate();
 	m_counter = new tCounter(m_index, &status);
-	m_counter->writeConfig_Mode(kTwoPulse, &status);
+	m_counter->writeConfig_Mode(mode, &status);
 	m_upSource = NULL;
 	m_downSource = NULL;
 	m_allocatedUpSource = false;
 	m_allocatedDownSource = false;
+	m_counter->writeTimerConfig_AverageSize(1, &status);
 }
 
 /**
@@ -94,6 +95,21 @@ Counter::Counter(AnalogTrigger &trigger)
 {
 	InitCounter();
 	SetUpSource(trigger.CreateOutput(AnalogTriggerOutput::kState));
+}
+
+Counter::Counter(EncodingType encodingType, DigitalSource *upSource, DigitalSource *downSource, bool inverted)
+{
+	wpi_assert(encodingType == k1X || encodingType == k2X);
+	InitCounter(kExternalDirection);
+	SetUpSource(upSource);
+	SetDownSource(downSource);
+
+	if (encodingType == k1X)
+		SetUpSourceEdge(true, false);
+	else
+		SetUpSourceEdge(true, true);
+
+	SetDownSourceEdge(inverted, true);
 }
 
 /**
@@ -185,19 +201,7 @@ void Counter::SetUpSource(AnalogTrigger &analogTrigger, AnalogTriggerOutput::Typ
  */
 void Counter::SetUpSource(DigitalSource &source)
 {
-	wpi_assert(m_upSource == NULL);
-	m_upSource = &source;
-	m_counter->writeConfig_UpSource_Module(source.GetModuleForRouting(), &status);
-	m_counter->writeConfig_UpSource_Channel(source.GetChannelForRouting(), &status);
-	m_counter->writeConfig_UpSource_AnalogTrigger(source.GetAnalogTriggerForRouting(), &status);
-
-	if(m_counter->readConfig_Mode(&status) == kTwoPulse ||
-			m_counter->readConfig_Mode(&status) == kExternalDirection)
-	{
-		SetUpSourceEdge(true, false);
-	}
-	m_counter->strobeReset(&status);
-	wpi_assertCleanStatus(status);
+	SetUpSource(&source);
 }
 
 /**
@@ -269,7 +273,8 @@ void Counter::SetDownSource(AnalogTrigger *analogTrigger, AnalogTriggerOutput::T
 void Counter::SetDownSource(DigitalSource *source)
 {
 	wpi_assert(m_downSource == NULL);
-	wpi_assert(m_counter->readConfig_Mode(&status) == kTwoPulse);
+	unsigned char mode = m_counter->readConfig_Mode(&status);
+	wpi_assert(mode == kTwoPulse || mode == kExternalDirection);
 	m_downSource = source;
 	m_counter->writeConfig_DownSource_Module(source->GetModuleForRouting(), &status);
 	m_counter->writeConfig_DownSource_Channel(source->GetChannelForRouting(), &status);
@@ -297,16 +302,7 @@ void Counter::SetDownSource(AnalogTrigger &analogTrigger, AnalogTriggerOutput::T
  */
 void Counter::SetDownSource(DigitalSource &source)
 {
-	wpi_assert(m_downSource == NULL);
-	wpi_assert(m_counter->readConfig_Mode(&status) == kTwoPulse);
-	m_downSource = &source;
-	m_counter->writeConfig_DownSource_Module(source.GetModuleForRouting(), &status);
-	m_counter->writeConfig_DownSource_Channel(source.GetChannelForRouting(), &status);
-	m_counter->writeConfig_DownSource_AnalogTrigger(source.GetAnalogTriggerForRouting(), &status);
-
-	SetDownSourceEdge(true, false);
-	m_counter->strobeReset(&status);
-	wpi_assertCleanStatus(status);
+	SetDownSource(&source);
 }
 
 /**
@@ -440,7 +436,7 @@ void Counter::Stop()
  */
 double Counter::GetPeriod()
 {
-	long period = m_counter->readTimerOutput_Period(&status);
+	long period = m_counter->readTimerOutput_Period(&status) / m_counter->readTimerOutput_Count(&status);
 	wpi_assertCleanStatus(status);
 	return period / 1.0e6;
 }
@@ -501,3 +497,19 @@ bool Counter::GetDirection()
 	return value;
 }
 
+/**
+ * Set the Counter to return reversed sensing on the direction.
+ * This allows counters to change the direction they are counting in the case of 1X and 2X
+ * quadrature encoding only. Any other counter mode isn't supported.
+ * @param reverseDirection true if the value counted should be negated.
+ */
+void Counter::SetReverseDirection(bool reverseDirection)
+{
+	if (m_counter->readConfig_Mode(&status) == kExternalDirection)
+	{
+		if (reverseDirection)
+			SetDownSourceEdge(true, true);
+		else
+			SetDownSourceEdge(false, true);
+	}
+}

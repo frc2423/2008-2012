@@ -125,7 +125,7 @@ void DigitalModule::SetRelayForward(UINT32 channel, bool on)
 	status = 0;
 	CheckRelayChannel(channel);
 	// TODO: Protect me with a semaphore.
-	UINT32 forwardRelays = m_fpgaDIO->readSlowValue_RelayFwd(&status);
+	UINT8 forwardRelays = m_fpgaDIO->readSlowValue_RelayFwd(&status);
 	if (on)
 		forwardRelays |= 1 << (channel - 1);
 	else
@@ -144,7 +144,7 @@ void DigitalModule::SetRelayReverse(UINT32 channel, bool on)
 	status = 0;
 	CheckRelayChannel(channel);
 	// TODO: Protect me with a semaphore.
-	UINT32 reverseRelays = m_fpgaDIO->readSlowValue_RelayRev(&status);
+	UINT8 reverseRelays = m_fpgaDIO->readSlowValue_RelayRev(&status);
 	if (on)
 		reverseRelays |= 1 << (channel - 1);
 	else
@@ -152,6 +152,46 @@ void DigitalModule::SetRelayReverse(UINT32 channel, bool on)
 	m_fpgaDIO->writeSlowValue_RelayRev(reverseRelays, &status);
 	wpi_assertCleanStatus(status);
 }
+
+/**
+ * Get the current state of the forward relay channel
+ */
+bool DigitalModule::GetRelayForward(UINT32 channel)
+{
+	status = 0;
+	UINT8 forwardRelays = m_fpgaDIO->readSlowValue_RelayFwd(&status);
+	return (forwardRelays & (1 << (channel - 1))) != 0;
+}
+
+/**
+ * Get the current state of all of the forward relay channels on this module.
+ */
+UINT8 DigitalModule::GetRelayForward(void)
+{
+	status = 0;
+	return m_fpgaDIO->readSlowValue_RelayFwd(&status);
+}
+
+/**
+ * Get the current state of the reverse relay channel
+ */
+bool DigitalModule::GetRelayReverse(UINT32 channel)
+{
+	status = 0;
+	UINT8 reverseRelays = m_fpgaDIO->readSlowValue_RelayRev(&status);
+	return (reverseRelays & (1 << (channel - 1))) != 0;
+	
+}
+
+/**
+ * Get the current state of all of the reverse relay channels on this module.
+ */
+UINT8 DigitalModule::GetRelayReverse(void)
+{
+	status = 0;
+	return m_fpgaDIO->readSlowValue_RelayRev(&status);	
+}
+
 
 /**
  * Allocate Digital I/O channels.
@@ -216,18 +256,55 @@ void DigitalModule::SetDIO(UINT32 channel, short value)
  * Read a digital I/O bit from the FPGA.
  * Get a single value from a digital I/O channel.
  */
-UINT32 DigitalModule::GetDIO(UINT32 channel)
+bool DigitalModule::GetDIO(UINT32 channel)
 {
 	status = 0;
 	UINT32 currentDIO = m_fpgaDIO->readDI(&status);
 	
 	//Shift 00000001 over channel-1 places.
 	//AND it against the currentDIO
-	//if it == 0, then return 0
-	//else return 1
+	//if it == 0, then return false
+	//else return true
 	wpi_assertCleanStatus(status);
-	UINT32 value = (currentDIO >> RemapDigitalChannel(channel - 1)) & 1;
-	return value;
+	return ((currentDIO >> RemapDigitalChannel(channel - 1)) & 1) != 0;
+}
+
+/**
+ * Read the state of all the Digital I/O lines from the FPGA
+ * These are not remapped to logical order.  They are still in hardware order.
+ */
+UINT16 DigitalModule::GetDIO(void)
+{
+	status = 0;
+	return m_fpgaDIO->readDI(&status);
+}
+
+/**
+ * Read the direction of a the Digital I/O lines
+ * A 1 bit means output and a 0 bit means input.
+ */
+bool DigitalModule::GetDIODirection(UINT32 channel)
+{
+	status = 0;
+	UINT32 currentOutputEnable = m_fpgaDIO->readOutputEnable(&status);
+	
+	//Shift 00000001 over channel-1 places.
+	//AND it against the currentOutputEnable
+	//if it == 0, then return false
+	//else return true
+	wpi_assertCleanStatus(status);
+	return ((currentOutputEnable >> RemapDigitalChannel(channel - 1)) & 1) != 0;
+}
+
+/**
+ * Read the direction of all the Digital I/O lines from the FPGA
+ * A 1 bit means output and a 0 bit means input.
+ * These are not remapped to logical order.  They are still in hardware order.
+ */
+UINT16 DigitalModule::GetDIODirection(void)
+{
+	status = 0;
+	return m_fpgaDIO->readOutputEnable(&status);
 }
 
 /**

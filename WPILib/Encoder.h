@@ -10,6 +10,8 @@
 #include "ChipObject.h"
 #include "CounterBase.h"
 #include "SensorBase.h"
+#include "Counter.h"
+#include "PIDSource.h"
 
 class DigitalSource;
 
@@ -25,27 +27,31 @@ class DigitalSource;
 class Encoder: public SensorBase, public CounterBase
 {
 public:
-	Encoder(UINT32 aChannel, UINT32 bChannel, bool reverseDirection=false);
-	Encoder(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 _bChannel, bool reverseDirection=false);
-	Encoder(DigitalSource *aSource, DigitalSource *bSource, bool reverseDirection=false);
-	Encoder::Encoder(DigitalSource &aSource, DigitalSource &bSource, bool reverseDirection);
+	Encoder(UINT32 aChannel, UINT32 bChannel, bool reverseDirection=false, EncodingType encodingType = k4X);
+	Encoder(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 _bChannel, bool reverseDirection=false, EncodingType encodingType = k4X);
+	Encoder(DigitalSource *aSource, DigitalSource *bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
+	Encoder(DigitalSource &aSource, DigitalSource &bSource, bool reverseDirection=false, EncodingType encodingType = k4X);
 	virtual ~Encoder();
 
 	// CounterBase interface
 	void Start();
 	INT32 Get();
+	INT32 GetRaw();
 	void Reset();
 	void Stop();
 	double GetPeriod();
 	void SetMaxPeriod(double maxPeriod);
 	bool GetStopped();
 	bool GetDirection();
-	float GetDistance();
-	void SetDistancePerTick(float distancePerTick);
+	double GetDistance();
+	double GetRate();
+	void SetMinRate(double minRate);
+	void SetDistancePerPulse(double distancePerPulse);
 	void SetReverseDirection(bool reverseDirection);
 
 private:
-	void InitEncoder(bool _reverseDirection);
+	void InitEncoder(bool _reverseDirection, EncodingType encodingType);
+	double DecodingScaleFactor();
 
 	DigitalSource *m_aSource;		// the A phase of the quad encoder
 	DigitalSource *m_bSource;		// the B phase of the quad encoder
@@ -53,7 +59,9 @@ private:
 	bool m_allocatedBSource;		// was the B source allocated locally?
 	tEncoder* m_encoder;
 	UINT8 m_index;
-	float m_distancePerTick;		// distance of travel for each encoder tick
+	double m_distancePerPulse;		// distance of travel for each encoder tick
+	Counter *m_counter;				// Counter object for 1x and 2x encoding
+	EncodingType m_encodingType;	// Encoding type
 };
 
 #endif

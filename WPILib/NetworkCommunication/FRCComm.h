@@ -18,6 +18,7 @@
 
 #define USER_CONTROL_DATA_SIZE 936
 #define USER_STATUS_DATA_SIZE 984
+#define USER_DS_LCD_DATA_SIZE 128
 
 struct FRCControlData{
 	UINT16 packetIndex;
@@ -120,16 +121,17 @@ typedef struct {
 extern "C" {
 	int getControlData(FRCControlData *data, char *userData, int wait_ms);
 	int setStatusData(float battery, UINT8 dsDigitalOut, const char *userData, int userDataLength, int wait_ms);
+	int setUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength, int wait_ms);
 
 	void setNewDataSem(SEM_ID);
 	void setResyncSem(SEM_ID);
 	void signalResyncActionDone(void);
-	
+
 	// this UINT32 is really a LVRefNum
 	void setNewDataOccurRef(UINT32 refnum);
 	void setResyncOccurRef(UINT32 refnum);
 
-	void getVersionString(char *version);
+	void FRC_NetworkCommunication_getVersionString(char *version);
 };
 
 #endif

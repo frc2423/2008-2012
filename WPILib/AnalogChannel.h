@@ -8,6 +8,7 @@
 #define ANALOG_CHANNEL_H_
 
 #include "SensorBase.h"
+#include "PIDSource.h"
 
 class AnalogModule;
 
@@ -23,7 +24,7 @@ class AnalogModule;
  * resolution, while the averaged samples are divided by the number of samples to retain the resolution,
  * but get more stable values.
  */
-class AnalogChannel : public SensorBase
+class AnalogChannel : public SensorBase, public PIDSource
 {
 public:
 	static const UINT32 kAccumulatorSlot = 1;
@@ -62,6 +63,8 @@ public:
 	INT64 GetAccumulatorValue();
 	UINT32 GetAccumulatorCount();
 	void GetAccumulatorOutput(INT64 *value, UINT32 *count);
+	
+	double PIDGet();
 
 private:
 	void InitChannel(UINT32 slot, UINT32 channel);

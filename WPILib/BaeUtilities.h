@@ -18,30 +18,12 @@
 #include "WPILib.h"
 
 /*  Constants */
-
-#define LOG_DEBUG    __FILE__,funcName,__LINE__,DEBUG_TYPE
-#define LOG_INFO     __FILE__,funcName,__LINE__,INFO_TYPE
-#define LOG_ERROR    __FILE__,funcName,__LINE__,ERROR_TYPE
-#define LOG_CRITICAL __FILE__,funcName,__LINE__,CRITICAL_TYPE
-#define LOG_FATAL    __FILE__,funcName,__LINE__,FATAL_TYPE
-#define LOG_DEBUG    __FILE__,funcName,__LINE__,DEBUG_TYPE
-
-/* Error Codes */
-#define ERR_VISION_GENERAL_ERROR			166000	// 
-#define ERR_COLOR_NOT_FOUND					166100	// frcvtrack.cpp
-#define ERR_PARTICLE_TOO_SMALL				166101	// frcvtrack.cpp
-
-#define ERR_CAMERA_FAILURE					166200	// frcAxis.cpp
-#define ERR_CAMERA_SOCKET_CREATE_FAILED		166201	// frcAxis.cpp
-#define ERR_CAMERA_CONNECT_FAILED			166202	// frcAxis.cpp
-#define ERR_CAMERA_STALE_IMAGE				166203	// frcAxis.cpp
-#define ERR_CAMERA_NOT_INITIALIZED			166204	// frcAxis.cpp
-#define ERR_CAMERA_NO_BUFFER_AVAILABLE		166205	// frcAxis.cpp
-#define ERR_CAMERA_HEADER_ERROR				166206	// frcAxis.cpp
-#define ERR_CAMERA_BLOCKING_TIMEOUT			166207	// frcAxis.cpp
-#define ERR_CAMERA_AUTHORIZATION_FAILED		166208	// frcAxis.cpp
-#define ERR_CAMERA_TASK_SPAWN_FAILED		166209	// frcAxis.cpp
-#define ERR_CAMERA_TASK_INPUT_OUT_OF_RANGE	166210	// frcAxis.cpp
+#define LOG_DEBUG    __FILE__,__FUNCTION__,__LINE__,DEBUG_TYPE
+#define LOG_INFO     __FILE__,__FUNCTION__,__LINE__,INFO_TYPE
+#define LOG_ERROR    __FILE__,__FUNCTION__,__LINE__,ERROR_TYPE
+#define LOG_CRITICAL __FILE__,__FUNCTION__,__LINE__,CRITICAL_TYPE
+#define LOG_FATAL    __FILE__,__FUNCTION__,__LINE__,FATAL_TYPE
+#define LOG_DEBUG    __FILE__,__FUNCTION__,__LINE__,DEBUG_TYPE
 
 /*   Enumerated Types */
 
@@ -77,6 +59,11 @@ void panInit();
 void panInit(double period);
 void panForTarget(Servo *panServo);
 void panForTarget(Servo *panServo, double sinStart);
+
+/* config file read utilities */
+int processFile(char *inputFile, char *outputString, int lineNumber);
+int emptyString(char *string);
+void stripString(char *string);
 
 #endif
 

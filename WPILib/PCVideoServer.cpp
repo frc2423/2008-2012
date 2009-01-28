@@ -20,6 +20,7 @@
 
 #include "AxisCamera.h"
 #include "BaeUtilities.h"
+#include "FrcError.h"
 #include "chipobject/NiRioStatus.h"
 #include "Task.h"
 #include "Timer.h"
@@ -73,7 +74,6 @@ PCVideoServer::PCVideoServer(void)
 	: m_task("PCVideo", (FUNCPTR)ImageToPCServer)
 {
     try {
-    	printf ("START PCVideoServer constructor\n");
         // Start the image communication task.
         StartPcTask();
         if (StatusIsFatal()) {
@@ -90,7 +90,7 @@ PCVideoServer::PCVideoServer(void)
 Stop serving images and destroy this class.
 */
 PCVideoServer::~PCVideoServer() {
-    printf ("START PCVideoServer DESTRUCTOR **********************\n");
+    //printf ("START PCVideoServer DESTRUCTOR **********************\n");
     //  Stop the images to PC server.
     Stop();
     //StopImageToPCServer();
@@ -161,7 +161,6 @@ void PCVideoServer::Start() {
 @brief Stop sending images to the PC.
 */
 void PCVideoServer::Stop() {
-	printf("Stop");
     g_stopImageToPCServer = true;
 }
 
@@ -173,7 +172,6 @@ void PCVideoServer::Stop() {
 @brief Stop sending images to the PC.
 */
 void StopImageToPCServer() {
-	printf("StopImageToPCServer");
 	g_stopImageToPCServer = true;
 }
 
@@ -190,8 +188,6 @@ bool ShouldStopImageToPCServer()  {
 @brief Initialize the socket and serve images to the PC.
 */
 int ImageToPCServer() {
-    printf("ImageToPCServer Started\n");
-
     /* Setup to PC sockets */
     struct sockaddr_in serverAddr;
     int sockAddrSize = sizeof(serverAddr);
@@ -203,9 +199,11 @@ int ImageToPCServer() {
     serverAddr.sin_addr.s_addr = htonl (INADDR_ANY);
 
     int success;
-    while (!ShouldStopImageToPCServer()) {
+    while (true) {
         double lastImageTimestamp = 0;
-        //  Create the socket.
+
+        taskSafe();
+    	//  Create the socket.
         if ((pcSock = socket (AF_INET, SOCK_STREAM, 0)) == ERROR) {
             perror ("socket");
             continue;
@@ -222,7 +220,7 @@ int ImageToPCServer() {
             continue;
         }
         //  Create queue for client connection requests.
-        printf ("Listening on socket (port:%d)\n",VIDEO_TO_PC_PORT);
+        //printf ("Listening on socket (port:%d)\n",VIDEO_TO_PC_PORT);
         if (listen (pcSock, 1) == ERROR)
         {
             perror ("listen");
@@ -232,65 +230,63 @@ int ImageToPCServer() {
         //  Accept a new connect request
         struct sockaddr_in clientAddr;
         int clientAddrSize;
-        printf ("accept socket\n");
         int newPCSock = accept (pcSock, reinterpret_cast<sockaddr*>(&clientAddr), &clientAddrSize);
         if (newPCSock  == ERROR) {
             perror ("accept");
             close(pcSock);
             continue;
         }
-        printf ("CONNECTED TO PC socket:%d\n",newPCSock);
         //  Got a connection.
         //TODO: check camera error
         //if (!StatusIsFatal()) {
-        if (1) {
-        	printf ("Everyting is OKAY...starting to get images from camera\n");
-            while(!ShouldStopImageToPCServer()) {
-                double newTimestamp;
-                int numBytes = 0;
-                char* imageData = NULL;
-                //printf ("Getting image from camera\n");
-                success = GetImageDataBlocking(&imageData, &numBytes, &newTimestamp, lastImageTimestamp);
-                if (!success) {
-                    //  If camera is not initialzed you will get failure and
-                    //  the timestamp is invalid. Reset this value and try again.
-                    lastImageTimestamp = 0;
-                    continue;
-                }
-                lastImageTimestamp = newTimestamp;
 
-                //printf ("Writing image to PC\n");
-                /* Write header to PC */
-                static const char header[4]={1,0,0,0};
-                int headerSend = write(newPCSock, const_cast<char*>(header), 4);
+        while(!ShouldStopImageToPCServer()) {
 
-                /* Write image length to PC */
-                int presend = write(newPCSock, reinterpret_cast<char*>(&numBytes), 4);
-
-                /* Write image to PC */
-                int sent = write (newPCSock, imageData, numBytes);
-
-                //  Cleanup memory allocated for the image.
-                delete imageData;
-                imageData = NULL;
-                numBytes = 0;
-
-                //  The PC probably closed connection. Get out of here
-                //  and try listening again.
-                if (headerSend == ERROR || sent == ERROR || presend == ERROR) {
-                    break;
-                }
-                //no point in running too fast -
-                //max camera frame rate is 30 fps
-                Wait(0.01);
+            double newTimestamp;
+            int numBytes = 0;
+            char* imageData = NULL;
+            //printf ("Getting image from camera\n");
+            success = GetImageDataBlocking(&imageData, &numBytes, &newTimestamp, lastImageTimestamp);
+            if (!success) {
+                //  If camera is not initialzed you will get failure and
+                //  the timestamp is invalid. Reset this value and try again.
+                lastImageTimestamp = 0;
+                continue;
             }
+            lastImageTimestamp = newTimestamp;
+
+            //printf ("Writing image to PC\n");
+            /* Write header to PC */
+            static const char header[4]={1,0,0,0};
+            int headerSend = write(newPCSock, const_cast<char*>(header), 4);
+
+            /* Write image length to PC */
+            int presend = write(newPCSock, reinterpret_cast<char*>(&numBytes), 4);
+
+            /* Write image to PC */
+            int sent = write (newPCSock, imageData, numBytes);
+
+            //  Cleanup memory allocated for the image.
+            delete imageData;
+            imageData = NULL;
+            numBytes = 0;
+
+            //  The PC probably closed connection. Get out of here
+            //  and try listening again.
+            if (headerSend == ERROR || sent == ERROR || presend == ERROR) {
+                break;
+            }
+            //no point in running too fast -
+            //max camera frame rate is 30 fps
+            Wait(0.01);
         }
-        printf ("CLEANING UP...\n");
         //  Clean up
         close (newPCSock);
         newPCSock = ERROR;
         close (pcSock);
         pcSock = ERROR;
+        taskUnsafe();
+        Wait(0.1);
     }
     return (OK);
 }

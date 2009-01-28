@@ -57,7 +57,6 @@ enum ImageSize { k640x480, k320x240, k160x120 };
 */
 enum ImageRotation { ROT_0 = 0, ROT_90 = 90, ROT_180 = 180, ROT_270 = 270 };
 
-
 /*  Image Acquisition functions */
 
 /* obtains an image from the camera server */
@@ -75,6 +74,11 @@ void StartImageSignal(int taskId);
 /* status & metrics */
 int frcCameraInitialized();
 int GetCameraMetric(FrcvCameraMetric metric);
+
+/* camera configuration */
+int ConfigureCamera(char *configString);
+int GetCameraSetting(char *configString, char *cameraResponse);
+int GetImageSetting(char *configString, char *cameraResponse);
 
 /* camera task control */
 int StartCameraTask();

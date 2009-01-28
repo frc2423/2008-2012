@@ -111,3 +111,13 @@ void Accelerometer::SetZero(float zero)
 {
 	m_zeroGVoltage = zero;
 }
+
+/**
+ * Get the Acceleration for the PID Source parent.
+ * 
+ * @return The current acceleration in Gs.
+ */ 
+double Accelerometer::PIDGet()
+{
+	return GetAcceleration();
+}

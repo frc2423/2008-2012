@@ -15,6 +15,8 @@
 class CounterBase
 {
 public:
+	typedef enum {k1X, k2X, k4X} EncodingType;
+
 	virtual ~CounterBase() {}
 	virtual void Start() = 0;
 	virtual INT32 Get() = 0;

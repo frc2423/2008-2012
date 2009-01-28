@@ -31,7 +31,7 @@
 #define ERR_CAMERA_AUTHORIZATION_FAILED		166208	// AxisCamera.cpp
 #define ERR_CAMERA_TASK_SPAWN_FAILED		166209	// AxisCamera.cpp
 #define ERR_CAMERA_TASK_INPUT_OUT_OF_RANGE	166210	// AxisCamera.cpp
-
+#define ERR_CAMERA_COMMAND_FAILURE			166211	// AxisCamera.cpp
 
 /* error handling functions */
 int GetLastVisionError();

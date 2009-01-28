@@ -9,11 +9,12 @@
 
 #include "PWM.h"
 #include "SpeedController.h"
+#include "PIDOutput.h"
 
 /**
  * Luminary Micro Jaguar Speed Control
  */
-class Jaguar : public PWM, public SpeedController
+class Jaguar : public PWM, public SpeedController, public PIDOutput
 {
 public:
 	explicit Jaguar(UINT32 channel);
@@ -21,6 +22,8 @@ public:
 	virtual ~Jaguar();
 	float Get();
 	void Set(float value);
+	
+	void PIDWrite(float output);
 
 private:
 	void InitJaguar();

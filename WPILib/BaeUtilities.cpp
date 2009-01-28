@@ -1,7 +1,7 @@
 /********************************************************************************
 *  Project   		: FIRST Motor Controller
 *  File Name  		: BaeUtilities.cpp        
-*  Contributors   	: JDG, ELF
+*  Contributors   	: JDG, ELF, EMF
 *  Creation Date 	: July 20, 2008
 *  Revision History	: Source code & revision history maintained at sourceforge.WPI.edu    
 *  File Description	: Open source utility extensions for FIRST Vision API.
@@ -11,16 +11,19 @@
 /*  Open Source Software - may be modified and shared by FRC teams. The code  */
 /*  must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib. */
 /*----------------------------------------------------------------------------*/
-
-#include "math.h"
-#include "stdioLib.h" 
-#include "string.h"
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <string.h>
+#include <math.h>
+#include <stdioLib.h> 
  
 #include "BaeUtilities.h"
 #include "Utility.h"
 
 /**
- *   Utility functions for frcvision
+ *   Utility functions 
  */
 
 /**
@@ -29,14 +32,12 @@
  */
 static DebugOutputType	dprintfFlag = DEBUG_OFF;  
 
-
 /**
  * Set the debug flag to print to screen, file on cRIO, both or neither
  * @param tempString The format string.
  */
 void SetDebugFlag ( DebugOutputType flag  )  
 { dprintfFlag = flag; }
-
 
 /**
  * Debug print to a file and/or a terminal window.
@@ -156,7 +157,6 @@ void dprintf ( char * tempString, ...  )  /* Variable argument list */
   }
 }
 
-
 /**
  * @brief Normalizes a value in a range, used for drive input
  * @param position The position in the range, starting at 0
@@ -208,7 +208,6 @@ void ShowActivity (char *fmt, ...)
   va_end (args);
 }
 
-
 #define PI 3.14159265358979
 /**
  * @brief Calculate sine wave increments (-1.0 to 1.0). 
@@ -222,35 +221,22 @@ void ShowActivity (char *fmt, ...)
 double SinPosition (double *period, double sinStart)
 {
   double rtnVal;
-  static int increment=-1;
-  static int synchronized=0;
   static double sinePeriod=0.0;
   static double timestamp;
-  static double factor;
   double sinArg;
 
+  //1st call
   if (period != NULL) {
-    increment = -1;
-    synchronized = 0;
     sinePeriod = *period;
-    if (sinePeriod <= 0.0) sinePeriod = 1.0;
+	timestamp = GetTime();
+	return 0.0;
   }
 
-  if (increment == -1) {
-    if (synchronized == 0) {
-      synchronized = 1;
-      timestamp = GetTime();
-      return (0.0);
-    } else {
-      factor = (PI * 2.0 * ((GetTime()) - timestamp)) / sinePeriod;
-      increment = 0;
-    }
-  }
-  sinArg = (double)(increment++) * factor;
-  sinArg += sinStart;
+  //Multiplying by 2*pi to the time difference makes sinePeriod work if it's measured in seconds.
+  //Adding sinStart to the part multiplied by PI, but not by 2, allows it to work as described in the comments.
+  sinArg = PI *((2.0 * (GetTime() - timestamp)) + sinStart) / sinePeriod;
   rtnVal = sin (sinArg);  
   return (rtnVal);
-
 }
 
 
@@ -294,5 +280,120 @@ void panForTarget(Servo *panServo, double sinStart)	{
 	//		normalizedSinPosition, newServoPosition );
 }
 
+
+/** @brief Read a file and return non-comment output string 
+
+Call the first time with 0 lineNumber to get the number of lines to read
+Then call with each lineNumber to get one camera parameter. There should
+be one property=value entry on each line, i.e. "exposure=auto"
+
+ * @param inputFile filename to read
+ * @param outputString one string
+ * @param lineNumber if 0, return number of lines; else return that line number
+ * @return int number of lines or -1 if error
+ **/
+int processFile(char *inputFile, char *outputString, int lineNumber)
+{
+	FILE *infile;
+	int stringSize = 80;		// max size of one line in file 
+	char inputStr[stringSize];
+	struct stat fileStatus;
+	int fileSize=0;
+	int lineCount=0;
+	  
+	if (lineNumber < 0)
+		  return (-1);
+
+	if ((infile = fopen (inputFile, "r")) == NULL) {
+	    printf ("Fatal error opening file %s\n",inputFile);
+	    return (0);
+	}
+    memset (&fileStatus, 0, sizeof(fileStatus));
+    if (!stat(inputFile, &fileStatus)) {
+      if (S_ISREG(fileStatus.st_mode)) {
+        fileSize = fileStatus.st_size;
+      }
+    }
+
+  while (!feof(infile)) {
+    if (fgets (inputStr, stringSize, infile) != NULL) {
+      // Skip empty lines
+      if (emptyString(inputStr))
+        continue;
+      // Skip comment lines
+      if (inputStr[0] == '#' || inputStr[0] == '!')
+        continue;
+
+      lineCount++;
+      if (lineNumber == 0)
+        continue;
+      else
+      {
+    	  if (lineCount == lineNumber)
+    		  break;
+      }
+    }
+  }
+
+  // close file 
+  fclose (infile);
+  // if number lines requested return the count
+  if (lineNumber == 0)
+	  return (lineCount);
+  // check for input out of range
+  if (lineNumber > lineCount)
+	  return (-1);
+  // return the line selected
+  if (lineCount) {
+    stripString(inputStr);
+    strcpy(outputString, inputStr);
+    return(lineCount);
+  } 
+  else {
+    return(-1);
+  }
+}
+
+/** Ignore empty string 
+ * @param string to check if empty
+ **/
+int emptyString(char *string)
+{
+  int i,len;
+
+  if(string == NULL)
+    return(1);
+
+  len = strlen(string);
+  for(i=0; i<len; i++) {
+    // Ignore the following characters
+    if (string[i] == '\n' || string[i] == '\r' ||
+        string[i] == '\t' || string[i] == ' ')
+      continue;
+    return(0);
+  }
+  return(1);
+}
+
+/** Remove special characters from string 
+ * @param string to process
+ **/
+void stripString(char *string)
+{
+  int i,j,len;
+
+  if(string == NULL)
+    return;
+
+  len = strlen(string);
+  for(i=0,j=0; i<len; i++) {
+    // Remove the following characters from the string
+    if (string[i] == '\n' || string[i] == '\r' || string[i] == '\"')
+      continue;
+    // Copy anything else
+    string[j++] = string[i];
+  }
+  string[j] = '\0'; 
+}
 
 

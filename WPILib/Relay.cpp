@@ -147,3 +147,36 @@ void Relay::Set(Relay::Value value)
 		wpi_assert(false);
 	}
 }
+
+
+/**
+ * Set the Relay Direction
+ * 
+ * Changes which values the relay can be set to depending on which direction is 
+ * used
+ * 
+ * Valid inputs are kBothDirections, kForwardOnly, and kReverseOnly
+ * 
+ *@param direction The direction for the relay to operate in
+ */ 
+void Relay::SetDirection(Relay::Direction direction){
+	if(m_direction == direction)
+		return;
+	m_module->SetRelayForward(m_channel, false);
+	m_module->SetRelayReverse(m_channel, false);
+	switch(direction)
+	{
+	case kBothDirections:
+		m_direction = kBothDirections;
+		break;
+	case kForwardOnly:
+		m_direction = kForwardOnly;
+		break;
+	case kReverseOnly:
+		m_direction = kReverseOnly;
+		break;
+	default:
+		wpi_assert(false);
+	}
+}
+

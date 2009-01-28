@@ -16,7 +16,7 @@ Watchdog::Watchdog()
 {
 	m_fpgaWatchDog = new tWatchdog(&status);
 	wpi_assertCleanStatus(status);
-	SetExpiration(kDefaultWatchdogExpiration_ms);
+	SetExpiration(kDefaultWatchdogExpiration);
 	SetEnabled(true);
 }
 
@@ -67,7 +67,7 @@ void Watchdog::Kill()
  * 
  * @return The number of seconds since last meal.
  */
-float Watchdog::GetTimer()
+double Watchdog::GetTimer()
 {
 	UINT32 timer = m_fpgaWatchDog->readTimer(&status);
 	wpi_assertCleanStatus(status);
@@ -79,7 +79,7 @@ float Watchdog::GetTimer()
  * 
  * @return The number of seconds before starvation following a meal (watchdog starves if it doesn't eat this often).
  */
-float Watchdog::GetExpiration()
+double Watchdog::GetExpiration()
 {
 	UINT32 expiration = m_fpgaWatchDog->readExpiration(&status);
 	wpi_assertCleanStatus(status);
@@ -91,7 +91,7 @@ float Watchdog::GetExpiration()
  * 
  * @param expiration The number of seconds before starvation following a meal (watchdog starves if it doesn't eat this often).
  */
-void Watchdog::SetExpiration(float expiration)
+void Watchdog::SetExpiration(double expiration)
 {
 	m_fpgaWatchDog->writeExpiration((UINT32)(expiration * (kSystemClockTicksPerMicrosecond * 1e6)), &status);
 	wpi_assertCleanStatus(status);

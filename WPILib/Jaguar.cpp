@@ -75,3 +75,12 @@ float Jaguar::Get()
 	return GetSpeed();
 }
 
+/**
+ * Write out the PID value as seen in the PIDOutput base object.
+ * 
+ * @param output Write out the PWM value as was found in the PIDController
+ */
+void Jaguar::PIDWrite(float output)
+{
+	Set(output);
+}

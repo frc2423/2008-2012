@@ -9,11 +9,12 @@
 
 #include "PWM.h"
 #include "SpeedController.h"
+#include "PIDOutput.h"
 
 /**
  * IFI Victor Speed Controller
  */
-class Victor : public PWM, public SpeedController
+class Victor : public PWM, public SpeedController, public PIDOutput
 {
 public:
 	explicit Victor(UINT32 channel);
@@ -21,6 +22,8 @@ public:
 	virtual ~Victor();
 	void Set(float value);
 	float Get();
+	
+	void PIDWrite(float output);
 
 private:
 	void InitVictor();

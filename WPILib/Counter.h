@@ -29,6 +29,7 @@ public:
 	explicit Counter(DigitalSource &source);
 	explicit Counter(AnalogTrigger *trigger);
 	explicit Counter(AnalogTrigger &trigger);
+	Counter(EncodingType encodingType, DigitalSource *upSource, DigitalSource *downSource, bool inverted);
 	virtual ~Counter();
 
 	void SetUpSource(UINT32 channel);
@@ -53,6 +54,8 @@ public:
 	void SetExternalDirectionMode();
 	void SetSemiPeriodMode(bool highRisingPeriod);
 	void SetPulseLengthMode(float threshold);
+	
+	void SetReverseDirection(bool reverseDirection);
 
 	// CounterBase interface
 	void Start();
@@ -65,7 +68,7 @@ public:
 	bool GetStopped();
 	bool GetDirection();
 private:
-	void InitCounter();
+	void InitCounter(Mode mode = kTwoPulse);
 
 	DigitalSource *m_upSource;		///< What makes the counter count up.
 	DigitalSource *m_downSource;	///< What makes the counter count down.

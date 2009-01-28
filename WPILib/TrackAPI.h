@@ -5,9 +5,6 @@
 *  Creation Date 	: August 12, 2008
 *  Revision History	: Source code & revision history maintained at sourceforge.WPI.edu    
 *  File Description	: Globally defined values for the FIRST Vision API
-* 
-*  API: Because nivision.h uses C++ style comments, any file including this
-*  must be a .cpp (not .c).
 */
 /*----------------------------------------------------------------------------*/
 /*        Copyright (c) FIRST 2008.  All Rights Reserved.                     */
@@ -20,6 +17,14 @@
 
 #include "VisionAPI.h"
 #include "BaeUtilities.h"
+
+/*  Constants */
+/** image quality requirement: particle must be this % of pixels 
+ * For instance, a 320x240 image has 76800 pixels. With this 
+ * tolerance at .01, the image must be 768 pixels.
+ * Use a percentage instead of a fixed # of pixels so different
+ * image sizes will work the same way */
+#define PARTICLE_TO_IMAGE_PERCENT 0.01
 
 /*  Structures */
 typedef struct TrackingThreshold_struct {
@@ -41,7 +46,7 @@ typedef enum FrcHue_enum {
 typedef enum FrcLight_enum { 
 	PASSIVE_LIGHT, BRIGHT_LIGHT, ACTIVE_LIGHT, WHITE_LIGHT, FLUORESCENT
 }FrcLight;
-
+	
 /* color tracking support functions */
 TrackingThreshold GetTrackingData(FrcHue hue, FrcLight light);
 
@@ -52,6 +57,7 @@ void PrintReport(TrackingThreshold* myReport);
 /*  Tracking functions */
 
 /* find a color in current camera image */
+bool InArea(Image* binaryImage, int particleIndex, Rect rect);
 int GetLargestParticle(Image* binaryImage, int* particleNum);
 int GetLargestParticle(Image* binaryImage, int* particleNum, Rect rect);
 int FindColor(FrcHue color, ParticleAnalysisReport* trackReport);
@@ -64,6 +70,5 @@ int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range
 int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range, 
 		const Range* plane3Range, ParticleAnalysisReport *trackReport, 
 		ColorReport *colorReport, Rect rect);
-
 #endif
 

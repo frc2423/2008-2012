@@ -8,12 +8,10 @@
 
 #include "Utility.h"
 #include "WPIStatus.h"
+#include <errnoLib.h>
 #include <string.h>
 #include <taskLib.h>
-
-extern "C" { INT32 ERRNO; }
-
-std::set<INT32> Task::m_tasks;
+#include <usrLib.h>
 
 /**
  * Create but don't launch a task.
@@ -24,7 +22,7 @@ std::set<INT32> Task::m_tasks;
  */
 Task::Task(char* name, FUNCPTR function, INT32 priority, UINT32 stackSize)
 {
-	m_taskID = 0;
+	m_taskID = kInvalidTaskID;
 	m_function = function;
 	m_priority = priority;
 	m_stackSize = stackSize;
@@ -35,7 +33,7 @@ Task::Task(char* name, FUNCPTR function, INT32 priority, UINT32 stackSize)
 
 Task::~Task()
 {
-	if (m_taskID != 0) Stop();
+	if (m_taskID != kInvalidTaskID) Stop();
 	delete [] m_taskName;
 	m_taskName = NULL;
 }
@@ -55,8 +53,7 @@ bool Task::Start(UINT32 arg0, UINT32 arg1, UINT32 arg2, UINT32 arg3, UINT32 arg4
 						arg0, arg1, arg2, arg3, arg4,	// parameter 1 - pointer to this class
 						arg5, arg6, arg7, arg8, arg9);// additional unused parameters
 	bool ok = HandleError(m_taskID);
-	if (ok) m_tasks.insert(m_taskID);
-	else m_taskID = 0;
+	if (!ok) m_taskID = kInvalidTaskID;
 	return ok;
 }
 
@@ -76,13 +73,12 @@ bool Task::Restart(void)
  */
 bool Task::Stop(void)
 {
-	m_tasks.erase(m_taskID);
 	bool ok = true;
 	if (Verify())
 	{
 		ok = HandleError(taskDelete(m_taskID));
 	}
-	m_taskID = 0;
+	m_taskID = kInvalidTaskID;
 	return ok;
 }
 
@@ -167,13 +163,13 @@ char* Task::GetName(void)
 
 /**
  * Get the ID of a task
- * @returns task ID of this task.
+ * @returns Task ID of this task.  Task::kInvalidTaskID (-1) if the task has not been started or has already exited.
  */
 INT32 Task::GetID(void)
 {
 	if (Verify())
 		return m_taskID;
-	return 0;
+	return kInvalidTaskID;
 }
 
 /**
@@ -182,7 +178,7 @@ INT32 Task::GetID(void)
 bool Task::HandleError(STATUS results)
 {
 	if (results != ERROR) return true;
-	switch(ERRNO)
+	switch(errnoGet())
 	{
 	case S_objLib_OBJ_ID_ERROR:
 		wpi_fatal(TaskIDError);
@@ -203,8 +199,9 @@ bool Task::HandleError(STATUS results)
 	case S_taskLib_ILLEGAL_PRIORITY:
 		wpi_fatal(TaskPriorityError);
 		break;
-		
+
 	default:
+		printErrno(errnoGet());
 		wpi_fatal(TaskError);
 	}
 	return false;

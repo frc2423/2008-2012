@@ -58,6 +58,10 @@ public:
 	virtual bool GetButton(ButtonType button);
 	bool GetRawButton(UINT32 button);
 	static Joystick* GetStickForPort(UINT32 port);
+	
+	virtual float GetMagnitude();
+	virtual float GetDirectionRadians();
+	virtual float GetDirectionDegrees();
 
 private:
 	DISALLOW_COPY_AND_ASSIGN(Joystick);

@@ -1224,6 +1224,8 @@ char* GetVisionErrorText(int errorCode)
 			{ errorText = "ERR_CAMERA_TASK_SPAWN_FAILED";break;}
 		case ERR_CAMERA_TASK_INPUT_OUT_OF_RANGE:
 			{ errorText = "ERR_CAMERA_TASK_INPUT_OUT_OF_RANGE";break;}
+		case ERR_CAMERA_COMMAND_FAILURE:
+			{ errorText = "ERR_CAMERA_COMMAND_FAILURE";break;}
 	}
 	
 	return errorText;

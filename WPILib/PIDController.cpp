@@ -14,10 +14,14 @@
  * @param Kp the proportional coefficient
  * @param Ki the integral coefficient
  * @param Kd the derivative coefficient
+ * @param source The PIDSource object that is used to get values
+ * @param output The PIDOutput object that is set to the output value
  * @param period the loop time for doing calculations. This particularly effects calculations of the
  * integral and differental terms. The default is 50ms.
  */
-PIDController::PIDController(float Kp, float Ki, float Kd, float period)
+PIDController::PIDController(float Kp, float Ki, float Kd,
+								PIDSource *source, PIDOutput *output,
+								float period)
 {
 	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
 	
@@ -36,12 +40,12 @@ PIDController::PIDController(float Kp, float Ki, float Kd, float period)
 
 	m_prevError = 0;
 	m_totalError = 0;
-	m_tolerence = .05;
+	m_tolerance = .05;
 
 	m_result = 0;
 	
-	m_pidInput = 0;
-	m_pidOutput = 0;
+	m_pidInput = source;
+	m_pidOutput = output;
 	
 	m_controlLoop->StartPeriodic(period);
 }
@@ -136,50 +140,26 @@ void PIDController::SetContinuous(bool continuous)
 }
 
 /**
- * Sets the PIDSource object from which the PIDController gets its feedback.
- * @param pidInput the source of feedback for the PIDController
- */
-void PIDController::SetInput(PIDSource *pidInput)
-{
-	m_pidInput = pidInput;
-}
-
-/**
- * Sets the PIDSource object from which the PIDController gets its feedback,
- * as well as the maximum and minimum values expected from the input.
- * @param pidInput the source of feedback for the PIDController
+ * Sets the maximum and minimum values expected from the input.
+ * 
  * @param minimumInput the minimum value expected from the input
  * @param maximumInput the maximum value expected from the output
  */
-void PIDController::SetInput(PIDSource *pidInput, float minimumInput,
-		float maximumInput)
+void PIDController::SetInputRange(float minimumInput, float maximumInput)
 {
-	m_pidInput = pidInput;
 	m_minimumInput = minimumInput;
 	m_maximumInput = maximumInput;	
 	SetSetpoint(m_setpoint);
 }
 
 /**
- * Sets the PIDOutput object which the PIDController writes to.
- * @param pidOutput the source of feedback for the PIDController
- */
-void PIDController::SetOutput(PIDOutput *pidOutput)
-{
-	m_pidOutput = pidOutput;
-}
-
-/**
- * Sets the PIDOutput object which the PIDController writes to, as well as the 
- * minimum and maximum values to write.
- * @param pidOutput the source of feedback for the PIDController
+ * Sets the minimum and maximum values to write.
+ * 
  * @param minimumOutput the minimum value to write to the output
  * @param maximumOutput the maximum value to write to the output
  */
-void PIDController::SetOutput(PIDOutput *pidOutput, float minimumOutput,
-		float maximumOutput)
+void PIDController::SetOutputRange(float minimumOutput, float maximumOutput)
 {
-	m_pidOutput = pidOutput;
 	m_minimumOutput = minimumOutput;
 	m_maximumOutput = maximumOutput;
 }
@@ -225,9 +205,9 @@ float PIDController::GetError()
  * OnTarget.
  * @param percentage error which is tolerable
  */
-void PIDController::SetTolerence(float percent)
+void PIDController::SetTolerance(float percent)
 {
-	m_tolerence = percent;
+	m_tolerance = percent;
 }
 
 /*
@@ -237,7 +217,7 @@ void PIDController::SetTolerence(float percent)
  */
 bool PIDController::OnTarget()
 {
-	return (fabs(m_error)<m_tolerence / 100 * 
+	return (fabs(m_error)<m_tolerance / 100 * 
 			(m_maximumInput - m_minimumInput));
 }
 

@@ -1,7 +1,7 @@
 /********************************************************************************
 *  Project   		: FIRST Motor Controller
 *  File Name  		: TrackAPI.cpp        
-*  Contributors   	: ELF
+*  Contributors   	: ELF, DWD
 *  Creation Date 	: August 10, 2008
 *  Revision History	: Source code & revision history maintained at sourceforge.WPI.edu   
 *  File Description	: Tracking Routines for FIRST Vision API
@@ -24,9 +24,6 @@
 int TrackAPI_debugFlag = 0;
 #define DPRINTF if(TrackAPI_debugFlag)dprintf
 
-/** image quality requirement: particle must be .0025 of pixels */
-#define PARTICLE_TO_IMAGE_PERCENT 0.25
-
 /**
 * @brief Find the largest particle that meets a criteria 
 * @param binaryImage Image to inspect
@@ -35,23 +32,23 @@ int TrackAPI_debugFlag = 0;
 */
 bool InArea(Image* binaryImage, int particleIndex, Rect rect)
 { 
-	char funcName[]="InArea";
 	double position;
+	
 	imaqMeasureParticle(binaryImage, particleIndex, 0, 
 			IMAQ_MT_BOUNDING_RECT_LEFT, &position);
-	if ( position < (rect.left + rect.width) ) return false;
+	if ( position < (rect.left             ) ) return false; // outside left of rectangle?
 	
 	imaqMeasureParticle(binaryImage, particleIndex, 0, 
 			IMAQ_MT_BOUNDING_RECT_TOP, &position);
-	if ( position < (rect.top + rect.height) ) return false;
+	if ( position < (rect.top              ) ) return false; // outside top of rectangle ?
 
 	imaqMeasureParticle(binaryImage, particleIndex, 0, 
 			IMAQ_MT_BOUNDING_RECT_RIGHT, &position);
-	if (position < rect.left) return false;
+	if (position > (rect.left + rect.width) ) return false;	// outside right of rectangle ?
 	
 	imaqMeasureParticle(binaryImage, particleIndex, 0, 
 			IMAQ_MT_BOUNDING_RECT_BOTTOM, &position);
-	if (position > rect.top) return false;	
+	if (position > (rect.top + rect.height) ) return false; // outside bottom of rectangle ?	
 
 	DPRINTF(LOG_INFO, "particle %i is in (%i %i) height %i width %i\n", 
 			particleIndex, rect.left, rect.top, rect.height, rect.width);
@@ -61,17 +58,16 @@ bool InArea(Image* binaryImage, int particleIndex, Rect rect)
 /**
 * @brief Find the largest particle that meets a criteria 
 * @param binaryImage Image to inspect
+* @param largestParticleIndex Index of the largest particle 
 * @param rect area to search
 * @return 0 = error
 */
-int GetLargestParticle(Image* binaryImage, int* particleNum)
-{ return GetLargestParticle(binaryImage, particleNum, IMAQ_NO_RECT); }
+int GetLargestParticle(Image* binaryImage, int* largestParticleIndex)
+{ return GetLargestParticle(binaryImage, largestParticleIndex, IMAQ_NO_RECT); }
 
-int GetLargestParticle(Image* binaryImage, int* particleNum, Rect rect)
+int GetLargestParticle(Image* binaryImage, int* largestParticleIndex, Rect rect)
 {
-	//char funcName[]="GetLargestParticle";
-	int largestParticleIndex = 0;
-	particleNum = &largestParticleIndex;
+	*largestParticleIndex = 0; // points to caller-provided variable
 	
 	/* determine number of particles in thresholded image */	
 	int numParticles;
@@ -79,7 +75,7 @@ int GetLargestParticle(Image* binaryImage, int* particleNum, Rect rect)
 	if ( !success )	{  return success; 	}			
 	
 	/* if no particles found we can quit here */
-	if (numParticles > 0)  {  return success; 	}
+	if (numParticles == 0)  {  return 0; 	}  // unsuccessful if zero particles found
 	
 	// find the largest particle
 	double largestParticleArea = 0;
@@ -91,10 +87,11 @@ int GetLargestParticle(Image* binaryImage, int* particleNum, Rect rect)
 			// see if is in the right area
 			if ( InArea(binaryImage, i, rect) ) {
 				largestParticleArea = particleArea;
-				largestParticleIndex = i;
+				*largestParticleIndex = i;  // return index to caller
 			}
 		}
-	}		
+	}
+	
 	return success;
 }
 
@@ -106,7 +103,6 @@ int GetLargestParticle(Image* binaryImage, int* particleNum, Rect rect)
 */
 int FindColor(FrcHue color, ParticleAnalysisReport* trackReport)
 {
-	char funcName[]="FindColor";
 	int success = 0;		// return: 0 = error
 	
 	/* track color */
@@ -115,7 +111,7 @@ int FindColor(FrcHue color, ParticleAnalysisReport* trackReport)
 
 	success = FindColor(IMAQ_HSL, &td.hue, &td.saturation, &td.luminance, trackReport); 
 	if ( !success )	{ 
-		//dprintf (LOG_INFO, "did not find color - errorCode= %i",GetLastVisionError());	
+		DPRINTF (LOG_INFO, "did not find color - errorCode= %i",GetLastVisionError());	
 		return success;
 	}
 
@@ -123,7 +119,7 @@ int FindColor(FrcHue color, ParticleAnalysisReport* trackReport)
 	
 	/* set an image quality restriction */
 	if (trackReport->particleToImagePercent < PARTICLE_TO_IMAGE_PERCENT) {
-		imaqSetError(ERR_PARTICLE_TOO_SMALL, funcName);
+		imaqSetError(ERR_PARTICLE_TOO_SMALL, __FUNCTION__);
 		success = 0;
 	}	
 	return success;
@@ -205,7 +201,6 @@ int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range
 		const Range* plane3Range, ParticleAnalysisReport *trackReport, 
 		ColorReport *colorReport, Rect rect)
 {
-	char funcName[]="FindColor";
 	int errorCode = 0;
 	int success = 0;
 	
@@ -221,7 +216,7 @@ int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range
 		DPRINTF(LOG_INFO, "No camera Image available Error = %i %s", 
 				errorCode, GetVisionErrorText(errorCode));
 		frcDispose(cameraImage); 
-		imaqSetError(errorCode, funcName);	//reset error code for the caller	
+		imaqSetError(errorCode, __FUNCTION__);	//reset error code for the caller	
 		return success;		
 	}	
 	
@@ -231,7 +226,7 @@ int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range
 	success = frcCopyImage(histImage,cameraImage);
 	if ( !success )	{ 
 		errorCode = GetLastVisionError(); 
-		frcDispose(funcName,cameraImage,histImage,NULL); 
+		frcDispose(__FUNCTION__,cameraImage,histImage,NULL); 
 		return success; 
 	}	
 	
@@ -240,23 +235,22 @@ int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range
 	if ( !success )	{ 
 		errorCode = GetLastVisionError(); 
 		DPRINTF (LOG_DEBUG, "Error = %i  %s ", errorCode, GetVisionErrorText(errorCode));
-		frcDispose(funcName,cameraImage,histImage,NULL); 
+		frcDispose(__FUNCTION__,cameraImage,histImage,NULL); 
 		return success; 
 	}	
 
-	int largestParticleIndex;
-	success = GetLargestParticle(cameraImage, &largestParticleIndex);
+	int largestParticleIndex = 0;
+	success = GetLargestParticle(cameraImage, &largestParticleIndex, rect );
 	if ( !success )	{
 		errorCode = GetLastVisionError(); 
 		DPRINTF (LOG_DEBUG, "Error after GetLargestParticle = %i  %s ", errorCode, GetVisionErrorText(errorCode));
-		frcDispose(funcName,cameraImage,histImage,NULL); 
+		frcDispose(__FUNCTION__,cameraImage,histImage,NULL); 
+		imaqSetError(ERR_COLOR_NOT_FOUND, __FUNCTION__);
 		return success; 
 	}
 	DPRINTF(LOG_INFO, "largestParticleIndex = %i\n", largestParticleIndex);
 
-	/* if no particles found we can quit here */
-	if (largestParticleIndex == 0)  {
-		
+	/* Particles were found  */
 		/* 
 		 * Fill in report information for largest particle found
 		 */
@@ -264,7 +258,7 @@ int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range
 		trackReport->imageTimestamp = GetTime();
 		
 		/* clean up */
-		if (!success) {frcDispose(funcName,cameraImage,histImage,NULL); return success;}
+		if (!success) {frcDispose(__FUNCTION__,cameraImage,histImage,NULL); return success;}
 		
 		/* particle color statistics */
 		/* only if a color report requested */
@@ -303,13 +297,8 @@ int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range
 			}
 		}
 
-	}	else	{
-		/* no particles found */
-		imaqSetError(ERR_COLOR_NOT_FOUND, funcName);
-		success = 0;
-	}
 	/* clean up */
-	frcDispose(funcName,cameraImage,histImage,NULL); 
+	frcDispose(__FUNCTION__,cameraImage,histImage,NULL); 
 	
 	return success;	
 }
@@ -329,7 +318,6 @@ int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range
  */
 TrackingThreshold GetTrackingData(FrcHue hue, FrcLight light)
 {
-	//char funcName[]="GetTrackingData";
 	TrackingThreshold trackingData;	
 	
 	//set saturation & luminance	
@@ -393,7 +381,7 @@ TrackingThreshold GetTrackingData(FrcHue hue, FrcLight light)
 		strcpy (trackingData.name, "GREEN");
 		if (light == FLUORESCENT) {
 			trackingData.hue.minValue = 60;
-			trackingData.hue.maxValue = 80;
+			trackingData.hue.maxValue = 110;
 		} else {
 			trackingData.hue.minValue = 90;
 			trackingData.hue.maxValue = 125;			
@@ -430,8 +418,7 @@ TrackingThreshold GetTrackingData(FrcHue hue, FrcLight light)
  */
 void PrintReport(ParticleAnalysisReport* myReport)
 {
-	char funcName[]="PrintReport";
-	dprintf(LOG_INFO, "particle analysis:\n    %s%i  %s%i\n    %s%d\n    %s%i  %s%i\n    %s%g  %s%g\n    %s%g\n    %s%i  %s%i\n    %s%i  %s%i\n",
+	dprintf(LOG_INFO, "particle analysis:\n    %s%i  %s%i\n    %s%lf\n    %s%i  %s%i\n    %s%g  %s%g\n    %s%g\n    %s%i  %s%i\n    %s%i  %s%i\n",
 			"imageHeight = ", myReport->imageHeight, 
 			"imageWidth = ", myReport->imageWidth, 
 			"imageTimestamp = ", myReport->imageTimestamp, 
@@ -456,8 +443,7 @@ void PrintReport(ParticleAnalysisReport* myReport)
  */
 void PrintReport(ColorReport* myReport)
 {
-	char funcName[]="PrintReport";
-	dprintf(LOG_INFO, "particle ranges for %i particles:",
+	dprintf(LOG_INFO, "particle ranges for %i particles:     ",
 			"numberParticlesFound = ", myReport->numberParticlesFound);
 	;
 	dprintf(LOG_INFO, "\n    %s%f  %s%f  %s%f\n    %s%f %s%f  %s%f\n    %s%f  %s%f  %s%f\n -------",
@@ -479,7 +465,6 @@ void PrintReport(ColorReport* myReport)
  */
 void PrintReport(TrackingThreshold* myReport)
 {
-	char funcName[]="PrintReport";
 	dprintf(LOG_INFO, "name of color: %s", myReport->name);
 
 	dprintf(LOG_INFO, "\n    %s%i  %s%i\n    %s%i %s%i\n    %s%i  %s%i\n -------",

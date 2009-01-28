@@ -373,3 +373,12 @@ void AnalogChannel::GetAccumulatorOutput(INT64 *value, UINT32 *count)
 	wpi_assertCleanStatus(status);
 }
 
+/**
+ * Get the Average voltage for the PID Source base object.
+ * 
+ * @return The average voltage.
+ */
+double AnalogChannel::PIDGet() 
+{
+	return GetAverageValue();
+}

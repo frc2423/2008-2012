@@ -25,15 +25,15 @@
 class Watchdog : public SensorBase
 {
 public:
-	static const UINT32 kDefaultWatchdogExpiration_ms = 500;
+	static const double kDefaultWatchdogExpiration = 0.5;
 
 	Watchdog();
 	virtual ~Watchdog();
 	bool Feed();
 	void Kill();
-	float GetTimer();
-	float GetExpiration();
-	void SetExpiration(float expiration_ms);
+	double GetTimer();
+	double GetExpiration();
+	void SetExpiration(double expiration);
 	bool GetEnabled();
 	void SetEnabled(bool enabled);
 	bool IsAlive();

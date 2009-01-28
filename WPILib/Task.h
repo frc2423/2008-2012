@@ -7,8 +7,8 @@
 #ifndef TASK_H
 #define TASK_H
 
-#include <set>
 #include "Base.h"
+#include <vxworks.h>
 
 /**
  * WPI task is a wrapper for the native Task object.
@@ -18,7 +18,8 @@ class Task
 {
 public:
 	static const UINT32 kDefaultPriority = 100;
-	
+	static const INT32 kInvalidTaskID = -1;
+
 	Task(char* name, FUNCPTR function, INT32 priority = kDefaultPriority, UINT32 stackSize = 20000);
 	virtual ~Task();
 
@@ -41,8 +42,6 @@ public:
 	INT32 GetID(void);
 
 private:
-	static std::set<INT32> m_tasks;
-
 	FUNCPTR m_function;
 	char* m_taskName;
 	INT32 m_taskID;

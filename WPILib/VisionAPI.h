@@ -25,8 +25,6 @@
 #define DEFAULT_BORDER_SIZE				3		//VisionAPI.frcCreateImage
 #define DEFAULT_SATURATION_THRESHOLD	40		//TrackAPI.FindColor
 
-static const char funcName[]="unknown_function";
-
 /*	  External Prototypes */
 
 /** Private NI function needed to write to the VxWorks target */

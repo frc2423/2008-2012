@@ -3,6 +3,9 @@
 class CompassDrive
 {
 public:
+	
+	float direction;
+	bool buttonPrev;
 
 	CompassDrive( SpeedController * leftMotor, SpeedController * rightMotor); 
 	 
@@ -13,6 +16,7 @@ public:
     float turnRate(float robot_Compass, float joystick_x, float joystick_y, float speed);
     float tankLeftMotors(float angleChange, float turn_Rate, float speed);
     float tankRightMotors(float angleChange, float turn_Rate, float speed);
+    float Direction(bool button);
     
 private:
   

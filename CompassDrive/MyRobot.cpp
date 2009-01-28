@@ -53,10 +53,13 @@ public:
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
+			bool trigger = stick1.GetTrigger();
+			drive.Direction(trigger);
+					
 			drive.Drive(
 					gyro.GetAngle(), 
 					stick1.GetAxis(Joystick::kXAxis), 
-					stick1.GetAxis(Joystick::kYAxis)*-1, 
+					stick1.GetAxis(Joystick::kYAxis)*-1,
 					stick2.GetAxis(Joystick::kYAxis)*-1);
 		}
 	}

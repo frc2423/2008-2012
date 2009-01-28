@@ -4,7 +4,9 @@
 
 CompassDrive::CompassDrive(SpeedController * leftMotor, SpeedController * rightMotor) :
 	m_leftMotor(leftMotor),
-	m_rightMotor(rightMotor)
+	m_rightMotor(rightMotor),
+	direction(1),
+	buttonPrev(false)
 {
 }
 
@@ -83,6 +85,11 @@ float CompassDrive::angleChange(float robot_Compass, float joystick_x, float joy
 		robot_Compass = fmod(robot_Compass, 360);
 	}
 	
+	if (direction == -1)
+	{
+		robot_Compass += 180;
+	}
+	
 	if (robot_Compass < 0)
 	{
 		robot_Compass = robot_Compass + 360;
@@ -107,16 +114,16 @@ float CompassDrive::turnRate(float robot_Compass, float joystick_x, float joysti
 {
     float angleChange_ = angleChange(robot_Compass, joystick_x, joystick_y);
 	float angleChange_H = .7;
-	float angleChange_L = .3;
-	float speed_H = .7;
-	float speed_L = .3;
+	float angleChange_L = .15;
+	float speed_H = .9;
+	float speed_L = .2;
 	
 	float turn_Rate;
     
 	//float max_Turn_Point = 180;
 	//float speed_Limit = 1.0;
 	
-	angleChange_ =  1.0 - (angleChange_ / 180.0);
+	angleChange_ = angleChange_ / 180.0;
 	
 	if (angleChange_ < 0)
     {
@@ -135,7 +142,7 @@ float CompassDrive::turnRate(float robot_Compass, float joystick_x, float joysti
 	turn_Rate = (((angleChange_ - angleChange_L) * (speed_H - speed_L)) / 
 			(angleChange_H - angleChange_L)) + angleChange_L;
 	
-	turn_Rate = (1.0 - turn_Rate) * speed;
+	turn_Rate = (1.0 - turn_Rate * 2.0) * speed;
 		
 	
 	/*if (angleChange_ > max_Turn_Point)
@@ -166,16 +173,20 @@ float CompassDrive::tankLeftMotors(float angleChange, float turn_Rate, float spe
 		left_Motors = 0.0;
 	}
 	
-	else if (angleChange > 0.0)
+	if ((direction == 1) && (angleChange > 0.0))
 	{
-		left_Motors = turn_Rate; //(turn_Rate * 1.5) -.5;
+		left_Motors = turn_Rate;
+	}
+	else if ((direction == -1) && (angleChange < 0.0))
+	{
+		left_Motors = turn_Rate;
 	}
 	else
 	{
 		left_Motors = speed;
 	}
 	
-	return left_Motors;
+	return left_Motors * direction;
 }
 
 float CompassDrive::tankRightMotors(float angleChange, float turn_Rate, float speed)
@@ -187,7 +198,11 @@ float CompassDrive::tankRightMotors(float angleChange, float turn_Rate, float sp
 		right_Motors = 0.0;
 	}
 	
-	else if (angleChange < 0.0)
+	if ((direction == 1) && (angleChange < 0.0))
+	{
+		right_Motors = turn_Rate;
+	}
+	else if ((direction == -1) && (angleChange > 0.0))
 	{
 		right_Motors = turn_Rate;
 	}
@@ -196,5 +211,20 @@ float CompassDrive::tankRightMotors(float angleChange, float turn_Rate, float sp
 		right_Motors = speed;
 	}
 	
-	return right_Motors;
+	return right_Motors * direction;
+}
+
+
+float CompassDrive::Direction(bool button)
+{	
+	if (button == true)
+	{
+		direction = -1;
+	}
+	else
+	{
+		direction = 1;
+	}
+	
+	return direction;
 }

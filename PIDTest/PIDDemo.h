@@ -6,6 +6,7 @@
 #include "PIDOutput.h"
 #include "PIDSource.h"
 
+#include <math.h>
 
 class PIDDemo : public PIDOutput, public PIDSource {
 public:
@@ -17,22 +18,33 @@ public:
 	 * @param Kd the derivative coefficient
 	 */
 	PIDDemo(float Kp, float Ki, float Kd) :
-		m_output(0),
-		m_controller(Kp, Ki, Kd, .25)
+		m_output(0), m_position(0),
+		m_controller(Kp, Ki, Kd, this, this, .25)
 	{
-		m_controller.SetInput(this, 0, 2);
-		m_controller.SetOutput(this, 0, 2);
+        //m_controller.SetContinuous();
+        m_controller.SetInputRange(0, 360);
+        m_controller.SetOutputRange(-360, 360);
+
 		m_controller.Enable();
 	}
 	
+#define SCALE 45.0
+
 	void PIDWrite(float output)
 	{
-		m_output = output;
+		if (output > SCALE)
+			m_output = 1;
+		else if (output < -SCALE)
+			m_output = -1;
+		else
+			m_output = output / SCALE;
+
+        m_position += output;
 	}
 	
-	float PIDGet()
+	double PIDGet()
 	{
-		return m_output;
+		return fmod(m_position, 360.0);
 	}
 	
 	void SetSetPoint(float input)
@@ -40,12 +52,18 @@ public:
 		m_controller.SetSetpoint(input);
 	}
 
-	float GetOutput()
+	double GetOutput()
 	{
 		return m_output;
 	}
+
+    bool OnTarget()
+    {
+        return m_controller.OnTarget();
+    }
 	
-	float 			m_output;
+	double 			m_output, m_position;
+
 	PIDController 	m_controller;
 };
 

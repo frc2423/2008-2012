@@ -6,11 +6,11 @@
 
 int main()
 {
-	float p = 0.5, i = .1, d = 0;
+	float p = 0.9F, i = 0.0F, d = 0.0F;
 
 	PIDDemo demo(p, i, d);	
 
-	demo.SetSetPoint(1);
+	demo.SetSetPoint(240);
 
 	for (int i = 0; i < 40; i++)
 	{

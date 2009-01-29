@@ -37,7 +37,7 @@ public:
 	void SetAngle(float angle);
 	
 	/// Get the angle that the wheel is supposed to be pointing
-	float GetAngle();
+	float GetSetAngle();
 	
 	/// Get the angle that the wheel is actually pointing
 	double GetCurrentAngle();

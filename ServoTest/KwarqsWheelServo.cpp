@@ -84,7 +84,7 @@ void KwarqsWheelServo::SetAngle(float angle)
 }
 
 /// Get the angle that the wheel is supposed to be pointing
-float KwarqsWheelServo::GetAngle()
+float KwarqsWheelServo::GetSetAngle()
 {
 	return m_pidController->GetSetpoint();
 }

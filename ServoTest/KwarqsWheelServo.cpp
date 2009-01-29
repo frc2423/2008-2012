@@ -68,6 +68,7 @@ KwarqsWheelServo::KwarqsWheelServo(
 	
 	// enable it
 	m_pidController->Enable();
+	m_encoder.Start();
 }
 
 KwarqsWheelServo::~KwarqsWheelServo()

@@ -1,5 +1,6 @@
 #include "WPILib.h"
 
+#include <math.h>
 #include "KwarqsWheelServo.h"
 
 /**
@@ -12,13 +13,17 @@ class RobotDemo : public SimpleRobot
 {
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
-
+	
+	KwarqsWheelServo servo;
+	
 public:
 	RobotDemo(void):
-		myRobot(1, 2),	// these must be initialized in the same order
-		stick(1)		// as they are declared above.
+		myRobot(1, 2),
+		stick(1),
+		servo(4, 5, 6, 45.0, 250)
 	{
-		GetWatchdog().SetExpiration(0.1);
+		GetWatchdog().SetExpiration(100);	
+		
 	}
 
 	/**
@@ -27,27 +32,58 @@ public:
 	void Autonomous(void)
 	{
 	}
-
+	
 	/**
 	 * Runs the motors with arcade steering. 
 	 */
 	void OperatorControl(void)
 	{
-		double lastTime = GetTime();
-	
+		double time = GetTime();
+		
+		double lastP = 0;
+		
 		GetWatchdog().SetEnabled(true);
+		
+		printf("Entered OperatorControl()\n");
+		
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
-			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
+			//myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			
-			// 100ms loop
-			if (GetTime() - lastTime > 0.001)
+			double setPoint = DriverStation::GetInstance()->GetAnalogIn(1);
+			double p = DriverStation::GetInstance()->GetAnalogIn(2);
+			
+			if (p > 1000.0)
+				p = 1000.0;
+			
+			p = p / 1000.0;
+			
+			// only change if there is a significant difference
+			if (fabs(p - lastP) > 0.05)
 			{
-				
-			
-				lastTime = GetTime();
+				servo.TuneParameters(p, 0, 0);
+				lastP = p;
 			}
+			
+			
+			if (setPoint > 1000.0)
+				setPoint = 1000.0;
+			
+			setPoint = ceil(setPoint /(1000.0/ 360.0));
+			
+			servo.SetAngle(setPoint);
+			
+			if (GetTime() - time > 0.1)
+			{
+				printf("Setpoint: %f, Current: %f, p: %f (%f)\r",
+						setPoint, servo.GetCurrentAngle(),
+						p, lastP);
+				
+				fflush(stdout);
+				time = GetTime();
+			}
+			
 		}
 	}
 };

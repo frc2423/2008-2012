@@ -90,7 +90,7 @@ void PIDController::Calculate()
 		if (m_continuous)
 		{
 			if (fabs(m_error) > 
-				m_maximumInput - m_minimumInput)
+				(m_maximumInput - m_minimumInput)/2)
 			{
 				if (m_error > 0)
 					m_error = m_error  - m_maximumInput + m_minimumInput;

@@ -21,7 +21,7 @@ public:
 		m_output(0), m_position(0),
 		m_controller(Kp, Ki, Kd, this, this, .25)
 	{
-        //m_controller.SetContinuous();
+        m_controller.SetContinuous();
         m_controller.SetInputRange(0, 360);
         m_controller.SetOutputRange(-360, 360);
 
@@ -40,6 +40,11 @@ public:
 			m_output = output / SCALE;
 
         m_position += output;
+
+		if (m_position > 360.0)
+			m_position -= 360.0;
+		else if (m_position < 0)
+			m_position += 360.0;
 	}
 	
 	double PIDGet()

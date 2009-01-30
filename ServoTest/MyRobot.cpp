@@ -40,7 +40,7 @@ public:
 	{
 		double time = GetTime();
 		
-		double lastP = 0;
+		double lastP = 0, lastI = 0;
 		
 		GetWatchdog().SetEnabled(true);
 		
@@ -53,17 +53,22 @@ public:
 			
 			double setPoint = DriverStation::GetInstance()->GetAnalogIn(1);
 			double p = DriverStation::GetInstance()->GetAnalogIn(2);
+			double i = DriverStation::GetInstance()->GetAnalogIn(3);
 			
 			if (p > 1000.0)
 				p = 1000.0;
-			
 			p = p / 1000.0;
 			
+			if (i > 1000.0)
+				i = 1000.0;
+			i = i / 1000.0;
+			
 			// only change if there is a significant difference
-			if (fabs(p - lastP) > 0.05)
+			if (fabs(p - lastP) > 0.05 || fabs(i - lastI) > 0.05)
 			{
-				servo.TuneParameters(p, 0, 0);
+				servo.TuneParameters(p, i, 0);
 				lastP = p;
+				lastI = i;
 			}
 			
 			
@@ -76,9 +81,9 @@ public:
 			
 			if (GetTime() - time > 0.1)
 			{
-				printf("Setpoint: %f, Current: %f, p: %f (%f)\r",
+				printf("Setpoint: %.3f, Current: %f, p: %.3f (%.3f) i: %.3f (%.3f)\r",
 						setPoint, servo.GetCurrentAngle(),
-						p, lastP);
+						p, lastP, i, lastI);
 				
 				fflush(stdout);
 				time = GetTime();

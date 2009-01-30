@@ -56,7 +56,14 @@ public:
 	{
 		return m_output;
 	}
-
+	void SetPosition(float position)
+	{
+		m_position = position;
+	}
+	double GetPosition()
+	{
+		return m_position;
+	}
     bool OnTarget()
     {
         return m_controller.OnTarget();

@@ -22,7 +22,7 @@ public:
 	// required methods
 	void Move();
 	const char * Name() { return "ArcadeControl"; }
-
+	
 private:
 
 	// joystick used for control

@@ -14,3 +14,14 @@ KwarqsMovementControl::KwarqsMovementControl(
 	m_driveController(driveController)
 {}
 
+
+void KwarqsMovementControl::OnEnable()
+{
+	printf("%s enabled\n", Name());
+}
+
+void KwarqsMovementControl::OnDisable()
+{
+	printf("%s disabled\n", Name());
+}
+

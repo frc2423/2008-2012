@@ -17,7 +17,7 @@ public:
 		KwarqsMovementControl(driveController)
 	{}
 
-	virtual void Move() 
+	void Move() 
 	{
 		// stay where you're at
 		m_driveController->Move(0,0);

@@ -33,6 +33,8 @@ class KwarqsRobotMain : public SimpleRobot
 	// XXX: Remember that if we have more than one set of motor 
 	// drivers, they have to share PWM's .. worry about it later
 	ArcadeDrive				arcadeDrive;
+	
+	KwarqsMovementControl * currentTeleoperatedControl;
 
 public:
 
@@ -44,7 +46,8 @@ public:
 	*/
 	KwarqsRobotMain() :
 		arcadeControl(&driveController),
-		nullMovementControl(&driveController)
+		nullMovementControl(&driveController),
+		currentTeleoperatedControl(NULL)
 	{
 		GetWatchdog().SetExpiration(200);
 		
@@ -77,9 +80,24 @@ public:
 		determine which control type to use.
 	*/
 	KwarqsMovementControl * GetTeleoperatedMovementControl()
-	{
-		// todo: need to read switches
-		return &arcadeControl;
+	{	
+		// select the type (todo: need to read switches)
+		KwarqsMovementControl * control = &arcadeControl;
+		
+		
+		// enable or disable it depending on whether it was previously
+		// selected
+		if (currentTeleoperatedControl != control)
+		{
+			// if its newly disabled, then call the appropriate function
+			if (currentTeleoperatedControl)
+				currentTeleoperatedControl->OnDisable();
+			
+			currentTeleoperatedControl = control;
+			currentTeleoperatedControl->OnEnable();
+		}
+		
+		return currentTeleoperatedControl;
 	}
 	
 	
@@ -97,11 +115,17 @@ public:
 		// it doesn't make any sense to allow it to change in the middle!
 		KwarqsMovementControl * movementControl = GetAutonomousMovementControl();
 		
+		// enable the control
+		movementControl->OnEnable();
+		
 		while (IsAutonomous())
 		{
 			movementControl->Move();
 			driveController.EndMove();
 		}
+		
+		// disable it
+		movementControl->OnDisable();
 	}
 
 	/**
@@ -120,7 +144,13 @@ public:
 			
 			GetTeleoperatedMovementControl()->Move();
 			driveController.EndMove();
+			
+			// wait period
+			Wait(0.0025);
 		}
+		
+		GetTeleoperatedMovementControl()->OnDisable();
+		currentTeleoperatedControl = NULL;
 	}
 };
 

@@ -49,6 +49,12 @@ public:
 	/// This returns the name of the class (useful for generic logging)
 	virtual const char * Name() = 0;
 	
+	/// called when this control is enabled (optional)
+	virtual void OnEnable();
+	
+	/// called when this control is disabled (optional)
+	virtual void OnDisable();
+	
 	/// @}
 	
 	// virtual destructor

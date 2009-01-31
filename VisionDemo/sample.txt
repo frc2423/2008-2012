@@ -1,0 +1,7 @@
+FRC Vision Demonstration Program
+--------------------------------
+
+This is based on the SimpleDemo program, with changes in autonomous to react to colors
+seen by the camera. There are a number of options described in the README file contained
+in the project.
+

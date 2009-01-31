@@ -9,10 +9,12 @@
 #include <WPILib.h>
 #include <math.h>
 
+#include "Deleter.h"
 #include "PositionInformation.h"
 
 // static variables
 PositionInformation * PositionInformation::m_instance = NULL;
+Deleter<PositionInformation> PositionInformation::deleter(&PositionInformation::m_instance);
 
 // constructor
 PositionInformation::PositionInformation() :

@@ -12,7 +12,7 @@
 
 // defined parameters
 #define PINFO_CALCULATION_PERIOD 	0.05		// period calculation is run
-#define ACCEL_HIST_LEN 				200 		// 10s of data
+#define ACCEL_HIST_LEN 				20 			// 1s of data
 #define FILT_COEFF 					0.05		// filter coefficient
 #define MOTION_THRESH 				0.4			// acceleration change needed to be considered 'motion'
 
@@ -60,11 +60,13 @@ public:
 	
 	// calibration stuff below:
 	
+	/// get the bias of the acceleration
+	void GetAccelerationBias( double &x, double &y);
 	/// set the bias of the acceleration
 	void SetAccelerationBias( double x, double y);
 	
 	/// estimate the bias of the acceleration
-	void EstimateAccelerationBias( double *x, double *y );
+	void EstimateAccelerationBias();
 	
 private:
 

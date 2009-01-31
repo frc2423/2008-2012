@@ -1,4 +1,10 @@
-
+/**
+	\file 		PositionInformation.cpp
+	\author 	Dustin Spicuzza (adapted from Rob McGurrin's C code),
+				last changed by $Author: dspicuzz $
+	\date 		Last changed on $Date: 2009-01-25 03:23:53 -0500 (Sun, 25 Jan 2009) $
+	\version 	$Rev: 46 $
+*/
 
 #include <WPILib.h>
 #include <math.h>
@@ -32,8 +38,14 @@ PositionInformation::PositionInformation() :
 	for (int i = 0; i < ACCEL_HIST_LEN; i++)
 		xBuff[i] = yBuff[i] = 0.0;
 		
-	// todo: probably should have some automatic calibration thing here
-	// to estimate the bias or something to that effect
+	// automatic calibration
+	for (int i = 0; i < ACCEL_HIST_LEN; i++)
+	{
+		CalculatePositionInformation();
+		Wait(PINFO_CALCULATION_PERIOD);
+	}
+	
+	EstimateAccelerationBias();
 	
 	
 	// todo: need to get our alliance and position, and calculate the offset
@@ -135,7 +147,7 @@ void PositionInformation::CalculatePositionInformation()
 
 // todo: this is used for calibration only, right? Or should it
 // be called every once in awhile?
-void PositionInformation::EstimateAccelerationBias( double *x, double *y )
+void PositionInformation::EstimateAccelerationBias()
 {
   Synchronized sync(m_mutex);
   int ind;
@@ -147,8 +159,15 @@ void PositionInformation::EstimateAccelerationBias( double *x, double *y )
     ySum += yBuff[ind];
       
   }
-  *x = xBias = xSum/ACCEL_HIST_LEN;
-  *y = yBias = ySum/ACCEL_HIST_LEN;  
+  
+  xBias = xSum/ACCEL_HIST_LEN;
+  yBias = ySum/ACCEL_HIST_LEN;  
+}
+
+void PositionInformation::GetAccelerationBias( double &x, double &y)
+{
+	x = xBias;
+	y = yBias;
 }
 
 void PositionInformation::SetAccelerationBias( double x, double y)
@@ -156,6 +175,8 @@ void PositionInformation::SetAccelerationBias( double x, double y)
 	xBias = x;
 	yBias = y;
 }
+
+
 
 
 

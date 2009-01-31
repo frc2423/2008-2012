@@ -1,7 +1,7 @@
 #include "math.h"
 
-#define ACCEL_HIST_LEN 100 /* 10s at .1s rate */
-#define FILT_COEFF .05
+#define ACCEL_HIST_LEN 50 /* 10s at .1s rate */
+#define FILT_COEFF .1
 #define MOTION_THRESH .4
 
 /* global variables */
@@ -86,6 +86,12 @@ void AccelerationUpdate( float x, float y, float deltaTime)
     
     yVelocity += yUpdate*deltaTime;
     yPos += yVelocity*deltaTime;
+  }
+  else
+  {    
+	  xVelocity = 0;
+	  yVelocity = 0;
+	  
   }
       
   

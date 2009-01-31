@@ -7,6 +7,8 @@
 
 #define MY_PI 3.14
 
+
+
 /**
  * This is a demo program showing the use of the RobotBase class.
  * The SimpleRobot class is the base of a robot application that will automatically call your
@@ -68,7 +70,12 @@ public:
 		printf("Entered OperatorControl\n");
 		
 		double time = GetTime(), start = GetTime();
+		float accX, accY;
+		
+		
+		
 		GetWatchdog().SetEnabled(true);
+		
 		
 		// allow writing to file system
 		Priv_SetWriteFileAllowed(1);
@@ -76,55 +83,78 @@ public:
 		char fname[128];
 		sprintf(fname, "sensors-%d.out", (int)time );
 		
-		FILE * fSensor = fopen(fname, "w");
+		FILE * fSensor = fopen(fname, "wb");
 		if (!fSensor)
 		{
 			fprintf(stderr, "%s could not be opened\n", fname);
 		}
-		fprintf(fSensor,"AccelX VelX PosX AccelY PosY Gyro EncoderLR Encoder RR\n");
+		//fprintf(fSensor,"AccelX VelX PosX AccelY PosY Gyro EncoderLR Encoder RR\n");
+		
 		
 		
 		// reset the accelerometer object and set the acceleromter biases
 	    AccelerationReset();
-	    AccelerationSetBias( .9511, .6285);
 	    
 	    //start the encoders
 	    encoderLeft.Start();
 	    encoderRight.Start();
 		
-		while (IsOperatorControl())
+		// cal the accelerometer biases
+		time = GetTime();
+	    while( GetTime() - start < 5 )
+	    {
+		  if( GetTime() - time > .1 )
+		  {
+			accX = accelerometerX.GetAcceleration() * 9.81;
+			accY = accelerometerY.GetAcceleration() * 9.81;
+	    	AccelerationUpdate( accX, accY, .1);
+            time = GetTime();
+		  }
+	    }
+	    start = GetTime();
+	    time = GetTime();
+	    
+		
+		float accBiasX, accBiasY;
+		AccelerationEstimateBias( &accBiasX, &accBiasY);
+		AccelerationSetBias( accBiasX, accBiasY);
+		printf("Done with cal accX:%1.4f accY:%1.4f ...\n",accBiasX,accBiasY);
+		
+					
+	    while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
 			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			
-			
-			
-			// only print messages every once in awhile, don't overload the system
+
+			//write the first 30 seconds to file
 			if (GetTime() - start > 30)
 			{
 				if (fSensor)
 				{
 					printf("Done writing %s.\n", fname);
 					fclose(fSensor);
+					fSensor = NULL;
 				}
 				
 			}
-			else if (GetTime() - time > 0.1)
+			
+			//update the sensors every 100ms
+			if (GetTime() - time > 0.1)
 			{
-				//printf("Gyro: %f, servo: %f\r", gyro.GetAngle(), angle);
-				//printf("voltage: %f\r", encoder.GetVoltage());
-				//printf("JoyX: %5.3f JoyY: %5.3f Trig: %s\r", 
-				//stick.GetX(), stick.GetY(), 
-		    	//stick.GetTrigger() == true ? "1" : "0");
-				
-				// convert g's to units of meters/sec	
 				
 				//read the sensor data
 				float velX, velY, posX, posY;
-				float accX = accelerometerX.GetAcceleration() * 9.81;
-				float accY = accelerometerY.GetAcceleration() * 9.81;
-				float gyroAngle = gyro.GetAngle()*180/MY_PI;
+				float gyroAngle = gyro.GetAngle();
+				int encoderL = encoderLeft.Get();
+				int encoderR =  encoderRight.Get();
 				
+				
+				
+				// convert g's to units of meters/sec	
+				accX = accelerometerX.GetAcceleration() * 9.81;
+				accY = accelerometerY.GetAcceleration() * 9.81;
+
 				//update the tracking object
 				AccelerationUpdate( accX, accY, .1);
 				
@@ -132,16 +162,28 @@ public:
 				GetAcceleration( &accX, &accY);
 				GetVelocity( &velX, &velY );
 				GetPosition( &posX, &posY );
-				
-				//read the encoders
-				
+								
 				//log the sensor values
-				fprintf(fSensor,"%f %f %f %f %f %f %f %f %f\n",
-						accX, velX, posX, 
+				if( fSensor)
+				{
+				  fwrite((char *)&accX, sizeof(float),1, fSensor);
+				  fwrite((char *)&velX, sizeof(float),1, fSensor);
+				  fwrite((char *)&posX, sizeof(float),1, fSensor);
+				  fwrite((char *)&accY, sizeof(float),1, fSensor);
+				  fwrite((char *)&velY, sizeof(float),1, fSensor);
+				  fwrite((char *)&posY, sizeof(float),1, fSensor);				
+				  fwrite((char *)&gyroAngle, sizeof(float),1, fSensor);
+				  fwrite((char *)&encoderL, sizeof(int), 1, fSensor);
+				  fwrite((char *)&encoderR, sizeof(int), 1, fSensor);
+				}
+
+				#if 0
+				printf("%f %f %f %f %f %f %f %d %d\r",
+						asccX, velX, posX, 
 						accY, velY, posY,
 						gyroAngle, 
 						encoderLeft.Get(), encoderRight.Get());
-				
+                #endif
 				
 				time = GetTime();
 			}

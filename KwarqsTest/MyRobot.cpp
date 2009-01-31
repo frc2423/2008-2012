@@ -69,9 +69,11 @@ public:
 	{
 		printf("Entered OperatorControl\n");
 		
-		double time = GetTime(), start = GetTime();
+		double time = GetTime(), start = GetTime(), printTime = GetTime();
 		float accX, accY;
-		
+		float velX, velY, posX, posY;
+        int encoderL, encoderR;
+        float gyroAngle;
 		
 		
 		GetWatchdog().SetEnabled(true);
@@ -144,10 +146,10 @@ public:
 			{
 				
 				//read the sensor data
-				float velX, velY, posX, posY;
-				float gyroAngle = gyro.GetAngle();
-				int encoderL = encoderLeft.Get();
-				int encoderR =  encoderRight.Get();
+				gyroAngle = gyro.GetAngle();
+				
+				encoderL = encoderLeft.Get();
+				encoderR =  encoderRight.Get();
 				
 				
 				
@@ -187,6 +189,13 @@ public:
 				
 				time = GetTime();
 			}
+			
+			if( GetTime() - printTime > 1)
+			{
+				printf("EncL:%d EncR:%d\n",encoderL,encoderR);
+				printTime = GetTime();
+			}
+			
 		}
 	}
 };

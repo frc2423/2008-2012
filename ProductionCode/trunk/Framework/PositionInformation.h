@@ -9,6 +9,7 @@
 #define KWARQS_POSITION_INFORMATION_H 
 
 #include "KwarqsDevices.h"
+#include "Deleter.h"
 
 // defined parameters
 #define PINFO_CALCULATION_PERIOD 	0.05		// period calculation is run
@@ -74,6 +75,7 @@ private:
 	PositionInformation();
 
 	static PositionInformation * m_instance;
+	static Deleter<PositionInformation> deleter;
 	
 	
 	// needed for the periodic calculation

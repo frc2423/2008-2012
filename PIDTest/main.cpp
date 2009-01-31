@@ -17,10 +17,9 @@ int main()
 		if (demo.OnTarget())
 			break;
 
-		printf("%2d: Output: %.3f %.3f: %s (err: %.3f, goal: %.3f)\n",
+		printf("%2d: Output: %.3f Position: %.3f (error: %.3f, goal: %.3f)\n",
 			i,
 			demo.GetOutput(), demo.GetPosition(),
-			demo.m_controller.OnTarget() ? "on" : "off",
 			demo.m_controller.GetError(),
 			demo.m_controller.GetSetpoint());
 

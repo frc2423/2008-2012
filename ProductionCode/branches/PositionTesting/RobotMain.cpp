@@ -15,6 +15,7 @@
 #include "SpeedLimiter.h"
 
 #include "ArcadeDrive.h"
+#include "AutomatedPIDMovement.h"
 
 class KwarqsRobotMain : public SimpleRobot
 {
@@ -23,6 +24,7 @@ class KwarqsRobotMain : public SimpleRobot
 	// control types
 	ArcadeControl 			arcadeControl;
 	NullMovementControl		nullMovementControl;
+	AutomatedPIDMovement	automatedPIDMovement;
 	
 	// drive types
 	
@@ -47,6 +49,7 @@ public:
 	KwarqsRobotMain() :
 		arcadeControl(&driveController),
 		nullMovementControl(&driveController),
+		automatedPIDMovement(&driveController),
 		currentTeleoperatedControl(NULL)
 	{
 		GetWatchdog().SetExpiration(200);
@@ -69,7 +72,7 @@ public:
 	*/
 	KwarqsMovementControl * GetAutonomousMovementControl()
 	{
-		return &nullMovementControl;
+		return &automatedPIDMovement;
 	}
 	
 	

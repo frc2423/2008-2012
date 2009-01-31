@@ -24,7 +24,13 @@ public:
 		
 		// initialize this
 		positionInfo = PositionInformation::GetInstance();
-		positionInfo->SetAccelerationBias( .9511, .6285);
+		
+		double x, y;
+		positionInfo->GetAccelerationBias(x, y);
+		
+		printf("Acceleration bias: %f, %f\n", x, y);
+		
+		//positionInfo->SetAccelerationBias( .9511, .6285);
 	}
 
 
@@ -38,6 +44,7 @@ public:
 	void OperatorControl(void)
 	{
 		double time = GetTime();
+		printf("Entering OperatorControl()\n");
 		
 		GetWatchdog().SetEnabled(true);
 		while (IsOperatorControl())

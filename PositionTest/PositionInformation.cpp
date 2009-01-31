@@ -1,9 +1,9 @@
 /**
 	\file 		PositionInformation.cpp
 	\author 	Dustin Spicuzza (adapted from Rob McGurrin's C code),
-				last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-01-25 03:23:53 -0500 (Sun, 25 Jan 2009) $
-	\version 	$Rev: 46 $
+				last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 */
 
 #include <WPILib.h>

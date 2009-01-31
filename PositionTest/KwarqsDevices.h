@@ -1,8 +1,8 @@
 /**
 	\file 		KwarqsDevices.h
-	\author 	Dustin Spicuzza: last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-01-25 03:23:53 -0500 (Sun, 25 Jan 2009) $
-	\version 	$Rev: 46 $
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 
 	This file contains initialization definitions that define channel number
 	or other needed data for motors and sensors. The idea is to keep all of

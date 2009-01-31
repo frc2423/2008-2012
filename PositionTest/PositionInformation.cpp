@@ -72,7 +72,7 @@ void PositionInformation::GetPosition(double &x, double &y)
 }
 
 /// returns the angle the robot is moving, relative to the robot
-double PositionInformation::GetRelativeHeading()
+double PositionInformation::GetHeading()
 {
 	Synchronized sync(m_mutex);
 	// todo: should we use velocity or acceleration to get this?
@@ -80,7 +80,7 @@ double PositionInformation::GetRelativeHeading()
 }
 
 /// returns the angle the robot is currently facing relative to the field
-double PositionInformation::GetAbsoluteHeading()
+double PositionInformation::GetAngle()
 {
 	return m_gyro.GetAngle() - m_gyro_offset;
 }

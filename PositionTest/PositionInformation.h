@@ -43,11 +43,11 @@ public:
 	/// returns the position of the bot on the field in X/Y coordinates
 	void GetPosition(double &x, double &y);
 	
-	/// returns the angle the robot is moving, relative to the robot
-	double GetRelativeHeading();
+	/// returns the angle (in degrees) the robot is moving, relative to the robot
+	double GetHeading();
 	
-	/// returns the angle the robot is currently facing, mod 360
-	double GetAbsoluteHeading();
+	/// returns the angle (in degrees) the robot is currently facing
+	double GetAngle();
 	
 	/// returns the acceration of the robot, relative to the robot
 	/// Note: uses the parameters to return the values by reference

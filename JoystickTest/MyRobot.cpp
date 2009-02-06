@@ -41,7 +41,14 @@ public:
 			
 			
 			if (GetTime()- time > .001){
-				printf ( "%.3f %.3f %.3f %.3f %.3f %d %d\r", 
+				for(int i = 1; i <= 12; i++)
+				{
+					printf("%d: %d ", i, (int)stick.GetRawButton(i));
+				}
+				
+				printf("\r");
+				
+			/*	printf ( "x: %.3f, y: %.3f, z: %.3f, twist: %.3f, throttle: %.3f, trigger: %d, top: %d\r", 
 						stick.GetX(),
 						stick.GetY(),
 						stick.GetZ(),
@@ -50,7 +57,7 @@ public:
 						(int)stick.GetTrigger(),
 						(int)stick.GetTop()
 						
-					) ;
+					) ; */
 				
 				time = GetTime () ;
 			}

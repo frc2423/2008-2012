@@ -9,7 +9,8 @@
 
 #include "Framework/KwarqsDriveController.h"
 
-#include "ArcadeControl.h"
+//#include "ArcadeControl.h"
+#include "CompassDrive.h"
 #include "NullMovementControl.h"
 
 #include "SpeedLimiter.h"
@@ -21,7 +22,8 @@ class KwarqsRobotMain : public SimpleRobot
 	KwarqsDriveController 	driveController;
 	
 	// control types
-	ArcadeControl 			arcadeControl;
+	//ArcadeControl 			arcadeControl;
+	CompassDrive				compassDrive;
 	NullMovementControl		nullMovementControl;
 	
 	// drive types
@@ -45,7 +47,7 @@ public:
 		and startup code here. 
 	*/
 	KwarqsRobotMain() :
-		arcadeControl(&driveController),
+		compassDrive(&driveController),
 		nullMovementControl(&driveController),
 		currentTeleoperatedControl(NULL)
 	{
@@ -82,7 +84,7 @@ public:
 	KwarqsMovementControl * GetTeleoperatedMovementControl()
 	{	
 		// select the type (todo: need to read switches)
-		KwarqsMovementControl * control = &arcadeControl;
+		KwarqsMovementControl * control = &compassDrive;
 		
 		
 		// enable or disable it depending on whether it was previously

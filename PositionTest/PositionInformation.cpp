@@ -145,6 +145,11 @@ void PositionInformation::CalculatePositionInformation()
     yVelocity += yUpdate*PINFO_CALCULATION_PERIOD;
     yPos += yVelocity*PINFO_CALCULATION_PERIOD;
   }
+  else
+  {
+    xVelocity = 0;
+    yVelocity = 0;
+  }
 }
 
 // todo: this is used for calibration only, right? Or should it

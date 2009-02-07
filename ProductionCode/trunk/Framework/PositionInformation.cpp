@@ -34,12 +34,12 @@ PositionInformation::PositionInformation() :
 	xBias(0.0), yBias(0.0)
 {
 	// create the mutex
-	m_mutex = semBCreate(0, SEM_EMPTY);
+	m_mutex = semBCreate(0, SEM_FULL);
 
 	// clear the array
 	for (int i = 0; i < ACCEL_HIST_LEN; i++)
 		xBuff[i] = yBuff[i] = 0.0;
-		
+	/*
 	// automatic calibration
 	for (int i = 0; i < ACCEL_HIST_LEN; i++)
 	{
@@ -48,7 +48,7 @@ PositionInformation::PositionInformation() :
 	}
 	
 	EstimateAccelerationBias();
-	
+	*/
 	
 	// todo: need to get our alliance and position, and calculate the offset
 	// of the gyro to the driver for absolute numbers
@@ -144,6 +144,11 @@ void PositionInformation::CalculatePositionInformation()
     
     yVelocity += yUpdate*PINFO_CALCULATION_PERIOD;
     yPos += yVelocity*PINFO_CALCULATION_PERIOD;
+  }
+  else
+  {
+    xVelocity = 0;
+    yVelocity = 0;
   }
 }
 

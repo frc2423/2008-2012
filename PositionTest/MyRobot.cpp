@@ -25,12 +25,12 @@ public:
 		// initialize this
 		positionInfo = PositionInformation::GetInstance();
 		
-		double x, y;
-		positionInfo->GetAccelerationBias(x, y);
+		//double x, y;
+		//positionInfo->GetAccelerationBias(x, y);
 		
-		printf("Acceleration bias: %f, %f\n", x, y);
+		//printf("Acceleration bias: %f, %f\n", x, y);
 		
-		//positionInfo->SetAccelerationBias( .9511, .6285);
+		positionInfo->SetAccelerationBias( .9511, .6285);
 	}
 
 
@@ -56,12 +56,14 @@ public:
 			{
 				double px = 0.0, py = 0.0;
 				double vx = 0.0, vy = 0.0;
+				double ax = 0.0, ay = 0.0;
 				
 				positionInfo->GetPosition(px, py);
 				positionInfo->GetVelocity(vx, vy);
+				positionInfo->GetAcceleration(ax, ay);
 				
-				printf("Position: x: %f, y: %f; Velocity: x: %f, y: %f\r", 
-						px, py, vx, vy);
+				printf("Position: x: %.3f, y: %.3f; Velocity: x: %.3f, y: %.3f; Acceleration: %.3f %.3f\r", 
+						px, py, vx, vy, ax, ay);
 				
 				time = GetTime();
 			}

@@ -12,8 +12,8 @@
 #include "Deleter.h"
 
 // defined parameters
-#define PINFO_CALCULATION_PERIOD 	0.05		// period calculation is run
-#define ACCEL_HIST_LEN 				20 			// 1s of data
+#define PINFO_CALCULATION_PERIOD 	0.1			// period calculation is run
+#define ACCEL_HIST_LEN 				100 		// 1s of data
 #define FILT_COEFF 					0.05		// filter coefficient
 #define MOTION_THRESH 				0.4			// acceleration change needed to be considered 'motion'
 

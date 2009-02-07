@@ -21,6 +21,12 @@ public:
 	void StartPeriodic(double period);
 	void Stop();
 private:
+	static Notifier *timerQueueHead;
+	static SEM_ID queueSemaphore;
+	static tAlarm *talarm;
+	static tInterruptManager *manager;
+	static int refcount;
+
 	static const UINT32 kTimerInterruptNumber = 28;
 	static void ProcessQueue(tNIRIO_u32 mask, void *params); // process the timer queue on a timer event
 	static void UpdateAlarm();			// update the FPGA alarm since the queue has changed
@@ -32,8 +38,8 @@ private:
 	double m_expirationTime;				// absolute expiration time for the current event
 	Notifier *m_nextEvent;					// next Nofifier event
 	bool m_periodic;						// true if this is a periodic event
-	static Notifier *m_head;				// head of list of current Notifiers
 	bool m_queued;							// indicates if this entry is queued
+	SEM_ID m_handlerSemaphore;				// held by interrupt manager task while handler call is in progress 
 	DISALLOW_COPY_AND_ASSIGN(Notifier);
 };
 

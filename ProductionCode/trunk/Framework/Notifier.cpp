@@ -11,10 +11,11 @@
 #include "WPIStatus.h"
 //#include "semLib.h"
 
-static Notifier *timerQueueHead = NULL;
-static SEM_ID m_semaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
-static tAlarm *talarm = NULL;
-static tInterruptManager *manager = NULL;
+Notifier *Notifier::timerQueueHead = NULL;
+SEM_ID Notifier::queueSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+tAlarm *Notifier::talarm = NULL;
+tInterruptManager *Notifier::manager = NULL;
+int Notifier::refcount = 0;
 
 /**
  * Create a Notifier for timer event notification.
@@ -32,7 +33,8 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 	m_period = 0;
 	m_nextEvent = NULL;
 	m_queued = false;
-	CRITICAL_REGION(m_semaphore)
+	m_handlerSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+	CRITICAL_REGION(queueSemaphore)
 	{
 		// do the first time intialization of static variables
 		if (talarm == NULL)
@@ -42,6 +44,7 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 			manager->enable(&status);
 			talarm = new tAlarm(&status);
 		}
+		refcount++;
 	}
 	END_REGION;
 	wpi_assertCleanStatus(status);
@@ -54,12 +57,30 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
  */
 Notifier::~Notifier()
 {
-	tRioStatusCode status = 0;
-	talarm->writeEnable(false, &status);
-	delete talarm;
-	manager->disable(&status);
-	delete manager;
-	wpi_assertCleanStatus(status);
+	CRITICAL_REGION(queueSemaphore)
+	{
+		DeleteFromQueue();
+
+		// do the first time intialization of static variables
+		if (!(--refcount))
+		{
+			tRioStatusCode status = 0;
+			talarm->writeEnable(false, &status);
+			delete talarm;
+			talarm = NULL;
+			manager->disable(&status);
+			delete manager;
+			manager = NULL;
+			wpi_assertCleanStatus(status);
+		}
+	}
+	END_REGION;
+
+	// Acquire the semaphore; this makes certain that the handler is 
+	// not being executed by the interrupt manager.
+	semTake(m_handlerSemaphore, WAIT_FOREVER);
+	semGive(m_handlerSemaphore);
+	semDelete(m_handlerSemaphore);
 }
 
 /**
@@ -80,7 +101,6 @@ void Notifier::UpdateAlarm()
 	else
 	{
 		// write the first item in the queue into the trigger time
-		timerQueueHead->m_expirationTime = GetClock() + timerQueueHead->m_period;
 		talarm->writeTriggerTime((UINT32)(timerQueueHead->m_expirationTime * 1e6), &status);
 		talarm->writeEnable(true, &status);
 	}
@@ -98,7 +118,7 @@ void Notifier::ProcessQueue(tNIRIO_u32 mask, void *params)
 	Notifier *current;
 	while (1)				// keep processing past events until no more
 	{
-		CRITICAL_REGION(m_semaphore)
+		CRITICAL_REGION(queueSemaphore)
 		{
 			double currentTime = GetClock();
 			current = timerQueueHead;
@@ -114,13 +134,19 @@ void Notifier::ProcessQueue(tNIRIO_u32 mask, void *params)
 				// compute when to put into queue
 				current->InsertInQueue(false);
 			}
+			else
+				// not periodic; removed from queue
+				current->m_queued = false;
+			
+			semTake(current->m_handlerSemaphore, WAIT_FOREVER);
 		}
 		END_REGION;
 
 		current->m_handler(current->m_param);	// call the event handler
+		semGive(current->m_handlerSemaphore);
 	}
 	// reschedule the first item in the queue
-	CRITICAL_REGION(m_semaphore)
+	CRITICAL_REGION(queueSemaphore)
 	{
 		UpdateAlarm();
 	}
@@ -151,13 +177,11 @@ void Notifier::InsertInQueue(bool updateAlarm)
 	}
 	else
 	{
-		for (Notifier *n = timerQueueHead; n != NULL; n = n->m_nextEvent)
-		{
-			if (n->m_nextEvent == NULL || n->m_expirationTime > this->m_expirationTime)
-			{
-				// if the new element goes after the *n element
-				this->m_nextEvent = n->m_nextEvent;
-				n->m_nextEvent = this;
+		for (Notifier **npp = &(timerQueueHead->m_nextEvent); ; npp = &(*npp)->m_nextEvent) {
+			Notifier *n = *npp;
+			if (!n || n->m_expirationTime > this->m_expirationTime) {
+				*npp = this;
+				this->m_nextEvent = n;
 				break;
 			}
 		}
@@ -176,7 +200,6 @@ void Notifier::DeleteFromQueue()
 {
 	if (m_queued)
 	{
-		semTake(m_semaphore, WAIT_FOREVER);
 		m_queued = false;
 		wpi_assert(timerQueueHead != NULL);
 		if (timerQueueHead == this)
@@ -206,7 +229,7 @@ void Notifier::DeleteFromQueue()
  */
 void Notifier::StartSingle(double period)
 {
-	CRITICAL_REGION(m_semaphore)
+	CRITICAL_REGION(queueSemaphore)
 	{
 		m_periodic = false;
 		m_period = period;
@@ -223,7 +246,7 @@ void Notifier::StartSingle(double period)
  */
 void Notifier::StartPeriodic(double period)
 {
-	CRITICAL_REGION(m_semaphore)
+	CRITICAL_REGION(queueSemaphore)
 	{
 		m_periodic = true;
 		m_period = period;
@@ -237,12 +260,16 @@ void Notifier::StartPeriodic(double period)
  * Stop timer events from occuring.
  * Stop any repeating timer events from occuring. This will also remove any single
  * notification events from the queue.
+ * If a timer-based call to the registered handler is in progress, this function will
+ * block until the handler call is complete.
  */
 void Notifier::Stop()
 {
-	CRITICAL_REGION(m_semaphore)
+	CRITICAL_REGION(queueSemaphore)
 	{
 		DeleteFromQueue();
 	}
 	END_REGION;
+	semTake(m_handlerSemaphore, WAIT_FOREVER);
+	semGive(m_handlerSemaphore);	
 }

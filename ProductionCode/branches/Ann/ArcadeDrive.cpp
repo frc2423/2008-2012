@@ -91,6 +91,17 @@ void ArcadeDrive::Move(float &speed, float &rotateValue)
 	leftMotorSpeed = Limit(leftMotorSpeed);
 	rightMotorSpeed = -Limit(rightMotorSpeed);
 	
+	// add in a little jog one way
+	m_leftMotor->Set(leftMotorSpeed);
+	m_rightMotor->Set(-rightMotorSpeed);
+	Wait(.001);
+		
+	// add in a little jog the other way
+	m_leftMotor->Set(-leftMotorSpeed);
+	m_rightMotor->Set(rightMotorSpeed);
+	Wait(.001);
+	
+	// use original joystick control
 	m_leftMotor->Set(leftMotorSpeed);
 	m_rightMotor->Set(rightMotorSpeed);
 }

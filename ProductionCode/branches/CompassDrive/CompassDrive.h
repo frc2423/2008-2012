@@ -15,7 +15,7 @@ public:
 	
 	CompassDrive( KwarqsDriveController * driveController); 
 	 
-    float control(float turn_Joystick, float speed_Joystick);
+    void control(int turn_Joystick, int speed_Joystick);
     float turnRate(int turn_Type, float angleChange_H, float angleChange_L, float speed_H, float speed_L);
     void getVariables();
     

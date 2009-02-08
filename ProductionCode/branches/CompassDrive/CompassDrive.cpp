@@ -10,14 +10,19 @@ CompassDrive::CompassDrive(KwarqsDriveController * driveController) :
 {
 	stick1 = Joystick::GetStickForPort(FIRST_JOYSTICK_PORT);
 	gyro1 = new Gyro(1);
+	gyro1->SetSensitivity(0.007);
 }
 
 /*void CompassDrive::Drive()*/
 void CompassDrive::Move()
 {
 	getVariables();
-	float Control = control(1, 1);
-	float turn_Rate = turnRate(1, .7, .15, .9, .2);
+	control(1, 1);
+	float turn_Rate = turnRate(2, .7, .01, .9, .01);
+
+	//printf("speed: %f, turn_Rate: %f\r", speed, turn_Rate);
+	
+	m_driveController->Move(speed, turn_Rate);
 }
 
 void CompassDrive::getVariables()
@@ -26,7 +31,7 @@ void CompassDrive::getVariables()
 	
 	joystick1_x = stick1->GetX();
 	//joystick2_x;
-	joystick1_y = stick1->GetY();
+	joystick1_y = stick1->GetY() * -1;
 	//joystick2_y;
 }
 
@@ -144,6 +149,8 @@ float CompassDrive::turnRate(int turn_Type, float angleChange_H, float angleChan
     
 	angleChange_ = angleChange_ / 180.0;
 	
+	float angleChange2 = angleChange_;
+	
 	if (angleChange_ < 0)
     {
         angleChange_ = angleChange_ * -1;
@@ -165,19 +172,28 @@ float CompassDrive::turnRate(int turn_Type, float angleChange_H, float angleChan
 	{
 		turn_Rate = turn_Rate * speed;
 	}
-	else if (turn_Type == 2)
+	//else if (turn_Type == 2)
+	//{
+		//turn_Rate = (1.0 - turn_Rate * 2.0) * speed;
+	//	turn_Rate = turn_Rate;
+	//}
+	
+	if (angleChange2 > 0)
 	{
-		turn_Rate = (1.0 - turn_Rate * 2.0) * speed;
+		turn_Rate = turn_Rate * -1;
+	}
+	
+	if ((speed > -.1) && (speed < .1))
+	{
+		turn_Rate = 0.0;
 	}
 		
 	return turn_Rate;
 } 
 
 
-float CompassDrive::control(float turn_Joystick, float speed_Joystick)
-{
-	float speed;
-	
+void CompassDrive::control(int turn_Joystick, int speed_Joystick)
+{	
 	if (turn_Joystick == 1)
 	{
 		get_Turn = 1;

@@ -57,7 +57,7 @@ void ArcadeDrive::Move(float &speed, float &rotateValue)
 	float leftMotorSpeed;
 	float rightMotorSpeed;
 
-	speed = Limit(speed);
+	speed = Limit(speed) * -1;
 	rotateValue = Limit(rotateValue);
 
 	if (speed > 0.0)

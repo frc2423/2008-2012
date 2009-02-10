@@ -35,7 +35,7 @@
 #include <WPILib.h>
 #include <math.h>
 
-#include "Framework/KwarqsConstants.h"
+#include "KwarqsConstants.h"
 #include "KwarqsWheelServo.h"
 
 /**

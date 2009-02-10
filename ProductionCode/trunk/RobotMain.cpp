@@ -9,12 +9,12 @@
 
 #include "Framework/KwarqsDriveController.h"
 
-#include "ArcadeControl.h"
+#include "SimpleControl.h"
 #include "NullMovementControl.h"
 
 #include "SpeedLimiter.h"
 
-#include "ArcadeDrive.h"
+#include "SwerveDrive.h"
 
 class KwarqsRobotMain : public SimpleRobot
 {

@@ -67,7 +67,7 @@ float KwarqsWheelMotor::GetSetSpeed()
 }
 
 /// Get the actual speed that the wheel is turning (via the encoder)
-float KwarqsWheelMotor::GetActualSpeed()
+double KwarqsWheelMotor::GetActualSpeed()
 {
 	// todo: implement me
 	return 0;

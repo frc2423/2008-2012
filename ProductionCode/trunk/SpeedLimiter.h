@@ -23,7 +23,7 @@ class SpeedLimiter : public KwarqsDriveBase
 	virtual bool IsPhysicalDrive() { return false; }
 
 	/// limits the speed of the robot
-	virtual void Move(float &speed, float &rotation)
+	virtual void Move(double &speed, double &angle, double &rotation)
 	{
 		if (speed < -.4)
 			speed = -.4;

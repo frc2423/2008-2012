@@ -8,7 +8,7 @@
 #ifndef KWARQS_POSITION_INFORMATION_H
 #define KWARQS_POSITION_INFORMATION_H 
 
-#include "KwarqsDevices.h"
+#include "KwarqsConstants.h"
 #include "Deleter.h"
 
 // defined parameters

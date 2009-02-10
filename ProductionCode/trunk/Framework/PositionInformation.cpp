@@ -11,7 +11,7 @@
 
 #include "Deleter.h"
 #include "PositionInformation.h"
-#include "Framework/KwarqsConstants.h"
+#include "KwarqsConstants.h"
 
 // static variables
 PositionInformation * PositionInformation::m_instance = NULL;
@@ -34,7 +34,7 @@ PositionInformation::PositionInformation() :
 
 	xBias(0.0), yBias(0.0)
 {
-	gyro.SetSensitivity(0.007);
+	m_gyro.SetSensitivity(0.007);
 
 	// create the mutex
 	m_mutex = semBCreate(0, SEM_FULL);

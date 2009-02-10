@@ -20,7 +20,7 @@ class KwarqsDriveController {
 public:
 
 	KwarqsDriveController() :
-		m_lastSpeed(0), m_lastRotation(0),
+		m_lastSpeed(0), m_lastAngle(0), m_lastRotation(0),
 		m_moved(false)
 	{}
 	
@@ -33,8 +33,15 @@ public:
 	/// enable a drive type
 	void EnableDrive(KwarqsDriveBase * drive);
 	
-	/// this is called when a KwarqsMovementController wants to move the bot
-	void Move(float speed, float rotation);
+	/** 
+	 	\brief Called when a KwarqsMovementController wants to move the bot
+	 	
+	 	@param speed	Speed for the robot to move
+	 	@param angle	Angle in degrees for the bot to move, where straight 
+	 					ahead is 0 degrees, and directly right is 90 degrees.
+	  	@param rotation	Angular rotation speed
+	 */
+	void Move(double speed, double angle, double rotation);
 	
 	/// this is called after all moving is complete for this iteration
 	/// of the loop is done -- only used by KwarqsRobotMain
@@ -53,7 +60,7 @@ private:
 
 	// ensures that move is called for every iteration of the
 	// loop for algorithms that require that
-	float 	m_lastSpeed, m_lastRotation;
+	double 	m_lastSpeed, m_lastAngle, m_lastRotation;
 	bool 	m_moved;
 	
 	

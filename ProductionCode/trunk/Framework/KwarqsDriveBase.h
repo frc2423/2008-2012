@@ -69,9 +69,10 @@ public:
 		by filter drive types when this is called.
 		
 		@param speed	Speed of the robot (-1 to 1)
+		@param angle	Angle for the robot to move (0 to 360)
 		@param rotation	Rotational speed of the robot (-1 to 1)
 	*/
-	virtual void Move(float &speed, float &rotation) = 0;
+	virtual void Move(double &speed, double &angle, double &rotation) = 0;
 
 	/// Return the name of the class
 	virtual const char * Name() = 0;

@@ -20,7 +20,7 @@ public:
 	void Move() 
 	{
 		// stay where you're at
-		m_driveController->Move(0,0);
+		m_driveController->Move(0,0,0);
 	}
 	
 	/// This returns the name of the class (useful for generic logging)

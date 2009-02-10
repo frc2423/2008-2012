@@ -9,6 +9,8 @@
 #define SWERVEDRIVE_H
 
 #include "Framework/KwarqsDriveBase.h"
+#include "Framework/KwarqsWheelMotor.h"
+#include "Framework/KwarqsWheelServo.h"
 
 class SwerveDrive : public KwarqsDriveBase {
 public:

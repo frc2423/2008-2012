@@ -36,6 +36,7 @@
 #include "SwerveDrive.h"
 
 #include "Framework/KwarqsConstants.h"
+#include "Framework/math_definitions.h"
 
 // default constructor
 SwerveDrive::SwerveDrive() :
@@ -50,7 +51,7 @@ SwerveDrive::SwerveDrive() :
 	m_motor_rr(MOTOR_RR_SLOT, PWM_RR_JAGUAR, ENCODER_MOTOR_RR_1, ENCODER_SERVO_RR_2 )
 {}
 
-void SwerveDrive::Move(double &speed, double &angle, double &rotateValue)
+void SwerveDrive::Move(double &speed, double &angle, double &rotation)
 {
 	// note: currently a rather braindead implementation, mostly because it
 	// assumes wheel reaction time is instantaneous

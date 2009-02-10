@@ -27,6 +27,8 @@ private:
 
 	// joystick used for control
 	Joystick * m_stick;
+	
+	Gyro gyro;
 };
 
 #endif

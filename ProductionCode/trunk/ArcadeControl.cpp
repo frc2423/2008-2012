@@ -35,38 +35,64 @@
 #include "WPILib.h"
 #include "ArcadeControl.h"
 
+# define M_PI           3.14159265358979323846
+#include <math.h>
+
+
 
 ArcadeControl::ArcadeControl(KwarqsDriveController * driveController) :
-	KwarqsMovementControl(driveController)
+	KwarqsMovementControl(driveController),
+	gyro(1)
 {
 	m_stick = Joystick::GetStickForPort(FIRST_JOYSTICK_PORT);
+	gyro.SetSensitivity(0.007);
 }
+
 
 // implements the default arcade drive control found in WPILib
 void ArcadeControl::Move()
-{
-	float moveValue = m_stick->GetY(), rotateValue = m_stick->GetX();
-
+{	
+	float speed, rotateValue;
+	
 	if (m_stick->GetTrigger())
 	{
-		// square the inputs (while preserving the sign) to increase fine control while permitting full power
-		if (moveValue >= 0.0)
+		float y = m_stick->GetY() * -1, x = m_stick->GetX();
+		
+		speed = sqrt(x*x+y*y);
+		
+		double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0 ) * -1;			
+		if (desired_angle < 0) desired_angle += 360;
+	
+		double current_angle = fmod(gyro.GetAngle(), 360.0);
+		if (current_angle < 0) current_angle += 360;
+	
+		rotateValue = (desired_angle - current_angle );
+			
+		if (rotateValue > 180)
+			rotateValue = rotateValue - 360.0;
+		else if (rotateValue < -180)
+			rotateValue = rotateValue + 360.0;
+			
+		if (fabs(rotateValue) < 15.0 )
+			rotateValue = 0;
+		
+		rotateValue = rotateValue / 90.0;
+		
+		if (speed < 0.01)
+			rotateValue = 0.0;
+		/*
+		if (GetTime() - ztime > 0.1)
 		{
-			moveValue = (moveValue * moveValue);
-		}
-		else
-		{
-			moveValue = -(moveValue * moveValue);
-		}
-		if (rotateValue >= 0.0)
-		{
-			rotateValue = (rotateValue * rotateValue);
-		}
-		else
-		{
-			rotateValue = -(rotateValue * rotateValue);
-		}
+			printf("desired: %f current: %f rotate: %f\r", 
+					desired_angle, current_angle, rotateValue);
+			ztime = GetTime();
+		}*/
+	}
+	else
+	{
+		speed = m_stick->GetY()*-1;
+		rotateValue = m_stick->GetX();
 	}
 	
-	m_driveController->Move(moveValue, rotateValue);
+	m_driveController->Move(speed, rotateValue);
 }

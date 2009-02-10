@@ -145,8 +145,6 @@ public:
 			GetTeleoperatedMovementControl()->Move();
 			driveController.EndMove();
 			
-			// wait period
-			Wait(0.0025);
 		}
 		
 		GetTeleoperatedMovementControl()->OnDisable();

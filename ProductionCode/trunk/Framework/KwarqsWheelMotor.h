@@ -34,16 +34,21 @@ class KwarqsWheelMotor {
 public:
 
 	/// constructor: passes in the port for the speed controller and encoder
-	KwarqsWheelMotor(UINT32 pwm_port, UINT32 encoder_port);
+	KwarqsWheelMotor(UINT32 slot, UINT32 pwm_port, UINT32 encoder_port1, UINT32 encoder_port2);
 
-	/// Set the speed of the motor (-1 to 1)? 
+	/// Set the speed of the motor (-1 to 1)
 	void SetSpeed(float speed);
 	
 	/// Get the speed that the motor was assigned to go via SetSpeed
 	float GetSetSpeed();
 	
 	/// Get the actual speed that the wheel is turning (via the encoder)
-	float GetActualSpeed();
+	double GetActualSpeed();
+
+private:
+	
+	Jaguar m_motor;
+	Encoder m_encoder;
 };
 
 #endif

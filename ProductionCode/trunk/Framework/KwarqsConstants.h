@@ -1,5 +1,5 @@
 /**
-	\file 		KwarqsDevices.h
+	\file 		KwarqsConstants.h
 	\author 	Dustin Spicuzza: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
@@ -10,8 +10,8 @@
 	later on if we need to move things around. 
 */
 
-#ifndef FRAMEWORK_KWARQS_DEVICES_H
-#define FRAMEWORK_KWARQS_DEVICES_H
+#ifndef FRAMEWORK_KWARQS_CONSTANTS_H
+#define FRAMEWORK_KWARQS_CONSTANTS_H
 
 // operator station
 #define FIRST_JOYSTICK_PORT			1
@@ -88,5 +88,8 @@
 #define SERVO_R_SCALE				45
 #define SERVO_R_TICKS				1000
 
+#define SERVO_PID_P					0.25
+#define SERVO_PID_I					0.0
+#define SERVO_PID_D					0.0
 
 #endif

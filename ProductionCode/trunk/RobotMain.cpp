@@ -21,7 +21,7 @@ class KwarqsRobotMain : public SimpleRobot
 	KwarqsDriveController 	driveController;
 	
 	// control types
-	ArcadeControl 			arcadeControl;
+	SimpleControl 			simpleControl;
 	NullMovementControl		nullMovementControl;
 	
 	// drive types
@@ -32,7 +32,7 @@ class KwarqsRobotMain : public SimpleRobot
 	// motor drivers
 	// XXX: Remember that if we have more than one set of motor 
 	// drivers, they have to share PWM's .. worry about it later
-	ArcadeDrive				arcadeDrive;
+	SwerveDrive				swerveDrive;
 	
 	KwarqsMovementControl * currentTeleoperatedControl;
 
@@ -45,7 +45,7 @@ public:
 		and startup code here. 
 	*/
 	KwarqsRobotMain() :
-		arcadeControl(&driveController),
+		simpleControl(&driveController),
 		nullMovementControl(&driveController),
 		currentTeleoperatedControl(NULL)
 	{
@@ -59,7 +59,7 @@ public:
 		
 		// todo: need a better way to do this, not satisfied with this
 		//driveController.AddDrive(&speedLimiter, DriveEnabled);
-		driveController.AddDrive(&arcadeDrive, DriveEnabled);
+		driveController.AddDrive(&swerveDrive, DriveEnabled);
 	}
 
 	/**
@@ -82,7 +82,7 @@ public:
 	KwarqsMovementControl * GetTeleoperatedMovementControl()
 	{	
 		// select the type (todo: need to read switches)
-		KwarqsMovementControl * control = &arcadeControl;
+		KwarqsMovementControl * control = &simpleControl;
 		
 		
 		// enable or disable it depending on whether it was previously

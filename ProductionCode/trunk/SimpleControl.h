@@ -1,5 +1,5 @@
 /**
-	\file 		ArcadeControl.h
+	\file 		SimpleControl.h
 	\author 	Dustin Spicuzza: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
@@ -13,15 +13,15 @@
 #include "Framework/KwarqsMovementControl.h"
 
 
-class ArcadeControl : public KwarqsMovementControl {
+class SimpleControl : public KwarqsMovementControl {
 public:
 
 	// constructor
-	ArcadeControl(KwarqsDriveController * driveController);
+	SimpleControl(KwarqsDriveController * driveController);
 
 	// required methods
 	void Move();
-	const char * Name() { return "ArcadeControl"; }
+	const char * Name() { return "SimpleControl"; }
 	
 private:
 

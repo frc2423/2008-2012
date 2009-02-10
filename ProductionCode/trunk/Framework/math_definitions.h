@@ -1,4 +1,6 @@
 
+#include <math.h>
+
 /* taken from the C99 standard include library */
 
 #ifndef M_PI

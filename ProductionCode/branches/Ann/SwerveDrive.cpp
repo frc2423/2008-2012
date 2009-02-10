@@ -1,8 +1,8 @@
 /**
 	\file 		SwerveDrive.cpp
-	\author 	Dustin Spicuzza: last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-02-10 00:30:27 -0500 (Tue, 10 Feb 2009) $
-	\version 	$Rev: 118 $
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 */
 
 /*

@@ -1,8 +1,8 @@
 /**
 	\file 		DataFile.h
-	\author 	Dustin Spicuzza: last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-01-25 03:36:25 -0500 (Sun, 25 Jan 2009) $
-	\version 	$Rev: 47 $
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 */
 
 /*

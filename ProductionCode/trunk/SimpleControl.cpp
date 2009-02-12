@@ -51,7 +51,6 @@ SimpleControl::SimpleControl(KwarqsDriveController * driveController) :
 }
 
 
-// implements the default arcade drive control found in WPILib
 void SimpleControl::Move()
 {	
 	double y = m_stick->GetY() * -1, x = m_stick->GetX();

@@ -16,6 +16,12 @@ enum DriveEnabledType {
 	DriveDisabled
 };
 
+/**
+	\brief Used by KwarqsMovementControl derived classes to move the robot
+	
+	This is the only supported interface for controlling the robot directly,
+	as it supports filtering and other useful things. 
+*/
 class KwarqsDriveController {
 public:
 
@@ -36,10 +42,11 @@ public:
 	/** 
 	 	\brief Called when a KwarqsMovementController wants to move the bot
 	 	
-	 	@param speed	Speed for the robot to move
+	 	@param speed	Speed for the robot to move (-1 to 1)
 	 	@param angle	Angle in degrees for the bot to move, where straight 
-	 					ahead is 0 degrees, and directly right is 90 degrees.
-	  	@param rotation	Angular rotation speed
+	 					ahead is 0 degrees, and angle increments positively in
+						a clockwise direction
+	  	@param rotation	Angular rotation (-1 to 1)
 	 */
 	void Move(double speed, double angle, double rotation);
 	

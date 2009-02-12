@@ -70,15 +70,7 @@ void CalculateWheel(
 	angle = (atan2(Vy, Vx)*180)/M_PI - 90.0;
 }
 
-/*
- 	\brief Moves the robot 
- 	
- 	@param speed		Desired velocity, from -1 to 1 (doesn't mean a lot)
- 	@param angle		Desired angle, where 0 is straight ahead, and
- 						angle increments positively counter clockwise.
- 	@param rotation		Desired rate of rotation
- 
- */
+
 void SwerveDrive::Move(double &speed, double &angle, double &rotation)
 {
 	/*

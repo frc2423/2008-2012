@@ -12,15 +12,20 @@
 #include "Framework/KwarqsConstants.h"
 #include "Framework/KwarqsMovementControl.h"
 
-
+/**
+	\class SimpleControl
+	\brief A very simple control system to demonstrate that things work
+*/
 class SimpleControl : public KwarqsMovementControl {
 public:
 
 	// constructor
 	SimpleControl(KwarqsDriveController * driveController);
 
-	// required methods
+	/// required method
 	void Move();
+	
+	/// required method
 	const char * Name() { return "SimpleControl"; }
 	
 private:

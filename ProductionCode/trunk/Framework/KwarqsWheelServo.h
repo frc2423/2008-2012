@@ -18,13 +18,14 @@ class UglyServoHack;
 	\class KwarqsWheelServo
 	\brief Controls the direction of the wheel, relative to the robot
 	
-	Ideally, this will be controlled by a PID loop just like a real servo
-	would be controlled. Will need at least two variants of this class,
-	since the front and rear motors are going to be different types so
-	they will need different tuning.
+	This is controlled by a PID loop just like a real servo
+	would be controlled. There are a number of different configuration
+	parameters required for each motor, all which are set in the constructor.
 	
-	At the moment, this class is set to auto-calibrate the wheel
-	as soon as it turns on. There is also a calibration function.
+	At the moment, this class is set to auto-calibrate the wheel as soon
+	as it turns on (open question on whether this is necessary). There 
+	is also a calibration function. Ideally, the calibration point will be
+	close to straight ahead.
 	
 	Only a KwarqsDriveBase derived class should create these. 
 */

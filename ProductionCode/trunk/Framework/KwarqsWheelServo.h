@@ -35,7 +35,8 @@ public:
 	virtual ~KwarqsWheelServo();
 
 	/// Set the angle that the wheel should be pointing
-	void SetAngle(float angle);
+	void SetAngle(double angle);
+	void SetAngleRadians(double angle);
 	
 	/// Get the angle that the wheel is supposed to be pointing
 	float GetSetAngle();

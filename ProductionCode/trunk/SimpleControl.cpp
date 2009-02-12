@@ -56,9 +56,9 @@ void SimpleControl::Move()
 {	
 	double y = m_stick->GetY() * -1, x = m_stick->GetX();
 		
-	double speed = sqrt(x*x+y*y);
+	double speed = hypot(x, y);
 	
-	double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0 ) * -1;			
+	double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0 );			
 	if (desired_angle < 0) desired_angle += 360;
 	
 	if (fabs(speed) < 0.01)

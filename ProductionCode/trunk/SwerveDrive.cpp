@@ -40,10 +40,10 @@
 
 // default constructor
 SwerveDrive::SwerveDrive() :
-	m_servo_lf(SERVO_LF_SLOT, PWM_LF_VICTOR, ENCODER_SERVO_LF_1, ENCODER_SERVO_LF_2, SERVO_F_SCALE, SERVO_F_TICKS ),
-	m_servo_rf(SERVO_RF_SLOT, PWM_RF_VICTOR, ENCODER_SERVO_RF_1, ENCODER_SERVO_RF_2, SERVO_R_SCALE, SERVO_R_TICKS ),
-	m_servo_lr(SERVO_LR_SLOT, PWM_LR_VICTOR, ENCODER_SERVO_LR_1, ENCODER_SERVO_LR_2, SERVO_F_SCALE, SERVO_F_TICKS ),
-	m_servo_rr(SERVO_RR_SLOT, PWM_RR_VICTOR, ENCODER_SERVO_RR_1, ENCODER_SERVO_RR_2, SERVO_R_SCALE, SERVO_R_TICKS ),
+	m_servo_lf( SERVO_LF_PARAMETERS ),
+	m_servo_rf( SERVO_RF_PARAMETERS ),
+	m_servo_lr( SERVO_LR_PARAMETERS ),
+	m_servo_rr( SERVO_RR_PARAMETERS ),
 	
 	m_motor_lf(MOTOR_LF_SLOT, PWM_LF_JAGUAR, ENCODER_MOTOR_LF_1, ENCODER_SERVO_LF_2 ),
 	m_motor_rf(MOTOR_RF_SLOT, PWM_RF_JAGUAR, ENCODER_MOTOR_RF_1, ENCODER_SERVO_RF_2 ),
@@ -51,40 +51,36 @@ SwerveDrive::SwerveDrive() :
 	m_motor_rr(MOTOR_RR_SLOT, PWM_RR_JAGUAR, ENCODER_MOTOR_RR_1, ENCODER_SERVO_RR_2 )
 {}
 
+/*
+	Calculates the parameters for an individual wheel
+	
+	Set as inline function for speed
+*/
+static inline
+void CalculateWheel(
+	double &magnitude, double &angle,
+	double Vtx, double Vty, double w,
+	double Rx, double Ry)
+{
+	double Vx = Vtx - w*Ry;
+	double Vy = Vty - w*Rx;
+	
+	// return as polar coordinates
+	magnitude = hypot(Vx,Vy); 
+	angle = (atan2(Vy, Vx)*180)/M_PI - 90.0;
+}
+
+/*
+ 	\brief Moves the robot 
+ 	
+ 	@param speed		Desired velocity, from -1 to 1 (doesn't mean a lot)
+ 	@param angle		Desired angle, where 0 is straight ahead, and
+ 						angle increments positively counter clockwise.
+ 	@param rotation		Desired rate of rotation
+ 
+ */
 void SwerveDrive::Move(double &speed, double &angle, double &rotation)
 {
-	// note: currently a rather braindead implementation, mostly because it
-	// assumes wheel reaction time is instantaneous
-   
-    if (fabs(rotation) < 0.01)
-    {
-        // no rotation
-		
-		m_servo_lf.SetAngle(angle);
-		m_servo_lf.SetAngle(angle);
-		m_servo_lf.SetAngle(angle);
-		m_servo_lf.SetAngle(angle);
-		
-		m_motor_lf.SetSpeed(speed);
-		m_motor_lr.SetSpeed(speed);
-		m_motor_rf.SetSpeed(speed);
-		m_motor_rr.SetSpeed(speed);
-		
-	}
-	else
-	{
-		// we need some rotation code here... punt for now
-		
-		m_motor_lf.SetSpeed(0);
-		m_motor_lr.SetSpeed(0);
-		m_motor_rf.SetSpeed(0);
-		m_motor_rr.SetSpeed(0);
-    }
-
-
-	// todo: ideas taken from Ian Mackenzie's ppt: 
-	// http://www.firstroboticscanada.org/site/files/workshops/omnidirectional.pdf
-	
 	/*
 		Thoughts and notes
 		
@@ -96,6 +92,59 @@ void SwerveDrive::Move(double &speed, double &angle, double &rotation)
 		Question: is this actually true? Should we just sit until the wheels
 		turn (this seems like a bad idea)
 		
+		Currently, neither of those is implemented.
+		
 	*/
+	
+	// set limitations on speed
+	if (speed < -1.0)
+		speed = -1.0;
+	else if (speed > 1.0)
+		speed = 1.0;
+	
+	// set limitations on rotation
+	if (rotation < -1.0)
+		rotation = -1.0;
+	else if (rotation > 1.0)
+		rotation = 1.0;
+ 
+	// convert speed/angle to Vx/Vy (offset angle by 90 degrees)
+	double Vtx = speed * cos( ((angle+90.0) * M_PI)/180.0 );
+	double Vty = speed * sin( ((angle+90.0) * M_PI)/180.0 );
+	
+	// LF, LR, RF, RR
+	double speeds[] = { 0.0, 0.0, 0.0, 0.0 };
+	double lf_angle, lr_angle, rf_angle, rr_angle;
+	
+	// find the speed and angle of each wheel (first two params passed back)	
+	CalculateWheel(speeds[0], lf_angle, Vtx, Vty, rotation, LF_DISPLACEMENT);
+	CalculateWheel(speeds[1], lr_angle, Vtx, Vty, rotation, LR_DISPLACEMENT);
+	CalculateWheel(speeds[2], rf_angle, Vtx, Vty, rotation, RF_DISPLACEMENT);
+	CalculateWheel(speeds[3], rr_angle, Vtx, Vty, rotation, RR_DISPLACEMENT);
+	
+	// then limit all motors based on the highest motor speed
+	double highest_speed = 0;
+	
+	for (int i = 0; i < 4; i++)
+		if (fabs(speeds[i]) > highest_speed)
+			highest_speed = fabs(speeds[i]);
+	
+	for (int i = 0; i < 4; i++)
+		speeds[i] /= highest_speed;
+	
+    
+    // set the motors
+	m_servo_lf.SetAngle(lf_angle);
+	m_servo_lr.SetAngle(lr_angle);
+	m_servo_rf.SetAngle(rf_angle);
+	m_servo_rr.SetAngle(rr_angle);
+	
+	m_motor_lf.SetSpeed(speeds[0]);
+	m_motor_lr.SetSpeed(speeds[1]);
+	m_motor_rf.SetSpeed(speeds[2]);
+	m_motor_rr.SetSpeed(speeds[3]);
 }
+
+
+
 

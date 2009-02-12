@@ -43,6 +43,12 @@
 #define PWM_RF_JAGUAR				1
 #define PWM_RR_JAGUAR				2
 
+// displacement of motors from center of rotation
+#define LF_DISPLACEMENT				-1,1
+#define LR_DISPLACEMENT				-1,-1
+#define RF_DISPLACEMENT				1,1
+#define RR_DISPLACEMENT				1,-1
+
 // encoder channels: motor
 #define ENCODER_MOTOR_LF_1			1
 #define ENCODER_MOTOR_LF_2			1
@@ -88,8 +94,24 @@
 #define SERVO_R_SCALE				45
 #define SERVO_R_TICKS				1000
 
+// global servo constants
 #define SERVO_PID_P					0.25
 #define SERVO_PID_I					0.0
 #define SERVO_PID_D					0.0
+
+// aggregated parameters (just ignore these)
+
+#define SERVO_PARAMS(lr, fr)		SERVO_##lr##fr##_SLOT, \
+									PWM_##lr##fr##_VICTOR, \
+									ENCODER_SERVO_##lr##fr##_1, \
+									ENCODER_SERVO_##lr##fr##_2, \
+									SERVO_##fr##_SCALE, \
+									SERVO_##fr##_TICKS		
+
+#define SERVO_LF_PARAMETERS 		SERVO_PARAMS(L,F)
+#define SERVO_LR_PARAMETERS			SERVO_PARAMS(L,R)
+#define SERVO_RF_PARAMETERS			SERVO_PARAMS(R,F)
+#define SERVO_RR_PARAMETERS			SERVO_PARAMS(R,R)
+
 
 #endif

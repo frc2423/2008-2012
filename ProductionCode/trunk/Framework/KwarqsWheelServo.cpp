@@ -82,7 +82,7 @@ KwarqsWheelServo::~KwarqsWheelServo()
 }
 
 /// Set the angle that the wheel should be pointing
-void KwarqsWheelServo::SetAngle(float angle)
+void KwarqsWheelServo::SetAngle(double angle)
 {
 	// do this directly, don't do shortest path via 180 degree turns.. 
 	// another layer of the application should do that

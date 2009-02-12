@@ -10,6 +10,10 @@
 
 #include "TunablePIDController.h"
 
+template <int i>
+class UglyServoHack;
+
+
 /**
 	\class KwarqsWheelServo
 	\brief Controls the direction of the wheel, relative to the robot
@@ -18,6 +22,9 @@
 	would be controlled. Will need at least two variants of this class,
 	since the front and rear motors are going to be different types so
 	they will need different tuning.
+	
+	At the moment, this class is set to auto-calibrate the wheel
+	as soon as it turns on. There is also a calibration function.
 	
 	Only a KwarqsDriveBase derived class should create these. 
 */
@@ -28,20 +35,33 @@ public:
 		UINT32 slot,
 		UINT32 pwm_port, 
 		UINT32 encoder_port1, UINT32 encoder_port2,
+		UINT32 cal_port,
 		double outputScale,
-		int encoderResolution
+		int encoderResolution,
+		double cal_offset
 	);
 	
 	virtual ~KwarqsWheelServo();
 
-	/// Set the angle that the wheel should be pointing
+	/// only needs to be called if the servo needs to be recalibrated
+	void Calibrate();
+	
+	/// lets you know if the servo is currently calibrated or not
+	bool IsCalibrated() { return m_calibrating; }
+	
+	/// Set the angle that the wheel should be pointing, where
+	/// 0 is straight ahead and angle increments positively 
+	/// counter clockwise
 	void SetAngle(double angle);
-	void SetAngleRadians(double angle);
 	
-	/// Get the angle that the wheel is supposed to be pointing
-	float GetSetAngle();
+	/// Get the angle that the wheel is supposed to be pointing, where
+	/// 0 is straight ahead and angle increments positively 
+	/// counter clockwise
+	double GetSetAngle();
 	
-	/// Get the angle that the wheel is actually pointing
+	/// Get the angle that the wheel is actually pointing, where
+	/// 0 is straight ahead and angle increments positively 
+	/// counter clockwise
 	double GetCurrentAngle();
 
 	
@@ -53,15 +73,57 @@ public:
 	void TuneParameters(float p, float i, float d);
 	
 private:
+	
+	// called when calibration is finished
+	void CalibrationComplete();
 
 	TunablePIDController * m_pidController;
 	
-	Victor 		m_motor;
-	Encoder 	m_encoder;
+	Victor 			m_motor;
+	Encoder 		m_encoder;
+	
+	// calibration sensor
+	DigitalInput 	m_sensor;
 	
 	double 		m_outputScale;
-	double		m_encoderResolution;
 	
+	int			m_encoderResolution;
+	
+	
+	bool		m_calibrating;
+	int			m_calibrated_offset;		// subtract from real counts
+	double		m_calibrating_offset;		// how many degrees off is the calibration point?
+	
+	template <int i>
+	friend class UglyServoHack;
 };
+
+
+
+// ignore this, its not important. Really, just ignore it. Go away.
+template <int i>
+class UglyServoHack {
+public:
+	static void Handler(tNIRIO_u32 x, void * param)
+	{
+		UglyServoHack<i>::that->CalibrationComplete();
+		UglyServoHack<i>::that = NULL;
+	}
+	
+	static KwarqsWheelServo * that;
+};
+
+#define SUSH(N) 								\
+	if (UglyServoHack<N>::that == NULL)			\
+	{											\
+		UglyServoHack<N>::that = this;			\
+		handler = UglyServoHack<1>::Handler;	\
+	}
+
+#define SETUP_UGLY_SERVO_HACK						\
+	SUSH(1) else SUSH(2) else SUSH(3) else SUSH(4) 	\
+	else {											\
+		wpi_assert(0 && "too many servos created");	\
+	}
 
 #endif

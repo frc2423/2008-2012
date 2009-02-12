@@ -20,7 +20,7 @@ public:
 	RobotDemo(void):
 		myRobot(1, 2),
 		stick(1),
-		servo(4, 5, 6, 45.0, 250)
+		servo(4, 4, 5, 6, 7, 45.0, 1000, 0)
 	{
 		GetWatchdog().SetExpiration(100);	
 		

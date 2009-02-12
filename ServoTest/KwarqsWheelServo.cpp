@@ -32,31 +32,54 @@
  */
 
 #include <WPILib.h>
+
 #include <math.h>
 #include "KwarqsWheelServo.h"
+
+
+template <int N>
+KwarqsWheelServo * UglyServoHack<N>::that = NULL;
 
 /**
 	\brief Constructor
 	
+	@param slot					Slot for electronics
 	@param pwm_port				PWM port for motor
 	@param encoder_port1		Encoder port
 	@param encoder_port2		Encoder port 
+	@param cal_port				Calibration port
+	
 	@param outputScale			A value used to indicate the max error angle to 
 								generate a full-power correctional response
 	@param encoderResolution	The number of wheel counts that it takes for the wheel
 								to rotate 360 degrees
+	@param cal_offset			Calibration offset (ie, when it goes low what 
+								angle are we currently facing?)
+	
 */
 KwarqsWheelServo::KwarqsWheelServo(
+	UINT32 slot,
 	UINT32 pwm_port, 
 	UINT32 encoder_port1, UINT32 encoder_port2,
+	UINT32 cal_port,
 	double outputScale,
-	int encoderResolution
+	int encoderResolution,
+	double cal_offset
 ) :
-	m_motor(pwm_port),
-	m_encoder(encoder_port1, encoder_port2),
+	m_motor(slot, pwm_port),
+	m_encoder(slot, encoder_port1, encoder_port2),
+	m_sensor(slot, cal_port),
 	m_outputScale(outputScale),
-	m_encoderResolution((double)encoderResolution)
+	m_encoderResolution(encoderResolution),
+	m_calibrating(false),
+	m_calibrating_offset(cal_offset)
 {
+	// see if the motor is already calibrated, saves us effort
+	if (!m_sensor.Get())
+		CalibrationComplete();
+	else
+		Calibrate();
+		
 
 	// create the PID controller
 	m_pidController = new TunablePIDController(.25, 0, 0, this, this);
@@ -76,15 +99,49 @@ KwarqsWheelServo::~KwarqsWheelServo()
 	delete m_pidController;
 }
 
-/// Set the angle that the wheel should be pointing
-void KwarqsWheelServo::SetAngle(float angle)
+void KwarqsWheelServo::Calibrate()
+{
+	// don't do this twice
+	if (m_calibrating)
+		return;
+	
+	m_calibrating = true;
+	
+	// setup the interrupt handlers.. this is very braindead, why
+	// can't I just pass the *this* pointer in?
+	
+	tInterruptHandler handler;
+	
+	SETUP_UGLY_SERVO_HACK
+	
+	m_sensor.RequestInterrupts(handler);
+		
+	m_sensor.SetUpSourceEdge(false, true);
+	m_sensor.EnableInterrupts();
+}
+
+void KwarqsWheelServo::CalibrationComplete()
+{
+	if (m_calibrating)
+		m_sensor.DisableInterrupts();
+	
+	m_calibrated_offset = m_encoder.GetRaw() % m_encoderResolution;
+	
+	m_calibrating = false;
+}
+
+
+/// Set the angle that the wheel should be pointing, where
+/// 0 is straight ahead and angle increments positively 
+/// counter clockwise
+void KwarqsWheelServo::SetAngle(double angle)
 {
 	// todo: shortest path via 180 degree turns?
 	m_pidController->SetSetpoint(fmod(angle, 360.0));
 }
 
 /// Get the angle that the wheel is supposed to be pointing
-float KwarqsWheelServo::GetSetAngle()
+double KwarqsWheelServo::GetSetAngle()
 {
 	return m_pidController->GetSetpoint();
 }
@@ -92,8 +149,9 @@ float KwarqsWheelServo::GetSetAngle()
 /// Get the angle that the wheel is actually pointing
 double KwarqsWheelServo::GetCurrentAngle()
 {
-	// convert the encoder value to a 0-360 value
-	return (fmod(m_encoder.Get(), m_encoderResolution) * 360.0) / m_encoderResolution;
+	// convert the encoder value to an angle
+	return ((double)((m_encoder.GetRaw() - m_calibrated_offset) % m_encoderResolution) * 360.0) 
+			/ (double)m_encoderResolution;
 }
 
 // generally you won't need to use this.. 
@@ -106,17 +164,20 @@ void KwarqsWheelServo::TuneParameters(float p, float i, float d)
 /// called when the PID Controller completes a calculation
 void KwarqsWheelServo::PIDWrite(float output)
 {
+	// calibration mode
+	if (m_calibrating)
+	{
+		m_motor.Set(1);
+		return;
+	}
+	
 	// the value received should be in the range of -360, 360 so we should
 	// just scale it to a value the victor can take.. but then we would not
 	// have a good response time (probably). So, we use the scale parameter
 	// to determine the rate of change in relation to the output
 	
-	if (output > m_outputScale)
-		output = 1;
-	else if (output < -m_outputScale)
-		output = -1;
-	else
-		output = output/m_outputScale;
+	// don't need to check the value for > 1 -- its done in WPILib
+	output = output/m_outputScale;
 	
 	// set the motor value
 	m_motor.Set(output);

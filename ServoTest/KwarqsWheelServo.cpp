@@ -65,6 +65,7 @@ KwarqsWheelServo::KwarqsWheelServo(
 	double outputScale,
 	int encoderResolution,
 	double cal_offset
+	bool invert
 ) :
 	m_motor(slot, pwm_port),
 	m_encoder(slot, encoder_port1, encoder_port2),
@@ -72,7 +73,8 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_outputScale(outputScale),
 	m_encoderResolution(encoderResolution),
 	m_calibrating(false),
-	m_calibrating_offset(cal_offset)
+	m_calibrating_offset(cal_offset),
+	m_invert( invert ? -1 : 1 )
 {
 	// see if the motor is already calibrated, saves us effort
 	if (!m_sensor.Get())
@@ -88,6 +90,7 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_pidController->SetContinuous();
 	m_pidController->SetInputRange(0, 360);
 	m_pidController->SetOutputRange(-360, 360);
+	m_pidController->SetTolerance(0.025);
 	
 	// enable it
 	m_pidController->Enable();
@@ -97,6 +100,16 @@ KwarqsWheelServo::KwarqsWheelServo(
 KwarqsWheelServo::~KwarqsWheelServo()
 {
 	delete m_pidController;
+}
+
+void KwarqsWheelServo::Enable()
+{
+	m_pidController->Enable();
+}
+
+void KwarqsWheelServo::Disable()
+{
+	m_pidController->Disable();
 }
 
 void KwarqsWheelServo::Calibrate()
@@ -150,8 +163,13 @@ double KwarqsWheelServo::GetSetAngle()
 double KwarqsWheelServo::GetCurrentAngle()
 {
 	// convert the encoder value to an angle
-	return ((double)((m_encoder.GetRaw() - m_calibrated_offset) % m_encoderResolution) * 360.0) 
-			/ (double)m_encoderResolution;
+	double angle = fmod((((double)((m_encoder.GetRaw() - m_calibrated_offset) % m_encoderResolution) * 360.0) 
+			/ (double)m_encoderResolution) - m_calibrating_offset, 360.0);
+			
+	if (angle < 360)
+		angle += 360;
+		
+	return angle;
 }
 
 // generally you won't need to use this.. 
@@ -167,7 +185,7 @@ void KwarqsWheelServo::PIDWrite(float output)
 	// calibration mode
 	if (m_calibrating)
 	{
-		m_motor.Set(1);
+		m_motor.Set(m_invert);
 		return;
 	}
 	
@@ -180,7 +198,10 @@ void KwarqsWheelServo::PIDWrite(float output)
 	output = output/m_outputScale;
 	
 	// set the motor value
-	m_motor.Set(output);
+	if (m_pidController->OnTarget())
+		m_motor.Set(0);
+	else
+		m_motor.Set(output * m_invert);
 }
 
 double KwarqsWheelServo::PIDGet()

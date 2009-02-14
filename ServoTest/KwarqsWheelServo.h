@@ -38,11 +38,16 @@ public:
 		UINT32 cal_port,
 		double outputScale,
 		int encoderResolution,
-		double cal_offset
+		double cal_offset,
+		bool invert = false
 	);
 	
 	virtual ~KwarqsWheelServo();
 
+	/// enabled by default
+	void Enable();
+	void Disable();
+	
 	/// only needs to be called if the servo needs to be recalibrated
 	void Calibrate();
 	
@@ -72,6 +77,8 @@ public:
 	// used to tune the class
 	void TuneParameters(float p, float i, float d);
 	
+	Victor 			m_motor;
+	
 private:
 	
 	// called when calibration is finished
@@ -79,7 +86,7 @@ private:
 
 	TunablePIDController * m_pidController;
 	
-	Victor 			m_motor;
+	
 	Encoder 		m_encoder;
 	
 	// calibration sensor
@@ -89,6 +96,7 @@ private:
 	
 	int			m_encoderResolution;
 	
+	float		m_invert;
 	
 	bool		m_calibrating;
 	int			m_calibrated_offset;		// subtract from real counts

@@ -18,14 +18,13 @@ class UglyServoHack;
 	\class KwarqsWheelServo
 	\brief Controls the direction of the wheel, relative to the robot
 	
-	This is controlled by a PID loop just like a real servo
-	would be controlled. There are a number of different configuration
-	parameters required for each motor, all which are set in the constructor.
+	Ideally, this will be controlled by a PID loop just like a real servo
+	would be controlled. Will need at least two variants of this class,
+	since the front and rear motors are going to be different types so
+	they will need different tuning.
 	
-	At the moment, this class is set to auto-calibrate the wheel as soon
-	as it turns on (open question on whether this is necessary). There 
-	is also a calibration function. Ideally, the calibration point will be
-	close to straight ahead.
+	At the moment, this class is set to auto-calibrate the wheel
+	as soon as it turns on. There is also a calibration function.
 	
 	Only a KwarqsDriveBase derived class should create these. 
 */
@@ -39,11 +38,16 @@ public:
 		UINT32 cal_port,
 		double outputScale,
 		int encoderResolution,
-		double cal_offset
+		double cal_offset,
+		bool invert = false
 	);
 	
 	virtual ~KwarqsWheelServo();
 
+	/// enabled by default
+	void Enable();
+	void Disable();
+	
 	/// only needs to be called if the servo needs to be recalibrated
 	void Calibrate();
 	
@@ -73,6 +77,8 @@ public:
 	// used to tune the class
 	void TuneParameters(float p, float i, float d);
 	
+	Victor 			m_motor;
+	
 private:
 	
 	// called when calibration is finished
@@ -80,7 +86,7 @@ private:
 
 	TunablePIDController * m_pidController;
 	
-	Victor 			m_motor;
+	
 	Encoder 		m_encoder;
 	
 	// calibration sensor
@@ -90,10 +96,11 @@ private:
 	
 	int			m_encoderResolution;
 	
-	
 	bool		m_calibrating;
 	int			m_calibrated_offset;		// subtract from real counts
 	double		m_calibrating_offset;		// how many degrees off is the calibration point?
+	
+	float		m_invert;
 	
 	template <int i>
 	friend class UglyServoHack;

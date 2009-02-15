@@ -64,11 +64,11 @@ KwarqsWheelServo::KwarqsWheelServo(
 	UINT32 cal_port,
 	double outputScale,
 	int encoderResolution,
-	double cal_offset
+	double cal_offset,
 	bool invert
 ) :
 	m_motor(slot, pwm_port),
-	m_encoder(slot, encoder_port1, encoder_port2),
+	m_encoder(slot, encoder_port1, slot, encoder_port2),
 	m_sensor(slot, cal_port),
 	m_outputScale(outputScale),
 	m_encoderResolution(encoderResolution),
@@ -84,7 +84,7 @@ KwarqsWheelServo::KwarqsWheelServo(
 		
 
 	// create the PID controller
-	m_pidController = new TunablePIDController(.25, 0, 0, this, this);
+	m_pidController = new TunablePIDController(0.95, 0, 0, this, this);
 	
 	// set the PID parameters
 	m_pidController->SetContinuous();
@@ -166,7 +166,7 @@ double KwarqsWheelServo::GetCurrentAngle()
 	double angle = fmod((((double)((m_encoder.GetRaw() - m_calibrated_offset) % m_encoderResolution) * 360.0) 
 			/ (double)m_encoderResolution) - m_calibrating_offset, 360.0);
 			
-	if (angle < 360)
+	if (angle < 0)
 		angle += 360;
 		
 	return angle;

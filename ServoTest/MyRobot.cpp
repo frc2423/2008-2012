@@ -3,6 +3,8 @@
 #include <math.h>
 #include "KwarqsWheelServo.h"
 
+#define M_PI 3.14159265358979323846
+
 /**
  * This is a demo program showing the use of the RobotBase class.
  * The SimpleRobot class is the base of a robot application that will automatically call your
@@ -17,11 +19,18 @@ class RobotDemo : public SimpleRobot
 	KwarqsWheelServo servo;
 	
 public:
+	// slot, pwm, e1, e2, cal
 	RobotDemo(void):
 		myRobot(1, 2),
 		stick(1),
-		servo(4, 4, 5, 6, 7, 45.0, 1000 * 4, 0)
+		servo(6, 4, 3, 4, 10, 25.0, 3272, 0, true)
 	{
+		// LF: 4, 2, 1, 2, 9, 25.0, 3272, 0
+		// LR: 4, 4, 3, 4, 10, 25.0, 3272, 0, true
+		// 
+		// RF: 6, 2, 1, 2, 11, 25.0, 3272, 0
+		// RR: 6, 4, 3, 4, 10, 25.0, 3272, 0, true
+		
 		GetWatchdog().SetExpiration(100);	
 		
 	}
@@ -35,9 +44,9 @@ public:
 	
 	bool ConvertStickToAngle(double &angle)
 	{
-		double y = stick->GetY() * -1, x = stick->GetX();
+		double y = stick.GetY() * -1, x = stick.GetX();
 		
-		double speed = hypot(x, y);
+		double speed = sqrt(x*x + y*y);
 		
 		double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0 );			
 		if (desired_angle < 0) desired_angle += 360;
@@ -93,6 +102,7 @@ public:
 					disabled = true;
 				}
 			
+				/*
 				if (p > 1000.0)
 					p = 1000.0;
 				p = p / 1000.0;
@@ -108,6 +118,7 @@ public:
 					lastP = p;
 					lastI = i;
 				}
+				 */
 				
 				// only change angle if desired
 				if (ConvertStickToAngle(setPoint))

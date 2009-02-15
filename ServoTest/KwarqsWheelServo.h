@@ -96,11 +96,11 @@ private:
 	
 	int			m_encoderResolution;
 	
-	float		m_invert;
-	
 	bool		m_calibrating;
 	int			m_calibrated_offset;		// subtract from real counts
 	double		m_calibrating_offset;		// how many degrees off is the calibration point?
+	
+	float		m_invert;
 	
 	template <int i>
 	friend class UglyServoHack;

@@ -21,7 +21,6 @@ public:
 	
 	// constructor/destructors
 	SwerveDrive();
-	~SwerveDrive();
 	
 	void Disable(){}
 	void Enable(){}

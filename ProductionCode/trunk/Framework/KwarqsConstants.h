@@ -78,7 +78,7 @@
 #define SERVO_LF_INVERT				false
 #define SERVO_LR_INVERT				true
 #define SERVO_RF_INVERT				false
-#define SERVO_RF_INVERT				true
+#define SERVO_RR_INVERT				true
 
 
 // encoder channels: servo
@@ -115,6 +115,7 @@
 									PWM_##lr##fr##_VICTOR, \
 									ENCODER_SERVO_##lr##fr##_1, \
 									ENCODER_SERVO_##lr##fr##_2, \
+									SERVO_CAL_##lr##fr, \
 									SERVO_##fr##_SCALE, \
 									SERVO_##fr##_TICKS, \
 									SERVO_##lr##fr##_INVERT

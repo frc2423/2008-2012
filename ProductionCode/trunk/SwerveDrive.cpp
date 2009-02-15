@@ -66,7 +66,7 @@ void CalculateWheel(
 	double Vy = Vty - w*Rx;
 	
 	// return as polar coordinates
-	magnitude = hypot(Vx,Vy); 
+	magnitude = sqrt(Vx*Vx+Vy*Vy); 
 	angle = (atan2(Vy, Vx)*180)/M_PI - 90.0;
 }
 
@@ -121,8 +121,11 @@ void SwerveDrive::Move(double &speed, double &angle, double &rotation)
 		if (fabs(speeds[i]) > highest_speed)
 			highest_speed = fabs(speeds[i]);
 	
-	for (int i = 0; i < 4; i++)
-		speeds[i] /= highest_speed;
+	if (fabs(highest_speed) < 0.001)
+		speeds[0] = speeds[1] = speeds[2] = speeds[3] = 0;
+	else
+		for (int i = 0; i < 4; i++)
+			speeds[i] /= highest_speed;
 	
     
     // set the motors

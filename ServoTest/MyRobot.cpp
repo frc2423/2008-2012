@@ -1,9 +1,8 @@
 #include "WPILib.h"
 
 #include <math.h>
-#include "KwarqsWheelServo.h"
-
-#define M_PI 3.14159265358979323846
+#include "Framework/KwarqsWheelServo.h"
+#include "Framework/math.h"
 
 /**
  * This is a demo program showing the use of the RobotBase class.

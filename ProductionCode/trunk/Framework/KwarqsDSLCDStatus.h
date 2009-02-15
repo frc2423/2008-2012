@@ -1,8 +1,8 @@
 /**
 	\file 		KwarqsDSLCDStatus.h
-	\author 	Dustin Spicuzza: last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-02-10 02:52:53 -0500 (Tue, 10 Feb 2009) $
-	\version 	$Rev: 122 $
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 */
 
 #ifndef FRAMEWORK_KWARQS_DSLCD_STATUS_H

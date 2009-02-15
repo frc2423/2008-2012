@@ -34,7 +34,9 @@
 
 #include "Notifier.h"
 #include <WPILib.h>
+
 #include "KwarqsDSLCDStatus.h"
+#include "PositionInformation.h"
 
 KwarqsDSLCDStatus::KwarqsDSLCDStatus()
 {
@@ -52,10 +54,12 @@ KwarqsDSLCDStatus::~KwarqsDSLCDStatus()
 void KwarqsDSLCDStatus::OnInterval(void * param)
 {
 	DriverStationLCD * lcd = DriverStationLCD::GetInstance();
+	PositionInformation * pos = PositionInformation::GetInstance();
 	
 	// do any updates necessary
 	lcd->Printf(DriverStationLCD::kMain_Line6, 0, 
-			"Uncal: %d", 
+			"%.1f@ Uncal: %d",
+			pos->GetNormalizedAngle(),
 			KwarqsWheelServo::UncalibratedServoCount()
 	);
 	

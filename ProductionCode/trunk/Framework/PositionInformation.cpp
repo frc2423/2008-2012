@@ -7,7 +7,7 @@
 */
 
 #include <WPILib.h>
-#include <math.h>
+#include "math.h"
 
 #include "Deleter.h"
 #include "PositionInformation.h"
@@ -90,6 +90,14 @@ double PositionInformation::GetHeading()
 double PositionInformation::GetAngle()
 {
 	return m_gyro.GetAngle() - m_gyro_offset;
+}
+
+double PositionInformation::GetNormalizedAngle()
+{
+	double angle = fmod(GetAngle(), 360.0);
+	if (angle < 0)
+		angle += 360;
+	return angle;
 }
 
 /// returns the acceration of the robot, relative to the robot

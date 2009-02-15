@@ -48,8 +48,12 @@ public:
 	/// returns the angle (in degrees) the robot is moving, relative to the robot
 	double GetHeading();
 	
-	/// returns the angle (in degrees) the robot is currently facing
+	/// returns the angle (in degrees) the robot is facing relative to the field
 	double GetAngle();
+	
+	/// returns the angle (in degrees) the robot is facing relative to the 
+	/// field, in the range of 0 to 360
+	double GetNormalizedAngle();
 	
 	/// returns the acceration of the robot, relative to the robot
 	/// Note: uses the parameters to return the values by reference

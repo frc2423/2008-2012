@@ -36,7 +36,7 @@
 #include "SwerveDrive.h"
 
 #include "Framework/KwarqsConstants.h"
-#include "Framework/math_definitions.h"
+#include "Framework/math.h"
 
 // default constructor
 SwerveDrive::SwerveDrive() :
@@ -66,13 +66,24 @@ void CalculateWheel(
 	double Vy = Vty - w*Rx;
 	
 	// return as polar coordinates
-	magnitude = sqrt(Vx*Vx+Vy*Vy); 
+	magnitude = __hypot(Vx, Vy); 
 	angle = (atan2(Vy, Vx)*180)/M_PI - 90.0;
 }
 
 
-void SwerveDrive::Move(double &speed, double &angle, double &rotation)
+void SwerveDrive::Move(
+	double &speed, 
+	double &angle, 
+	double &rotation,
+	bool &stop
+)
 {
+	if (stop)
+	{
+		Stop();
+		return;
+	}
+	
 	/*
 		Thoughts and notes
 		
@@ -87,6 +98,20 @@ void SwerveDrive::Move(double &speed, double &angle, double &rotation)
 		Currently, neither of those is implemented.
 		
 	*/
+	
+	// special case: doing nothing
+	if (fabs(speed) < 0.01 && fabs(angle) < 0.01 && fabs(rotation) < 0.01)
+	{
+		// this forces motors to stop and keeps the wheels pointed in the
+		// same direction, much less annoying
+		m_motor_lf.SetSpeed(0);
+		m_motor_lr.SetSpeed(0);
+		m_motor_rf.SetSpeed(0);
+		m_motor_rr.SetSpeed(0);
+		
+		return;
+	}
+	
 	
 	// set limitations on speed
 	if (speed < -1.0)
@@ -121,7 +146,8 @@ void SwerveDrive::Move(double &speed, double &angle, double &rotation)
 		if (fabs(speeds[i]) > highest_speed)
 			highest_speed = fabs(speeds[i]);
 	
-	if (fabs(highest_speed) < 0.001)
+	// don't divide by zero
+	if (fabs(highest_speed) < 0.0001)
 		speeds[0] = speeds[1] = speeds[2] = speeds[3] = 0;
 	else
 		for (int i = 0; i < 4; i++)
@@ -138,6 +164,28 @@ void SwerveDrive::Move(double &speed, double &angle, double &rotation)
 	m_motor_lr.SetSpeed(speeds[1]);
 	m_motor_rf.SetSpeed(speeds[2]);
 	m_motor_rr.SetSpeed(speeds[3]);
+	
+}
+
+void SwerveDrive::Stop()
+{
+	/// @todo: turn the wheels against the current
+	/// acceleration vector and stop all motors. Is that actually
+	/// a good way to do it?
+	
+	// if the vector is near zero, then just spread all fours 
+	// and hope for the best
+
+	m_servo_lf.SetAngle(45);
+	m_servo_lr.SetAngle(315);
+	m_servo_rf.SetAngle(135);
+	m_servo_rr.SetAngle(225);
+	
+	m_motor_lf.SetSpeed(0);
+	m_motor_lr.SetSpeed(0);
+	m_motor_rf.SetSpeed(0);
+	m_motor_rr.SetSpeed(0);
+	
 	
 }
 

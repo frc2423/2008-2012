@@ -46,15 +46,26 @@ void KwarqsDriveController::EnableDrive(KwarqsDriveBase * drive)
 }
 
 
-void KwarqsDriveController::Move(double speed, double angle, double rotation)
+void KwarqsDriveController::Move(
+	double speed, 
+	double angle, 
+	double rotation, 
+	bool stop)
 {
+	// set these first
+	m_lastSpeed = speed;
+	m_lastAngle = angle;
+	m_lastRotation = rotation;
+	m_lastStop = stop;
+	
+	
 	DriveIterator i = m_enabledDrives.begin();
 	const DriveIterator end = m_enabledDrives.end();
 	
 	// call all the drives to drive the bot, allowing the filters to modify
 	// the drive parameters if needed
 	for (; i != end; i++)
-		(*i)->Move(speed, angle, rotation);
+		(*i)->Move(speed, angle, rotation, stop);
 	
 	m_moved = true;
 }
@@ -64,7 +75,7 @@ void KwarqsDriveController::EndMove()
 {
 	// if we haven't moved yet, then its time to do so
 	if (!m_moved)
-		Move(m_lastSpeed, m_lastAngle, m_lastRotation);
+		Move(m_lastSpeed, m_lastAngle, m_lastRotation, m_lastStop);
 		
 	m_moved = false;
 }

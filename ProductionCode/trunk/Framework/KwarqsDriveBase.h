@@ -71,8 +71,9 @@ public:
 		@param speed	Speed of the robot (-1 to 1)
 		@param angle	Angle for the robot to move (0 to 360)
 		@param rotation	Rotational speed of the robot (-1 to 1)
+		@param stop		If true, then stop the robot absolutely
 	*/
-	virtual void Move(double &speed, double &angle, double &rotation) = 0;
+	virtual void Move(double &speed, double &angle, double &rotation, bool &stop) = 0;
 
 	/// Return the name of the class
 	virtual const char * Name() = 0;

@@ -1,6 +1,8 @@
 
 #include <math.h>
 
+double __hypot(double x, double y);
+
 /* taken from the C99 standard include library */
 
 #ifndef M_PI

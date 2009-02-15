@@ -47,8 +47,9 @@ public:
 	 					ahead is 0 degrees, and angle increments positively in
 						a clockwise direction
 	  	@param rotation	Angular rotation (-1 to 1)
+	  	@param stop		Stop the robot motion completely
 	 */
-	void Move(double speed, double angle, double rotation);
+	void Move(double speed, double angle, double rotation, bool stop);
 	
 	/// this is called after all moving is complete for this iteration
 	/// of the loop is done -- only used by KwarqsRobotMain
@@ -68,7 +69,7 @@ private:
 	// ensures that move is called for every iteration of the
 	// loop for algorithms that require that
 	double 	m_lastSpeed, m_lastAngle, m_lastRotation;
-	bool 	m_moved;
+	bool 	m_moved, m_lastStop;
 	
 	
 };

@@ -40,7 +40,7 @@
 
 #include "SimpleControl.h"
 
-#include "Framework/math_definitions.h"
+#include "Framework/math.h"
 #include "Framework/KwarqsConstants.h"
 
 
@@ -55,7 +55,7 @@ void SimpleControl::Move()
 {	
 	double y = m_stick->GetY() * -1, x = m_stick->GetX();
 		
-	double speed = sqrt(x*x+y*y);
+	double speed = __hypot(x, y);
 	
 	double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0 );			
 	if (desired_angle < 0) desired_angle += 360;
@@ -63,5 +63,5 @@ void SimpleControl::Move()
 	if (fabs(speed) < 0.01)
 		desired_angle = 0.0;
 	
-	m_driveController->Move(speed, desired_angle, m_stick->GetTwist());
+	m_driveController->Move(speed, desired_angle, m_stick->GetTwist(), m_stick->GetTrigger());
 }

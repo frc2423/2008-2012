@@ -41,14 +41,17 @@ public:
 	 					ahead is 0 degrees, and angle increments positively in
 						a clockwise direction
 	  	@param rotation	Angular rotation (-1 to 1)
+	  	@param stop		If this is true, then stop the robot
 	*/
-	void Move(double &speed, double &angle, double &rotation);
+	void Move(double &speed, double &angle, double &rotation, bool &stop);
 
 	/// Return the name of the class
 	const char * Name() { return "SwerveDrive"; }
 
 
 private:
+	
+	void Stop();
 	
 	// servos
 	KwarqsWheelServo		m_servo_lf;

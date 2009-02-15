@@ -47,7 +47,7 @@
 */
 KwarqsWheelMotor::KwarqsWheelMotor(UINT32 slot, UINT32 pwm_port, UINT32 encoder_port1, UINT32 encoder_port2) :
 	m_motor(slot, pwm_port),
-	m_encoder(slot, encoder_port1, slot, encoder_port2)
+	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X)
 {
 	SetSpeed(0);
 	m_encoder.Start();

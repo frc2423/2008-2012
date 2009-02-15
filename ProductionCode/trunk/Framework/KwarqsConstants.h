@@ -13,6 +13,10 @@
 #ifndef FRAMEWORK_KWARQS_CONSTANTS_H
 #define FRAMEWORK_KWARQS_CONSTANTS_H
 
+
+#define SLOT_1 4
+#define SLOT_2 6
+
 // operator station
 #define FIRST_JOYSTICK_PORT			1
 #define SECOND_JOYSTICK_PORT		2
@@ -33,15 +37,15 @@
 
 // drive motors
 
-#define MOTOR_LF_SLOT				4
-#define MOTOR_LR_SLOT				4
-#define MOTOR_RF_SLOT				5
-#define MOTOR_RR_SLOT				5
+#define MOTOR_LF_SLOT				SLOT_1
+#define MOTOR_LR_SLOT				SLOT_1
+#define MOTOR_RF_SLOT				SLOT_2
+#define MOTOR_RR_SLOT				SLOT_2
 
 #define PWM_LF_JAGUAR				1
-#define PWM_LR_JAGUAR				2
-#define PWM_RF_JAGUAR				1
-#define PWM_RR_JAGUAR				2
+#define PWM_LR_JAGUAR				3
+#define PWM_RF_JAGUAR				3
+#define PWM_RR_JAGUAR				1
 
 // displacement of motors from center of rotation
 #define LF_DISPLACEMENT				-1,1
@@ -50,52 +54,58 @@
 #define RR_DISPLACEMENT				1,-1
 
 // encoder channels: motor
-#define ENCODER_MOTOR_LF_1			1
-#define ENCODER_MOTOR_LF_2			1
-#define ENCODER_MOTOR_LR_1			1
-#define ENCODER_MOTOR_LR_2			1
-#define ENCODER_MOTOR_RF_1			1
-#define ENCODER_MOTOR_RF_2			1
-#define ENCODER_MOTOR_RR_1			1
-#define ENCODER_MOTOR_RR_2			1
+#define ENCODER_MOTOR_LF_1			5
+#define ENCODER_MOTOR_LF_2			14
+#define ENCODER_MOTOR_LR_1			7
+#define ENCODER_MOTOR_LR_2			8
+#define ENCODER_MOTOR_RF_1			5
+#define ENCODER_MOTOR_RF_2			6
+#define ENCODER_MOTOR_RR_1			7
+#define ENCODER_MOTOR_RR_2			8
 
 
 // servos
-#define SERVO_LF_SLOT				4
-#define SERVO_LR_SLOT				4
-#define SERVO_RF_SLOT				5
-#define SERVO_RR_SLOT				5
+#define SERVO_LF_SLOT				SLOT_1
+#define SERVO_LR_SLOT				SLOT_1
+#define SERVO_RF_SLOT				SLOT_2
+#define SERVO_RR_SLOT				SLOT_2
 
-#define PWM_LF_VICTOR				3
+#define PWM_LF_VICTOR				2
 #define PWM_LR_VICTOR				4
-#define PWM_RF_VICTOR				3
+#define PWM_RF_VICTOR				2
 #define PWM_RR_VICTOR				4
+
+#define SERVO_LF_INVERT				false
+#define SERVO_LR_INVERT				true
+#define SERVO_RF_INVERT				false
+#define SERVO_RF_INVERT				true
+
 
 // encoder channels: servo
 #define ENCODER_SERVO_LF_1			1
-#define ENCODER_SERVO_LF_2			1
-#define ENCODER_SERVO_LR_1			1
-#define ENCODER_SERVO_LR_2			1
+#define ENCODER_SERVO_LF_2			2
+#define ENCODER_SERVO_LR_1			3
+#define ENCODER_SERVO_LR_2			4
 #define ENCODER_SERVO_RF_1			1
-#define ENCODER_SERVO_RF_2			1
-#define ENCODER_SERVO_RR_1			1
-#define ENCODER_SERVO_RR_2			1
+#define ENCODER_SERVO_RF_2			2
+#define ENCODER_SERVO_RR_1			3
+#define ENCODER_SERVO_RR_2			4
 
 // servo calibration signals
-#define SERVO_CAL_LF				1
-#define SERVO_CAL_LR				1
-#define SERVO_CAL_RF				1
-#define SERVO_CAL_RR				1
+#define SERVO_CAL_LF				9
+#define SERVO_CAL_LR				10
+#define SERVO_CAL_RF				11
+#define SERVO_CAL_RR				10
 
 // servo constants
-#define SERVO_F_SCALE				45
-#define SERVO_F_TICKS				1000
+#define SERVO_F_SCALE				25
+#define SERVO_F_TICKS				3272
 
-#define SERVO_R_SCALE				45
-#define SERVO_R_TICKS				1000
+#define SERVO_R_SCALE				25
+#define SERVO_R_TICKS				3272
 
 // global servo constants
-#define SERVO_PID_P					0.25
+#define SERVO_PID_P					0.95
 #define SERVO_PID_I					0.0
 #define SERVO_PID_D					0.0
 
@@ -106,7 +116,8 @@
 									ENCODER_SERVO_##lr##fr##_1, \
 									ENCODER_SERVO_##lr##fr##_2, \
 									SERVO_##fr##_SCALE, \
-									SERVO_##fr##_TICKS		
+									SERVO_##fr##_TICKS, \
+									SERVO_##lr##fr##_INVERT
 
 #define SERVO_LF_PARAMETERS 		SERVO_PARAMS(L,F)
 #define SERVO_LR_PARAMETERS			SERVO_PARAMS(L,R)

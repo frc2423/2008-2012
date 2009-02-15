@@ -114,8 +114,11 @@ class UglyServoHack {
 public:
 	static void Handler(tNIRIO_u32 x, void * param)
 	{
-		UglyServoHack<i>::that->CalibrationComplete();
-		UglyServoHack<i>::that = NULL;
+		if (UglyServoHack<i>::that)
+		{
+			UglyServoHack<i>::that->CalibrationComplete();
+			UglyServoHack<i>::that = NULL;
+		}
 	}
 	
 	static KwarqsWheelServo * that;

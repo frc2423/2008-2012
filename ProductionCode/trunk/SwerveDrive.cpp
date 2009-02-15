@@ -138,6 +138,7 @@ void SwerveDrive::Move(double &speed, double &angle, double &rotation)
 	m_motor_lr.SetSpeed(speeds[1]);
 	m_motor_rf.SetSpeed(speeds[2]);
 	m_motor_rr.SetSpeed(speeds[3]);
+	
 }
 
 

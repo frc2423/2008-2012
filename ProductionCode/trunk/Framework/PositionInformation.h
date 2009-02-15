@@ -12,9 +12,9 @@
 #include "Deleter.h"
 
 // defined parameters
-#define PINFO_CALCULATION_PERIOD 	0.05		// period calculation is run
-#define ACCEL_HIST_LEN 				20 			// 1s of data
-#define FILT_COEFF 					0.05		// filter coefficient
+#define PINFO_CALCULATION_PERIOD 	0.1			// period calculation is run
+#define ACCEL_HIST_LEN 				50 			// 1s of data
+#define FILT_COEFF 					0.1			// filter coefficient
 #define MOTION_THRESH 				0.4			// acceleration change needed to be considered 'motion'
 
 
@@ -42,7 +42,8 @@ public:
 	~PositionInformation();
 
 	/// returns the position of the bot on the field in X/Y coordinates
-	void GetPosition(double &x, double &y);
+	/// (note: this function is not accurate)
+	void GetPosition(double * x, double * y);
 	
 	/// returns the angle (in degrees) the robot is moving, relative to the robot
 	double GetHeading();
@@ -52,17 +53,17 @@ public:
 	
 	/// returns the acceration of the robot, relative to the robot
 	/// Note: uses the parameters to return the values by reference
-	void GetAcceleration(double &x, double &y);
+	void GetAcceleration(double * x, double * y);
 	
 	/// returns the velocity of the robot, relative to the robot
 	/// Note: Uses the parameters to return the values by reference
-	void GetVelocity(double &x, double &y);
+	void GetVelocity(double * x, double * y);
 	
 	
 	// calibration stuff below:
 	
 	/// get the bias of the acceleration
-	void GetAccelerationBias( double &x, double &y);
+	void GetAccelerationBias( double * x, double * y);
 	/// set the bias of the acceleration
 	void SetAccelerationBias( double x, double y);
 	

@@ -42,8 +42,9 @@ PositionInformation::PositionInformation() :
 	// clear the array
 	for (int i = 0; i < ACCEL_HIST_LEN; i++)
 		xBuff[i] = yBuff[i] = 0.0;
-	/*
-	// automatic calibration
+	
+	
+	// automatic calibration for acceleration
 	for (int i = 0; i < ACCEL_HIST_LEN; i++)
 	{
 		CalculatePositionInformation();
@@ -51,10 +52,11 @@ PositionInformation::PositionInformation() :
 	}
 	
 	EstimateAccelerationBias();
-	*/
 	
-	// todo: need to get our alliance and position, and calculate the offset
-	// of the gyro to the driver for absolute numbers
+	printf("PositionInformation bias set to: accX:%1.4f accY:%1.4f ...\n", xBias, yBias);
+	
+	/// @todo need to get our alliance and position, and calculate the offset
+	/// of the gyro to the driver for absolute numbers
 
 	// start the calculations
 	m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
@@ -69,18 +71,18 @@ PositionInformation::~PositionInformation()
 
 
 /// returns the position of the bot on the field in X/Y coordinates
-void PositionInformation::GetPosition(double &x, double &y)
+void PositionInformation::GetPosition(double * x, double * y)
 {
 	Synchronized sync(m_mutex);
-	x = xPos;
-	y = yPos;
+	*x = xPos;
+	*y = yPos;
 }
 
 /// returns the angle the robot is moving, relative to the robot
 double PositionInformation::GetHeading()
 {
 	Synchronized sync(m_mutex);
-	// todo: should we use velocity or acceleration to get this?
+	/// @todo should we use velocity or acceleration to get this?
 	return 0;
 }
 
@@ -91,24 +93,20 @@ double PositionInformation::GetAngle()
 }
 
 /// returns the acceration of the robot, relative to the robot
-/// Note: uses the parameters to return the values by reference
-void PositionInformation::GetAcceleration(double &x, double &y)
+void PositionInformation::GetAcceleration(double * x, double * y)
 {
 	Synchronized sync(m_mutex);
-	x = xUpdate;
-	y = yUpdate;
+	*x = xUpdate;
+	*y = yUpdate;
 }
 
 /// returns the velocity of the robot, relative to the robot
-/// Note: Uses the parameters to return the values by reference
-void PositionInformation::GetVelocity(double &x, double &y)
+void PositionInformation::GetVelocity(double * x, double * y)
 {
 	Synchronized sync(m_mutex);
-	x = xVelocity;
-	y = yVelocity;
+	*x = xVelocity;
+	*y = yVelocity;
 }
-	
-
 	
 
 // called every N milliseconds to calculate the information needed
@@ -136,7 +134,7 @@ void PositionInformation::CalculatePositionInformation()
   yUpdate = alpha*( y - yBias ) + (1-alpha)*yUpdate;
     
   /* compute the magnitude of the acceleration to check if we are moving */
-  mag = sqrt(xUpdate*xUpdate + yUpdate*yUpdate);
+  mag = __hypot(xUpdate, yUpdate);
   
   if( mag > MOTION_THRESH ) 
   {
@@ -174,10 +172,10 @@ void PositionInformation::EstimateAccelerationBias()
   yBias = ySum/ACCEL_HIST_LEN;  
 }
 
-void PositionInformation::GetAccelerationBias( double &x, double &y)
+void PositionInformation::GetAccelerationBias( double * x, double * y)
 {
-	x = xBias;
-	y = yBias;
+	*x = xBias;
+	*y = yBias;
 }
 
 void PositionInformation::SetAccelerationBias( double x, double y)

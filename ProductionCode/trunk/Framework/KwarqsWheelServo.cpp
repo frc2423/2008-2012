@@ -40,8 +40,14 @@
 template <int N>
 KwarqsWheelServo * UglyServoHack<N>::that = NULL;
 
+
+
 /**
 	\brief Constructor
+	
+	There are far too many parameters to remember, so for ease
+	of use you can look at KwarqsConstants.h for some macros
+	that define the appropriate parameters. 
 	
 	@param slot					Slot for electronics
 	@param pwm_port				PWM port for motor
@@ -62,19 +68,20 @@ KwarqsWheelServo::KwarqsWheelServo(
 	UINT32 pwm_port, 
 	UINT32 encoder_port1, UINT32 encoder_port2,
 	UINT32 cal_port,
+	double cal_offset,
 	double outputScale,
 	int encoderResolution,
-	double cal_offset,
-	bool invert
+	bool invert_motor,
+	bool invert_encoder
 ) :
 	m_motor(slot, pwm_port),
-	m_encoder(slot, encoder_port1, slot, encoder_port2),
+	m_encoder(slot, encoder_port1, slot, encoder_port2, invert_encoder),
 	m_sensor(slot, cal_port),
 	m_outputScale(outputScale),
 	m_encoderResolution(encoderResolution),
 	m_calibrating(false),
 	m_calibrating_offset(cal_offset),
-	m_invert( invert ? -1 : 1 )
+	m_invert_motor( invert_motor ? -1 : 1 )
 {
 	// see if the motor is already calibrated, saves us effort
 	if (!m_sensor.Get())
@@ -119,6 +126,7 @@ void KwarqsWheelServo::Calibrate()
 		return;
 	
 	m_calibrating = true;
+	KwarqsWheelServo::m_uncalibrated_servos++;
 	
 	// setup the interrupt handlers.. this is very braindead, why
 	// can't I just pass the *this* pointer in?
@@ -136,7 +144,10 @@ void KwarqsWheelServo::Calibrate()
 void KwarqsWheelServo::CalibrationComplete()
 {
 	if (m_calibrating)
+	{
+		KwarqsWheelServo::m_uncalibrated_servos--;
 		m_sensor.DisableInterrupts();
+	}
 	
 	m_calibrated_offset = m_encoder.GetRaw() % m_encoderResolution;
 	
@@ -185,7 +196,7 @@ void KwarqsWheelServo::PIDWrite(float output)
 	// calibration mode
 	if (m_calibrating)
 	{
-		m_motor.Set(m_invert);
+		m_motor.Set(m_invert_motor);
 		return;
 	}
 	
@@ -201,10 +212,19 @@ void KwarqsWheelServo::PIDWrite(float output)
 	if (m_pidController->OnTarget())
 		m_motor.Set(0);
 	else
-		m_motor.Set(output * m_invert);
+		m_motor.Set(output * m_invert_motor);
 }
 
 double KwarqsWheelServo::PIDGet()
 {
 	return GetCurrentAngle();
+}
+
+/** static functions **/
+
+int KwarqsWheelServo::m_uncalibrated_servos = 0;
+
+int KwarqsWheelServo::UncalibratedServoCount()
+{
+	return KwarqsWheelServo::m_uncalibrated_servos;
 }

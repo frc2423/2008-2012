@@ -150,6 +150,7 @@ void SwerveDrive::Move(
 	if (fabs(highest_speed) < 0.0001)
 		speeds[0] = speeds[1] = speeds[2] = speeds[3] = 0;
 	else
+		// scale each speed by the highest speed
 		for (int i = 0; i < 4; i++)
 			speeds[i] /= highest_speed;
 	

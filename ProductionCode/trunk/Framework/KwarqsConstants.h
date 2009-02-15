@@ -70,15 +70,19 @@
 #define SERVO_RF_SLOT				SLOT_2
 #define SERVO_RR_SLOT				SLOT_2
 
-#define PWM_LF_VICTOR				2
-#define PWM_LR_VICTOR				4
-#define PWM_RF_VICTOR				2
-#define PWM_RR_VICTOR				4
+#define SERVO_LF_VICTOR				2
+#define SERVO_LR_VICTOR				4
+#define SERVO_RF_VICTOR				2
+#define SERVO_RR_VICTOR				4
 
-#define SERVO_LF_INVERT				false
-#define SERVO_LR_INVERT				true
-#define SERVO_RF_INVERT				false
-#define SERVO_RR_INVERT				true
+#define SERVO_LF_INVERT_MOTOR		false
+#define SERVO_LF_INVERT_ENCODER		false
+#define SERVO_LR_INVERT_MOTOR		true
+#define SERVO_LR_INVERT_ENCODER		false
+#define SERVO_RF_INVERT_MOTOR		false
+#define SERVO_RF_INVERT_ENCODER		false
+#define SERVO_RR_INVERT_MOTOR 		true
+#define SERVO_RR_INVERT_ENCODER		false
 
 
 // encoder channels: servo
@@ -91,17 +95,24 @@
 #define ENCODER_SERVO_RR_1			3
 #define ENCODER_SERVO_RR_2			4
 
-// servo calibration signals
-#define SERVO_CAL_LF				9
-#define SERVO_CAL_LR				10
-#define SERVO_CAL_RF				11
-#define SERVO_CAL_RR				10
+// servo calibration signals (hall effect sensors)
+#define SERVO_LF_CAL_PORT			9
+#define SERVO_LR_CAL_PORT			10
+#define SERVO_RF_CAL_PORT			11
+#define SERVO_RR_CAL_PORT			10
 
-// servo constants
-#define SERVO_F_SCALE				25
+// angle that the calibration point represents (in degrees)
+#define SERVO_LF_CAL_OFFSET			0.0
+#define SERVO_LR_CAL_OFFSET			0.0	
+#define SERVO_RF_CAL_OFFSET			0.0
+#define SERVO_RR_CAL_OFFSET			0.0
+
+// servo constants (front)
+#define SERVO_F_SCALE				25.0
 #define SERVO_F_TICKS				3272
 
-#define SERVO_R_SCALE				25
+// servo constants (back)
+#define SERVO_R_SCALE				25.0
 #define SERVO_R_TICKS				3272
 
 // global servo constants
@@ -112,13 +123,15 @@
 // aggregated parameters (just ignore these)
 
 #define SERVO_PARAMS(lr, fr)		SERVO_##lr##fr##_SLOT, \
-									PWM_##lr##fr##_VICTOR, \
+									SERVO_##lr##fr##_VICTOR, \
 									ENCODER_SERVO_##lr##fr##_1, \
 									ENCODER_SERVO_##lr##fr##_2, \
-									SERVO_CAL_##lr##fr, \
+									SERVO_##lr##fr##_CAL_PORT, \
+									SERVO_##lr##fr##_CAL_OFFSET, \
 									SERVO_##fr##_SCALE, \
 									SERVO_##fr##_TICKS, \
-									SERVO_##lr##fr##_INVERT
+									SERVO_##lr##fr##_INVERT_MOTOR, \
+									SERVO_##lr##fr##_INVERT_ENCODER
 
 #define SERVO_LF_PARAMETERS 		SERVO_PARAMS(L,F)
 #define SERVO_LR_PARAMETERS			SERVO_PARAMS(L,R)

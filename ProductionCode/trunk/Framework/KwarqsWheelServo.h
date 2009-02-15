@@ -31,15 +31,19 @@ class UglyServoHack;
 class KwarqsWheelServo : public PIDSource, public PIDOutput {
 public:
 
+	/// provided for status purposes
+	static int UncalibratedServoCount();
+	
 	KwarqsWheelServo(
 		UINT32 slot,
 		UINT32 pwm_port, 
 		UINT32 encoder_port1, UINT32 encoder_port2,
 		UINT32 cal_port,
+		double cal_offset,
 		double outputScale,
 		int encoderResolution,
-		double cal_offset,
-		bool invert = false
+		bool invert_motor,
+		bool invert_encoder
 	);
 	
 	virtual ~KwarqsWheelServo();
@@ -81,6 +85,8 @@ public:
 	
 private:
 	
+	static int m_uncalibrated_servos;
+	
 	// called when calibration is finished
 	void CalibrationComplete();
 
@@ -100,7 +106,7 @@ private:
 	int			m_calibrated_offset;		// subtract from real counts
 	double		m_calibrating_offset;		// how many degrees off is the calibration point?
 	
-	float		m_invert;
+	float		m_invert_motor;
 	
 	template <int i>
 	friend class UglyServoHack;

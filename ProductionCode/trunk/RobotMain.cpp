@@ -8,6 +8,7 @@
 #include "WPILib.h"
 
 #include "Framework/KwarqsDriveController.h"
+#include "Framework/KwarqsDSLCDStatus.h"
 
 #include "SimpleControl.h"
 #include "NullMovementControl.h"
@@ -19,6 +20,7 @@
 class KwarqsRobotMain : public SimpleRobot
 {
 	KwarqsDriveController 	driveController;
+	KwarqsDSLCDStatus		status;
 	
 	// control types
 	SimpleControl 			simpleControl;
@@ -144,11 +146,15 @@ public:
 			
 			GetTeleoperatedMovementControl()->Move();
 			driveController.EndMove();
-			
 		}
 		
 		GetTeleoperatedMovementControl()->OnDisable();
 		currentTeleoperatedControl = NULL;
+	}
+	
+	void UpdateLCD()
+	{
+		
 	}
 };
 

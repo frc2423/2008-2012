@@ -148,7 +148,7 @@ void KwarqsWheelServo::Calibrate()
 
 void KwarqsWheelServo::CalibrationComplete()
 {
-	if (m_calibrating)
+	if (m_calibrating && !m_in_manual_mode)
 	{
 		KwarqsWheelServo::m_uncalibrated_servos--;
 		m_sensor.DisableInterrupts();
@@ -158,6 +158,22 @@ void KwarqsWheelServo::CalibrationComplete()
 	
 	m_calibrating = false;
 }
+
+void KwarqsWheelServo::EnableManualCalibration()
+{
+	m_calibrating = true;
+	m_in_manual_mode = true;
+}
+
+void KwarqsWheelServo::DisableManualCalibration()
+{
+	if (m_in_manual_mode)
+	{
+		m_in_manual_mode = false;
+		CalibrationComplete();
+	}
+}
+
 
 
 /// Set the angle that the wheel should be pointing, where
@@ -210,7 +226,13 @@ void KwarqsWheelServo::PIDWrite(float output)
 	// calibration mode
 	if (m_calibrating)
 	{
-		m_motor.Set(m_invert_motor);
+		if (m_in_manual_mode)
+		{
+			Joystick * stick = Joystick::GetStickForPort(1);
+			m_motor.Set(stick->GetY() * -1 * m_invert_motor);
+		}
+		else
+			m_motor.Set(m_invert_motor);
 		return;
 	}
 	

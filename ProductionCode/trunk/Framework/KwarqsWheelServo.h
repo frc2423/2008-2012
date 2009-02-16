@@ -52,6 +52,9 @@ public:
 	void Enable();
 	void Disable();
 	
+	void EnableManualCalibration();
+	void DisableManualCalibration();
+	
 	/// only needs to be called if the servo needs to be recalibrated
 	void Calibrate();
 	
@@ -110,6 +113,8 @@ private:
 	double		m_calibrating_offset;		// how many degrees off is the calibration point?
 	
 	float		m_invert_motor;
+	
+	bool 		m_in_manual_mode;
 	
 	template <int i>
 	friend class UglyServoHack;

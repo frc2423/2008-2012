@@ -115,8 +115,13 @@ public:
 			{
 				double setPoint;
 				
-				if (stick.GetTrigger())
+				if (stick.GetTop())
 					servo->Calibrate();
+					
+				if (stick.GetTrigger())
+					servo->EnableManualCalibration();
+				else
+					servo->DisableManualCalibration();
 				
 				// only change angle if desired
 				if (ConvertStickToAngle(setPoint))

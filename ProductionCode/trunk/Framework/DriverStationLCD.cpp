@@ -91,3 +91,35 @@ void DriverStationLCD::Printf(Line line, UINT32 startingColumn, const char *writ
 	va_end (args);
 }
 
+/**
+ * Print formatted text to the Driver Station LCD text bufer. This function 
+ * pads the line with empty spaces. 
+ * 
+ * Use UpdateLCD() periodically to actually send the test to the Driver Station.
+ * 
+ * @param line The line on the LCD to print to.
+ * @param writeFmt The printf format string describing how to print.
+ */
+void DriverStationLCD::PrintfLine(Line line, const char *writeFmt, ...)
+{
+	va_list args;
+	char lineBuffer[kLineLength + 1];
+
+	if (line < kMain_Line6 || line > kUser_Line6)
+		return;
+
+	va_start (args, writeFmt);
+	{
+		Synchronized sync(m_textBufferSemaphore);
+		// snprintf appends NULL to its output.  Therefore we can't write directly to the buffer.
+		INT32 length = std::min( vsnprintf(lineBuffer, kLineLength + 1, writeFmt, args), kLineLength);
+		memcpy(m_textBuffer + line * kLineLength + sizeof(UINT16), lineBuffer, length);
+
+		if (length < kLineLength)
+			memset(m_textBuffer + line * kLineLength + sizeof(UINT16) + length, ' ', kLineLength - length);
+	}
+
+	va_end (args);
+}
+
+

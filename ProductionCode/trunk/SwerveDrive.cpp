@@ -69,7 +69,7 @@ void CalculateWheel(
 	double Rx, double Ry)
 {
 	double Vx = Vtx - w*Ry;
-	double Vy = Vty - w*Rx;
+	double Vy = Vty + w*Rx;
 	
 	// return as polar coordinates
 	magnitude = __hypot(Vx, Vy); 
@@ -178,7 +178,6 @@ void SwerveDrive::Move(
 	else if (rotation > 1.0)
 		rotation = 1.0;
  
-	/*
 	// convert speed/angle to Vx/Vy (offset angle by 90 degrees)
 	double Vtx = speed * cos( ((angle+90.0) * M_PI)/180.0 );
 	double Vty = speed * sin( ((angle+90.0) * M_PI)/180.0 );
@@ -219,18 +218,6 @@ void SwerveDrive::Move(
 	m_motor_lr.SetSpeed(speeds[1]);
 	m_motor_rf.SetSpeed(speeds[2]);
 	m_motor_rr.SetSpeed(speeds[3]);
-	
-	*/
-	
-	m_servo_lf.SetAngle(angle);
-	m_servo_lr.SetAngle(angle);
-	m_servo_rf.SetAngle(angle);
-	m_servo_rr.SetAngle(angle);
-	
-	m_motor_lf.SetSpeed(speed);
-	m_motor_lr.SetSpeed(speed);
-	m_motor_rf.SetSpeed(speed);
-	m_motor_rr.SetSpeed(speed);	
 }
 
 void SwerveDrive::Stop()
@@ -242,6 +229,7 @@ void SwerveDrive::Stop()
 	// if the vector is near zero, then just spread all fours 
 	// and hope for the best
 
+	if (m_servo_lf.GetAngle() - 
 	m_servo_lf.SetAngle(45);
 	m_servo_lr.SetAngle(315);
 	m_servo_rf.SetAngle(135);

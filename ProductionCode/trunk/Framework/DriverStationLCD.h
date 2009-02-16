@@ -28,6 +28,7 @@ public:
 
 	void UpdateLCD();
 	void Printf(Line line, UINT32 startingColumn, const char *writeFmt, ...);
+	void PrintfLine(Line line, const char *writeFrt, ...);
 
 protected:
 	DriverStationLCD();

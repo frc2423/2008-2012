@@ -1,5 +1,5 @@
 /**
-	\file 		SpeedLimiter.h
+	\file 		PseudoGearbox.h
 	\author 	Dustin Spicuzza: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
@@ -10,11 +10,12 @@
 #define SPEEDLIMITER_H
 
 /**
-	\class SpeedLimiter
+	\class PseudoGearbox
 	\brief This is a trivially simple filter drive class that limits the 
-	speed of the robot. Mostly exists just to show how this works
+	speed of the robot. There is a question of whether this belongs here 
+	or not. I feel.. no. 
 */
-class SpeedLimiter : public KwarqsDriveBase 
+class PseudoGearbox : public KwarqsDriveBase 
 {
 	void Disable(){}
 	void Enable(){}
@@ -25,14 +26,15 @@ class SpeedLimiter : public KwarqsDriveBase
 	/// limits the speed of the robot
 	virtual void Move(double &speed, double &angle, double &rotation, bool &stop)
 	{
-		if (speed < -.4)
-			speed = -.4;
-		else if (speed > .4)
-			speed = .4;
+		if (DriverStation::GetDigitalIn(DS_IN_GEARSHIFT))
+			speed *= 0.5;
+	
+		speed = pow(speed, 3);
+		rotation = pow(speed, 3);
 	}
 
 	/// Return the name of the class
-	virtual const char * Name() { return "SpeedLimiter"; }
+	virtual const char * Name() { return "PseudoGearbox"; }
 };
 
 #endif

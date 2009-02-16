@@ -1,10 +1,12 @@
 #include "WPILib.h"
 
 #include <math.h>
-#include "Framework/KwarqsDSLCDStatus.h"
 #include "Framework/KwarqsWheelServo.h"
 #include "Framework/KwarqsConstants.h"
 #include "Framework/math.h"
+#include "Framework/DriverStationLCD.h"
+
+#include "Framework/KwarqsBCDInput.h"
 
 /**
  * This is a demo program showing the use of the RobotBase class.
@@ -14,22 +16,29 @@
  */ 
 class RobotDemo : public SimpleRobot
 {
-	KwarqsDSLCDStatus 	status;		// status engine
 	Joystick 			stick; 		// only joystick
 	
-	KwarqsWheelServo servo;
+	DriverStationLCD	* lcd;
+	
+	KwarqsWheelServo servo_lf, servo_lr, servo_rf, servo_rr;
+	
+	
 	
 public:
 	// slot, pwm, e1, e2, cal
 	RobotDemo(void):
 		stick(1),
-		
-		servo(SERVO_LF_PARAMETERS)
-		//servo(SERVO_LR_PARAMETERS)
-		//servo(SERVO_RF_PARAMETERS)
-		//servo(SERVO_RR_PARAMETERS)
+		servo_lf(SERVO_LF_PARAMETERS),
+		servo_lr(SERVO_LR_PARAMETERS),
+		servo_rf(SERVO_RF_PARAMETERS),
+		servo_rr(SERVO_RR_PARAMETERS)
 	{
-		GetWatchdog().SetExpiration(100);		
+		GetWatchdog().SetExpiration(100);
+		
+		//servo_lf.Calibrate();
+		//servo_lr.Calibrate();
+		//servo_rf.Calibrate();
+		//servo_rr.Calibrate();		
 	}
 
 	/**
@@ -60,66 +69,116 @@ public:
 	 */
 	void OperatorControl(void)
 	{
+		GetWatchdog().SetEnabled(true);
+		
 		double time = GetTime();
 		
-		double lastP = 0, lastI = 0, p = 0, i = 0;
-		double setPoint = 0;
+		lcd = DriverStationLCD::GetInstance();
+		lcd->Printf(DriverStationLCD::kMain_Line6, 1, "Hit select for status");
 		
-		GetWatchdog().SetEnabled(true);
 		
 		printf("Entered OperatorControl()\n");
 		
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
-			//myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			
-			//double setPoint = DriverStation::GetInstance()->GetAnalogIn(1);
+			KwarqsWheelServo * servo = NULL;
 			
-			//double p = DriverStation::GetInstance()->GetAnalogIn(2);
-			//double i = DriverStation::GetInstance()->GetAnalogIn(3);
+			int input = GetBCDInput();
+			
+			switch (input)
+			{
+			case 1:
+				servo = &servo_lf;
+				break;
+				
+			case 2:
+				servo = &servo_lr;
+				break;
+				
+			case 3:
+				servo = &servo_rf;
+				break;
+				
+			case 4:
+				servo = &servo_rr;
+				break;
+				
+			default:
+				servo = NULL;
+			}
+			
 			
 			// do calibration
-			if (stick.GetTrigger())
-				servo.Calibrate();
-			
-			/*
-			if (p > 1000.0)
-				p = 1000.0;
-			p = p / 1000.0;
-			
-			if (i > 1000.0)
-				i = 1000.0;
-			i = i / 1000.0;
-			
-			// only change if there is a significant difference
-			if (fabs(p - lastP) > 0.05 || fabs(i - lastI) > 0.05)
+			if (servo)
 			{
-				servo.TuneParameters(p, i, 0);
-				lastP = p;
-				lastI = i;
-			}
-			 */
-			
-			// only change angle if desired
-			if (ConvertStickToAngle(setPoint))
-				servo.SetAngle(setPoint);
-			
-			//if (setPoint > 1000.0)
-			//	setPoint = 1000.0;
-			
-			//setPoint = ceil(setPoint /(1000.0/ 360.0));
-			
-			if (GetTime() - time > 0.25)
-			{
-				printf("Setpoint: %.3f, Current: %f, p: %.3f (%.3f) i: %.3f (%.3f)\r",
-						setPoint, servo.GetCurrentAngle(),
-						p, lastP, i, lastI);
+				double setPoint;
 				
-				fflush(stdout);
+				if (stick.GetTrigger())
+					servo->Calibrate();
+				
+				// only change angle if desired
+				if (ConvertStickToAngle(setPoint))
+					servo->SetAngle(setPoint);
+			}
+			
+			if (GetTime() - time > 0.1)
+			{
+				switch (input)
+				{
+				case 1:
+					lcd->Printf(DriverStationLCD::kUser_Line2, 1, "Sel: Left Front(LF)");
+					break;
+					
+				case 2:
+					lcd->Printf(DriverStationLCD::kUser_Line2, 1, "Sel: Left Rear (LR)");
+					break;
+					
+				case 3:
+					lcd->Printf(DriverStationLCD::kUser_Line2, 1, "Sel: Right Front (RF)");
+					break;
+					
+				case 4:
+					lcd->Printf(DriverStationLCD::kUser_Line2, 1, "Sel: Right Rear (RR)");
+					break;
+					
+				default:
+					lcd->Printf(DriverStationLCD::kUser_Line2, 1, "Sel: None (%d)", GetBCDInput());
+				}
+				
+				
+				lcd->Printf(DriverStationLCD::kUser_Line3, 1, "LF: %.1f %.1f %s %s",
+					servo_lf.GetSetAngle(),
+					servo_lf.GetCurrentAngle(),
+					servo_lf.IsCalibrated() ? "C" : "NC",
+					servo_lf.GetSensor() ? "0" : "1" 
+				);
+				
+				lcd->Printf(DriverStationLCD::kUser_Line4, 1, "LR: %.1f %.1f %s %s",
+					servo_lr.GetSetAngle(),
+					servo_lr.GetCurrentAngle(),
+					servo_lr.IsCalibrated() ? "C" : "NC",
+					servo_lr.GetSensor() ? "0" : "1" 
+				);
+				
+				lcd->Printf(DriverStationLCD::kUser_Line5, 1, "RF: %.1f %.1f %s %s",
+					servo_rf.GetSetAngle(),
+					servo_rf.GetCurrentAngle(),
+					servo_rf.IsCalibrated() ? "C" : "NC",
+					servo_rf.GetSensor() ? "0" : "1" 
+				);
+
+				lcd->Printf(DriverStationLCD::kUser_Line6, 1, "RR: %.1f %.1f %s %s",
+					servo_rr.GetSetAngle(),
+					servo_rr.GetCurrentAngle(),
+					servo_rr.IsCalibrated() ? "C" : "NC",
+					servo_rr.GetSensor() ? "0" : "1" 
+				);
+				
+				lcd->UpdateLCD();
 				time = GetTime();
 			}
-			
 		}
 	}
 };

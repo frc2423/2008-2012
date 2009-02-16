@@ -44,8 +44,8 @@
 
 #define PWM_LF_JAGUAR				1
 #define PWM_LR_JAGUAR				3
-#define PWM_RF_JAGUAR				3
-#define PWM_RR_JAGUAR				1
+#define PWM_RF_JAGUAR				1
+#define PWM_RR_JAGUAR				3
 
 // displacement of motors from center of rotation
 #define LF_DISPLACEMENT				-1,1
@@ -75,8 +75,8 @@
 #define SERVO_RF_VICTOR				2
 #define SERVO_RR_VICTOR				4
 
-#define SERVO_LF_INVERT_MOTOR		false
-#define SERVO_LF_INVERT_ENCODER		false
+#define SERVO_LF_INVERT_MOTOR		true
+#define SERVO_LF_INVERT_ENCODER		true
 #define SERVO_LR_INVERT_MOTOR		true
 #define SERVO_LR_INVERT_ENCODER		false
 #define SERVO_RF_INVERT_MOTOR		false

@@ -72,6 +72,9 @@ public:
 	/// 0 is straight ahead and angle increments positively 
 	/// counter clockwise
 	double GetCurrentAngle();
+	
+	/// returns true if the wheel is at the sensor, false if not
+	bool GetSensor();
 
 	
 	// only accessed by the PIDController class

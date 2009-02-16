@@ -83,11 +83,16 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_calibrating_offset(cal_offset),
 	m_invert_motor( invert_motor ? -1 : 1 )
 {
+/*
 	// see if the motor is already calibrated, saves us effort
 	if (!m_sensor.Get())
 		CalibrationComplete();
 	else
 		Calibrate();
+*/
+
+	// no calibration by default
+	CalibrationComplete();
 		
 
 	// create the PID controller
@@ -181,6 +186,11 @@ double KwarqsWheelServo::GetCurrentAngle()
 		angle += 360;
 		
 	return angle;
+}
+
+bool KwarqsWheelServo::GetSensor()
+{
+	return !m_sensor.Get();
 }
 
 // generally you won't need to use this.. 

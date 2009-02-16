@@ -14,20 +14,28 @@
 class RobotDemo : public SimpleRobot
 {
 	Joystick stick; // only joystick
+	Joystick stick2;
 
 	Encoder encoder;
+	Encoder motorEncoder;
 	DigitalInput sensor;
 	Victor victor;
+	Jaguar jaguar;
 
+#define SLOT SLOT_2
+	
 public:
 	RobotDemo(void):
-		stick(1),		// as they are declared above.
-		encoder(SLOT_2, 3, SLOT_2, 4),
-		sensor(SLOT_2, 10),
-		victor(SLOT_2, 4)
+		stick(1), stick2(2),		// as they are declared above.
+		encoder(SLOT, 3, SLOT, 4),
+		motorEncoder(SLOT, 7, SLOT, 8, false, Encoder::k2X),
+		sensor(SLOT, 10),
+		victor(SLOT, 5),
+		jaguar(SLOT, 3)
 	{
 		GetWatchdog().SetExpiration(0.1);
 		encoder.Start();
+		motorEncoder.Start();
 	}
 
 	/**
@@ -43,6 +51,7 @@ public:
 			GetWatchdog().Feed();
 			
 			victor.Set(stick.GetY()*-1);
+			jaguar.Set(stick2.GetY()*-1);
 			
 			if (GetTime() - time > 0.025)
 			{
@@ -55,10 +64,8 @@ public:
 				if (angle < 0.0)
 					angle += 360.0;
 					
-					
-				
-				printf("Encoder: %d. Sensor: %d, Angle: %f\r",
-						encoder.Get(), sensor.Get(), angle);
+				printf("Encoder: %d Motor: %d Sensor: %d, Angle: %f\r",
+						encoder.Get(), motorEncoder.Get(), sensor.Get(), angle);
 				time = GetTime();
 			}
 			

@@ -21,6 +21,8 @@
 #define FIRST_JOYSTICK_PORT			1
 #define SECOND_JOYSTICK_PORT		2
 
+#define CALIBRATION_SWITCH			1
+
 // analog sidecar
 #define GYRO_CHANNEL				1
 

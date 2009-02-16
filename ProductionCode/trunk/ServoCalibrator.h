@@ -11,9 +11,12 @@ public:
 	void Calibrate();
 
 private:
+	
+	bool ConvertStickToAngle(double &angle);
 
-	Joystick * m_stick;
+	Joystick * m_stick, * m_motorStick;
 	RobotChassis * m_chassis;
+	double m_time;
 	
 };
 

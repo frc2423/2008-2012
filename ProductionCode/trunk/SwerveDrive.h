@@ -53,6 +53,7 @@ private:
 	SwerveDrive();
 	
 	void Stop();
+	void ShortestPath(double &speed, double &angle, double current_angle );
 	
 	RobotChassis * m_chassis;
 	

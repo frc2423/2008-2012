@@ -68,6 +68,9 @@ void CalculateWheel(
 }
 
 
+
+
+
 void SwerveDrive::Move(
 	double &speed, 
 	double &angle, 
@@ -79,32 +82,31 @@ void SwerveDrive::Move(
 	{		
 		DriverStationLCD * lcd = DriverStationLCD::GetInstance();
 		
-		lcd->Printf(DriverStationLCD::kUser_Line3, 1, "LF: %.1f %.1f %s %s",
+		lcd->Printf(DriverStationLCD::kUser_Line2, 1, "S: %.1f A: %.1f R: %.1f          ",
+				speed, angle, rotation);
+		
+		lcd->Printf(DriverStationLCD::kUser_Line3, 1, "LF: %.1f %.1f %.1f          ",
 			m_chassis->servo_lf.GetSetAngle(),
 			m_chassis->servo_lf.GetCurrentAngle(),
-			m_chassis->servo_lf.IsCalibrated() ? "C" : "NC",
-			m_chassis->servo_lf.GetSensor() ? "0" : "1" 
+			m_chassis->motor_lr.GetSetSpeed()
 		);
 		
-		lcd->Printf(DriverStationLCD::kUser_Line4, 1, "LR: %.1f %.1f %s %s",
+		lcd->Printf(DriverStationLCD::kUser_Line4, 1, "LR: %.1f %.1f %.1f          ",
 			m_chassis->servo_lr.GetSetAngle(),
 			m_chassis->servo_lr.GetCurrentAngle(),
-			m_chassis->servo_lr.IsCalibrated() ? "C" : "NC",
-			m_chassis->servo_lr.GetSensor() ? "0" : "1" 
+			m_chassis->motor_lr.GetSetSpeed()
 		);
 		
-		lcd->Printf(DriverStationLCD::kUser_Line5, 1, "RF: %.1f %.1f %s %s",
+		lcd->Printf(DriverStationLCD::kUser_Line5, 1, "RF: %.1f %.1f %.1f          ",
 			m_chassis->servo_rf.GetSetAngle(),
 			m_chassis->servo_rf.GetCurrentAngle(),
-			m_chassis->servo_rf.IsCalibrated() ? "C" : "NC",
-			m_chassis->servo_rf.GetSensor() ? "0" : "1" 
+			m_chassis->motor_lr.GetSetSpeed()
 		);
 
-		lcd->Printf(DriverStationLCD::kUser_Line6, 1, "RR: %.1f %.1f %s %s",
+		lcd->Printf(DriverStationLCD::kUser_Line6, 1, "RR: %.1f %.1f %.1f          ",
 			m_chassis->servo_rr.GetSetAngle(),
 			m_chassis->servo_rr.GetCurrentAngle(),
-			m_chassis->servo_rr.IsCalibrated() ? "C" : "NC",
-			m_chassis->servo_rr.GetSensor() ? "0" : "1" 
+			m_chassis->motor_lr.GetSetSpeed()
 		);
 		
 		lcd->UpdateLCD();
@@ -180,13 +182,19 @@ void SwerveDrive::Move(
 		if (fabs(speeds[i]) > highest_speed)
 			highest_speed = fabs(speeds[i]);
 	
-	// don't divide by zero
-	if (fabs(highest_speed) < 0.0001)
-		speeds[0] = speeds[1] = speeds[2] = speeds[3] = 0;
-	else
+	// only need to scale if speed > 1
+	if (highest_speed > 1.0 )
+	{
 		// scale each speed by the highest speed
 		for (int i = 0; i < 4; i++)
 			speeds[i] /= highest_speed;
+	}
+	
+	// calculate the shortest path to the setpoint
+	ShortestPath(speeds[0], lf_angle, m_chassis->servo_lf.GetCurrentAngle());
+	ShortestPath(speeds[1], lr_angle, m_chassis->servo_lr.GetCurrentAngle());
+	ShortestPath(speeds[2], rf_angle, m_chassis->servo_rf.GetCurrentAngle());
+	ShortestPath(speeds[3], rr_angle, m_chassis->servo_rr.GetCurrentAngle());
 	
     
     // set the motors
@@ -210,7 +218,6 @@ void SwerveDrive::Stop()
 	// if the vector is near zero, then just spread all fours 
 	// and hope for the best
 
-	if (m_chassis->servo_lf.GetAngle() - 
 	m_chassis->servo_lf.SetAngle(45);
 	m_chassis->servo_lr.SetAngle(315);
 	m_chassis->servo_rf.SetAngle(135);
@@ -223,6 +230,34 @@ void SwerveDrive::Stop()
 	
 	
 }
+
+// returns the shortest path to an angle, adjusts speed also
+void SwerveDrive::ShortestPath(double &speed, double &angle, double current_angle )
+{
+	double alternate_angle = angle + 180 > 360 ? angle - 180 : angle + 180;
+
+	double error1 = angle - current_angle;
+	double error2 = alternate_angle - current_angle;
+
+	if (fabs(error1) > 180)
+	{
+		if (error1 < 0)
+			error1 += 360;
+		else
+			error1 -= 360;
+	}
+	
+	error1 = fabs(error1);
+	error2 = fabs(error2);
+
+	// if the other way is quicker, then use that instead
+	if (error1 > error2)
+	{
+		angle = alternate_angle;
+		speed = speed * -1;
+	}
+}
+
 
 
 

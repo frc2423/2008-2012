@@ -10,10 +10,11 @@
 #include "Framework/KwarqsDriveController.h"
 #include "Framework/KwarqsDSLCDStatus.h"
 
+#include "ServoCalibrator.h"
+
 #include "SimpleControl.h"
 #include "NullMovementControl.h"
 
-#include "SpeedLimiter.h"
 
 #include "SwerveDrive.h"
 
@@ -25,6 +26,8 @@ class KwarqsRobotMain : public SimpleRobot
 	
 	RobotChassis			chassis;
 	
+	ServoCalibrator			servoCalibrator;
+	
 	// control types
 	SimpleControl 			simpleControl;
 	NullMovementControl		nullMovementControl;
@@ -32,7 +35,7 @@ class KwarqsRobotMain : public SimpleRobot
 	// drive types
 	
 	// filters
-	SpeedLimiter			speedLimiter;
+	//SpeedLimiter			speedLimiter;
 	
 	// motor drivers
 	SwerveDrive				swerveDrive;
@@ -49,6 +52,7 @@ public:
 	*/
 	KwarqsRobotMain() :
 		ds(DriverStation::GetInstance()),
+		servoCalibrator(&chassis),
 		simpleControl(&driveController),
 		nullMovementControl(&driveController),
 		swerveDrive(&chassis),
@@ -148,13 +152,11 @@ public:
 			GetWatchdog().Feed();
 			
 			if (ds->GetDigitalIn(CALIBRATION_SWITCH))
+				servoCalibrator.Calibrate();
+			else
 			{
 				GetTeleoperatedMovementControl()->Move();
 				driveController.EndMove();
-			}
-			else
-			{
-				servoCalibrator->Calibrate();
 			}
 		}
 		

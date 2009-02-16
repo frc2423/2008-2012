@@ -229,7 +229,9 @@ void KwarqsWheelServo::PIDWrite(float output)
 		if (m_in_manual_mode)
 		{
 			Joystick * stick = Joystick::GetStickForPort(1);
-			m_motor.Set(stick->GetY() * -1 * m_invert_motor);
+			
+			// power of 3 so its easier to calibrate the motor
+			m_motor.Set( pow(stick->GetY() * -1 * m_invert_motor, 3));
 		}
 		else
 			m_motor.Set(m_invert_motor);

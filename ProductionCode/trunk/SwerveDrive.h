@@ -9,8 +9,7 @@
 #define SWERVEDRIVE_H
 
 #include "Framework/KwarqsDriveBase.h"
-#include "Framework/KwarqsWheelMotor.h"
-#include "Framework/KwarqsWheelServo.h"
+#include "RobotChassis.h"
 
 /**
 	\class SwerveDrive
@@ -20,7 +19,7 @@ class SwerveDrive : public KwarqsDriveBase {
 public:
 	
 	// constructor/destructors
-	SwerveDrive();
+	SwerveDrive(RobotChassis * chassis);
 	
 	void Disable(){}
 	void Enable(){}
@@ -50,20 +49,12 @@ public:
 
 
 private:
+
+	SwerveDrive();
 	
 	void Stop();
 	
-	// servos
-	KwarqsWheelServo		m_servo_lf;
-	KwarqsWheelServo		m_servo_rf;
-	KwarqsWheelServo		m_servo_lr;
-	KwarqsWheelServo		m_servo_rr;
-
-	// motors
-	KwarqsWheelMotor		m_motor_lf;
-	KwarqsWheelMotor		m_motor_rf;
-	KwarqsWheelMotor		m_motor_lr;
-	KwarqsWheelMotor		m_motor_rr;
+	RobotChassis * m_chassis;
 	
 	double m_time;
 	

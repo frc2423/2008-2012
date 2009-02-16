@@ -19,8 +19,11 @@
 
 class KwarqsRobotMain : public SimpleRobot
 {
+	DriverStation * 		ds;
 	KwarqsDriveController 	driveController;
 	//KwarqsDSLCDStatus		status;
+	
+	RobotChassis			chassis;
 	
 	// control types
 	SimpleControl 			simpleControl;
@@ -32,8 +35,6 @@ class KwarqsRobotMain : public SimpleRobot
 	SpeedLimiter			speedLimiter;
 	
 	// motor drivers
-	// XXX: Remember that if we have more than one set of motor 
-	// drivers, they have to share PWM's .. worry about it later
 	SwerveDrive				swerveDrive;
 	
 	KwarqsMovementControl * currentTeleoperatedControl;
@@ -47,8 +48,10 @@ public:
 		and startup code here. 
 	*/
 	KwarqsRobotMain() :
+		ds(DriverStation::GetInstance()),
 		simpleControl(&driveController),
 		nullMovementControl(&driveController),
+		swerveDrive(&chassis),
 		currentTeleoperatedControl(NULL)
 	{
 		GetWatchdog().SetExpiration(200);
@@ -144,8 +147,15 @@ public:
 		{
 			GetWatchdog().Feed();
 			
-			GetTeleoperatedMovementControl()->Move();
-			driveController.EndMove();
+			if (ds->GetDigitalIn(CALIBRATION_SWITCH))
+			{
+				GetTeleoperatedMovementControl()->Move();
+				driveController.EndMove();
+			}
+			else
+			{
+				servoCalibrator->Calibrate();
+			}
 		}
 		
 		GetTeleoperatedMovementControl()->OnDisable();

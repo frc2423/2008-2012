@@ -40,8 +40,8 @@
 
 #include "SimpleControl.h"
 
-#include "Framework/math.h"
-#include "Framework/KwarqsConstants.h"
+#include "../Framework/math.h"
+#include "../Framework/KwarqsConstants.h"
 
 
 SimpleControl::SimpleControl(KwarqsDriveController * driveController) :

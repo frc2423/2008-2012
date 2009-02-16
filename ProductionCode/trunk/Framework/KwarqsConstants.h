@@ -55,10 +55,10 @@
 #define PWM_RR_JAGUAR				3
 
 // displacement of motors from center of rotation
-#define LF_DISPLACEMENT				-1,1
-#define LR_DISPLACEMENT				-1,-1
-#define RF_DISPLACEMENT				1,1
-#define RR_DISPLACEMENT				1,-1
+#define LF_DISPLACEMENT				-0.5,1
+#define LR_DISPLACEMENT				-0.5,-1
+#define RF_DISPLACEMENT				0.5,1
+#define RR_DISPLACEMENT				0.5,-1
 
 // encoder channels: motor
 #define ENCODER_MOTOR_LF_1			5

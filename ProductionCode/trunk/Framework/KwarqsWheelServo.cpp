@@ -83,14 +83,6 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_calibrating_offset(cal_offset),
 	m_invert_motor( invert_motor ? -1 : 1 )
 {
-/*
-	// see if the motor is already calibrated, saves us effort
-	if (!m_sensor.Get())
-		CalibrationComplete();
-	else
-		Calibrate();
-*/
-
 	// no calibration by default
 	CalibrationComplete();
 		
@@ -102,7 +94,7 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_pidController->SetContinuous();
 	m_pidController->SetInputRange(0, 360);
 	m_pidController->SetOutputRange(-360, 360);
-	m_pidController->SetTolerance(0.025);
+	m_pidController->SetTolerance(0.0025);
 	
 	// enable it
 	m_pidController->Enable();

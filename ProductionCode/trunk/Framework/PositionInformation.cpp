@@ -34,8 +34,10 @@ PositionInformation::PositionInformation() :
 
 	xBias(0.0), yBias(0.0)
 {
+	
 	m_gyro.SetSensitivity(0.007);
 
+	/*
 	// create the mutex
 	m_mutex = semBCreate(0, SEM_FULL);
 
@@ -60,7 +62,8 @@ PositionInformation::PositionInformation() :
 
 	// start the calculations
 	m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
-	m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);	
+	m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);
+	*/
 }
 
 // destructor

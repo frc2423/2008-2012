@@ -126,11 +126,11 @@ void ServoCalibrator::Calibrate()
 		switch (input)
 		{
 		case 1:
-			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Left Front(LF)");
+			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Left Front(LF)  ");
 			break;
 			
 		case 2:
-			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Left Rear (LR)");
+			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Left Rear (LR)  ");
 			break;
 			
 		case 3:
@@ -138,36 +138,36 @@ void ServoCalibrator::Calibrate()
 			break;
 			
 		case 4:
-			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Right Rear (RR)");
+			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Right Rear (RR) ");
 			break;
 			
 		default:
-			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: None (%d)", GetBCDInput());
+			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: None (%d)       ", GetBCDInput());
 		}
 		
 		
-		lcd->PrintfLine(DriverStationLCD::kUser_Line3, "LF: %.1f %.1f %s %s",
+		lcd->PrintfLine(DriverStationLCD::kUser_Line3, "LF: %.1f %.1f %s %s            ",
 			m_chassis->servo_lf.GetSetAngle(),
 			m_chassis->servo_lf.GetCurrentAngle(),
 			m_chassis->servo_lf.IsCalibrated() ? "C" : "NC",
 			m_chassis->servo_lf.GetSensor() ? "0" : "1" 
 		);
 		
-		lcd->PrintfLine(DriverStationLCD::kUser_Line4, "LR: %.1f %.1f %s %s",
+		lcd->PrintfLine(DriverStationLCD::kUser_Line4, "LR: %.1f %.1f %s %s            ",
 			m_chassis->servo_lr.GetSetAngle(),
 			m_chassis->servo_lr.GetCurrentAngle(),
 			m_chassis->servo_lr.IsCalibrated() ? "C" : "NC",
 			m_chassis->servo_lr.GetSensor() ? "0" : "1" 
 		);
 		
-		lcd->PrintfLine(DriverStationLCD::kUser_Line5, "RF: %.1f %.1f %s %s",
+		lcd->PrintfLine(DriverStationLCD::kUser_Line5, "RF: %.1f %.1f %s %s            ",
 			m_chassis->servo_rf.GetSetAngle(),
 			m_chassis->servo_rf.GetCurrentAngle(),
 			m_chassis->servo_rf.IsCalibrated() ? "C" : "NC",
 			m_chassis->servo_rf.GetSensor() ? "0" : "1" 
 		);
 
-		lcd->PrintfLine(DriverStationLCD::kUser_Line6, "RR: %.1f %.1f %s %s",
+		lcd->PrintfLine(DriverStationLCD::kUser_Line6, "RR: %.1f %.1f %s %s            ",
 			m_chassis->servo_rr.GetSetAngle(),
 			m_chassis->servo_rr.GetCurrentAngle(),
 			m_chassis->servo_rr.IsCalibrated() ? "C" : "NC",

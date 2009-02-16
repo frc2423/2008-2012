@@ -13,8 +13,11 @@
 #include "ServoCalibrator.h"
 
 #include "SimpleControl.h"
+#include "CompassDrive.h"
 #include "NullMovementControl.h"
 
+#include "Framework/KwarqsGamePiece.h"
+#include "Framework/KwarqsBCDInput.h"
 
 #include "SwerveDrive.h"
 
@@ -30,7 +33,10 @@ class KwarqsRobotMain : public SimpleRobot
 	
 	// control types
 	SimpleControl 			simpleControl;
+	CompassDrive			compassDrive;
 	NullMovementControl		nullMovementControl;
+	
+	KwarqsGamePiece 		gamePiece;
 	
 	// drive types
 	
@@ -54,6 +60,7 @@ public:
 		ds(DriverStation::GetInstance()),
 		servoCalibrator(&chassis),
 		simpleControl(&driveController),
+		compassDrive(&driveController),
 		nullMovementControl(&driveController),
 		swerveDrive(&chassis),
 		currentTeleoperatedControl(NULL)
@@ -91,8 +98,21 @@ public:
 	KwarqsMovementControl * GetTeleoperatedMovementControl()
 	{	
 		// select the type (todo: need to read switches)
-		KwarqsMovementControl * control = &simpleControl;
+		KwarqsMovementControl * control;
 		
+		switch (GetBCDInput())
+		{
+		case 1:
+			control = &compassDrive;
+			break;
+			
+		case 2: 
+			control = &simpleControl;
+			break;
+		
+		default:
+			control = &nullMovementControl;
+		}
 		
 		// enable or disable it depending on whether it was previously
 		// selected
@@ -104,7 +124,11 @@ public:
 			
 			currentTeleoperatedControl = control;
 			currentTeleoperatedControl->OnEnable();
+					
 		}
+		
+		DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kMain_Line6, "%.1f %s                  ", 
+				PositionInformation::GetInstance()->GetAngle(), control->Name());
 		
 		return currentTeleoperatedControl;
 	}
@@ -158,6 +182,8 @@ public:
 				GetTeleoperatedMovementControl()->Move();
 				driveController.EndMove();
 			}
+			
+			gamePiece.PerformMovement();
 		}
 		
 		GetTeleoperatedMovementControl()->OnDisable();

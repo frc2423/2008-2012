@@ -43,11 +43,17 @@
 	@param slot					Slot for the PWM and encoder
 	@param pwm_port				PWM port for motor
 	@param encoder_port1		Encoder port
-	@param encoder_port2		Encoder port 
+	@param encoder_port2		Encoder port
+	@param invert_motor			Set to true if invert the motor
 */
-KwarqsWheelMotor::KwarqsWheelMotor(UINT32 slot, UINT32 pwm_port, UINT32 encoder_port1, UINT32 encoder_port2) :
+KwarqsWheelMotor::KwarqsWheelMotor(
+		UINT32 slot, 
+		UINT32 pwm_port, 
+		UINT32 encoder_port1, UINT32 encoder_port2,
+		bool invert_motor) :
 	m_motor(slot, pwm_port),
-	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X)
+	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X),
+	m_invert(invert_motor ? -1 : 1)
 {
 	SetSpeed(0);
 	m_encoder.Start();
@@ -57,7 +63,7 @@ KwarqsWheelMotor::KwarqsWheelMotor(UINT32 slot, UINT32 pwm_port, UINT32 encoder_
 void KwarqsWheelMotor::SetSpeed(float speed)
 {
 	// don't need to bounds check this, its already done in PWM
-	m_motor.Set(speed);
+	m_motor.Set(speed * m_invert);
 }
 
 /// Get the speed that the motor was assigned to go via SetSpeed

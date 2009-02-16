@@ -84,14 +84,14 @@ void SwerveDrive::Move(
 	bool &stop
 )
 {
-	
+	/*
 	if (m_stick->GetTop())
 	{
 		m_servo_lf.Calibrate();
 		m_servo_lr.Calibrate();
 		m_servo_rf.Calibrate();
 		m_servo_rr.Calibrate();
-	}
+	}*/
 	
 	
 	if (GetTime() - m_time > 0.1)

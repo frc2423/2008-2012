@@ -42,6 +42,11 @@
 #define MOTOR_RF_SLOT				SLOT_2
 #define MOTOR_RR_SLOT				SLOT_2
 
+#define MOTOR_LF_INVERT				true
+#define MOTOR_LR_INVERT				true
+#define MOTOR_RF_INVERT				false
+#define MOTOR_RR_INVERT				false
+
 #define PWM_LF_JAGUAR				1
 #define PWM_LR_JAGUAR				3
 #define PWM_RF_JAGUAR				1
@@ -141,7 +146,8 @@
 #define MOTOR_PARAMS(lr, fr)		MOTOR_##lr##fr##_SLOT, \
 									PWM_##lr##fr##_JAGUAR, \
 									ENCODER_MOTOR_##lr##fr##_1, \
-									ENCODER_MOTOR_##lr##fr##_2
+									ENCODER_MOTOR_##lr##fr##_2, \
+									MOTOR_##lr##fr##_INVERT
 
 #define MOTOR_LF_PARAMETERS			MOTOR_PARAMS(L,F)
 #define MOTOR_LR_PARAMETERS			MOTOR_PARAMS(L,R)

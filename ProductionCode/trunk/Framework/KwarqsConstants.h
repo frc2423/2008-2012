@@ -138,5 +138,15 @@
 #define SERVO_RF_PARAMETERS			SERVO_PARAMS(R,F)
 #define SERVO_RR_PARAMETERS			SERVO_PARAMS(R,R)
 
+#define MOTOR_PARAMS(lr, fr)		MOTOR_##lr##fr##_SLOT, \
+									PWM_##lr##fr##_JAGUAR, \
+									ENCODER_MOTOR_##lr##fr##_1, \
+									ENCODER_MOTOR_##lr##fr##_2
+
+#define MOTOR_LF_PARAMETERS			MOTOR_PARAMS(L,F)
+#define MOTOR_LR_PARAMETERS			MOTOR_PARAMS(L,R)
+#define MOTOR_RF_PARAMETERS			MOTOR_PARAMS(R,F)
+#define MOTOR_RR_PARAMETERS			MOTOR_PARAMS(R,R)
+
 
 #endif

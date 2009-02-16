@@ -57,7 +57,7 @@ void KwarqsDSLCDStatus::OnInterval(void * param)
 	PositionInformation * pos = PositionInformation::GetInstance();
 	
 	// do any updates necessary
-	lcd->Printf(DriverStationLCD::kMain_Line6, 0, 
+	lcd->Printf(DriverStationLCD::kMain_Line6, 1, 
 			"%.1f@ Uncal: %d",
 			pos->GetNormalizedAngle(),
 			KwarqsWheelServo::UncalibratedServoCount()

@@ -20,7 +20,7 @@
 class KwarqsRobotMain : public SimpleRobot
 {
 	KwarqsDriveController 	driveController;
-	KwarqsDSLCDStatus		status;
+	//KwarqsDSLCDStatus		status;
 	
 	// control types
 	SimpleControl 			simpleControl;
@@ -150,11 +150,6 @@ public:
 		
 		GetTeleoperatedMovementControl()->OnDisable();
 		currentTeleoperatedControl = NULL;
-	}
-	
-	void UpdateLCD()
-	{
-		
 	}
 };
 

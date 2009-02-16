@@ -32,11 +32,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "WPILib.h"
+
+#include <WPILib.h>
 #include "SwerveDrive.h"
 
 #include "Framework/KwarqsConstants.h"
 #include "Framework/math.h"
+#include "Framework/DriverStationLCD.h"
 
 // default constructor
 SwerveDrive::SwerveDrive() :
@@ -48,8 +50,12 @@ SwerveDrive::SwerveDrive() :
 	m_motor_lf(MOTOR_LF_PARAMETERS ),
 	m_motor_rf(MOTOR_RF_PARAMETERS ),
 	m_motor_lr(MOTOR_LR_PARAMETERS ),
-	m_motor_rr(MOTOR_RR_PARAMETERS )
-{}
+	m_motor_rr(MOTOR_RR_PARAMETERS ),
+	
+	m_time(GetTime())
+{
+	m_stick = Joystick::GetStickForPort(FIRST_JOYSTICK_PORT);
+}
 
 /*
 	Calculates the parameters for an individual wheel
@@ -78,6 +84,53 @@ void SwerveDrive::Move(
 	bool &stop
 )
 {
+	
+	if (m_stick->GetTop())
+	{
+		m_servo_lf.Calibrate();
+		m_servo_lr.Calibrate();
+		m_servo_rf.Calibrate();
+		m_servo_rr.Calibrate();
+	}
+	
+	
+	if (GetTime() - m_time > 0.1)
+	{		
+		DriverStationLCD * lcd = DriverStationLCD::GetInstance();
+		
+		lcd->Printf(DriverStationLCD::kUser_Line3, 1, "LF: %.1f %.1f %s %s",
+			m_servo_lf.GetSetAngle(),
+			m_servo_lf.GetCurrentAngle(),
+			m_servo_lf.IsCalibrated() ? "C" : "NC",
+			m_servo_lf.GetSensor() ? "0" : "1" 
+		);
+		
+		lcd->Printf(DriverStationLCD::kUser_Line4, 1, "LR: %.1f %.1f %s %s",
+			m_servo_lr.GetSetAngle(),
+			m_servo_lr.GetCurrentAngle(),
+			m_servo_lr.IsCalibrated() ? "C" : "NC",
+			m_servo_lr.GetSensor() ? "0" : "1" 
+		);
+		
+		lcd->Printf(DriverStationLCD::kUser_Line5, 1, "RF: %.1f %.1f %s %s",
+			m_servo_rf.GetSetAngle(),
+			m_servo_rf.GetCurrentAngle(),
+			m_servo_rf.IsCalibrated() ? "C" : "NC",
+			m_servo_rf.GetSensor() ? "0" : "1" 
+		);
+
+		lcd->Printf(DriverStationLCD::kUser_Line6, 1, "RR: %.1f %.1f %s %s",
+			m_servo_rr.GetSetAngle(),
+			m_servo_rr.GetCurrentAngle(),
+			m_servo_rr.IsCalibrated() ? "C" : "NC",
+			m_servo_rr.GetSensor() ? "0" : "1" 
+		);
+		
+		lcd->UpdateLCD();
+		m_time = GetTime();
+	}
+	
+	
 	if (stop)
 	{
 		Stop();
@@ -177,8 +230,7 @@ void SwerveDrive::Move(
 	m_motor_lf.SetSpeed(speed);
 	m_motor_lr.SetSpeed(speed);
 	m_motor_rf.SetSpeed(speed);
-	m_motor_rr.SetSpeed(speed);
-	
+	m_motor_rr.SetSpeed(speed);	
 }
 
 void SwerveDrive::Stop()

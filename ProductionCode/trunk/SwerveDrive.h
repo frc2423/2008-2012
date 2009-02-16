@@ -65,6 +65,10 @@ private:
 	KwarqsWheelMotor		m_motor_lr;
 	KwarqsWheelMotor		m_motor_rr;
 	
+	double m_time;
+	
+	Joystick * m_stick;
+	
 };
 
 

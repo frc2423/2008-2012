@@ -165,8 +165,12 @@ void KwarqsWheelServo::CalibrationComplete()
 /// counter clockwise
 void KwarqsWheelServo::SetAngle(double angle)
 {
-	// todo: shortest path via 180 degree turns?
-	m_pidController->SetSetpoint(fmod(angle, 360.0));
+	// make sure you handle negative angles correctly.. otherwise
+	// we will enter bad oscillations
+	angle = fmod(angle, 360.0);
+	if (angle < 0)
+		angle += 360.0;
+	m_pidController->SetSetpoint(angle);
 }
 
 /// Get the angle that the wheel is supposed to be pointing

@@ -102,16 +102,16 @@ public:
 		
 		switch (GetBCDInput())
 		{
-		case 1:
-			control = &compassDrive;
-			break;
+			case 8:
+				control = &compassDrive;
+				break;
+				
+			case 9: 
+				control = &simpleControl;
+				break;
 			
-		case 2: 
-			control = &simpleControl;
-			break;
-		
-		default:
-			control = &nullMovementControl;
+			default:
+				control = &nullMovementControl;
 		}
 		
 		// enable or disable it depending on whether it was previously

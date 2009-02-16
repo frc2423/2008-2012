@@ -8,8 +8,6 @@
 #ifndef KWARQS_WHEEL_SERVO_BASE_H
 #define KWARQS_WHEEL_SERVO_BASE_H
 
-#include "TunablePIDController.h"
-
 template <int i>
 class UglyServoHack;
 
@@ -96,7 +94,7 @@ private:
 	// called when calibration is finished
 	void CalibrationComplete();
 
-	TunablePIDController * m_pidController;
+	PIDController * m_pidController;
 	
 	
 	Encoder 		m_encoder;

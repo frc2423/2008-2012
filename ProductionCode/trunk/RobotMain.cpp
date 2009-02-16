@@ -12,9 +12,9 @@
 
 #include "ServoCalibrator.h"
 
-#include "SimpleControl.h"
-#include "CompassDrive.h"
-#include "NullMovementControl.h"
+#include "Controls/SimpleControl.h"
+#include "Controls/CompassDrive.h"
+#include "Controls/NullMovementControl.h"
 
 #include "Framework/KwarqsGamePiece.h"
 #include "Framework/KwarqsBCDInput.h"

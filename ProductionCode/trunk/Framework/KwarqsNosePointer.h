@@ -58,9 +58,9 @@ public:
 				
 				// sqrt:
 				if (error < 0)
-					m_result = ((sqrt(fabs(error)) * .5) / sqrt(190))*-1;
+					m_result = ((sqrt(fabs(error))) / sqrt(190))*-1;
 				else
-					m_result = (sqrt(error) * .5) / sqrt(190);
+					m_result = (sqrt(error)) / sqrt(190);
 			}
 			
 		

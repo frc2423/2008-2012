@@ -23,6 +23,6 @@ void KwarqsGamePiece::PerformMovement()
 		m_low_arm_motor.Set(0);
 	
 	// scale this value so it can only go the correct direction
-	m_upper_arm_motor.Set(((m_stick->GetZ()*-1) + 1.0/ 2));
+	m_upper_arm_motor.Set(((m_stick->GetZ()*-1) + 1.0)/ 2);
 }
 

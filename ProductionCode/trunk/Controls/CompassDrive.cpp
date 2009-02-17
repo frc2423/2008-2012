@@ -21,7 +21,7 @@ void CompassDrive::Move()
 	
 	speed = CalculateSpeed();
 	wheel_Direction = CalculateWheelDirection();
-	rotation = pow(m_stick.GetTwist() * -1, 3);
+	rotation = m_stick.GetTwist() * -1;
 	
 	m_driveController->Move(speed, wheel_Direction, rotation, m_stick.GetTrigger());
 }

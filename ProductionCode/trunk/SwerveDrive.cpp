@@ -44,9 +44,7 @@
 SwerveDrive::SwerveDrive(RobotChassis * chassis) :
 	m_chassis(chassis),
 	m_time(GetTime())
-{
-	m_stick = Joystick::GetStickForPort(FIRST_JOYSTICK_PORT);
-}
+{}
 
 /*
 	Calculates the parameters for an individual wheel

@@ -58,9 +58,6 @@ private:
 	RobotChassis * m_chassis;
 	
 	double m_time;
-	
-	Joystick * m_stick;
-	
 };
 
 

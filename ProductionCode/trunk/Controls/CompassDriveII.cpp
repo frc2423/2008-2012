@@ -28,9 +28,12 @@ void CompassDriveII::Move()
 {	
 	double speed, wheel_Direction;
 	
+	// normal compass drive stuff here
 	speed = CalculateSpeed();
 	wheel_Direction = CalculateWheelDirection();
 	
+	// special compass drive thing: adjust the front of the
+	// robot to where the nose should be
 	double y2 = m_stick2.GetY() * -1, x2 = m_stick2.GetX();
 	double face_angle = 0, output = 0, robot_angle = 0;
 	
@@ -45,9 +48,6 @@ void CompassDriveII::Move()
 		output = m_controller.GetCalculation(face_angle, robot_angle);
 		if (output > 90)
 			output -= 180;
-		
-		if (fabs(speed) < 0.1)
-			speed = .5;
 	}
 	
 	DriverStationLCD::GetInstance()->Printf(DriverStationLCD::kUser_Line2, 1,"%.1f %f %f                 ",

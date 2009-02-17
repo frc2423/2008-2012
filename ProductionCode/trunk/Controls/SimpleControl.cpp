@@ -42,6 +42,7 @@
 
 #include "../Framework/math.h"
 #include "../Framework/KwarqsConstants.h"
+#include "../Framework/DriverStationLCD.h"
 
 
 SimpleControl::SimpleControl(KwarqsDriveController * driveController) :
@@ -59,8 +60,13 @@ void SimpleControl::Move()
 	double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0 );			
 	if (desired_angle < 0) desired_angle += 360;
 	
-	if (fabs(speed) < 0.01)
+	if (fabs(speed) < 0.00001)
 		desired_angle = 0.0;
 	
-	m_driveController->Move(speed, desired_angle, pow(m_stick.GetTwist() * -1, 3), m_stick.GetTrigger());
+	double rotation = m_stick.GetTwist() * -1;
+	
+	m_driveController->Move(speed, desired_angle, rotation , m_stick.GetTrigger());
+	
+	DriverStationLCD::GetInstance()->Printf(DriverStationLCD::kUser_Line2, 1, "S: %.1f A: %.1f R: %.1f          ",
+			speed, desired_angle, rotation);
 }

@@ -1,25 +1,25 @@
 /**
-	\file 		PseudoGearbox.h
+	\file 		PsuedoGearbox.h
 	\author 	Dustin Spicuzza: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
 */
 
 
-#ifndef SPEEDLIMITER_H
-#define SPEEDLIMITER_H
+#ifndef PSEUDOGEARBOX_H
+#define PSEUDOGEARBOX_H
 
 /**
-	\class PseudoGearbox
+	\class PsuedoGearbox
 	\brief This is a trivially simple filter drive class that limits the 
 	speed of the robot. There is a question of whether this belongs here 
 	or not. I feel.. no. 
 */
-class PseudoGearbox : public KwarqsDriveBase 
+class PsuedoGearbox : public KwarqsDriveBase 
 {
 public:
 
-	PseudoGearBox() :
+	PsuedoGearbox() :
 		m_stick(FIRST_JOYSTICK_PORT)
 	{}
 
@@ -42,7 +42,7 @@ public:
 	}
 
 	/// Return the name of the class
-	virtual const char * Name() { return "PseudoGearbox"; }
+	virtual const char * Name() { return "PsuedoGearbox"; }
 	
 private:
 

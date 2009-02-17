@@ -18,6 +18,7 @@
 #include "Controls/CompassDriveII.h"
 
 #include "Autonomous/AutonomousDemo.h"
+#include "Autonomous/AutonomousRandomDemo.h"
 
 #include "Framework/KwarqsGamePiece.h"
 #include "Framework/KwarqsBCDInput.h"
@@ -42,6 +43,7 @@ class KwarqsRobotMain : public SimpleRobot
 	NullMovementControl		nullMovementControl;
 	
 	AutonomousDemo			autonomousDemo;
+	AutonomousRandomDemo	autonomousRandomDemo;
 	
 	KwarqsGamePiece 		gamePiece;
 	
@@ -74,6 +76,7 @@ public:
 		nullMovementControl(&driveController),
 		
 		autonomousDemo(&driveController),
+		autonomousRandomDemo(&driveController),
 		
 		swerveDrive(&chassis),
 		currentTeleoperatedControl(NULL)
@@ -103,6 +106,9 @@ public:
 		{
 			case 1:
 				return &autonomousDemo;
+				
+			case 2:
+				return &autonomousRandomDemo;
 				
 			default:
 				return &nullMovementControl;
@@ -168,7 +174,7 @@ public:
 	void Autonomous()
 	{
 		GetWatchdog().SetEnabled(false);
-		pseudoGearbox.Disable();
+		psuedoGearbox.Disable();
 		
 	
 		// this only gets selected at the beginning of autonomous mode,
@@ -197,7 +203,7 @@ public:
 	{
 		double update_time = GetTime();
 		
-		pseudoGearbox.Enable();
+		psuedoGearbox.Enable();
 		
 		printf("Entered OperatorControl()\n");
 		GetWatchdog().SetEnabled(true);

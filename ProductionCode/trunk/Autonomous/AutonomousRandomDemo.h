@@ -32,7 +32,7 @@ public:
 			state += 1;
 		}
 		
-		rotation = m_nosePointer(rotation_goal);
+		rotation = m_nosePointer.GetRotation (rotation_goal);
 			
 		m_driveController->Move(speed, angle, rotation, false);
 		

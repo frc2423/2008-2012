@@ -32,28 +32,21 @@ void CompassDriveII::Move()
 	speed = CalculateSpeed();
 	wheel_Direction = CalculateWheelDirection();
 	
-	// special compass drive thing: adjust the front of the
+	// special compass drive II thing: adjust the front of the
 	// robot to where the nose should be
 	double y2 = m_stick2.GetY() * -1, x2 = m_stick2.GetX();
-	double face_angle = 0, output = 0, robot_angle = 0;
+	double rotation = 0;
 	
-	if (fabs(__hypot(x2, y2)) > 0.1)
+	// if we're meant to be rotating, do so
+	if (fabs(__hypot(x2, y2)) > 0.0)
 	{
-		face_angle = (atan2(y2, x2) * (180/M_PI) - 90.0 );			
+		double face_angle = (atan2(y2, x2) * (180/M_PI) - 90.0 );			
 		if (face_angle < 0) face_angle += 360;
-		
-		double robot_angle = m_position->GetNormalizedAngle()*-1;
-		if (robot_angle <0) robot_angle += 360;
-		
-		output = m_controller.GetCalculation(face_angle, robot_angle);
-		if (output > 90)
-			output -= 180;
+
+		rotation = nosePointer.GetRotation(face_angle);
 	}
 	
-	DriverStationLCD::GetInstance()->Printf(DriverStationLCD::kUser_Line2, 1,"%.1f %f %f                 ",
-			robot_angle, output, output/140);
-	
-	m_driveController->Move(speed, wheel_Direction, output/140, m_stick.GetTrigger());
+	m_driveController->Move(speed, wheel_Direction, rotation, m_stick.GetTrigger());
 }
 
 double CompassDriveII::robotCompass()

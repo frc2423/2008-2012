@@ -90,7 +90,7 @@ void PIDController::Calculate()
 		if (m_continuous)
 		{
 			if (fabs(m_error) > 
-				m_maximumInput - m_minimumInput)
+				(m_maximumInput - m_minimumInput)/2)
 			{
 				if (m_error > 0)
 					m_error = m_error  - m_maximumInput + m_minimumInput;
@@ -249,4 +249,13 @@ void PIDController::Reset()
 	m_totalError = 0;
 	
 	m_result = 0;
+}
+
+void PIDController::TuneParameters(float Kp, float Ki, float Kd)
+{
+	m_P = Kp;
+	m_I = Ki;
+	m_D = Kd;
+	
+	m_totalError = 0;
 }

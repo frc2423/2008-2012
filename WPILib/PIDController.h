@@ -4,8 +4,8 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef PIDCONTROLLER_H_
-#define PIDCONTROLLER_H_
+#ifndef PIDController_H_
+#define PIDController_H_
 
 #include "Base.h"
 
@@ -68,6 +68,8 @@ public:
 	void Disable();
 	
 	void Reset();
+	
+	void TuneParameters(float Kp, float Ki, float Kd);
 };
 
 #endif

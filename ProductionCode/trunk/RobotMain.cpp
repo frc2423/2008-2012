@@ -20,6 +20,7 @@
 #include "Framework/KwarqsGamePiece.h"
 #include "Framework/KwarqsBCDInput.h"
 
+#include "PsuedoGearbox.h"
 #include "SwerveDrive.h"
 
 class KwarqsRobotMain : public SimpleRobot
@@ -44,6 +45,7 @@ class KwarqsRobotMain : public SimpleRobot
 	
 	// filters
 	//SpeedLimiter			speedLimiter;
+	PsuedoGearbox			psuedoGearbox;
 	
 	// motor drivers
 	SwerveDrive				swerveDrive;
@@ -78,6 +80,7 @@ public:
 		
 		// todo: need a better way to do this, not satisfied with this
 		//driveController.AddDrive(&speedLimiter, DriveEnabled);
+		driveController.AddDrive(&psuedoGearbox, DriveEnabled);
 		driveController.AddDrive(&swerveDrive, DriveEnabled);
 	}
 

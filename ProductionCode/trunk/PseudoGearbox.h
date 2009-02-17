@@ -17,6 +17,12 @@
 */
 class PseudoGearbox : public KwarqsDriveBase 
 {
+public:
+
+	PseudoGearBox() :
+		m_stick(FIRST_JOYSTICK_PORT)
+	{}
+
 	void Disable(){}
 	void Enable(){}
 
@@ -26,15 +32,30 @@ class PseudoGearbox : public KwarqsDriveBase
 	/// limits the speed of the robot
 	virtual void Move(double &speed, double &angle, double &rotation, bool &stop)
 	{
-		if (DriverStation::GetDigitalIn(DS_IN_GEARSHIFT))
-			speed *= 0.5;
+		// don't touch this (turbo mode)
+		if (m_stick.GetTopButton())
+			return;
 	
-		speed = pow(speed, 3);
-		rotation = pow(speed, 3);
+		// low speed action
+		speed *= .5;
+		rotation *= .5;
 	}
 
 	/// Return the name of the class
 	virtual const char * Name() { return "PseudoGearbox"; }
+	
+private:
+
+	KwarqsJoystick m_stick;
+	
+	double DeadFilter(double val, double max)
+	{
+		if (fabs(val) > max)
+			return max;
+		
+		return val * max;
+	}
+	
 };
 
 #endif

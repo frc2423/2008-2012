@@ -1,0 +1,17 @@
+
+Notes/Thoughts:
+
+- All framework classes will be created in a main class called KwarqsMain (which inherits from RobotBase). All framework classes will typically create their own WPILib objects to interact with devices, except as specified. 
+
+- We will be using Doxygen to document the code (its really easy and brainless, honestly). (Dustin will conduct a tutorial on this in the near future)
+
+- I propose that we use the WPILib naming conventions (see page 34 of their manual)
+
+- Unit Testing: we can create fake WPILib classes that allow us to emulate devices and test them outside of the robot. An open question is whether we should use a formal framework or not -- I prefer that the tests just do a bunch of things and output OK/FAIL depending on the result. I will defer to better suggestions however.
+
+ - A goal: it would be nice to be able to log all movement against all position data, and be able to analyze this using excel/MATLAB or something to that effect (maybe some custom analysis program)
+ 
+ - A useful idea is possibly store an INI file (or other type of config file) on the robot, and use that for particular types of settings (since there is an FTP server on it).
+
+ - Question: does it make sense to combine the KwarqsWheelMotor and KwarqsWheelServoBase classes into a single class KwarqsWheel? Probably.
+ 

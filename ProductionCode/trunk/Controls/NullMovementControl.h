@@ -8,7 +8,7 @@
 #ifndef NULLMOVEMENTCONTROL_H
 #define NULLMOVEMENTCONTROL_H
 
-#include "Framework/KwarqsMovementControl.h"
+#include "../Framework/KwarqsMovementControl.h"
 
 class NullMovementControl : public KwarqsMovementControl {
 public:

@@ -45,8 +45,14 @@ ServoCalibrator::ServoCalibrator(RobotChassis * chassis) :
 	m_stick(Joystick::GetStickForPort(1)),
 	m_motorStick(Joystick::GetStickForPort(2)),
 	m_chassis(chassis),
-	m_time(0)
-{}
+	m_time(0),
+	m_in_pot_mode(false),
+	m_idx(0),
+	m_pot_time(0)
+{
+	for (int i = 0; i < POT_ARRAY_SIZE; i++)
+		m_pot_array[i] = 0;
+}
 
 
 bool ServoCalibrator::ConvertStickToAngle(double &angle)
@@ -106,14 +112,32 @@ void ServoCalibrator::Calibrate()
 		
 		if (m_stick->GetTop())
 			servo->Calibrate();
-			
+		
+		/*
 		if (m_stick->GetTrigger())
 			servo->EnableManualCalibration();
 		else
 			servo->DisableManualCalibration();
+		*/
 		
-		// only change angle if desired
-		if (ConvertStickToAngle(setPoint))
+		if (m_stick->GetTrigger())
+		{
+			// adjust using the pot, filter the values
+			if (GetTime() - m_pot_time > 0.1)
+			{
+				servo->SetAngle( ceil( GetFilteredPotValue() /(1000.0/ 500.0) ) );
+				m_pot_time = GetTime();
+			}
+			
+			m_in_pot_mode = true;
+		} 
+		else if (m_in_pot_mode)
+		{
+			servo->Reset();
+			m_in_pot_mode = false;
+		}
+		 // only change angle if desired
+		else if (ConvertStickToAngle(setPoint))
 			servo->SetAngle(setPoint);
 		
 		motor->SetSpeed(m_motorStick->GetY()*-1);
@@ -177,4 +201,19 @@ void ServoCalibrator::Calibrate()
 		lcd->UpdateLCD();
 		m_time = GetTime();
 	}
+}
+
+double ServoCalibrator::GetFilteredPotValue()
+{
+	if (++m_idx > POT_ARRAY_SIZE)
+		m_idx = 0;
+	
+	m_pot_array[m_idx] = DriverStation::GetInstance()->GetAnalogIn(1);
+	
+	// average it
+	double sum = 0;
+	for (int i = 0; i < POT_ARRAY_SIZE; i++)
+		sum += m_pot_array[i];
+	
+	return sum/POT_ARRAY_SIZE;
 }

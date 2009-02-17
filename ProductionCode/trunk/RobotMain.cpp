@@ -181,9 +181,9 @@ public:
 			{
 				GetTeleoperatedMovementControl()->Move();
 				driveController.EndMove();
+				
+				gamePiece.PerformMovement();
 			}
-			
-			gamePiece.PerformMovement();
 		}
 		
 		GetTeleoperatedMovementControl()->OnDisable();

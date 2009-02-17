@@ -61,6 +61,8 @@ public:
 	/// lets you know if the servo is currently calibrated or not
 	bool IsCalibrated() { return m_calibrating; }
 	
+	void Reset() { CalibrationComplete(); }
+	
 	/// Set the angle that the wheel should be pointing, where
 	/// 0 is straight ahead and angle increments positively 
 	/// counter clockwise

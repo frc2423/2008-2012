@@ -3,9 +3,9 @@
 #ifndef COMPASSDRIVE_H
 #define COMPASSDRIVE_H
 
-#include "Framework/KwarqsConstants.h"
-#include "Framework/KwarqsMovementControl.h"
-#include "Framework/PositionInformation.h"
+#include "../Framework/KwarqsConstants.h"
+#include "../Framework/KwarqsMovementControl.h"
+#include "../Framework/PositionInformation.h"
 
 
 class CompassDrive : public KwarqsMovementControl {

@@ -18,8 +18,7 @@ CompassDriveII::CompassDriveII(KwarqsDriveController * driveController) :
 	KwarqsMovementControl(driveController),
 	m_stick(FIRST_JOYSTICK_PORT),
 	m_stick2(SECOND_JOYSTICK_PORT),
-	m_position(PositionInformation::GetInstance()),
-	m_controller(0.5, -360, 360)
+	m_position(PositionInformation::GetInstance())
 {}
 
 
@@ -43,7 +42,7 @@ void CompassDriveII::Move()
 		double face_angle = (atan2(y2, x2) * (180/M_PI) - 90.0 );			
 		if (face_angle < 0) face_angle += 360;
 
-		rotation = nosePointer.GetRotation(face_angle);
+		rotation = m_nosePointer.GetRotation(face_angle);
 	}
 	
 	m_driveController->Move(speed, wheel_Direction, rotation, m_stick.GetTrigger());

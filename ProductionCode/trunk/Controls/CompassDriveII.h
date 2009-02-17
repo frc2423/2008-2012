@@ -9,7 +9,7 @@
 #ifndef COMPASSDRIVE_II_H
 #define COMPASSDRIVE_II_H
 
-#include "../Framework/FakePController.h"
+#include "../Framework/KwarqsNosePointer.h"
 #include "../Framework/KwarqsConstants.h"
 #include "../Framework/KwarqsMovementControl.h"
 #include "../Framework/PositionInformation.h"
@@ -45,7 +45,7 @@ private:
 	
 	PositionInformation * m_position;
 	
-	FakePController m_controller;
+	KwarqsNosePointer m_nosePointer;
 };
 
 #endif

@@ -3,11 +3,12 @@
 #ifndef AUTONOMOUS_DEMO
 #define AUTONOMOUS_DEMO
 
-class AutonomousDemo : KwarqsMovementControl {
+class AutonomousDemo : public KwarqsMovementControl {
 public:
 
 	AutonomousDemo(KwarqsDriveController * driveController) :
-		KwarqsMovementControl(driveController)
+		KwarqsMovementControl(driveController),
+		m_time(0)
 	{}
 	
 	void OnEnable()
@@ -63,7 +64,7 @@ public:
 private:
 
 	KwarqsNosePointer m_nosePointer;
-	double m_time = 0;
+	double m_time;
 	
 	
 };

@@ -2,6 +2,7 @@
 #ifndef FAKE_PID_CONTROLLER_H
 #define FAKE_PID_CONTROLLER_H
 
+#include "PositionInformation.h"
 #include "math.h"
 
 /**
@@ -24,7 +25,7 @@ public:
 		if (GetTime() - last_sample_time > 0.05)
 		{
 			// normalize the direction we want to go to
-			setpoint = fabs(setpoint, 360.0);
+			setpoint = fmod(setpoint, 360.0);
 			if (setpoint < 0) setpoint += 360;
 		
 			// get the direction we're currently facing
@@ -71,8 +72,6 @@ public:
 	}
 	
 private:
-
-	KwarqsNosePointer();
 
 	double last_sample_time;
 	double m_result;

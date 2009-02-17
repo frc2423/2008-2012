@@ -17,6 +17,8 @@
 #include "Controls/NullMovementControl.h"
 #include "Controls/CompassDriveII.h"
 
+#include "AutonomousDemo.h"
+
 #include "Framework/KwarqsGamePiece.h"
 #include "Framework/KwarqsBCDInput.h"
 
@@ -38,6 +40,8 @@ class KwarqsRobotMain : public SimpleRobot
 	CompassDrive			compassDrive;
 	CompassDriveII			compassDriveII;
 	NullMovementControl		nullMovementControl;
+	
+	AutonomousDemo			autonomousDemo;
 	
 	KwarqsGamePiece 		gamePiece;
 	
@@ -66,7 +70,11 @@ public:
 		simpleControl(&driveController),
 		compassDrive(&driveController),
 		compassDriveII(&driveController),
+		
 		nullMovementControl(&driveController),
+		
+		autonomousDemo(&driveController),
+		
 		swerveDrive(&chassis),
 		currentTeleoperatedControl(NULL)
 	{
@@ -91,7 +99,7 @@ public:
 	*/
 	KwarqsMovementControl * GetAutonomousMovementControl()
 	{
-		return &nullMovementControl;
+		return &autonomousDemo;
 	}
 	
 	

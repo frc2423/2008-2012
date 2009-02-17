@@ -10,10 +10,9 @@
 
 CompassDrive::CompassDrive(KwarqsDriveController * driveController) :
 	KwarqsMovementControl(driveController),
+	m_stick(FIRST_JOYSTICK_PORT),
 	m_position(PositionInformation::GetInstance())
-{
-	m_stick = Joystick::GetStickForPort(FIRST_JOYSTICK_PORT);
-}
+{}
 
 
 void CompassDrive::Move()

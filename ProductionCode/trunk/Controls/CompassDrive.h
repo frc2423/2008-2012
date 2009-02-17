@@ -6,7 +6,7 @@
 #include "../Framework/KwarqsConstants.h"
 #include "../Framework/KwarqsMovementControl.h"
 #include "../Framework/PositionInformation.h"
-#include 
+#include "../Framework/KwarqsJoystick.h"
 
 
 class CompassDrive : public KwarqsMovementControl {

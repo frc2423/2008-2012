@@ -1,8 +1,12 @@
 
-#ifndef KWARQS_JOYSTICK
-#define KWARQS_JOYSTICK
+#ifndef KWARQS_JOYSTICK_H
+#define KWARQS_JOYSTICK_H
 
-#define DEAD_ZONE_FILTER 0.15
+#include <WPILib.h>
+#include "math.h"
+
+
+#define DEAD_ZONE_VALUE 0.15
 
 /**
 	\class Joystick that implements a smart dead zone
@@ -15,12 +19,12 @@ public:
 		m_joystick = Joystick::GetStickForPort(port);
 	}
 
-	float GetX(JoystickHand hand = kRightHand)
+	float GetX(Joystick::JoystickHand hand = Joystick::kRightHand)
 	{
 		return DeadFilter(m_joystick->GetX(hand));
 	}
 	
-	float GetY(JoystickHand hand = kRightHand)
+	float GetY(Joystick::JoystickHand hand = Joystick::kRightHand)
 	{
 		return DeadFilter(m_joystick->GetY(hand));
 	}
@@ -40,12 +44,12 @@ public:
 		return DeadFilter(m_joystick->GetTwist());
 	}
 	
-	virtual bool GetTrigger(JoystickHand hand = kRightHand)
+	virtual bool GetTrigger(Joystick::JoystickHand hand = Joystick::kRightHand)
 	{
 		return m_joystick->GetTrigger(hand);
 	}
 	
-	virtual bool GetTop(JoystickHand hand = kRightHand)
+	virtual bool GetTop(Joystick::JoystickHand hand = Joystick::kRightHand)
 	{
 		return m_joystick->GetTop(hand);
 	}
@@ -53,7 +57,7 @@ public:
 	/// for use when this doesn't expose enough interfaces
 	Joystick * RawJoystick() 
 	{
-		return m_stick;
+		return m_joystick;
 	}
 	
 private:

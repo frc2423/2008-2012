@@ -11,6 +11,7 @@
 
 #include "../Framework/KwarqsConstants.h"
 #include "../Framework/KwarqsMovementControl.h"
+#include "../Framework/KwarqsJoystick.h"
 
 /**
 	\class SimpleControl

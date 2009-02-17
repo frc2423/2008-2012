@@ -11,6 +11,7 @@
 #define POT_ARRAY_SIZE 10
 
 #include "RobotChassis.h"
+#include "Framework/KwarqsJoystick.h"
 
 class ServoCalibrator {
 public:

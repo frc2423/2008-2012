@@ -45,10 +45,9 @@
 
 
 SimpleControl::SimpleControl(KwarqsDriveController * driveController) :
-	KwarqsMovementControl(driveController)
-{
-	m_stick = Joystick::GetStickForPort(FIRST_JOYSTICK_PORT);
-}
+	KwarqsMovementControl(driveController),
+	m_stick(FIRST_JOYSTICK_PORT)
+{}
 
 
 void SimpleControl::Move()

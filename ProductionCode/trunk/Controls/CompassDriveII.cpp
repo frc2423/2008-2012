@@ -16,12 +16,11 @@
 
 CompassDriveII::CompassDriveII(KwarqsDriveController * driveController) :
 	KwarqsMovementControl(driveController),
+	m_stick(FIRST_JOYSTICK_PORT),
+	m_stick2(SECOND_JOYSTICK_PORT),
 	m_position(PositionInformation::GetInstance()),
 	m_controller(0.5, -360, 360)
-{
-	m_stick = Joystick::GetStickForPort(FIRST_JOYSTICK_PORT);
-	m_stick2 = Joystick::GetStickForPort(SECOND_JOYSTICK_PORT);
-}
+{}
 
 
 
@@ -32,7 +31,7 @@ void CompassDriveII::Move()
 	speed = CalculateSpeed();
 	wheel_Direction = CalculateWheelDirection();
 	
-	double y2 = m_stick2->GetY() * -1, x2 = m_stick2->GetX();
+	double y2 = m_stick2.GetY() * -1, x2 = m_stick2.GetX();
 	double face_angle = 0, output = 0, robot_angle = 0;
 	
 	if (fabs(__hypot(x2, y2)) > 0.1)

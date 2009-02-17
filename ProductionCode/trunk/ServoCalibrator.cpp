@@ -42,16 +42,16 @@
 #include "Framework/math.h"
 
 ServoCalibrator::ServoCalibrator(RobotChassis * chassis) :
-	m_stick(Joystick::GetStickForPort(1)),
-	m_motorStick(Joystick::GetStickForPort(2)),
+	m_stick(FIRST_JOYSTICK_PORT),
+	m_motorStick(SECOND_JOYSTICK_PORT),
 	m_chassis(chassis),
 	m_time(0)
 	//m_in_pot_mode(false),
 	//m_idx(0),
 	//m_pot_time(0)
 {
-	for (int i = 0; i < POT_ARRAY_SIZE; i++)
-		m_pot_array[i] = 0;
+	//for (int i = 0; i < POT_ARRAY_SIZE; i++)
+	//	m_pot_array[i] = 0;
 }
 
 
@@ -116,11 +116,11 @@ void ServoCalibrator::Calibrate()
 		if (m_stick.GetTrigger())
 		{
 			// adjust using the pot, filter the values
-			if (GetTime() - m_pot_time > 0.1)
-			{
+			//if (GetTime() - m_pot_time > 0.1)
+			//{
 				servo->SetAngle( ceil( GetFilteredPotValue() /(1000.0/ 500.0) ) );
-				m_pot_time = GetTime();
-			}
+			//	m_pot_time = GetTime();
+			//}
 			
 			m_in_pot_mode = true;
 		} 
@@ -133,7 +133,7 @@ void ServoCalibrator::Calibrate()
 		else if (ConvertStickToAngle(setPoint))
 			servo->SetAngle(setPoint);
 		
-		motor->SetSpeed(m_motorStick->GetY()*-1);
+		motor->SetSpeed(m_motorStick.GetY()*-1);
 	}
 
 	if (GetTime() - m_time > 0.1)

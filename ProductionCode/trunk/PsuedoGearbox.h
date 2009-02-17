@@ -33,11 +33,11 @@ public:
 	virtual void Move(double &speed, double &angle, double &rotation, bool &stop)
 	{
 		// don't touch this (turbo mode)
-		if (m_stick.GetTop())
+		if (m_stick.GetTrigger())
 			return;
 	
 		// low speed action (boring)
-		speed *= .5;
+		speed *= .6;
 		rotation *= .5;
 	}
 

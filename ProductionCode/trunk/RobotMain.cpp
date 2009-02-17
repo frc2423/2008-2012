@@ -17,7 +17,7 @@
 #include "Controls/NullMovementControl.h"
 #include "Controls/CompassDriveII.h"
 
-#include "AutonomousDemo.h"
+#include "Autonomous/AutonomousDemo.h"
 
 #include "Framework/KwarqsGamePiece.h"
 #include "Framework/KwarqsBCDInput.h"
@@ -146,7 +146,7 @@ public:
 		}
 		
 		DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kMain_Line6, "%.1f %s                  ", 
-				PositionInformation::GetInstance()->GetAngle(), control->Name());
+				PositionInformation::GetInstance()->GetNormalizedAngle(), control->Name());
 		
 		return currentTeleoperatedControl;
 	}
@@ -186,6 +186,7 @@ public:
 	*/
 	void OperatorControl()
 	{
+		double update_time = GetTime();
 		printf("Entered OperatorControl()\n");
 		GetWatchdog().SetEnabled(true);
 		
@@ -201,6 +202,21 @@ public:
 				driveController.EndMove();
 				
 				gamePiece.PerformMovement();
+			}
+			
+			if (GetTime() - update_time > 0.2)
+			{
+				DriverStationLCD * lcd = DriverStationLCD::GetInstance();
+				
+				// update and clear
+				lcd->UpdateLCD();
+				lcd->Printf(DriverStationLCD::kUser_Line2, 1, "                   ");
+				lcd->Printf(DriverStationLCD::kUser_Line3, 1, "                   ");
+				lcd->Printf(DriverStationLCD::kUser_Line4, 1, "                   ");
+				lcd->Printf(DriverStationLCD::kUser_Line5, 1, "                   ");
+				lcd->Printf(DriverStationLCD::kUser_Line6, 1, "                   ");
+				
+				update_time = GetTime();
 			}
 		}
 		

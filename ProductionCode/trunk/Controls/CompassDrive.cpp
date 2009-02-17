@@ -23,7 +23,7 @@ void CompassDrive::Move()
 	wheel_Direction = CalculateWheelDirection();
 	rotation = m_stick.GetTwist() * -1;
 	
-	m_driveController->Move(speed, wheel_Direction, rotation, m_stick.GetTrigger());
+	m_driveController->Move(speed, wheel_Direction, rotation, m_stick.GetTop());
 }
 
 double CompassDrive::robotCompass()

@@ -45,7 +45,7 @@ void CompassDriveII::Move()
 		rotation = m_nosePointer.GetRotation(face_angle);
 	}
 	
-	m_driveController->Move(speed, wheel_Direction, rotation, m_stick.GetTrigger());
+	m_driveController->Move(speed, wheel_Direction, rotation, m_stick.GetTop());
 }
 
 double CompassDriveII::robotCompass()

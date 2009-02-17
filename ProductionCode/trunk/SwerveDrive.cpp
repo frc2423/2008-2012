@@ -76,6 +76,7 @@ void SwerveDrive::Move(
 	bool &stop
 )
 {
+	/*
 	if (GetTime() - m_time > 0.1)
 	{		
 		DriverStationLCD * lcd = DriverStationLCD::GetInstance();
@@ -110,6 +111,7 @@ void SwerveDrive::Move(
 		lcd->UpdateLCD();
 		m_time = GetTime();
 	}
+	*/
 	
 	
 	if (stop)

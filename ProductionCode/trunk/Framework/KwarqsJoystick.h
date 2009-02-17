@@ -2,7 +2,7 @@
 #ifndef KWARQS_JOYSTICK
 #define KWARQS_JOYSTICK
 
-#define DEAD_ZONE_FILTER 0.2
+#define DEAD_ZONE_FILTER 0.15
 
 /**
 	\class Joystick that implements a smart dead zone

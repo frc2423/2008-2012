@@ -143,22 +143,27 @@ void ServoCalibrator::Calibrate()
 		switch (input)
 		{
 		case 1:
+			lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Sel: Left Front(LF)  ");
 			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Left Front(LF)  ");
 			break;
 			
 		case 2:
+			lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Sel: Left Rear (LR)  ");
 			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Left Rear (LR)  ");
 			break;
 			
 		case 3:
+			lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Sel: Right Front (RF)");
 			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Right Front (RF)");
 			break;
 			
 		case 4:
+			lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Sel: Right Rear (RR) ");
 			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Right Rear (RR) ");
 			break;
 			
 		default:
+			lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Sel: None (%d)       ", GetBCDInput());
 			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: None (%d)       ", GetBCDInput());
 		}
 		

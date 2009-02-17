@@ -57,6 +57,8 @@ class KwarqsRobotMain : public SimpleRobot
 	SwerveDrive				swerveDrive;
 	
 	KwarqsMovementControl * currentTeleoperatedControl;
+	
+	KwarqsJoystick			m_stick;
 
 public:
 
@@ -79,7 +81,8 @@ public:
 		autonomousRandomDemo(&driveController),
 		
 		swerveDrive(&chassis),
-		currentTeleoperatedControl(NULL)
+		currentTeleoperatedControl(NULL),
+		m_stick(1)
 	{
 		GetWatchdog().SetExpiration(200);
 		
@@ -102,10 +105,13 @@ public:
 	*/
 	KwarqsMovementControl * GetAutonomousMovementControl()
 	{
+		return &autonomousDemo;
+		
+		/*
 		switch (GetBCDInput())
 		{
 			case 1:
-				return &autonomousDemo;
+				
 				
 			case 2:
 				return &autonomousRandomDemo;
@@ -113,6 +119,7 @@ public:
 			default:
 				return &nullMovementControl;
 		}
+		*/
 	}
 	
 	
@@ -174,7 +181,7 @@ public:
 	void Autonomous()
 	{
 		GetWatchdog().SetEnabled(false);
-		psuedoGearbox.Disable();
+		psuedoGearbox.Enable();
 		
 	
 		// this only gets selected at the beginning of autonomous mode,
@@ -216,6 +223,9 @@ public:
 				servoCalibrator.Calibrate();
 			else
 			{
+				//if (m_stick.GetRawButton(5) && m_stick.GetRawButton(6))
+				//	PositionInformation::GetInstance()->ResetHeading();
+				
 				GetTeleoperatedMovementControl()->Move();
 				driveController.EndMove();
 				

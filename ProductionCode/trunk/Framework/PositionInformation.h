@@ -74,6 +74,11 @@ public:
 	/// estimate the bias of the acceleration
 	void EstimateAccelerationBias();
 	
+	void ResetHeading()
+	{
+		m_gyro_offset = GetAngle();
+	}
+	
 private:
 
 	// this is private, since this is a singleton class

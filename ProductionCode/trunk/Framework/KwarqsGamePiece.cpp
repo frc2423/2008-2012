@@ -16,7 +16,8 @@ KwarqsGamePiece::KwarqsGamePiece() :
 
 void KwarqsGamePiece::PerformMovement()
 {
-	if (m_stick->GetRawButton(3))
+	//if (m_stick->GetRawButton(3))
+	if (m_stick->GetTrigger())
 		m_low_arm_motor.Set(1);
 	else if (m_stick->GetRawButton(2))
 		m_low_arm_motor.Set(-1);
@@ -26,7 +27,7 @@ void KwarqsGamePiece::PerformMovement()
 	double val = ((m_stick->GetZ()*-1) + 1.0)/ 2;
 	
 	// scale this value so it can only go the correct direction
-	m_upper_arm_motor.Set(((m_stick->GetZ()*-1) + 1.0)/ 2);
+	m_upper_arm_motor.Set(val*-1);
 	
 	DriverStationLCD::GetInstance()->Printf(DriverStationLCD::kUser_Line6, 1, "%f", val);
 }

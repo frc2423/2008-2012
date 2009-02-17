@@ -25,7 +25,13 @@ public:
 		bool stop = false;
 	
 		// rotate to 180 in two seconds
-		if (elapsed < 3)
+		if (elapsed < 1)
+		{
+			speed = 1;
+			angle = 0;
+			rotation = 0;
+		}
+		else if (elapsed < 4)
 		{
 			speed = 1;
 			angle = 0;
@@ -33,20 +39,13 @@ public:
 		}
 		else if (elapsed < 6)
 		{
-			speed = 1;
+			speed = .5;
 			angle = 180;
 			rotation = m_nosePointer.GetRotation(180);
 		}
-		else if (elapsed < 9)
-		{
-			speed = .5;
-			angle = 270;
-			rotation = m_nosePointer.GetRotation(90);
-		}
-		
 		else if (elapsed < 12)
 		{
-			speed = 0.2;
+			speed = 0.5;
 			angle = 0;
 			rotation = 1;
 		}

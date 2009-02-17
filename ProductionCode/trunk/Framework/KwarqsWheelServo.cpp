@@ -118,6 +118,9 @@ void KwarqsWheelServo::Disable()
 
 void KwarqsWheelServo::Calibrate()
 {
+	/*
+		disable this -- it no longer works
+
 	// don't do this twice
 	if (m_calibrating)
 		return;
@@ -136,18 +139,21 @@ void KwarqsWheelServo::Calibrate()
 		
 	m_sensor.SetUpSourceEdge(false, true);
 	m_sensor.EnableInterrupts();
+	
+	*/
 }
 
 void KwarqsWheelServo::CalibrationComplete()
 {
+	/*
 	if (m_calibrating && !m_in_manual_mode)
 	{
 		KwarqsWheelServo::m_uncalibrated_servos--;
 		m_sensor.DisableInterrupts();
 	}
-	
-	m_calibrated_offset = m_encoder.GetRaw() % m_encoderResolution;
-	
+	*/
+
+	m_calibrated_offset = m_encoder.GetRaw() % m_encoderResolution;	
 	m_calibrating = false;
 }
 
@@ -216,6 +222,7 @@ void KwarqsWheelServo::TuneParameters(float p, float i, float d)
 void KwarqsWheelServo::PIDWrite(float output)
 {
 	// calibration mode
+	/*
 	if (m_calibrating)
 	{
 		if (m_in_manual_mode)
@@ -229,6 +236,7 @@ void KwarqsWheelServo::PIDWrite(float output)
 			m_motor.Set(m_invert_motor);
 		return;
 	}
+	*/
 	
 	// the value received should be in the range of -360, 360 so we should
 	// just scale it to a value the victor can take.. but then we would not

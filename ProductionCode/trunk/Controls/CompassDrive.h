@@ -6,6 +6,7 @@
 #include "../Framework/KwarqsConstants.h"
 #include "../Framework/KwarqsMovementControl.h"
 #include "../Framework/PositionInformation.h"
+#include 
 
 
 class CompassDrive : public KwarqsMovementControl {
@@ -29,7 +30,7 @@ private:
 
 
 	// joystick used for control
-	Joystick * m_stick;
+	KwarqsJoystick m_stick;
 	PositionInformation * m_position;
 };
 

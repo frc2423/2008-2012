@@ -31,7 +31,7 @@ public:
 private:
 
 	// joystick used for control
-	Joystick * m_stick;
+	KwarqsJoystick m_stick;
 };
 
 #endif

@@ -39,8 +39,8 @@ private:
 
 
 	// joystick used for control
-	Joystick * m_stick;
-	Joystick * m_stick2;
+	KwarqsJoystick m_stick;
+	KwarqsJoystick m_stick2;
 	
 	PositionInformation * m_position;
 	

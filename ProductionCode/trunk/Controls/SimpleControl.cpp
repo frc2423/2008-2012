@@ -53,7 +53,7 @@ SimpleControl::SimpleControl(KwarqsDriveController * driveController) :
 
 void SimpleControl::Move()
 {	
-	double y = m_stick->GetY() * -1, x = m_stick->GetX();
+	double y = m_stick.GetY() * -1, x = m_stick.GetX();
 		
 	double speed = __hypot(x, y);
 	
@@ -63,5 +63,5 @@ void SimpleControl::Move()
 	if (fabs(speed) < 0.01)
 		desired_angle = 0.0;
 	
-	m_driveController->Move(speed, desired_angle, pow(m_stick->GetTwist() * -1, 3), m_stick->GetTrigger());
+	m_driveController->Move(speed, desired_angle, pow(m_stick.GetTwist() * -1, 3), m_stick.GetTrigger());
 }

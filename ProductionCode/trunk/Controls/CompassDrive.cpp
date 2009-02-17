@@ -22,9 +22,9 @@ void CompassDrive::Move()
 	
 	speed = CalculateSpeed();
 	wheel_Direction = CalculateWheelDirection();
-	rotation = pow(m_stick->GetTwist() * -1, 3);
+	rotation = pow(m_stick.GetTwist() * -1, 3);
 	
-	m_driveController->Move(speed, wheel_Direction, rotation, m_stick->GetTrigger());
+	m_driveController->Move(speed, wheel_Direction, rotation, m_stick.GetTrigger());
 }
 
 double CompassDrive::robotCompass()
@@ -45,7 +45,7 @@ double CompassDrive::robotCompass()
 double CompassDrive::controllerCompass()
 {
 	double controller_Compass;
-	double joystick_x = m_stick->GetX(), joystick_y = m_stick->GetY() * -1;
+	double joystick_x = m_stick.GetX(), joystick_y = m_stick.GetY() * -1;
 	
 	if ((joystick_x > 0) && (joystick_y > 0))
 	{
@@ -113,7 +113,7 @@ double CompassDrive::CalculateWheelDirection()
 
 double CompassDrive::CalculateSpeed()
 {
-	return __hypot(m_stick->GetX(), m_stick->GetY()*-1);
+	return __hypot(m_stick.GetX(), m_stick.GetY()*-1);
 }
 	
 	

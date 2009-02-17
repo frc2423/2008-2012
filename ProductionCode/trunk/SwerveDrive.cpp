@@ -191,10 +191,10 @@ void SwerveDrive::Move(
 	}
 	
 	// calculate the shortest path to the setpoint
-	/*ShortestPath(speeds[0], lf_angle, m_chassis->servo_lf.GetCurrentAngle());
+	ShortestPath(speeds[0], lf_angle, m_chassis->servo_lf.GetCurrentAngle());
 	ShortestPath(speeds[1], lr_angle, m_chassis->servo_lr.GetCurrentAngle());
 	ShortestPath(speeds[2], rf_angle, m_chassis->servo_rf.GetCurrentAngle());
-	ShortestPath(speeds[3], rr_angle, m_chassis->servo_rr.GetCurrentAngle());*/
+	ShortestPath(speeds[3], rr_angle, m_chassis->servo_rr.GetCurrentAngle());
 	
     
     // set the motors

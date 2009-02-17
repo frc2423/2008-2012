@@ -23,15 +23,15 @@ private:
 	bool ConvertStickToAngle(double &angle);
 	double GetFilteredPotValue();
 
-	Joystick * m_stick, * m_motorStick;
+	KwarqsJoystick m_stick, m_motorStick;
 	RobotChassis * m_chassis;
 	double m_time;
 	
 	bool m_in_pot_mode;
 	
-	double m_pot_array[POT_ARRAY_SIZE];
-	int m_idx;
-	double m_pot_time;
+	//double m_pot_array[POT_ARRAY_SIZE];
+	//int m_idx;
+	//double m_pot_time;
 	
 };
 

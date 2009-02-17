@@ -8,54 +8,58 @@ public:
 
 	AutonomousDemo(KwarqsDriveController * driveController) :
 		KwarqsMovementControl(driveController),
-		m_time(0)
+		m_start_time(0),
+		m_tm(0)
 	{}
 	
 	void OnEnable()
 	{
-		m_time = GetTime();
+		m_tm = m_start_time = GetTime();
 	}
 
 	void Move() 
 	{
-		double elapsed = GetTime() - m_time;
+		double elapsed = GetTime() - m_start_time;
 	
 		double speed = 0, angle = 0, rotation = 0;
 		bool stop = false;
 	
 		// rotate to 180 in two seconds
-		if (elapsed < 2)
+		if (elapsed < 3)
 		{
 			speed = 1;
 			angle = 0;
 			rotation = m_nosePointer.GetRotation(180);
 		}
-		else if (elapsed < 3)
+		else if (elapsed < 6)
 		{
-			// go forward one second
-			speed = .5;
-			angle = 45;
+			speed = 1;
+			angle = 180;
 			rotation = m_nosePointer.GetRotation(180);
 		}
-		else if (elapsed < 5)
+		else if (elapsed < 9)
 		{
-			// go sideways another second
 			speed = .5;
 			angle = 270;
 			rotation = m_nosePointer.GetRotation(90);
 		}
 		
-		else if (elapsed < 7)
+		else if (elapsed < 12)
 		{
-			// spin for a few seconds
-			speed = 0;
+			speed = 0.2;
 			angle = 0;
-			rotation = .2;
+			rotation = 1;
 		}
 		else
 			stop = true;
 			
 		m_driveController->Move(speed, angle, rotation, stop);
+		
+		if (GetTime() - m_tm > .25)
+		{
+			printf("%f: s: %.1f a: %1f r: %.1f\r", elapsed, speed, angle, rotation);
+			m_tm = GetTime();
+		}
 	}
 	
 	/// This returns the name of the class (useful for generic logging)
@@ -64,8 +68,7 @@ public:
 private:
 
 	KwarqsNosePointer m_nosePointer;
-	double m_time;
-	
+	double m_start_time, m_tm;
 	
 };
 

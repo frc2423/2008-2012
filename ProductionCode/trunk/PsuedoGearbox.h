@@ -20,11 +20,16 @@ class PsuedoGearbox : public KwarqsDriveBase
 public:
 
 	PsuedoGearbox() :
-		m_stick(FIRST_JOYSTICK_PORT)
+		m_stick(FIRST_JOYSTICK_PORT),
+		m_enabled(true)
 	{}
 
-	void Disable(){}
-	void Enable(){}
+	void Disable(){
+		m_enabled = false;
+	}
+	void Enable(){
+		m_enabled = true;
+	}
 
 	/// this is a filter, so return false
 	virtual bool IsPhysicalDrive() { return false; }
@@ -33,7 +38,7 @@ public:
 	virtual void Move(double &speed, double &angle, double &rotation, bool &stop)
 	{
 		// don't touch this (turbo mode)
-		if (m_stick.GetTrigger())
+		if (!m_enabled || m_stick.GetTrigger())
 			return;
 	
 		// low speed action (boring)
@@ -47,6 +52,7 @@ public:
 private:
 
 	KwarqsJoystick m_stick;
+	bool m_enabled;
 	
 	double DeadFilter(double val, double max)
 	{

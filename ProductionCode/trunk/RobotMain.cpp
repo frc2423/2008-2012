@@ -99,7 +99,14 @@ public:
 	*/
 	KwarqsMovementControl * GetAutonomousMovementControl()
 	{
-		return &autonomousDemo;
+		switch (GetBCDInput())
+		{
+			case 1:
+				return &autonomousDemo;
+				
+			default:
+				return &nullMovementControl;
+		}
 	}
 	
 	
@@ -161,7 +168,9 @@ public:
 	void Autonomous()
 	{
 		GetWatchdog().SetEnabled(false);
+		pseudoGearbox.Disable();
 		
+	
 		// this only gets selected at the beginning of autonomous mode,
 		// it doesn't make any sense to allow it to change in the middle!
 		KwarqsMovementControl * movementControl = GetAutonomousMovementControl();
@@ -187,6 +196,9 @@ public:
 	void OperatorControl()
 	{
 		double update_time = GetTime();
+		
+		pseudoGearbox.Enable();
+		
 		printf("Entered OperatorControl()\n");
 		GetWatchdog().SetEnabled(true);
 		

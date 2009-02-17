@@ -17,10 +17,10 @@ int main(int argc, char ** argv)
 			for (double x = -1.0; x < 1.1; x += 0.25)
 			{
 
-				double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0 ) * -1;			
+				double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0);		
 				if (desired_angle < 0) desired_angle += 360;
 
-				
+				printf("%4.4f ", desired_angle);
 
 				double rotateValue = (desired_angle - current_angle );
 					
@@ -38,7 +38,7 @@ int main(int argc, char ** argv)
 				else if (rotateValue < -1.0)
 					rotateValue = -1.0;
 				
-				printf("%4.4f ", rotateValue);
+				//printf("%4.4f ", rotateValue);
 			}
 			
 			printf("\n");

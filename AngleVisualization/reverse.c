@@ -5,7 +5,7 @@
 
 int main(int argc, char ** argv)
 {
-	if (argc < 1)
+	if (argc < 2)
 		return 0;
 
 	double angle = strtod(argv[1], 0);
@@ -24,14 +24,11 @@ int main(int argc, char ** argv)
 			else
 				error1 -= 360;
 		}
-		
-		error1 = fabs(error1);
-		error2 = fabs(error2);
 
-		if (error1 < error2)
-			printf("%.1f: %f\n", current_angle, angle);
+		if (fabs(error1) < fabs(error2))
+			printf("%.1f: %f (%f < %f)\n", current_angle, angle, error1, error2);
 		else
-			printf("%.1f: %f\n", current_angle, alternate_angle);
+			printf("%.1f: %f (%f > %f)\n", current_angle, alternate_angle, error1, error2);
 	}
 	
 	return 0;

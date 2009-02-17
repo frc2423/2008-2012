@@ -134,7 +134,7 @@ void SwerveDrive::Move(
 	*/
 	
 	// special case: doing nothing
-	if (fabs(speed) < 0.01 && fabs(angle) < 0.01 && fabs(rotation) < 0.01)
+	if (fabs(speed) < 0.0001 && fabs(angle) < 0.0001 && fabs(rotation) < 0.0001)
 	{
 		// this forces motors to stop and keeps the wheels pointed in the
 		// same direction, much less annoying

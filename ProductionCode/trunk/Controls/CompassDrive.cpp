@@ -2,8 +2,8 @@
 
 #include <WPILib.h>
 
-#include "../Framework/math.h"
-#include "../Framework/KwarqsConstants.h"
+#include "Framework/math.h"
+#include "Framework/KwarqsConstants.h"
 
 #include "CompassDrive.h"
 

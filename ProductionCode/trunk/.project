@@ -3,7 +3,6 @@
 	<name>Kwarqs2009</name>
 	<comment></comment>
 	<projects>
-		<project>WPILib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

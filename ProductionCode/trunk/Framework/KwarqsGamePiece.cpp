@@ -14,7 +14,13 @@ KwarqsGamePiece::KwarqsGamePiece() :
 
 void KwarqsGamePiece::PerformMovement()
 {
-	m_low_arm_motor.Set(m_stick->GetY()*-1);
+	if (m_stick->GetRawButton(3))
+		m_low_arm_motor.Set(1);
+	else if (m_stick->GetRawButton(2))
+		m_low_arm_motor.Set(-1);
+	else
+		m_low_arm_motor.Set(0);
+	
 	m_upper_arm_motor.Set(m_stick->GetZ()*-1);
 }
 

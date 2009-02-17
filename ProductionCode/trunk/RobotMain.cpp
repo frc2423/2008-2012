@@ -15,6 +15,7 @@
 #include "Controls/SimpleControl.h"
 #include "Controls/CompassDrive.h"
 #include "Controls/NullMovementControl.h"
+#include "Controls/CompassDriveII.h"
 
 #include "Framework/KwarqsGamePiece.h"
 #include "Framework/KwarqsBCDInput.h"
@@ -34,6 +35,7 @@ class KwarqsRobotMain : public SimpleRobot
 	// control types
 	SimpleControl 			simpleControl;
 	CompassDrive			compassDrive;
+	CompassDriveII			compassDriveII;
 	NullMovementControl		nullMovementControl;
 	
 	KwarqsGamePiece 		gamePiece;
@@ -61,6 +63,7 @@ public:
 		servoCalibrator(&chassis),
 		simpleControl(&driveController),
 		compassDrive(&driveController),
+		compassDriveII(&driveController),
 		nullMovementControl(&driveController),
 		swerveDrive(&chassis),
 		currentTeleoperatedControl(NULL)
@@ -102,6 +105,10 @@ public:
 		
 		switch (GetBCDInput())
 		{
+			case 7:
+				control = &compassDriveII;
+				break;
+		
 			case 8:
 				control = &compassDrive;
 				break;

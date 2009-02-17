@@ -80,6 +80,17 @@ public:
 	
 	/// returns true if the wheel is at the sensor, false if not
 	bool GetSensor();
+	
+	int GetRaw()
+	{
+		return m_encoder.GetRaw();
+	}
+	
+	void SetRaw(double value)
+	{
+		Disable();
+		m_motor.Set(value);
+	}
 
 	
 	// only accessed by the PIDController class

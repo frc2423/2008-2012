@@ -166,35 +166,35 @@ void SwerveDrive::Move(
 	double Vty = speed * sin( ((angle+90.0) * M_PI)/180.0 );
 	
 	// LF, LR, RF, RR
-	double speeds[] = { 0.0, 0.0, 0.0, 0.0 };
+	double lf_speed, lr_speed, rf_speed, rr_speed;
 	double lf_angle, lr_angle, rf_angle, rr_angle;
 	
 	// find the speed and angle of each wheel (first two params passed back)	
-	CalculateWheel(speeds[0], lf_angle, Vtx, Vty, rotation, LF_DISPLACEMENT);
-	CalculateWheel(speeds[1], lr_angle, Vtx, Vty, rotation, LR_DISPLACEMENT);
-	CalculateWheel(speeds[2], rf_angle, Vtx, Vty, rotation, RF_DISPLACEMENT);
-	CalculateWheel(speeds[3], rr_angle, Vtx, Vty, rotation, RR_DISPLACEMENT);
+	CalculateWheel(lf_speed, lf_angle, Vtx, Vty, rotation, LF_DISPLACEMENT);
+	CalculateWheel(lr_speed, lr_angle, Vtx, Vty, rotation, LR_DISPLACEMENT);
+	CalculateWheel(rf_speed, rf_angle, Vtx, Vty, rotation, RF_DISPLACEMENT);
+	CalculateWheel(rr_speed, rr_angle, Vtx, Vty, rotation, RR_DISPLACEMENT);
 	
 	// then limit all motors based on the highest motor speed
-	double highest_speed = 0;
-	
-	for (int i = 0; i < 4; i++)
-		if (fabs(speeds[i]) > highest_speed)
-			highest_speed = fabs(speeds[i]);
+	double highest_speed = std::max( 
+		std::max( fabs(lf_speed), fabs(lr_speed) ), 
+		std::max( fabs(rf_speed), fabs(rr_speed) )
+	);
 	
 	// only need to scale if speed > 1
 	if (highest_speed > 1.0 )
 	{
-		// scale each speed by the highest speed
-		for (int i = 0; i < 4; i++)
-			speeds[i] /= highest_speed;
+		lf_speed /= highest_speed;
+		lr_speed /= highest_speed;
+		rf_speed /= highest_speed;
+		rr_speed /= highest_speed;
 	}
 	
 	// calculate the shortest path to the setpoint
-	ShortestPath(speeds[0], lf_angle, m_chassis->servo_lf.GetCurrentAngle());
-	ShortestPath(speeds[1], lr_angle, m_chassis->servo_lr.GetCurrentAngle());
-	ShortestPath(speeds[2], rf_angle, m_chassis->servo_rf.GetCurrentAngle());
-	ShortestPath(speeds[3], rr_angle, m_chassis->servo_rr.GetCurrentAngle());
+	ShortestPath(lf_speed, lf_angle, m_chassis->servo_lf.GetCurrentAngle());
+	ShortestPath(lr_speed, lr_angle, m_chassis->servo_lr.GetCurrentAngle());
+	ShortestPath(rf_speed, rf_angle, m_chassis->servo_rf.GetCurrentAngle());
+	ShortestPath(rr_speed, rr_angle, m_chassis->servo_rr.GetCurrentAngle());
 	
     
     // set the motors
@@ -203,10 +203,10 @@ void SwerveDrive::Move(
 	m_chassis->servo_rf.SetAngle(rf_angle);
 	m_chassis->servo_rr.SetAngle(rr_angle);
 	
-	m_chassis->motor_lf.SetSpeed(speeds[0]);
-	m_chassis->motor_lr.SetSpeed(speeds[1]);
-	m_chassis->motor_rf.SetSpeed(speeds[2]);
-	m_chassis->motor_rr.SetSpeed(speeds[3]);
+	m_chassis->motor_lf.SetSpeed(lf_speed);
+	m_chassis->motor_lr.SetSpeed(lr_speed);
+	m_chassis->motor_rf.SetSpeed(rf_speed);
+	m_chassis->motor_rr.SetSpeed(rf_angle);
 }
 
 void SwerveDrive::Stop()
@@ -227,8 +227,6 @@ void SwerveDrive::Stop()
 	m_chassis->motor_lr.SetSpeed(0);
 	m_chassis->motor_rf.SetSpeed(0);
 	m_chassis->motor_rr.SetSpeed(0);
-	
-	
 }
 
 // returns the shortest path to an angle, adjusts speed also

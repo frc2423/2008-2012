@@ -46,24 +46,6 @@ SwerveDrive::SwerveDrive(RobotChassis * chassis) :
 	m_time(GetTime())
 {}
 
-/*
-	Calculates the parameters for an individual wheel
-	
-	Set as inline function for speed
-*/
-static inline
-void CalculateWheel(
-	double &magnitude, double &angle,
-	double Vtx, double Vty, double w,
-	double Rx, double Ry)
-{
-	double Vx = Vtx - w*Ry;
-	double Vy = Vty + w*Rx;
-	
-	// return as polar coordinates
-	magnitude = __hypot(Vx, Vy); 
-	angle = (atan2(Vy, Vx)*180)/M_PI - 90.0;
-}
 
 
 
@@ -161,52 +143,185 @@ void SwerveDrive::Move(
 	else if (rotation > 1.0)
 		rotation = 1.0;
  
-	// convert speed/angle to Vx/Vy (offset angle by 90 degrees)
-	double Vtx = speed * cos( ((angle+90.0) * M_PI)/180.0 );
-	double Vty = speed * sin( ((angle+90.0) * M_PI)/180.0 );
 	
-	// LF, LR, RF, RR
-	double lf_speed, lr_speed, rf_speed, rr_speed;
-	double lf_angle, lr_angle, rf_angle, rr_angle;
-	
-	// find the speed and angle of each wheel (first two params passed back)	
-	CalculateWheel(lf_speed, lf_angle, Vtx, Vty, rotation, LF_DISPLACEMENT);
-	CalculateWheel(lr_speed, lr_angle, Vtx, Vty, rotation, LR_DISPLACEMENT);
-	CalculateWheel(rf_speed, rf_angle, Vtx, Vty, rotation, RF_DISPLACEMENT);
-	CalculateWheel(rr_speed, rr_angle, Vtx, Vty, rotation, RR_DISPLACEMENT);
-	
-	// then limit all motors based on the highest motor speed
-	double highest_speed = std::max( 
-		std::max( fabs(lf_speed), fabs(lr_speed) ), 
-		std::max( fabs(rf_speed), fabs(rr_speed) )
-	);
-	
-	// only need to scale if speed > 1
-	if (highest_speed > 1.0 )
-	{
-		lf_speed /= highest_speed;
-		lr_speed /= highest_speed;
-		rf_speed /= highest_speed;
-		rr_speed /= highest_speed;
+//----------------------------------------------------------------------------------------------
+// ANNETTE--added lots of stuff
+//----------------------------------------------------------------------------------------------
+
+
+// I'm assuming this method's parameter, angle (for the basic direction the wwheels are facing), is in radians,
+// and that 0 means pointing so that the robot would be driving straight front.
+
+// For this, I'm assuming that twisting the joystick will mean have robot drive in a curve, rotating along the way.
+
+// The "key point" should be roughly the center of mass of the robot-and-trailer combination.
+// Since it should be on the mid-line, only its distance back from the front wheels is needed.
+
+// It might be worthwhile experimenting to find the best value to use for that, for the "big_r"
+// that affects furthest center of rotation (shallowest curve), for the fudge factor that affects
+// the closest center of rotation (shallowest curve, and for the function. 
+ 
+
+
+// constants
+
+const double length=18.5, width=29.5, key_d=12;	// robot shape, and key point distance from front
+
+const double big_r=100; 			// longest possible distance between key and center of rotation
+						// for shallowest curve (that's not a straight line)
+						// maybe make it close to the field size (54')
+const double PI = 3.1415926;
+const double half_pi = PI/2;
+const double to_radians = 180./PI;
+const double to_degrees = PI/180.;
+const double almost_0 = .01;
+const double fudge = 1.0;			// fudge factor for computing small_r
+				
+const double half_w=width/2;	// half width
+const double lf_x=key_d, lr_x=key_d-length,
+			rf_x=key_d, rr_x=key_d-length; 	//x coordinates of wheels
+const double lf_y=half_w, lr_y=half_w, rf_y=-half_w,
+			rr_y=-half_w; 			//y coordinates of wheels
+
+
+//other variables
+
+double small_r; 		// shortest desired distance between key and center of rotation
+				
+
+double r, r_angle, rx, ry;	// length of radius to center of rotation,
+				// and its angle and coordinates
+						
+double r_lf, r_lr, r_rf, r_rr; 	// distances from center of rotation to wheels
+double r_max;			// max of the r's
+
+double angle_in_radians;
+
+double angle1, angle2;		//some temporaries for angles
+
+   
+    if (fabs(rotation) < almost_0)
+    {
+        // no rotation
+		
+		m_chassis->servo_lf.SetAngle(angle);
+		m_chassis->servo_rf.SetAngle(angle);
+		m_chassis->servo_lr.SetAngle(angle);
+		m_chassis->servo_rr.SetAngle(angle);
+		
+		m_chassis->motor_lf.SetSpeed(speed);
+		m_chassis->motor_lr.SetSpeed(speed);
+		m_chassis->motor_rf.SetSpeed(speed);
+		m_chassis->motor_rr.SetSpeed(speed);
+		
 	}
+	else
+	{
+		// we need some rotation code here... 
+
+
+// determine smallest r
+// it should be at least as big as the length from the key point to any of the wheels
+
+small_r = max(key_d, length-key_d);	//just a temp val here, to use in next line
+small_r = sqrt( small_r*small_r + width*width/4.) + fudge; // add in the fudge factor
+
+
+// compute r based on magnitude of twist or "rotation", between 0 and 1
+// a previous step already took care of rotation too close to 0
+
+// this is linear, but alternative functions could be tried
+// they should be smoothly decreasing as rotation increases, and 
+// be approximately =big_r for rotation close to 0,
+// and be =small_r for rotation equal 1
+
+r = big_r+(small_r-big_r)*fabs(rotation);
+
+// calc r's coordinates
+// positive rotation means clockwise,
+// so center of rotation is to the right if you're facing in heading angle direction
+
+angle_in_radians = angle*to_radians;
+
+r_angle = rotation>0 ? angle_in_radians - half_pi : angle_in_radians + half_pi; 
+rx = r*cos (r_angle);
+ry = r*sin (r_angle);
+
+// calc distance from center of rotation to each wheel
+r_lf = sqrt((lf_x-rx)*(lf_x-rx) + (lf_y-ry)*(lf_y-ry));
+r_lr = sqrt((lr_x-rx)*(lr_x-rx) + (lr_y-ry)*(lr_y-ry));
+r_rf = sqrt((rf_x-rx)*(rf_x-rx) + (rf_y-ry)*(rf_y-ry));
+r_rr = sqrt((rr_x-rx)*(rr_x-rx) + (rr_y-ry)*(rr_y-ry));
+
+// find the biggest r, the distance of the wheel furthest away from the center of rotation
+
+	r_max = max(max(r_lf, r_lr), max(r_rf,  r_rr));
+
+
+// set wheel speeds
+// the furthest wheel gets the full speed
+// the rest are proportionally less
+
+		m_chassis->motor_lf.SetSpeed(speed*r_lf/r_max);
+		m_chassis->motor_lr.SetSpeed(speed*r_lr/r_max);
+		m_chassis->motor_rf.SetSpeed(speed*r_rf/r_max);
+		m_chassis->motor_rr.SetSpeed(speed*r_rr/r_max);
+
+
+// compute and set angles
+// use arctan of slope of line perpendicular
+// to the line connecting the center of rotation and the wheel, and
+// picking out of the arctan results, which could be + or - 180 degrees,
+// the one closest to the input angle
+
+if (fabs(ry-lf_y)<almost_0)
+	if (rx-lf_x >=0) m_chassis->servo_lf.SetAngle(0); // angle is along x axis
+		else m_chassis->servo_lf.SetAngle(180.) ; // but neg direction
+
+	else { 	angle1 = (atan ((rx-lf_x)/(lf_y-ry)))*to_degrees;
+		angle2 = angle1>0 ? angle1-180. :angle1+180.;
+
+		m_chassis->servo_lf.SetAngle(fabs(angle1-angle) < fabs(angle1-angle) ? angle1 : angle2);
+		}		
+
+if (fabs(ry-lr_y)<almost_0)
+	if (rx-lr_x >=0) m_chassis->servo_lr.SetAngle(0); // angle is along x axis
+		else m_chassis->servo_lr.SetAngle(180.) ; // but neg direction
+
+	else { 	angle1 = (atan ((rx-lr_x)/(lr_y-ry)))*to_degrees;
+		angle2 = angle1>0 ? angle1-180. :angle1+180.;
+
+		m_chassis->servo_lr.SetAngle(fabs(angle1-angle) < fabs(angle1-angle) ? angle1 : angle2);
+		}	
+
+if (fabs(ry-rf_y)<almost_0)
+	if (rx-rf_x >=0) m_chassis->servo_rf.SetAngle(0); // angle is along x axis
+		else m_chassis->servo_rf.SetAngle(180.);  // but neg direction
+
+	else { 	angle1 = (atan ((rx-rf_x)/(rf_y-ry)))*to_degrees;
+		angle2 = angle1>0 ? angle1-180. :angle1+180.;
+
+		m_chassis->servo_rf.SetAngle(fabs(angle1-angle) < fabs(angle1-angle) ? angle1 : angle2);
+		}	
+
+if (fabs(ry-rr_y)<almost_0)
+	if (rx-rr_x >=0) m_chassis->servo_rr.SetAngle(0); // angle is along x axis
+		else m_chassis->servo_rr.SetAngle(180.) ; // but neg direction
+
+	else { 	angle1 = (atan ((rx-rr_x)/(rr_y-ry)))*to_degrees;
+		angle2 = angle1>0 ? angle1-180. :angle1+180.;
+
+		m_chassis->servo_rr.SetAngle(fabs(angle1-angle) < fabs(angle1-angle) ? angle1 : angle2);
+		}	
+
+    }
+
+
 	
-	// calculate the shortest path to the setpoint
-	ShortestPath(lf_speed, lf_angle, m_chassis->servo_lf.GetCurrentAngle());
-	ShortestPath(lr_speed, lr_angle, m_chassis->servo_lr.GetCurrentAngle());
-	ShortestPath(rf_speed, rf_angle, m_chassis->servo_rf.GetCurrentAngle());
-	ShortestPath(rr_speed, rr_angle, m_chassis->servo_rr.GetCurrentAngle());
+
+
+
 	
-    
-    // set the motors
-	m_chassis->servo_lf.SetAngle(lf_angle);
-	m_chassis->servo_lr.SetAngle(lr_angle);
-	m_chassis->servo_rf.SetAngle(rf_angle);
-	m_chassis->servo_rr.SetAngle(rr_angle);
-	
-	m_chassis->motor_lf.SetSpeed(lf_speed);
-	m_chassis->motor_lr.SetSpeed(lr_speed);
-	m_chassis->motor_rf.SetSpeed(rf_speed);
-	m_chassis->motor_rr.SetSpeed(rf_angle);
 }
 
 void SwerveDrive::Stop()
@@ -229,32 +344,10 @@ void SwerveDrive::Stop()
 	m_chassis->motor_rr.SetSpeed(0);
 }
 
-// returns the shortest path to an angle, adjusts speed also
-void SwerveDrive::ShortestPath(double &speed, double &angle, double current_angle )
-{
-	double alternate_angle = angle + 180 > 360 ? angle - 180 : angle + 180;
 
-	double error1 = angle - current_angle;
-	double error2 = alternate_angle - current_angle;
 
-	if (fabs(error1) > 180)
-	{
-		if (error1 < 0)
-			error1 += 360;
-		else
-			error1 -= 360;
-	}
-	
-	error1 = fabs(error1);
-	error2 = fabs(error2);
 
-	// if the other way is quicker, then use that instead
-	if (error1 > error2)
-	{
-		angle = alternate_angle;
-		speed = speed * -1;
-	}
-}
+
 
 
 

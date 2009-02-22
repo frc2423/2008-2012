@@ -8,7 +8,7 @@
 #include "WPILib.h"
 
 #include "Framework/KwarqsDriveController.h"
-#include "Framework/KwarqsDSLCDStatus.h"
+#include "Framework/DriverStationLCD.h"
 
 #include "ServoCalibrator.h"
 
@@ -30,7 +30,6 @@ class KwarqsRobotMain : public SimpleRobot
 {
 	DriverStation * 		ds;
 	KwarqsDriveController 	driveController;
-	//KwarqsDSLCDStatus		status;
 	
 	RobotChassis			chassis;
 	
@@ -50,7 +49,6 @@ class KwarqsRobotMain : public SimpleRobot
 	// drive types
 	
 	// filters
-	//SpeedLimiter			speedLimiter;
 	PsuedoGearbox			psuedoGearbox;
 	
 	// motor drivers

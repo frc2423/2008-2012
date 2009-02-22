@@ -86,7 +86,7 @@ public:
 		return m_encoder.GetRaw();
 	}
 	
-	void SetRaw(double value)
+	void SetRaw(float value)
 	{
 		Disable();
 		m_motor.Set(value);

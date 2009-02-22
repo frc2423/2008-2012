@@ -101,8 +101,8 @@ private:
 	
 	// Objects
 	Gyro 			m_gyro;
-	Accelerometer 	m_accelerometerX;
-	Accelerometer 	m_accelerometerY;
+	//Accelerometer 	m_accelerometerX;
+	//Accelerometer 	m_accelerometerY;
 	
 	
 	// heading information

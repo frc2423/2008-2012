@@ -81,20 +81,20 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_encoderResolution(encoderResolution),
 	m_calibrating(false),
 	m_calibrating_offset(cal_offset),
-	m_invert_motor( invert_motor ? -1 : 1 )
+	m_invert_motor( invert_motor ? -1.0F : 1.0F )
 {
 	// no calibration by default
 	CalibrationComplete();
 		
 
 	// create the PID controller
-	m_pidController = new TunablePIDController(0.95, 0, 0, this, this);
+	m_pidController = new TunablePIDController(0.95F, 0.0F, 0.0F, this, this);
 	
 	// set the PID parameters
 	m_pidController->SetContinuous();
 	m_pidController->SetInputRange(0, 360);
 	m_pidController->SetOutputRange(-360, 360);
-	m_pidController->SetTolerance(0.0025);
+	m_pidController->SetTolerance(0.0025F);
 	
 	// enable it
 	m_pidController->Enable();
@@ -184,7 +184,7 @@ void KwarqsWheelServo::SetAngle(double angle)
 	angle = fmod(angle, 360.0);
 	if (angle < 0)
 		angle += 360.0;
-	m_pidController->SetSetpoint(angle);
+	m_pidController->SetSetpoint((float)angle);
 }
 
 /// Get the angle that the wheel is supposed to be pointing
@@ -244,7 +244,7 @@ void KwarqsWheelServo::PIDWrite(float output)
 	// to determine the rate of change in relation to the output
 	
 	// don't need to check the value for > 1 -- its done in WPILib
-	output = output/m_outputScale;
+	output = output/(float)m_outputScale;
 	
 	// set the motor value
 	if (m_pidController->OnTarget())

@@ -19,9 +19,10 @@ Deleter<PositionInformation> PositionInformation::deleter(&PositionInformation::
 
 // constructor
 PositionInformation::PositionInformation() :
+	m_notifier(NULL),
 	m_gyro(GYRO_CHANNEL),
-	m_accelerometerX(ACCELEROMETER_X_CHANNEL),
-	m_accelerometerY(ACCELEROMETER_Y_CHANNEL),
+	//m_accelerometerX(ACCELEROMETER_X_CHANNEL),
+	//m_accelerometerY(ACCELEROMETER_Y_CHANNEL),
 	
 	m_gyro_offset(0.0),
 	
@@ -35,7 +36,7 @@ PositionInformation::PositionInformation() :
 	xBias(0.0), yBias(0.0)
 {
 	
-	m_gyro.SetSensitivity(0.007);
+	m_gyro.SetSensitivity(0.007F);
 
 	/*
 	// create the mutex
@@ -69,7 +70,8 @@ PositionInformation::PositionInformation() :
 // destructor
 PositionInformation::~PositionInformation()
 {
-	delete m_notifier;
+	if (m_notifier)
+		delete m_notifier;
 }
 
 
@@ -124,9 +126,12 @@ void PositionInformation::GetVelocity(double * x, double * y)
 void PositionInformation::CalculatePositionInformation()
 {
   Synchronized sync(m_mutex);
-  
-  double x = m_accelerometerX.GetAcceleration() * 9.81;
-  double y = m_accelerometerY.GetAcceleration() * 9.81;
+
+	wpi_assert(0 && "should not be called");
+// x = m_accelerometerX.GetAcceleration() * 9.81;
+//double y = m_accelerometerY.GetAcceleration() * 9.81;
+
+  double x = 0.0, y = 0.0;
 
   double alpha = FILT_COEFF;
   double mag;

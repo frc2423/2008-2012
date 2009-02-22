@@ -3,6 +3,8 @@
 #ifndef AUTONOMOUS_RANDOM_DEMO
 #define AUTONOMOUS_RANDOM_DEMO
 
+#include <ctime>
+
 class AutonomousRandomDemo : public KwarqsMovementControl {
 public:
 
@@ -16,7 +18,7 @@ public:
 	{
 		m_tm = m_start_time = GetTime();
 		state = 0;
-		srand(time(0));
+		srand((unsigned)time(0));
 	}
 
 	void Move() 

@@ -50,7 +50,7 @@ private:
 	Jaguar m_motor;
 	Encoder m_encoder;
 	
-	double m_invert;
+	float m_invert;
 };
 
 #endif

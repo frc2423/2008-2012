@@ -53,7 +53,7 @@ KwarqsWheelMotor::KwarqsWheelMotor(
 		bool invert_motor) :
 	m_motor(slot, pwm_port),
 	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X),
-	m_invert(invert_motor ? -1 : 1)
+	m_invert(invert_motor ? -1.0F : 1.0F)
 {
 	SetSpeed(0);
 	m_encoder.Start();

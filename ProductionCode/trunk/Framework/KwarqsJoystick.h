@@ -6,10 +6,11 @@
 #include "math.h"
 
 
-#define DEAD_ZONE_VALUE 0.15
+#define DEAD_ZONE_VALUE 0.15F
 
 /**
-	\class Joystick that implements a smart dead zone
+	\class KwarqsJoystick 
+	\brief A joystick class that implements a 'smart' dead zone
 */
 class KwarqsJoystick {
 public:

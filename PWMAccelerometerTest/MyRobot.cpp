@@ -29,17 +29,11 @@ public:
 		countYhi.SetUpSource(4);
 		countYlow.SetUpSource(4);
 		
-		// specify the edge
-		countXhi.SetUpSourceEdge(true, false);
-		countXlow.SetUpSourceEdge(false, true);
-		countXhi.SetUpSourceEdge(true, false);
-		countYlow.SetUpSourceEdge(false, true);
-		
 		// setup the counters
-		countXhi.SetPulseLengthMode(1.0);
-		countXlow.SetPulseLengthMode(1.0);
-		countYhi.SetPulseLengthMode(1.0);
-		countYlow.SetPulseLengthMode(1.0);
+		countXhi.SetSemiPeriodMode(true);
+		countXlow.SetSemiPeriodMode(false);
+		countYhi.SetSemiPeriodMode(true);
+		countYlow.SetSemiPeriodMode(false);
 		
 		countXhi.Start();
 		countXlow.Start();
@@ -68,7 +62,7 @@ public:
 				double ayH = countYhi.GetPeriod();
 				double ayL = countYlow.GetPeriod();
 				
-				// convert to m/s^2
+				// convert to m/s^2 -- 50% duty cycle is 0g
 				double ax = (((axH / (axH + axL)) - .5) * 8.0) * 9.81;
 				double ay = (((ayH / (ayH + ayL)) - .5) * 8.0) * 9.81;
 								

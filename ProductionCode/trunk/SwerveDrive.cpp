@@ -32,13 +32,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// for definition of std::max
+#include <stdio.h>
 
 #include <WPILib.h>
+
 #include "SwerveDrive.h"
 
 #include "Framework/KwarqsConstants.h"
 #include "Framework/math.h"
-#include "Framework/DriverStationLCD.h"
 
 // default constructor
 SwerveDrive::SwerveDrive(RobotChassis * chassis) :
@@ -176,7 +178,7 @@ void SwerveDrive::Move(
 	CalculateWheel(rr_speed, rr_angle, Vtx, Vty, rotation, RR_DISPLACEMENT);
 	
 	// then limit all motors based on the highest motor speed
-	double highest_speed = std::max( 
+	double highest_speed = std::max(
 		std::max( fabs(lf_speed), fabs(lr_speed) ), 
 		std::max( fabs(rf_speed), fabs(rr_speed) )
 	);

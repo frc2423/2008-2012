@@ -8,6 +8,8 @@
 
 #include "Timer.h"
 
+#include <Simulator/Simulator.h>
+
 SimpleRobot::SimpleRobot()
 {
 	m_robotMainOverridden = true;
@@ -63,19 +65,22 @@ void SimpleRobot::StartCompetition()
 	RobotMain();
 	if ( !m_robotMainOverridden)
 	{
-		while (1)
+		while (Simulator::ShouldContinue())
 		{
-			while (IsDisabled()) Wait(.01);		// wait for robot to be enabled
+			Simulator::NextStep(0.0);
+
+			if (IsDisabled())
+				continue;
 
 			if (IsAutonomous())
 			{
 				Autonomous();					// run the autonomous method
-				while (IsAutonomous() && !IsDisabled()) Wait(.01);
+				while (IsAutonomous() && !IsDisabled() && Simulator::ShouldContinue()) Wait(.01);
 			}
 			else
 			{
 				OperatorControl();				// run the operator control method
-				while (IsOperatorControl() && !IsDisabled()) Wait(.01);
+				while (IsOperatorControl() && !IsDisabled() && Simulator::ShouldContinue()) Wait(.01);
 			}
 		}
 	}

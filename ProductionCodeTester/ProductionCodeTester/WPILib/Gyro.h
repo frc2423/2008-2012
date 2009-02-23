@@ -23,10 +23,10 @@
 class Gyro : public SensorBase, public PIDSource
 {
 public:
-	explicit Gyro(UINT32 channel)
+	explicit Gyro(UINT32 slot, UINT32 channel)
 	{
 		m_ok = false;
-		Simulator::AddGyro(this, channel);
+		Simulator::AddGyro(this, slot, channel);
 	}
 	virtual ~Gyro()
 	{

@@ -12,6 +12,13 @@
 #include "NetworkCommunication/FRCComm.h"
 #include <strLib.h>
 
+#include <Simulator/Simulator.h>
+
+#ifdef USE_MSVC_MEMORY_TRACING
+	// this enables advanced memory leak detection
+	#include <wx/msw/msvcrt.h>
+#endif
+
 DriverStation* DriverStation::m_instance = NULL;
 
 /**
@@ -291,13 +298,23 @@ bool DriverStation::IsDisabled()
 
 bool DriverStation::IsAutonomous()
 {
+	Simulator::NextStep(0.0);
 	GetData();
+	
+	if (!Simulator::ShouldContinue())
+		return false;
+	
 	return m_controlData->autonomous;
 }
 
 bool DriverStation::IsOperatorControl()
 {
+	Simulator::NextStep(0.0);
 	GetData();
+	
+	if (!Simulator::ShouldContinue())
+		return false;
+	
 	return !m_controlData->autonomous;
 }
 

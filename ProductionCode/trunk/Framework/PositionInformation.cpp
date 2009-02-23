@@ -20,7 +20,7 @@ Deleter<PositionInformation> PositionInformation::deleter(&PositionInformation::
 // constructor
 PositionInformation::PositionInformation() :
 	m_notifier(NULL),
-	m_gyro(GYRO_CHANNEL),
+	m_gyro(1, GYRO_CHANNEL),
 	//m_accelerometerX(ACCELEROMETER_X_CHANNEL),
 	//m_accelerometerY(ACCELEROMETER_Y_CHANNEL),
 	

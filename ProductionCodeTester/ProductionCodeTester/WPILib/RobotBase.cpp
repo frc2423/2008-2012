@@ -118,6 +118,11 @@ bool RobotBase::IsNewDataAvailable()
 	return true;
 }
 
+void RobotBase::startRobotTask(FUNCPTR factory)
+{
+	RobotBase::getInstance().StartCompetition();
+}
+
 #if 0
 
 /**

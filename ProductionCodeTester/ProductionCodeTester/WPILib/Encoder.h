@@ -34,7 +34,7 @@ public:
 		m_reverseDirection = reverseDirection;
 		m_encodingType = encodingType;
 		
-		Simulator::AddEncoder(this, aSlot, aChannel, bSlot, _bChannel, reverseDirection);
+		Simulator::AddEncoder(this, aSlot, aChannel, bSlot, _bChannel);
 	}
 	
 	virtual ~Encoder()

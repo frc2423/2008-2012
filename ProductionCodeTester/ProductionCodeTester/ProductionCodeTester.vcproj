@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)/WPILib&quot;;$(ProjectDir);&quot;$(ProjectDir)/VxWorks&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)/WPILib&quot;;$(ProjectDir);&quot;$(ProjectDir)/VxWorks&quot;;C:\wxWidgets\include;C:\wxWidgets\include\msvc"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;USE_MSVC_MEMORY_TRACING"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,9 +61,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="wsock32.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib comctl32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib rpcrt4.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="C:\wxWidgets\lib\vc_lib"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -115,7 +117,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)/WPILib&quot;;$(ProjectDir);&quot;$(ProjectDir)/VxWorks&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)/WPILib&quot;;$(ProjectDir);&quot;$(ProjectDir)/VxWorks&quot;;C:\wxWidgets\include;C:\wxWidgets\include\msvc"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -134,9 +136,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="wsock32.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib comctl32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib rpcrt4.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="C:\wxWidgets\lib\vc_lib"
 				GenerateDebugInformation="true"
-				SubSystem="1"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -173,7 +177,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\main.cpp"
+				RelativePath=".\App.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\SimulationWindow.cpp"
 				>
 			</File>
 			<Filter
@@ -366,6 +374,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\SimulationWindow.h"
+				>
+			</File>
 			<Filter
 				Name="trunk"
 				>
@@ -649,6 +661,10 @@
 			<Filter
 				Name="Simulator"
 				>
+				<File
+					RelativePath=".\Simulator\ControlInterface.h"
+					>
+				</File>
 				<File
 					RelativePath=".\Simulator\Simulator.h"
 					>

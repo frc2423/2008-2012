@@ -22,7 +22,7 @@ class DigitalModule;
 class DigitalInput : public DigitalSource {
 public:
 	DigitalInput(UINT32 slot, UINT32 channel){
-		Simulator::AddDigitalInput(this, channel);
+		Simulator::AddDigitalInput(this, slot, channel);
 	}
 	~DigitalInput(){
 		Simulator::DeleteDigitalInput(this);

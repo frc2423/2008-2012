@@ -7,10 +7,15 @@
 #include <VxWorks/VxWorks.h>
 #include <WPILib/NetworkCommunication/FRCComm.h>
 
+#include "SimulationData.h"
+
 DECLARE_EVENT_TYPE(EVT_ON_STEP, -1)
 
 // 25ms default step size
 #define SIMULATOR_STEP_SIZE 0.025
+
+
+
 
 struct ControlInterface {
 
@@ -25,7 +30,11 @@ struct ControlInterface {
 	
 	wxWindow *		evtHandler;
 	
+	// data going to the simulation
 	FRCControlData	controlData;
+	
+	// data coming from the simulation
+	SimulationData	simulationData;
 	
 	ControlInterface(wxWindow * handler) :
 		exit_now(false), evtHandler(handler)

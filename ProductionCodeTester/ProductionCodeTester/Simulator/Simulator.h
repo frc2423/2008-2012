@@ -126,8 +126,6 @@ private:
 	std::vector <Notifier*> 		m_notifiers;
 	std::vector <DigitalInputInfo> 	m_digitalInputs;
 	
-	char 							m_lcdText[21 * 6 + 2];
-	
 	// current time
 	double 							m_time;
 	ControlInterface *				m_controlInterface;

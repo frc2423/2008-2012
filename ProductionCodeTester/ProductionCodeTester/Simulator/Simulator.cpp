@@ -27,9 +27,7 @@ Simulator * Simulator::m_instance = NULL;
 Simulator::Simulator(ControlInterface * controlInterface) :
 	m_time(0),
 	m_controlInterface(controlInterface)
-{
-	memset(m_lcdText, ' ', sizeof(m_lcdText));
-}
+{}
 
 // does not return until simulation is complete
 void Simulator::StartSimulation(ControlInterface * controlInterface)
@@ -108,9 +106,10 @@ void Simulator::SetLCDData(const char * userDsLcdData, int userDsLcdDataLength)
 {
 	wxMutexLocker mtx(Simulator::m_instance->m_controlInterface->lock);
 
-	if (userDsLcdDataLength > sizeof(Simulator::m_instance->m_lcdText))
-		userDsLcdDataLength = sizeof(Simulator::m_instance->m_lcdText);
-	memcpy(Simulator::m_instance->m_lcdText, userDsLcdData, userDsLcdDataLength);
+	if (userDsLcdDataLength > sizeof(Simulator::m_instance->m_controlInterface->simulationData.lcdText))
+		userDsLcdDataLength = sizeof(Simulator::m_instance->m_controlInterface->simulationData.lcdText);
+		
+	memcpy(Simulator::m_instance->m_controlInterface->simulationData.lcdText, userDsLcdData, userDsLcdDataLength);
 }
 	
 // retrieves control information

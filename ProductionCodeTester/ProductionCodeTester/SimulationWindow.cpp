@@ -21,8 +21,10 @@ BEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_CLOSE( SimulationWindow::OnClose )
 	EVT_BUTTON( XRCID("m_startButton"), SimulationWindow::OnStartClicked )
 	EVT_BUTTON( XRCID("m_stepButton"), SimulationWindow::OnStepClicked )
+	EVT_SPINCTRL( XRCID("m_mode"), SimulationWindow::OnNewMode)
 	EVT_COMMAND( 42, EVT_ON_STEP, SimulationWindow::OnStep )
 	EVT_TIMER( 1, SimulationWindow::OnSimulationTimer)
+	EVT_TIMER( 2, SimulationWindow::OnDrawTimer)
 END_EVENT_TABLE()
 
 
@@ -32,7 +34,8 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	m_threadCondition(m_threadMutex),
 	m_controlInterface(this),
 	m_started(false),
-	m_simulationTimer(this, 1)
+	m_simulationTimer(this, 1),
+	m_drawTimer(this, 2)
 {
 	// initialize XRC elements..
 	wxXmlResource::Get()->LoadFrame(this, parent, wxT("SimulationWindow"));
@@ -55,6 +58,17 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	
 	XRC_INIT(m_enabledBox, wxCheckBox);
 	XRC_INIT(m_autonomousBox, wxCheckBox);
+
+	XRC_INIT(m_lcdTop, wxTextCtrl);
+	XRC_INIT(m_lcdBottom, wxTextCtrl);
+
+	wxStaticText * tmp;
+	
+	tmp = XRCCTRL(*this, "m_getMotorsSizer", wxStaticText);
+	m_motorsSizer = tmp->GetContainingSizer();
+
+	tmp = XRCCTRL(*this, "m_getDisplaySizer", wxStaticText);
+	m_displaySizer = tmp->GetContainingSizer();
 	
 	// setup validation
 	m_joy1X->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
@@ -72,11 +86,32 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	m_statusBar->SetFieldsCount(2);
 	m_statusBar->SetStatusText(wxT("Stopped"), 0);
 	m_statusBar->SetStatusText(wxT("0.0s"), 1);
-	
+
+	wxPanel * p = XRCCTRL(*this, "m_topPanel", wxPanel);
+	m_motor1 = new MotorDisplay(p);
+	m_motorsSizer->Add( m_motor1 );
+
+	//SetAutoLayout(true);
+
+	//
+	p->Layout();
+
+	//Fit();
+	//SetAutoLayout(true);
+	//Layout();
+
 	// initialize the simulation thread
 	BeginSimulation();
 	
 	// anything else that needs to be done
+
+	// try to update regularly
+	m_drawTimer.Start(200);
+}
+
+void SimulationWindow::OnNewMode(wxSpinEvent &event)
+{
+	m_motor1->SetValue(((double)m_mode->GetValue() - 5.0)/5.0);
 }
 
 void SimulationWindow::OnClose(wxCloseEvent &event)
@@ -149,6 +184,27 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 		data->stick2Axis1 = GetJoystickValue(m_joy2X);
 		data->stick2Axis2 = GetJoystickValue(m_joy2Y);
 		data->stick2Axis4 = GetJoystickValue(m_joy2T);
+
+		data->dsDigitalIn = 0;
+
+		// port 1
+		if (m_calibrateBox->IsChecked())
+			data->dsDigitalIn |= 0x01;
+
+		int mode = m_mode->GetValue();
+
+		// port 7 is lsb
+		if (mode & 0x01)
+			data->dsDigitalIn |= 0x40;
+		// port 6
+		if (mode & 0x02)
+			data->dsDigitalIn |= 0x20;
+		// port 4
+		if (mode & 0x04)
+			data->dsDigitalIn |= 0x08;
+		// port 3
+		if (mode & 0x08)
+			data->dsDigitalIn |= 0x04;
 	}
 	
 	m_controlInterface.Step();
@@ -157,6 +213,7 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 void SimulationWindow::OnStep(wxCommandEvent &event)
 {
 	m_statusBar->SetStatusText(wxString::Format(wxT("%.3f"), Simulator::GetTime()), 1);
+	m_data_ready = true;
 }
 
 
@@ -215,5 +272,37 @@ signed char SimulationWindow::GetJoystickValue(wxTextCtrl * ctrl)
 	return (signed char)(x * 127.0);
 }
 
+void SimulationWindow::OnDrawTimer(wxTimerEvent &event)
+{
+	if (!m_data_ready)
+		return;
+
+	SimulationData newData;
+
+	// transfer info over in a threadsafe way
+	{
+		wxMutexLocker mtx(m_controlInterface.lock);
+		newData = m_controlInterface.simulationData;
+	}
+
+	// then do the drawing
+
+	// lcd text
+	m_lcdTop->SetValue(wxString::FromUTF8(newData.lcdText + 2, 21));
+
+	wxString str = wxString::FromUTF8(newData.lcdText + 23, sizeof(newData.lcdText)-23);
+	
+	for (int i = 1;i < 5; i++)
+	{
+		if (i*21+i-1 >= str.size())
+			break;
+
+		str.insert(i*21+i-1, wxT("\n"));
+	}
+
+	m_lcdBottom->SetValue(str);
+
+	m_data_ready = false;
+}
 
 

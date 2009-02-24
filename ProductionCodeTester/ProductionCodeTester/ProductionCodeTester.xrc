@@ -4,7 +4,7 @@
 		<style>wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL</style>
 		<size>661,508</size>
 		<title>Robot Simulation</title>
-		<object class="wxPanel" name="m_panel2">
+		<object class="wxPanel" name="m_topPanel">
 			<style>wxTAB_TRAVERSAL</style>
 			<object class="wxBoxSizer">
 				<orient>wxHORIZONTAL</orient>
@@ -306,6 +306,14 @@
 							<border>5</border>
 							<object class="wxBoxSizer">
 								<orient>wxVERTICAL</orient>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag></flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_getDisplaySizer">
+										<label></label>
+									</object>
+								</object>
 							</object>
 						</object>
 						<object class="sizeritem">
@@ -314,6 +322,58 @@
 							<border>5</border>
 							<object class="wxBoxSizer">
 								<orient>wxHORIZONTAL</orient>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag></flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_getMotorsSizer">
+										<label></label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxTextCtrl" name="m_lcdTop">
+												<size>175,-1</size>
+												<font>
+													<family>teletype</family>
+													<style>normal</style>
+													<weight>normal</weight>
+													<underlined>0</underlined>
+													<face>Courier New</face>
+												</font>
+												<value></value>
+												<maxlength>0</maxlength>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxTextCtrl" name="m_lcdBottom">
+												<style>wxTE_MULTILINE|wxTE_NO_VSCROLL|wxTE_READONLY</style>
+												<size>175,80</size>
+												<font>
+													<size>8</size>
+													<family>teletype</family>
+													<style>normal</style>
+													<weight>normal</weight>
+													<underlined>0</underlined>
+													<face>Courier New</face>
+												</font>
+												<value></value>
+												<maxlength>0</maxlength>
+											</object>
+										</object>
+									</object>
+								</object>
 							</object>
 						</object>
 					</object>

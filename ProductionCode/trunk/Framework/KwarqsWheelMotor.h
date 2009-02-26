@@ -9,6 +9,8 @@
 #ifndef FRAMEWORK_KWARQS_WHEELMOTOR_H
 #define FRAMEWORK_KWARQS_WHEELMOTOR_H
 
+#define IMPLEMENTATION_1
+
 /**
 	\class KwarqsWheelMotor
 	\brief A class that is used to control the speed of a motor
@@ -51,6 +53,10 @@ private:
 	Encoder m_encoder;
 	
 	float m_invert;
+	
+	float m_lastSpeed;
+	double m_lastUpdate;
+	
 };
 
 #endif

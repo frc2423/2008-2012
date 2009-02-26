@@ -37,6 +37,11 @@
 //	RR: right-rear
 //
 
+// testbot:
+
+#define LEFT_MOTOR_PWM 1
+#define RIGHT_MOTOR_PWM 2
+
 // drive motors
 
 #define MOTOR_LF_SLOT				SLOT_1

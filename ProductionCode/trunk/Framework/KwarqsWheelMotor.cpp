@@ -37,6 +37,8 @@
 
 #include "KwarqsWheelMotor.h"
 
+#define M_K 0.1
+
 /**
 	\brief Constructor
 	
@@ -53,17 +55,32 @@ KwarqsWheelMotor::KwarqsWheelMotor(
 		bool invert_motor) :
 	m_motor(slot, pwm_port),
 	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X),
-	m_invert(invert_motor ? -1.0F : 1.0F)
+	m_invert(invert_motor ? -1.0F : 1.0F),
+	m_lastSpeed(0),
+	m_lastUpdate(0)
 {
 	SetSpeed(0);
 	m_encoder.Start();
 }
 
 /// Set the speed of the motor (-1 to 1)? 
-void KwarqsWheelMotor::SetSpeed(float speed)
+void KwarqsWheelMotor::SetSpeed(float desired_speed)
 {
-	// don't need to bounds check this, its already done in PWM
-	m_motor.Set(speed * m_invert);
+	
+#ifdef IMPLEMENTATION_1
+	
+	if (GetTime() - m_lastUpdate > 0.05)
+	{
+		float speed = m_lastSpeed + (desired_speed - m_lastSpeed)* M_K;
+		
+		// don't need to bounds check this, its already done in PWM
+		m_motor.Set(speed * m_invert);
+	
+		m_lastUpdate = GetTime();
+	}
+
+#endif
+
 }
 
 /// Get the speed that the motor was assigned to go via SetSpeed

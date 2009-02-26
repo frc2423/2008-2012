@@ -34,7 +34,7 @@ public:
 		@param speed	Speed of the robot (-1 to 1)
 		@param rotation	Rotational speed of the robot (-1 to 1)
 	*/
-	void Move(float &speed, float &rotation);
+	void Move(double &speed, double &heading, double &rotation, bool &stop);
 
 	/// Return the name of the class
 	const char * Name() { return "ArcadeDrive"; }
@@ -42,7 +42,7 @@ public:
 
 private:
 	
-	float Limit(float num);
+	double Limit(double num);
 	
 	SpeedController * m_leftMotor;
 	SpeedController * m_rightMotor;

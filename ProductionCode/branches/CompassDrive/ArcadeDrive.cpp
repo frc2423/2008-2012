@@ -35,7 +35,7 @@
 #include "WPILib.h"
 #include "ArcadeDrive.h"
 
-#include "Framework/KwarqsDevices.h"
+#include "Framework/KwarqsConstants.h"
 
 // default constructor
 ArcadeDrive::ArcadeDrive()
@@ -51,11 +51,11 @@ ArcadeDrive::~ArcadeDrive()
 	delete m_rightMotor;
 }
 
-void ArcadeDrive::Move(float &speed, float &rotateValue)
+void ArcadeDrive::Move(double &speed, double &heading, double &rotateValue, bool &stop)
 {
 	// local variables to hold the computed PWM values for the motors
-	float leftMotorSpeed;
-	float rightMotorSpeed;
+	double leftMotorSpeed;
+	double rightMotorSpeed;
 
 	speed = Limit(speed) * -1;
 	rotateValue = Limit(rotateValue);
@@ -99,7 +99,7 @@ void ArcadeDrive::Move(float &speed, float &rotateValue)
 /**
  * Limit motor values to the -1.0 to +1.0 range.
  */
-float ArcadeDrive::Limit(float num)
+double ArcadeDrive::Limit(double num)
 {
 	if (num > 1.0)
 	{

@@ -22,7 +22,7 @@ void CompassDrive::Move()
 
 	//printf("speed: %f, turn_Rate: %f\r", speed, turn_Rate);
 	
-	m_driveController->Move(speed, turn_Rate);
+	m_driveController->Move(speed, 0, turn_Rate, false);
 }
 
 void CompassDrive::getVariables()

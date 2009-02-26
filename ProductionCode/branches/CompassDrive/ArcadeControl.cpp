@@ -45,7 +45,7 @@ ArcadeControl::ArcadeControl(KwarqsDriveController * driveController) :
 // implements the default arcade drive control found in WPILib
 void ArcadeControl::Move()
 {
-	float moveValue = m_stick->GetY(), rotateValue = m_stick->GetX();
+	double moveValue = m_stick->GetY(), rotateValue = m_stick->GetX();
 
 	if (m_stick->GetTrigger())
 	{
@@ -68,5 +68,5 @@ void ArcadeControl::Move()
 		}
 	}
 	
-	m_driveController->Move(moveValue, rotateValue);
+	m_driveController->Move(moveValue, 0, rotateValue, false);
 }

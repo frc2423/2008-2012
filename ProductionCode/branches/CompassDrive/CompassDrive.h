@@ -1,5 +1,5 @@
 #include <WPILib.h>
-#include "Framework/KwarqsDevices.h"
+#include "Framework/KwarqsConstants.h"
 #include "Framework/KwarqsMovementControl.h"
 
 class CompassDrive: public KwarqsMovementControl

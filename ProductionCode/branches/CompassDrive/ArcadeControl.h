@@ -9,7 +9,7 @@
 #ifndef ARCADE_CONTROL_H
 #define ARCADE_CONTROL_H
 
-#include "Framework/KwarqsDevices.h"
+#include "Framework/KwarqsConstants.h"
 #include "Framework/KwarqsMovementControl.h"
 
 

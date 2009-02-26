@@ -51,6 +51,7 @@ public:
 	static UINT8 UnmapDigitalChannel(UINT32 channel) { return 15 - channel; }; // TODO: Need channel validation
 
 private:
+	SEM_ID m_relaySemaphore;
 	tDIO *m_fpgaDIO;
 };
 

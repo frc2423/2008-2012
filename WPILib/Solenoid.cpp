@@ -7,9 +7,10 @@
 #include "Solenoid.h"
 
 #include "Resource.h"
+#include "Synchronized.h"
 #include "Utility.h"
 
-static SEM_ID semaphore = semMCreate(SEM_DELETE_SAFE | SEM_INVERSION_SAFE); // synchronize access to multi-value registers
+SEM_ID Solenoid::m_semaphore = NULL;
 static Resource *allocated = NULL;
 
 tSolenoid *Solenoid::m_fpgaSolenoidModule = NULL;
@@ -27,6 +28,8 @@ void Solenoid::InitSolenoid()
 	m_refCount++;
 	if (m_refCount == 1)
 	{
+		// Needs to be global since the protected resource spans all Solenoid objects.
+		m_semaphore = semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE);
 		m_fpgaSolenoidModule = new tSolenoid(&status);
 	}
 
@@ -69,6 +72,8 @@ Solenoid::~Solenoid()
 	{
 		delete m_fpgaSolenoidModule;
 		m_fpgaSolenoidModule = NULL;
+		semDelete(m_semaphore);
+		m_semaphore = NULL;
 	}
 	m_refCount--;
 }
@@ -91,8 +96,8 @@ UINT32 Solenoid::SlotToIndex(UINT32 slot)
  */
 void Solenoid::Set(bool on)
 {
-	semTake(semaphore, WAIT_FOREVER);
 	{
+		Synchronized sync(m_semaphore);
 		UINT8 value = m_fpgaSolenoidModule->readDO7_0(&status);
 		if (on)
 		{
@@ -104,7 +109,6 @@ void Solenoid::Set(bool on)
 		}
 		m_fpgaSolenoidModule->writeDO7_0(value, &status);
 	}
-	semGive(semaphore);
 
 	wpi_assertCleanStatus(status);
 }

@@ -22,6 +22,7 @@ void InterruptableSensorBase::AllocateInterrupts(bool watcher)
 {
 	wpi_assert(m_interrupt == NULL);
 	wpi_assert(m_manager == NULL);
+	// Expects the calling leaf class to allocate an interrupt index.
 	m_interrupt = new tInterrupt(m_interruptIndex, &status);
 	m_interrupt->writeConfig_WaitForAck(false, &status);
 	m_manager = new tInterruptManager(1 << m_interruptIndex, watcher, &status);
@@ -43,12 +44,13 @@ void InterruptableSensorBase::CancelInterrupts()
 
 /**
  * In synchronous mode, wait for the defined interrupt to occur.
+ * @param timeout Timeout in seconds
  */
-void InterruptableSensorBase::WaitForInterrupt(INT32 msTimeout)
+void InterruptableSensorBase::WaitForInterrupt(float timeout)
 {
 	wpi_assert(m_manager != NULL);
 	wpi_assert(m_interrupt != NULL);
-	m_manager->watch(msTimeout, &status);
+	m_manager->watch((INT32)(timeout * 1e3), &status);
 	wpi_assertCleanStatus(status);
 }
 
@@ -56,8 +58,6 @@ void InterruptableSensorBase::WaitForInterrupt(INT32 msTimeout)
  * Enable interrupts to occur on this input.
  * Interrupts are disabled when the RequestInterrupt call is made. This gives time to do the
  * setup of the other options before starting to field interrupts.
- * 
- * @todo Implement me
  */
 void InterruptableSensorBase::EnableInterrupts()
 {
@@ -69,8 +69,6 @@ void InterruptableSensorBase::EnableInterrupts()
 
 /**
  * Disable Interrupts without without deallocating structures.
- * 
- * @todo Implement me
  */
 void InterruptableSensorBase::DisableInterrupts()
 {
@@ -78,4 +76,15 @@ void InterruptableSensorBase::DisableInterrupts()
 	wpi_assert(m_interrupt != NULL);
 	m_manager->disable(&status);
 	wpi_assertCleanStatus(status);
+}
+
+/**
+ * Return the timestamp for the interrupt that occurred most recently.
+ * This is in the same time domain as GetClock().
+ * @return Timestamp in seconds since boot.
+ */
+double InterruptableSensorBase::ReadInterruptTimestamp()
+{
+	wpi_assert(m_interrupt != NULL);
+	return m_interrupt->readTimeStamp(&status) * 1e-6;
 }

@@ -4,10 +4,11 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#ifndef PIDController_H_
-#define PIDController_H_
+#ifndef PIDCONTROLLER_H_
+#define PIDCONTROLLER_H_
 
 #include "Base.h"
+#include "semLib.h"
 
 class PIDOutput;
 class PIDSource;
@@ -38,6 +39,9 @@ private:
 	float m_setpoint;
 	float m_error;
 	float m_result;
+	float m_period;
+	
+	SEM_ID m_semaphore;
 	
 	PIDSource *m_pidInput;
 	PIDOutput *m_pidOutput;
@@ -55,6 +59,10 @@ public:
 	void SetContinuous(bool continuous = true);
 	void SetInputRange(float minimumInput, float maximumInput);
 	void SetOutputRange(float mimimumOutput, float maximumOutput);
+	void SetPID(float p, float i, float d);
+	float GetP();
+	float GetI();
+	float GetD();
 	
 	void SetSetpoint(float setpoint);
 	float GetSetpoint();
@@ -68,8 +76,6 @@ public:
 	void Disable();
 	
 	void Reset();
-	
-	void TuneParameters(float Kp, float Ki, float Kd);
 };
 
 #endif

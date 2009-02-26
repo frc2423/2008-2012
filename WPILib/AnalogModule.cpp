@@ -5,11 +5,12 @@
 /*----------------------------------------------------------------------------*/
 
 #include "AnalogModule.h"
+#include "Synchronized.h"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIStatus.h"
 
-static SEM_ID semaphore = semMCreate(SEM_DELETE_SAFE | SEM_INVERSION_SAFE); // synchronize access to multi-value registers
+SEM_ID AnalogModule::m_registerWindowSemaphore = NULL;
 
 /**
  * Get an instance of an Analog Module.
@@ -73,6 +74,12 @@ AnalogModule::AnalogModule(UINT32 slot)
 
 	while ( ! m_module->readCalOK(&status) )
 		Wait(.001);
+
+	if (m_registerWindowSemaphore == NULL)
+	{
+		// Needs to be global since the protected resource spans both module singletons.
+		m_registerWindowSemaphore = semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE);
+	}
 
 	wpi_assertCleanStatus(status);
 }
@@ -265,13 +272,12 @@ INT16 AnalogModule::GetValue(UINT32 channel)
 	readSelect.Module = SlotToIndex(m_slot);
 	readSelect.Averaged = false;
 
-	semTake(semaphore, WAIT_FOREVER);
 	{
+		Synchronized sync(m_registerWindowSemaphore);
 		m_module->writeReadSelect(readSelect, &status);
 		m_module->strobeLatchOutput(&status);
 		value = (INT16) m_module->readOutput(&status);
 	}
-	semGive(semaphore);
 
 	wpi_assertCleanStatus(status);
 	return value;
@@ -299,13 +305,12 @@ INT32 AnalogModule::GetAverageValue(UINT32 channel)
 	readSelect.Module = SlotToIndex(m_slot);
 	readSelect.Averaged = true;
 
-	semTake(semaphore, WAIT_FOREVER); // link this instance on the list
 	{
+		Synchronized sync(m_registerWindowSemaphore);
 		m_module->writeReadSelect(readSelect, &status);
 		m_module->strobeLatchOutput(&status);
 		value = m_module->readOutput(&status);
 	}
-	semGive(semaphore);
 
 	wpi_assertCleanStatus(status);
 	return value;

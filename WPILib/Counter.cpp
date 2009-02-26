@@ -436,7 +436,18 @@ void Counter::Stop()
  */
 double Counter::GetPeriod()
 {
-	long period = m_counter->readTimerOutput_Period(&status) / m_counter->readTimerOutput_Count(&status);
+	tCounter::tTimerOutput output = m_counter->readTimerOutput(&status);
+	double period;
+	if (output.Stalled)
+	{
+		// Return infinity
+		double zero = 0.0;
+		period = 1.0 / zero;
+	}
+	else
+	{
+		period = (double)output.Period / (double)output.Count;
+	}
 	wpi_assertCleanStatus(status);
 	return period / 1.0e6;
 }

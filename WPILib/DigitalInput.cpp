@@ -108,7 +108,7 @@ bool DigitalInput::GetAnalogTriggerForRouting()
  * called when an interrupt occurs.
  * The default is interrupt on rising edges only.
  */
-void DigitalInput::RequestInterrupts(tInterruptHandler handler)
+void DigitalInput::RequestInterrupts(tInterruptHandler handler, void *param)
 {
 	m_interruptIndex = interrupts->Allocate();
 //TODO: check for error on allocation
@@ -119,10 +119,9 @@ void DigitalInput::RequestInterrupts(tInterruptHandler handler)
 	m_interrupt->writeConfig_Source_AnalogTrigger(GetAnalogTriggerForRouting(), &status);
 	m_interrupt->writeConfig_Source_Channel(GetChannelForRouting(), &status);
 	m_interrupt->writeConfig_Source_Module(GetModuleForRouting(), &status);
-	m_interrupt->writeConfig_RisingEdge(true, &status);
-	m_interrupt->writeConfig_FallingEdge(false, &status);
+	SetUpSourceEdge(true, false);
 
-	m_manager->registerHandler(handler, NULL, &status);
+	m_manager->registerHandler(handler, param, &status);
 	wpi_assertCleanStatus(status);
 }
 

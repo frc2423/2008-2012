@@ -15,9 +15,9 @@ typedef void (*TimerEventHandler)(void *param);
 class Notifier
 {
 public:
-	Notifier(TimerEventHandler handler, void *param);
+	Notifier(TimerEventHandler handler, void *param = NULL);
 	virtual ~Notifier();
-	void StartSingle(double period);
+	void StartSingle(double delay);
 	void StartPeriodic(double period);
 	void Stop();
 private:
@@ -30,7 +30,7 @@ private:
 	static const UINT32 kTimerInterruptNumber = 28;
 	static void ProcessQueue(tNIRIO_u32 mask, void *params); // process the timer queue on a timer event
 	static void UpdateAlarm();			// update the FPGA alarm since the queue has changed
-	void InsertInQueue(bool updateAlarm);	// insert this Notifier in the timer queue
+	void InsertInQueue(bool reschedule);	// insert this Notifier in the timer queue
 	void DeleteFromQueue();				// delete this Notifier from the timer queue
 	TimerEventHandler m_handler;			// address of the handler
 	void *m_param;							// a parameter to pass to the handler

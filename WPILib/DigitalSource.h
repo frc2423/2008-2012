@@ -23,7 +23,7 @@ public:
 	virtual UINT32 GetChannelForRouting() = 0;
 	virtual UINT32 GetModuleForRouting() = 0;
 	virtual bool GetAnalogTriggerForRouting() = 0;
-	virtual void RequestInterrupts(tInterruptHandler handler) = 0;
+	virtual void RequestInterrupts(tInterruptHandler handler, void *param) = 0;
 	virtual void RequestInterrupts() = 0;
 };
 

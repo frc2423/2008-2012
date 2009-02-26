@@ -52,9 +52,9 @@ public:
 
 	void SetUpDownCounterMode();
 	void SetExternalDirectionMode();
-	void SetSemiPeriodMode(bool highRisingPeriod);
+	void SetSemiPeriodMode(bool highSemiPeriod);
 	void SetPulseLengthMode(float threshold);
-	
+
 	void SetReverseDirection(bool reverseDirection);
 
 	// CounterBase interface

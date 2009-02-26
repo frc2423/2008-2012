@@ -34,6 +34,7 @@ private:
 	UINT32 m_channel; ///< The channel on the module to control.
 	static tSolenoid *m_fpgaSolenoidModule; ///< FPGA Solenoid Module object.
 	static UINT32 m_refCount; ///< Reference count for the chip object.
+	static SEM_ID m_semaphore;
 };
 
 #endif

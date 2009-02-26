@@ -27,7 +27,7 @@ Dashboard::Dashboard(char **userStatus)
 	m_localPrintBuffer = new char[kMaxDashboardDataSize * 2];
 	m_localPrintBuffer[0] = 0;
 	m_packPtr = m_localBuffer;
-	m_printSemaphore = semMCreate(SEM_DELETE_SAFE | SEM_INVERSION_SAFE); // synchronize access to multi-value registers
+	m_printSemaphore = semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE); // synchronize access to multi-value registers
 }
 
 /**

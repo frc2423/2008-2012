@@ -56,7 +56,7 @@ typedef struct ParticleAnalysisReport_struct {
 	/* Area of the particle */
 	double 	particleArea;				// MeasurementType: IMAQ_MT_AREA
 	/* Bounding Rectangle */
-	Rect 	boundingRect;				// IMAQ_MT_BOUNDING_RECT_LEFT/TOP/RIGHT/BOTTOM
+	Rect 	boundingRect;				// left/top/width/height
 	/* Percentage of the particle Area covering the Image Area. */
 	double 	particleToImagePercent;		// MeasurementType: IMAQ_MT_AREA_BY_IMAGE_AREA
 	/* Percentage of the particle Area in relation to its Particle and Holes Area */

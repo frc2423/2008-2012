@@ -16,7 +16,7 @@
 Task Ultrasonic::m_task("UltrasonicChecker", (FUNCPTR)UltrasonicChecker); // task doing the round-robin automatic sensing
 Ultrasonic *Ultrasonic::m_firstSensor = NULL; // head of the ultrasonic sensor list
 bool Ultrasonic::m_automaticEnabled = false; // automatic round robin mode
-SEM_ID Ultrasonic::m_semaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL); // synchronize access to the list of sensors
+SEM_ID Ultrasonic::m_semaphore = 0;
 
 /**
  * Background task that goes through the list of ultrasonic sensors and pings each one in turn. The counter
@@ -51,6 +51,7 @@ void Ultrasonic::UltrasonicChecker()
 void Ultrasonic::Initialize()
 {
 	bool originalMode = m_automaticEnabled;
+	if (m_semaphore == 0) m_semaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 	SetAutomaticMode(false); // kill task when adding a new sensor
 	semTake(m_semaphore, WAIT_FOREVER); // link this instance on the list
 	{
@@ -60,6 +61,7 @@ void Ultrasonic::Initialize()
 	semGive(m_semaphore);
 
 	m_counter = new Counter(m_echoChannel); // set up counter for this sensor
+	m_counter->SetMaxPeriod(1.0);
 	m_counter->SetSemiPeriodMode(true);
 	m_counter->Reset();
 	m_counter->Start();

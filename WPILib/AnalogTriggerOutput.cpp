@@ -79,7 +79,7 @@ bool AnalogTriggerOutput::GetAnalogTriggerForRouting()
 /**
  * Request interrupts asynchronously on this digital input.
  */
-void AnalogTriggerOutput::RequestInterrupts(tInterruptHandler handler)
+void AnalogTriggerOutput::RequestInterrupts(tInterruptHandler handler, void *param)
 {
 	wpi_assert(false);
 }

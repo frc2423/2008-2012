@@ -211,7 +211,8 @@ int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range
 	/* get image from camera - if the camera has not finished initializing,
 	 * this will fail 
 	 */
-	success = GetImage(cameraImage,NULL);
+	double imageTime;
+	success = GetImage(cameraImage, &imageTime);
 	if (!success){
 		DPRINTF(LOG_INFO, "No camera Image available Error = %i %s", 
 				errorCode, GetVisionErrorText(errorCode));
@@ -255,7 +256,7 @@ int FindColor(ColorMode mode, const Range* plane1Range, const Range* plane2Range
 		 * Fill in report information for largest particle found
 		 */
 		success = frcParticleAnalysis(cameraImage, largestParticleIndex, trackReport);
-		trackReport->imageTimestamp = GetTime();
+		trackReport->imageTimestamp = imageTime;
 		
 		/* clean up */
 		if (!success) {frcDispose(__FUNCTION__,cameraImage,histImage,NULL); return success;}

@@ -943,7 +943,7 @@ Task g_axisCameraTask("Camera", (FUNCPTR)initCamera);
  * @param frames Frames per second 
  * @param compression Camera image compression 
  * @param resolution Camera image size 
- * @param rotation Camera image rotation 
+ * @param rotation Camera image rotation (ROT_0 or ROT_180)
  * @return TaskID of camera task, or -1 if error.
  */
 int StartCameraTask()

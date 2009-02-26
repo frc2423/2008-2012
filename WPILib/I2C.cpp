@@ -6,10 +6,11 @@
 
 #include "I2C.h"
 #include "DigitalModule.h"
+#include "Synchronized.h"
 #include "Utility.h"
 #include "WPIStatus.h"
 
-static SEM_ID semaphore = semMCreate(SEM_DELETE_SAFE | SEM_INVERSION_SAFE); // synchronize access to multi-value registers
+SEM_ID I2C::m_semaphore = NULL;
 
 /**
  * Constructor.
@@ -21,6 +22,10 @@ I2C::I2C(DigitalModule *module, UINT8 deviceAddress)
 	: m_module (module)
 	, m_deviceAddress (deviceAddress)
 {
+	if (m_semaphore == NULL)
+	{
+		m_semaphore = semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE);
+	}
 }
 
 /**
@@ -42,18 +47,15 @@ I2C::~I2C()
  */
 void I2C::Write(UINT8 registerAddress, UINT8 data)
 {
-	semTake(semaphore, WAIT_FOREVER);
-	{
-		m_module->m_fpgaDIO->writeI2CConfig_Address(m_deviceAddress, &status);
-		m_module->m_fpgaDIO->writeI2CConfig_Register(registerAddress, &status);
-		m_module->m_fpgaDIO->writeI2CConfig_DataToSend(data, &status);
-		m_module->m_fpgaDIO->writeI2CConfig_Read(false, &status);
-		UINT8 transaction = m_module->m_fpgaDIO->readI2CStatus_Transaction(&status);
-		m_module->m_fpgaDIO->strobeI2CStart(&status);
-		while(transaction == m_module->m_fpgaDIO->readI2CStatus_Transaction(&status)) taskDelay(1);
-		while(!m_module->m_fpgaDIO->readI2CStatus_Done(&status)) taskDelay(1);
-	}
-	semGive(semaphore);
+	Synchronized sync(m_semaphore);
+	m_module->m_fpgaDIO->writeI2CConfig_Address(m_deviceAddress, &status);
+	m_module->m_fpgaDIO->writeI2CConfig_Register(registerAddress, &status);
+	m_module->m_fpgaDIO->writeI2CConfig_DataToSend(data, &status);
+	m_module->m_fpgaDIO->writeI2CConfig_Read(false, &status);
+	UINT8 transaction = m_module->m_fpgaDIO->readI2CStatus_Transaction(&status);
+	m_module->m_fpgaDIO->strobeI2CStart(&status);
+	while(transaction == m_module->m_fpgaDIO->readI2CStatus_Transaction(&status)) taskDelay(1);
+	while(!m_module->m_fpgaDIO->readI2CStatus_Done(&status)) taskDelay(1);
 }
 
 /**
@@ -82,8 +84,8 @@ void I2C::Read(UINT8 registerAddress, UINT8 count, UINT8 *buffer)
 		return;
 	}
 
-	semTake(semaphore, WAIT_FOREVER);
 	{
+		Synchronized sync(m_semaphore);
 		m_module->m_fpgaDIO->writeI2CConfig_Address(m_deviceAddress, &status);
 		m_module->m_fpgaDIO->writeI2CConfig_Register(registerAddress, &status);
 		m_module->m_fpgaDIO->writeI2CConfig_BytesToRead(count, &status);
@@ -94,7 +96,6 @@ void I2C::Read(UINT8 registerAddress, UINT8 count, UINT8 *buffer)
 		while(!m_module->m_fpgaDIO->readI2CStatus_Done(&status)) taskDelay(1);
 		data = m_module->m_fpgaDIO->readI2CDataReceived(&status);
 	}
-	semGive(semaphore);
 
 	for(INT32 i=0; i<count; i++)
 	{

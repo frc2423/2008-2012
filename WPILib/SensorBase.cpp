@@ -54,9 +54,11 @@ void SensorBase::AddToSingletonList()
  */
 void SensorBase::DeleteSingletons()
 {
-	for (SensorBase *b = m_singletonList; b != NULL; b = b->m_nextSingleton)
+	for (SensorBase *next = m_singletonList; next != NULL;)
 	{
-		delete b;
+		SensorBase *tmp = next;
+		next = next->m_nextSingleton;
+		delete tmp;
 	}
 	m_singletonList = NULL;
 }
@@ -152,7 +154,7 @@ bool SensorBase::CheckSolenoidModule(UINT32 slot)
 /**
  * Check that the digital channel number is valid.
  * Verify that the channel number is one of the legal channel numbers. Channel numbers are
- * 0-based.
+ * 1-based.
  */
 bool SensorBase::CheckDigitalChannel(UINT32 channel)
 {
@@ -165,7 +167,7 @@ bool SensorBase::CheckDigitalChannel(UINT32 channel)
 /**
  * Check that the digital channel number is valid.
  * Verify that the channel number is one of the legal channel numbers. Channel numbers are
- * 0-based.
+ * 1-based.
  */
 bool SensorBase::CheckRelayChannel(UINT32 channel)
 {
@@ -178,7 +180,7 @@ bool SensorBase::CheckRelayChannel(UINT32 channel)
 /**
  * Check that the digital channel number is valid.
  * Verify that the channel number is one of the legal channel numbers. Channel numbers are
- * 0-based.
+ * 1-based.
  */
 bool SensorBase::CheckPWMChannel(UINT32 channel)
 {

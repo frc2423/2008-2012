@@ -9,6 +9,7 @@
 #include "PIDSource.h"
 #include "PIDOutput.h"
 #include <math.h>
+#include "Synchronized.h"
 /**
  * Allocate a PID object with the given constants for P, I, D
  * @param Kp the proportional coefficient
@@ -21,9 +22,13 @@
  */
 PIDController::PIDController(float Kp, float Ki, float Kd,
 								PIDSource *source, PIDOutput *output,
-								float period)
+								float period) :
+	m_semaphore (0)
 {
+	m_semaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+
 	m_controlLoop = new Notifier(PIDController::CallCalculate, this);
+	
 	
 	m_P = Kp;
 	m_I = Ki;
@@ -46,8 +51,9 @@ PIDController::PIDController(float Kp, float Ki, float Kd,
 	
 	m_pidInput = source;
 	m_pidOutput = output;
-	
-	m_controlLoop->StartPeriodic(period);
+	m_period = period;
+
+	m_controlLoop->StartPeriodic(m_period);
 }
 
 /**
@@ -55,6 +61,7 @@ PIDController::PIDController(float Kp, float Ki, float Kd,
  */
 PIDController::~PIDController()
 {
+	semFlush(m_semaphore);
 	delete m_controlLoop;
 }
 
@@ -78,6 +85,8 @@ void PIDController::CallCalculate(void *controller)
   */	
 void PIDController::Calculate()
 {
+	CRITICAL_REGION(m_semaphore)
+	{
 	if (m_pidInput == 0)
 		return;
 	if (m_pidOutput == 0)
@@ -90,7 +99,7 @@ void PIDController::Calculate()
 		if (m_continuous)
 		{
 			if (fabs(m_error) > 
-				(m_maximumInput - m_minimumInput)/2)
+				(m_maximumInput - m_minimumInput) / 2)
 			{
 				if (m_error > 0)
 					m_error = m_error  - m_maximumInput + m_minimumInput;
@@ -115,6 +124,65 @@ void PIDController::Calculate()
 		
 		m_pidOutput->PIDWrite(m_result);
 	}
+	}
+	END_REGION;
+}
+
+/**
+ * Set the PID Controller gain parameters.
+ * Set the proportional, integral, and differential coefficients.
+ * @param p Proportional coefficient
+ * @param i Integral coefficient
+ * @param d Differential coefficient
+ */
+void PIDController::SetPID(float p, float i, float d)
+{
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_P = p;
+		m_I = i;
+		m_D = d;
+	}
+	END_REGION;
+}
+
+/**
+ * Get the Proportional coefficient
+ * @return proportional coefficient
+ */
+float PIDController::GetP()
+{
+	CRITICAL_REGION(m_semaphore)
+	{
+		return m_P;
+	}
+	END_REGION;
+}
+
+/**
+ * Get the Integral coefficient
+ * @return integral coefficient
+ */
+float PIDController::GetI()
+{
+	CRITICAL_REGION(m_semaphore)
+	{
+		return m_I;
+	}
+	END_REGION;
+}
+
+/**
+ * Get the Differential coefficient
+ * @return differential coefficient
+ */
+float PIDController::GetD()
+{
+	CRITICAL_REGION(m_semaphore)
+	{
+		return m_D;
+	}
+	END_REGION;
 }
 
 /**
@@ -124,7 +192,13 @@ void PIDController::Calculate()
  */
 float PIDController::Get()
 {
-	return m_result;
+	float result;
+	CRITICAL_REGION(m_semaphore)
+	{
+		result = m_result;
+	}
+	END_REGION;
+	return result;
 }
 
 /**
@@ -136,7 +210,12 @@ float PIDController::Get()
  */
 void PIDController::SetContinuous(bool continuous)
 {
-	m_continuous = continuous;
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_continuous = continuous;
+	}
+	END_REGION;
+
 }
 
 /**
@@ -147,8 +226,13 @@ void PIDController::SetContinuous(bool continuous)
  */
 void PIDController::SetInputRange(float minimumInput, float maximumInput)
 {
-	m_minimumInput = minimumInput;
-	m_maximumInput = maximumInput;	
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_minimumInput = minimumInput;
+		m_maximumInput = maximumInput;	
+	}
+	END_REGION;
+
 	SetSetpoint(m_setpoint);
 }
 
@@ -160,8 +244,12 @@ void PIDController::SetInputRange(float minimumInput, float maximumInput)
  */
 void PIDController::SetOutputRange(float minimumOutput, float maximumOutput)
 {
-	m_minimumOutput = minimumOutput;
-	m_maximumOutput = maximumOutput;
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_minimumOutput = minimumOutput;
+		m_maximumOutput = maximumOutput;
+	}
+	END_REGION;
 }
 
 /**
@@ -170,16 +258,20 @@ void PIDController::SetOutputRange(float minimumOutput, float maximumOutput)
  */
 void PIDController::SetSetpoint(float setpoint)
 {
-	if (m_maximumInput > m_minimumInput) {
-		if (setpoint > m_maximumInput)
-			m_setpoint = m_maximumInput;
-		else if (setpoint < m_minimumInput)
-			m_setpoint = m_minimumInput;
+	CRITICAL_REGION(m_semaphore)
+	{
+		if (m_maximumInput > m_minimumInput) {
+			if (setpoint > m_maximumInput)
+				m_setpoint = m_maximumInput;
+			else if (setpoint < m_minimumInput)
+				m_setpoint = m_minimumInput;
+			else
+				m_setpoint = setpoint;
+		}
 		else
 			m_setpoint = setpoint;
 	}
-	else
-		m_setpoint = setpoint;
+	END_REGION;	
 }
 
 /**
@@ -188,7 +280,13 @@ void PIDController::SetSetpoint(float setpoint)
  */
 float PIDController::GetSetpoint()
 {
-	return m_setpoint;
+	float setpoint;
+	CRITICAL_REGION(m_semaphore)
+	{
+		setpoint = m_setpoint;
+	}
+	END_REGION;
+	return setpoint;
 }
 
 /**
@@ -197,7 +295,13 @@ float PIDController::GetSetpoint()
  */
 float PIDController::GetError()
 {
-	return m_error;
+	float  error;
+	CRITICAL_REGION(m_semaphore)
+	{
+		error = m_error;
+	}
+	END_REGION;
+	return error;
 }
 
 /*
@@ -207,7 +311,11 @@ float PIDController::GetError()
  */
 void PIDController::SetTolerance(float percent)
 {
-	m_tolerance = percent;
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_tolerance = percent;
+	}
+	END_REGION;
 }
 
 /*
@@ -217,8 +325,14 @@ void PIDController::SetTolerance(float percent)
  */
 bool PIDController::OnTarget()
 {
-	return (fabs(m_error)<m_tolerance / 100 * 
-			(m_maximumInput - m_minimumInput));
+	bool temp;
+	CRITICAL_REGION(m_semaphore)
+	{
+		temp = (fabs(m_error)<m_tolerance / 100 * 
+				(m_maximumInput - m_minimumInput));
+	}
+	END_REGION;
+	return temp;
 }
 
 /**
@@ -226,15 +340,25 @@ bool PIDController::OnTarget()
  */
 void PIDController::Enable()
 {
-	m_enabled = true;
+	CRITICAL_REGION(m_semaphore)
+	{
+			
+		m_enabled = true;
+	}
+	END_REGION;	
 }
 /**
  * Stop running the PIDController, this sets the output to zero before stopping.
  */
 void PIDController::Disable()
 {
-	m_enabled = false;
-	m_pidOutput->PIDWrite(0);
+
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_pidOutput->PIDWrite(0);
+		m_enabled = false;
+	}
+	END_REGION;
 }
 
 /**
@@ -244,18 +368,11 @@ void PIDController::Reset()
 {
 	Disable();
 	
-	m_prevError = 0;
-	
-	m_totalError = 0;
-	
-	m_result = 0;
-}
-
-void PIDController::TuneParameters(float Kp, float Ki, float Kd)
-{
-	m_P = Kp;
-	m_I = Ki;
-	m_D = Kd;
-	
-	m_totalError = 0;
+	CRITICAL_REGION(m_semaphore)
+	{
+		m_prevError = 0;
+		m_totalError = 0;
+		m_result = 0;
+	}
+	END_REGION;
 }

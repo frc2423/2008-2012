@@ -51,7 +51,7 @@ public:
 	virtual UINT32 GetChannelForRouting();
 	virtual UINT32 GetModuleForRouting();
 	virtual bool GetAnalogTriggerForRouting();
-	virtual void RequestInterrupts(tInterruptHandler handler); ///< Asynchronus handler version.
+	virtual void RequestInterrupts(tInterruptHandler handler, void *param=NULL); ///< Asynchronus handler version.
 	virtual void RequestInterrupts();		///< Synchronus Wait version.
 protected:
 	AnalogTriggerOutput(AnalogTrigger *trigger, Type outputType);

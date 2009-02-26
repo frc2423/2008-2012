@@ -9,10 +9,9 @@
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIStatus.h"
-//#include "semLib.h"
 
 Notifier *Notifier::timerQueueHead = NULL;
-SEM_ID Notifier::queueSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+SEM_ID Notifier::queueSemaphore = NULL;
 tAlarm *Notifier::talarm = NULL;
 tInterruptManager *Notifier::manager = NULL;
 int Notifier::refcount = 0;
@@ -34,10 +33,14 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 	m_nextEvent = NULL;
 	m_queued = false;
 	m_handlerSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
-	CRITICAL_REGION(queueSemaphore)
+	if (queueSemaphore == NULL)
 	{
+		queueSemaphore = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+	}
+	{
+		Synchronized sync(queueSemaphore);
 		// do the first time intialization of static variables
-		if (talarm == NULL)
+		if (refcount == 0)
 		{
 			manager = new tInterruptManager(1 << kTimerInterruptNumber, false, &status);
 			manager->registerHandler(ProcessQueue, NULL, &status);
@@ -46,7 +49,6 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
 		}
 		refcount++;
 	}
-	END_REGION;
 	wpi_assertCleanStatus(status);
 }
 
@@ -57,11 +59,11 @@ Notifier::Notifier(TimerEventHandler handler, void *param)
  */
 Notifier::~Notifier()
 {
-	CRITICAL_REGION(queueSemaphore)
 	{
+		Synchronized sync(queueSemaphore);
 		DeleteFromQueue();
 
-		// do the first time intialization of static variables
+		// Delete the static variables when the last one is going away
 		if (!(--refcount))
 		{
 			tRioStatusCode status = 0;
@@ -74,12 +76,11 @@ Notifier::~Notifier()
 			wpi_assertCleanStatus(status);
 		}
 	}
-	END_REGION;
 
 	// Acquire the semaphore; this makes certain that the handler is 
 	// not being executed by the interrupt manager.
 	semTake(m_handlerSemaphore, WAIT_FOREVER);
-	semGive(m_handlerSemaphore);
+	// Delete while holding the semaphore so there can be no race.
 	semDelete(m_handlerSemaphore);
 }
 
@@ -93,15 +94,11 @@ Notifier::~Notifier()
 void Notifier::UpdateAlarm()
 {
 	tRioStatusCode status = 0;
-	if (timerQueueHead == NULL)
-	{
-		// turn off alarm if the queue is empty
-		talarm->writeEnable(false, &status);
-	}
-	else
+	if (timerQueueHead != NULL)
 	{
 		// write the first item in the queue into the trigger time
 		talarm->writeTriggerTime((UINT32)(timerQueueHead->m_expirationTime * 1e6), &status);
+		// Enable the alarm.  The hardware disables itself after each alarm.
 		talarm->writeEnable(true, &status);
 	}
 	wpi_assertCleanStatus(status);
@@ -116,10 +113,10 @@ void Notifier::UpdateAlarm()
 void Notifier::ProcessQueue(tNIRIO_u32 mask, void *params)
 {
 	Notifier *current;
-	while (1)				// keep processing past events until no more
+	while (true)				// keep processing past events until no more
 	{
-		CRITICAL_REGION(queueSemaphore)
 		{
+			Synchronized sync(queueSemaphore);
 			double currentTime = GetClock();
 			current = timerQueueHead;
 			if (current == NULL || current->m_expirationTime > currentTime)
@@ -132,54 +129,66 @@ void Notifier::ProcessQueue(tNIRIO_u32 mask, void *params)
 			{
 				// if periodic, requeue the event
 				// compute when to put into queue
-				current->InsertInQueue(false);
+				current->InsertInQueue(true);
 			}
 			else
+			{
 				// not periodic; removed from queue
 				current->m_queued = false;
-			
+			}
+			// Take handler semaphore while holding queue semaphore to make sure
+			//  the handler will execute to completion in case we are being deleted.
 			semTake(current->m_handlerSemaphore, WAIT_FOREVER);
 		}
-		END_REGION;
 
 		current->m_handler(current->m_param);	// call the event handler
 		semGive(current->m_handlerSemaphore);
 	}
 	// reschedule the first item in the queue
-	CRITICAL_REGION(queueSemaphore)
-	{
-		UpdateAlarm();
-	}
-	END_REGION;
+	Synchronized sync(queueSemaphore);
+	UpdateAlarm();
 }
 
 /**
  * Insert this Notifier into the timer queue in right place.
  * WARNING: this method does not do synchronization! It must be called from somewhere
  * that is taking care of synchronizing access to the queue.
- * @param updateAlarm If true, the UpdateAlarm method is called which will enable the
- * alarm if necessary. Only updated when called from the interrupt routine. This ensures
- * that the public methods only update the queue after finishing inserting.
+ * @param reschedule If false, the scheduled alarm is based on the curent time and UpdateAlarm
+ * method is called which will enable the alarm if necessary.
+ * If true, update the time by adding the period (no drift) when rescheduled periodic from ProcessQueue.
+ * This ensures that the public methods only update the queue after finishing inserting.
  */
-void Notifier::InsertInQueue(bool updateAlarm)
+void Notifier::InsertInQueue(bool reschedule)
 {
 	tRioStatusCode status = 0;
-	m_expirationTime = GetClock() + m_period;
+	if (reschedule)
+	{
+		m_expirationTime += m_period;
+	}
+	else
+	{
+		m_expirationTime = GetClock() + m_period;
+	}
 	if (timerQueueHead == NULL || timerQueueHead->m_expirationTime >= this->m_expirationTime)
 	{
 		// the queue is empty or greater than the new entry
 		// the new entry becomes the first element
 		this->m_nextEvent = timerQueueHead;
 		timerQueueHead = this;
-		if (updateAlarm)
-			UpdateAlarm();						// since the first element changed, update alarm
+		if (!reschedule)
+		{
+			// since the first element changed, update alarm, unless we already plan to
+			UpdateAlarm();
+		}
 		wpi_assertCleanStatus(status);
 	}
 	else
 	{
-		for (Notifier **npp = &(timerQueueHead->m_nextEvent); ; npp = &(*npp)->m_nextEvent) {
+		for (Notifier **npp = &(timerQueueHead->m_nextEvent); ; npp = &(*npp)->m_nextEvent)
+		{
 			Notifier *n = *npp;
-			if (!n || n->m_expirationTime > this->m_expirationTime) {
+			if (n == NULL || n->m_expirationTime > this->m_expirationTime)
+			{
 				*npp = this;
 				this->m_nextEvent = n;
 				break;
@@ -224,36 +233,31 @@ void Notifier::DeleteFromQueue()
 
 /**
  * Register for single event notification.
- * A timer event is queued for a single event after the time has run out. The
- * event handler will be called at that time.
+ * A timer event is queued for a single event after the specified delay.
+ * @param delay Seconds to wait before the handler is called.
  */
-void Notifier::StartSingle(double period)
+void Notifier::StartSingle(double delay)
 {
-	CRITICAL_REGION(queueSemaphore)
-	{
-		m_periodic = false;
-		m_period = period;
-		DeleteFromQueue();
-		InsertInQueue(true);
-	}
-	END_REGION;
+	Synchronized sync(queueSemaphore);
+	m_periodic = false;
+	m_period = delay;
+	DeleteFromQueue();
+	InsertInQueue(false);
 }
 
 /**
  * Register for periodic event notification.
- * A timer event is queued for periodic event notification. Each time the intterupt
+ * A timer event is queued for periodic event notification. Each time the interrupt
  * occurs, the event will be immedeatly requeued for the same time interval.
+ * @param period Period in seconds to call the handler starting one period after the call to this method.
  */
 void Notifier::StartPeriodic(double period)
 {
-	CRITICAL_REGION(queueSemaphore)
-	{
-		m_periodic = true;
-		m_period = period;
-		DeleteFromQueue();
-		InsertInQueue(true);
-	}
-	END_REGION;
+	Synchronized sync(queueSemaphore);
+	m_periodic = true;
+	m_period = period;
+	DeleteFromQueue();
+	InsertInQueue(false);
 }
 
 /**
@@ -265,11 +269,10 @@ void Notifier::StartPeriodic(double period)
  */
 void Notifier::Stop()
 {
-	CRITICAL_REGION(queueSemaphore)
 	{
+		Synchronized sync(queueSemaphore);
 		DeleteFromQueue();
 	}
-	END_REGION;
-	semTake(m_handlerSemaphore, WAIT_FOREVER);
-	semGive(m_handlerSemaphore);	
+	// Wait for a currently executing handler to complete before returning from Stop()
+	Synchronized sync(m_handlerSemaphore);
 }

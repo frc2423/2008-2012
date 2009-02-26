@@ -8,6 +8,7 @@
 #include "I2C.h"
 #include "PWM.h"
 #include "Resource.h"
+#include "Synchronized.h"
 #include "Utility.h"
 #include "WPIStatus.h"
 
@@ -69,11 +70,17 @@ DigitalModule::DigitalModule(UINT32 slot)
 	// Turn off all relay outputs.
 	m_fpgaDIO->writeSlowValue_RelayFwd(0, &status);
 	m_fpgaDIO->writeSlowValue_RelayRev(0, &status);
+
+	// Create a semaphore to protect changes to the relay values
+	m_relaySemaphore = semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE);
+
 	AddToSingletonList();
 }
 
 DigitalModule::~DigitalModule()
 {
+	semDelete(m_relaySemaphore);
+	m_relaySemaphore = NULL;
 	delete m_fpgaDIO;
 	m_modules[m_slot] = NULL;
 }
@@ -124,13 +131,15 @@ void DigitalModule::SetRelayForward(UINT32 channel, bool on)
 {
 	status = 0;
 	CheckRelayChannel(channel);
-	// TODO: Protect me with a semaphore.
-	UINT8 forwardRelays = m_fpgaDIO->readSlowValue_RelayFwd(&status);
-	if (on)
-		forwardRelays |= 1 << (channel - 1);
-	else
-		forwardRelays &= ~(1 << (channel - 1));
-	m_fpgaDIO->writeSlowValue_RelayFwd(forwardRelays, &status);
+	{
+		Synchronized sync(m_relaySemaphore);
+		UINT8 forwardRelays = m_fpgaDIO->readSlowValue_RelayFwd(&status);
+		if (on)
+			forwardRelays |= 1 << (channel - 1);
+		else
+			forwardRelays &= ~(1 << (channel - 1));
+		m_fpgaDIO->writeSlowValue_RelayFwd(forwardRelays, &status);
+	}
 	wpi_assertCleanStatus(status);
 }
 
@@ -143,13 +152,15 @@ void DigitalModule::SetRelayReverse(UINT32 channel, bool on)
 {
 	status = 0;
 	CheckRelayChannel(channel);
-	// TODO: Protect me with a semaphore.
-	UINT8 reverseRelays = m_fpgaDIO->readSlowValue_RelayRev(&status);
-	if (on)
-		reverseRelays |= 1 << (channel - 1);
-	else
-		reverseRelays &= ~(1 << (channel - 1));
-	m_fpgaDIO->writeSlowValue_RelayRev(reverseRelays, &status);
+	{
+		Synchronized sync(m_relaySemaphore);
+		UINT8 reverseRelays = m_fpgaDIO->readSlowValue_RelayRev(&status);
+		if (on)
+			reverseRelays |= 1 << (channel - 1);
+		else
+			reverseRelays &= ~(1 << (channel - 1));
+		m_fpgaDIO->writeSlowValue_RelayRev(reverseRelays, &status);
+	}
 	wpi_assertCleanStatus(status);
 }
 

@@ -262,7 +262,18 @@ double Encoder::GetPeriod()
 	}
 	else
 	{
-		UINT32 value = m_encoder->readTimerOutput_Period(&status) / m_encoder->readTimerOutput_Count(&status);
+		tEncoder::tTimerOutput output = m_encoder->readTimerOutput(&status);
+		double value;
+		if (output.Stalled)
+		{
+			// Return infinity
+			double zero = 0.0;
+			value = 1.0 / zero;
+		}
+		else
+		{
+			value = (double)output.Period / (double)output.Count;
+		}
 		wpi_assertCleanStatus(status);
 		// Workaround artf4249: treat the 4x decoder as a 2x decoder for for the timer only.
 		// Should be multiplied by 0.25 for 4x decoding... using 0.5 as 2x
@@ -362,7 +373,7 @@ double Encoder::DecodingScaleFactor()
  */
 double Encoder::GetDistance()
 {
-	return Get() * m_distancePerPulse;
+	return GetRaw() * DecodingScaleFactor() * m_distancePerPulse;
 }
 
 /**

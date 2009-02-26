@@ -55,7 +55,7 @@ enum ImageSize { k640x480, k320x240, k160x120 };
 /**
 @brief Possible rotation values that you can set on the camera.
 */
-enum ImageRotation { ROT_0 = 0, ROT_90 = 90, ROT_180 = 180, ROT_270 = 270 };
+enum ImageRotation { ROT_0 = 0, ROT_180 = 180 };
 
 /*  Image Acquisition functions */
 

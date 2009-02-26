@@ -1,6 +1,8 @@
 #include "WPILib.h"
 #include "DriverStationLCD.h"
 
+#include "filters.h"
+
 
 class RobotDemo : public SimpleRobot
 {
@@ -15,9 +17,16 @@ public:
 	{
 		double tm = GetTime();
 		
+		LowPassFilter filter1;
+		LowPassFilter filter2;
+		LowPassFilter filter3;
+		LowPassFilter filter4;
+		
 		GetWatchdog().SetEnabled(true);
 		while (IsOperatorControl())
 		{
+			GetWatchdog().Feed();
+			
 			if (GetTime() - tm > 0.1)
 			{
 				DriverStationLCD * lcd = DriverStationLCD::GetInstance();
@@ -34,10 +43,14 @@ public:
 						(int)m_ds->GetDigitalIn(8)
 				);
 								
-				lcd->PrintfLine(DriverStationLCD::kUser_Line3, "1: %f", m_ds->GetAnalogIn(1));
-				lcd->PrintfLine(DriverStationLCD::kUser_Line4, "2: %f", m_ds->GetAnalogIn(2));
-				lcd->PrintfLine(DriverStationLCD::kUser_Line5, "3: %f", m_ds->GetAnalogIn(3));
-				lcd->PrintfLine(DriverStationLCD::kUser_Line6, "4: %f", m_ds->GetAnalogIn(4));
+				lcd->PrintfLine(DriverStationLCD::kUser_Line3, "1: %.1f", 
+						filter1.Calculate( m_ds->GetAnalogIn(1)) );
+				lcd->PrintfLine(DriverStationLCD::kUser_Line4, "2: %.1f", 
+						filter2.Calculate( m_ds->GetAnalogIn(2)) );
+				lcd->PrintfLine(DriverStationLCD::kUser_Line5, "3: %.1f", 
+						filter3.Calculate( m_ds->GetAnalogIn(3)) );
+				lcd->PrintfLine(DriverStationLCD::kUser_Line6, "4: %.1f", 
+						filter4.Calculate( m_ds->GetAnalogIn(4)) );
 				
 				lcd->UpdateLCD();
 				

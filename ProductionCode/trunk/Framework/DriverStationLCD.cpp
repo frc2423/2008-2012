@@ -9,6 +9,9 @@
 #include "Synchronized.h"
 #include <strLib.h>
 
+#define LineLength 21
+
+
 DriverStationLCD* DriverStationLCD::m_instance = NULL;
 
 /**
@@ -71,8 +74,8 @@ void DriverStationLCD::Printf(Line line, UINT32 startingColumn, const char *writ
 {
 	va_list args;
 	UINT32 start = startingColumn - 1;
-	INT32 maxLength = kLineLength - start;
-	char lineBuffer[kLineLength + 1];
+	INT32 maxLength = LineLength - start;
+	char lineBuffer[LineLength + 1];
 
 	if (startingColumn < 1 || startingColumn > startingColumn)
 		return;
@@ -84,10 +87,8 @@ void DriverStationLCD::Printf(Line line, UINT32 startingColumn, const char *writ
 	{
 		Synchronized sync(m_textBufferSemaphore);
 		// snprintf appends NULL to its output.  Therefore we can't write directly to the buffer.
-		INT32 length = vsnprintf(lineBuffer, kLineLength + 1, writeFmt, args);
-
-		if (length > 0)
-			memcpy(m_textBuffer + start + line * kLineLength + sizeof(UINT16), lineBuffer, std::min(maxLength,length));
+		INT32 length = vsnprintf(lineBuffer, LineLength + 1, writeFmt, args);
+		memcpy(m_textBuffer + start + line * LineLength + sizeof(UINT16), lineBuffer, std::min(maxLength,length));
 	}
 
 	va_end (args);
@@ -105,7 +106,7 @@ void DriverStationLCD::Printf(Line line, UINT32 startingColumn, const char *writ
 void DriverStationLCD::PrintfLine(Line line, const char *writeFmt, ...)
 {
 	va_list args;
-	char lineBuffer[kLineLength + 1];
+	char lineBuffer[LineLength + 1];
 
 	if (line < kMain_Line6 || line > kUser_Line6)
 		return;
@@ -114,14 +115,11 @@ void DriverStationLCD::PrintfLine(Line line, const char *writeFmt, ...)
 	{
 		Synchronized sync(m_textBufferSemaphore);
 		// snprintf appends NULL to its output.  Therefore we can't write directly to the buffer.
-		INT32 length = std::min( vsnprintf(lineBuffer, kLineLength + 1, writeFmt, args), kLineLength);
-		if (length == -1)
-			length = kLineLength;
+		INT32 length = std::min( vsnprintf(lineBuffer, LineLength + 1, writeFmt, args), LineLength);
+		memcpy(m_textBuffer + line * LineLength + sizeof(UINT16), lineBuffer, length);
 
-		memcpy(m_textBuffer + line * kLineLength + sizeof(UINT16), lineBuffer, length);
-
-		if (length < kLineLength)
-			memset(m_textBuffer + line * kLineLength + sizeof(UINT16) + length, ' ', kLineLength - length);
+		if (length < LineLength)
+			memset(m_textBuffer + line * LineLength + sizeof(UINT16) + length, ' ', LineLength - length);
 	}
 
 	va_end (args);

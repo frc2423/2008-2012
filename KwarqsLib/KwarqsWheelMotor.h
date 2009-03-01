@@ -6,8 +6,8 @@
 */
 
 
-#ifndef FRAMEWORK_KWARQS_WHEELMOTOR_H
-#define FRAMEWORK_KWARQS_WHEELMOTOR_H
+#ifndef KWARQSLIB_KWARQS_WHEELMOTOR_H
+#define KWARQSLIB_KWARQS_WHEELMOTOR_H
 
 #include "filters.h"
 #include "DriverStationLCD.h"

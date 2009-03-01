@@ -5,8 +5,8 @@
 	\version 	$Rev$
 */
 
-#ifndef FRAMEWORK_KWARQS_DRIVECONTROLLER_H
-#define FRAMEWORK_KWARQS_DRIVECONTROLLER_H
+#ifndef KWARQSLIB_KWARQS_DRIVECONTROLLER_H
+#define KWARQSLIB_KWARQS_DRIVECONTROLLER_H
 
 #include <vector>
 #include "KwarqsDriveBase.h"

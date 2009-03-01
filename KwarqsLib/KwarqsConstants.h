@@ -10,8 +10,8 @@
 	later on if we need to move things around. 
 */
 
-#ifndef FRAMEWORK_KWARQS_CONSTANTS_H
-#define FRAMEWORK_KWARQS_CONSTANTS_H
+#ifndef KWARQSLIB_KWARQS_CONSTANTS_H
+#define KWARQSLIB_KWARQS_CONSTANTS_H
 
 
 #define SLOT_1 4

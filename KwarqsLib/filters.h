@@ -1,6 +1,6 @@
 
-#ifndef FRAMEWORK_FILTERS_H
-#define FRAMEWORK_FILTERS_H
+#ifndef KWARQSLIB_FILTERS_H
+#define KWARQSLIB_FILTERS_H
 
 #include <vector>
 #include <cassert>

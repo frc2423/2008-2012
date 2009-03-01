@@ -12,9 +12,6 @@
 #include "filters.h"
 #include "DriverStationLCD.h"
 
-//#define IMPLEMENTATION_1
-#define IMPLEMENTATION_2
-
 /**
 	\class KwarqsWheelMotor
 	\brief A class that is used to control the speed of a motor

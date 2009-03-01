@@ -7,6 +7,9 @@
 
 #include "KwarqsConstants.h"
 
+// todo: make this more general, probably should add
+// to some input class
+
 inline int GetBCDInput()
 {
 	DriverStation * ds = DriverStation::GetInstance();

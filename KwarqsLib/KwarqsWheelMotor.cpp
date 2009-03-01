@@ -35,6 +35,8 @@
  
 #include <WPILib.h>
 
+
+#include "KwarqsBCDInput.h"
 #include "KwarqsWheelMotor.h"
 #include "KwarqsConstants.h"
 
@@ -119,6 +121,8 @@ void KwarqsWheelMotor::SetSpeed(float desired_speed, double velocity)
 		// the semi-real thing
 		case 3:
 		
+			// this should be high for quick response
+			#define K_1		.5
 			
 			// this should be high to allow for quick response
 			#define K_2		.5
@@ -127,28 +131,26 @@ void KwarqsWheelMotor::SetSpeed(float desired_speed, double velocity)
 			#define SLIP_PCT .2
 			
 			
-			// if we're going too fast
-			if (velocity * (1 + SLIP_PCT) < encoder_velocity)
+			// if we're going too fast and the user wants us to
+			// go faster, ignore them and go slower
+			if (velocity * (1 + SLIP_PCT) < encoder_velocity && 
+				desired_speed > m_lastSpeed)
 			{
-				// if the user wants to go faster, ignore them
-				if (desired_speed > m_lastSpeed)
-				{
-					// go slower
-				}
+				m_lastSpeed += m_lastSpeed * -K_1;
 			}
 			
-			// if we're going too slow
-			else if (velocity * (1 - SLIP_PCT) > encoder_velocity)
+			// if we're going too slow and the user wants us to go
+			// slower, ignore them and go faster
+			else if (velocity * (1 - SLIP_PCT) > encoder_velocity &&
+				desired_speed < m_lastSpeed)
 			{
-				// if the user wants to go slower, ignore them
-				if (desired_speed < m_lastSpeed)
-				{
-					// go faster
-				}
+				m_lastSpeed += m_lastSpeed * K_1;
 			}
-
-			// PID style loop thing
-			m_lastSpeed = m_lastSpeed + (desired_speed - m_lastSpeed)* K_2;
+			else
+			{
+				// PID style loop thing
+				m_lastSpeed += (desired_speed - m_lastSpeed)* K_2;
+			}
 		
 			break;
 				

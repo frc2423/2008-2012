@@ -9,8 +9,9 @@
 #ifndef ARCADE_CONTROL_H
 #define ARCADE_CONTROL_H
 
-#include "Framework/KwarqsConstants.h"
-#include "Framework/KwarqsMovementControl.h"
+#include "KwarqsLib/KwarqsConstants.h"
+#include "KwarqsLib/KwarqsMovementControl.h"
+#include "KwarqsLib/KwarqsJoystick.h"
 
 
 class ArcadeControl : public KwarqsMovementControl {
@@ -26,7 +27,7 @@ public:
 private:
 
 	// joystick used for control
-	Joystick * m_stick;
+	KwarqsJoystick m_stick;
 };
 
 #endif

@@ -32,22 +32,22 @@
 * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "WPILib.h"
+#include <WPILib.h>
 #include "ArcadeControl.h"
 
 
 ArcadeControl::ArcadeControl(KwarqsDriveController * driveController) :
-	KwarqsMovementControl(driveController)
+	KwarqsMovementControl(driveController),
+	m_stick(FIRST_JOYSTICK_PORT)
 {
-	m_stick = Joystick::GetStickForPort(FIRST_JOYSTICK_PORT);
 }
 
 // implements the default arcade drive control found in WPILib
 void ArcadeControl::Move()
 {
-	double moveValue = m_stick->GetY()*-1, rotateValue = m_stick->GetX();
+	double moveValue = m_stick.GetY()*-1, rotateValue = m_stick.GetX();
 
-	if (m_stick->GetTrigger())
+	if (m_stick.GetTrigger())
 	{
 		// square the inputs (while preserving the sign) to increase fine control while permitting full power
 		if (moveValue >= 0.0)

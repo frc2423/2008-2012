@@ -111,6 +111,9 @@ public:
 				break;
 		}
 		
+		if (m_file == NULL)
+			fprintf(stderr, "Error opening file %s in mode %d\n", filename, (int)mode);
+		
 		return m_file != NULL;
 	}
 	

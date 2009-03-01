@@ -9,6 +9,7 @@
 
 #include "Framework/KwarqsDriveController.h"
 #include "Framework/DriverStationLCD.h"
+#include "KwarqsLib/DelayTime.h"
 
 #include "ArcadeControl.h"
 #include "CompassDrive.h"
@@ -145,7 +146,7 @@ public:
 	*/
 	void OperatorControl()
 	{
-		double update_time = GetTime();
+		DelayTime delay;
 		
 		printf("Entered OperatorControl()\n");
 		GetWatchdog().SetEnabled(true);
@@ -158,7 +159,7 @@ public:
 			GetTeleoperatedMovementControl()->Move();
 			driveController.EndMove();
 			
-			if (GetTime() - update_time > 0.2)
+			if (delay.DoEvent())
 			{
 				// update and clear
 				lcd->UpdateLCD();
@@ -168,10 +169,7 @@ public:
 				lcd->Printf(DriverStationLCD::kUser_Line4, 1, "                   ");
 				lcd->Printf(DriverStationLCD::kUser_Line5, 1, "                   ");
 				lcd->Printf(DriverStationLCD::kUser_Line6, 1, "                   ");
-				
-				update_time = GetTime();
 			}
-			
 		}
 		
 		GetTeleoperatedMovementControl()->OnDisable();

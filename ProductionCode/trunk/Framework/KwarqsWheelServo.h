@@ -107,9 +107,10 @@ private:
 	static int m_uncalibrated_servos;
 	
 	// called when calibration is finished
+	static void CalibrationIrqHandler(tNIRIO_u32 x, void * param);
 	void CalibrationComplete();
 
-	TunablePIDController * m_pidController;
+	PIDController * m_pidController;
 	
 	
 	Encoder 		m_encoder;
@@ -129,8 +130,7 @@ private:
 	
 	bool 		m_in_manual_mode;
 	
-	template <int i>
-	friend class UglyServoHack;
+	SEM_ID		m_calibration_mutex;
 };
 
 

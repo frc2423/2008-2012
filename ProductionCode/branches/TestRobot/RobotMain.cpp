@@ -20,6 +20,7 @@
 
 class KwarqsRobotMain : public SimpleRobot
 {
+	DriverStationLCD *		lcd;
 	KwarqsDriveController 	driveController;
 	
 	// control types
@@ -46,8 +47,11 @@ public:
 
 		To get things to happen, you need to add your class initialization
 		and startup code here. 
+		
+		This executes as soon as the code loads. 
 	*/
 	KwarqsRobotMain() :
+		lcd( DriverStationLCD::GetInstance() ),
 		arcadeControl(&driveController),
 		nullMovementControl(&driveController),
 		currentTeleoperatedControl(NULL)
@@ -100,6 +104,9 @@ public:
 			currentTeleoperatedControl->OnEnable();
 		}
 		
+				DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kMain_Line6, "%.1f %s", 
+				PositionInformation::GetInstance()->GetNormalizedAngle(), control->Name());
+		
 		return currentTeleoperatedControl;
 	}
 	
@@ -138,7 +145,7 @@ public:
 	*/
 	void OperatorControl()
 	{
-		double tm = GetTime();
+		double update_time = GetTime();
 		
 		printf("Entered OperatorControl()\n");
 		GetWatchdog().SetEnabled(true);
@@ -147,16 +154,22 @@ public:
 		{
 			GetWatchdog().Feed();
 			
+			// perform a movement
 			GetTeleoperatedMovementControl()->Move();
 			driveController.EndMove();
 			
-			// wait period
-			//Wait(0.0025);
-			
-			if (GetTime() - tm > 0.2)
+			if (GetTime() - update_time > 0.2)
 			{
-				DriverStationLCD::GetInstance()->UpdateLCD();
-				tm = GetTime();
+				// update and clear
+				lcd->UpdateLCD();
+				lcd->Printf(DriverStationLCD::kMain_Line6, 1, "                   ");
+				lcd->Printf(DriverStationLCD::kUser_Line2, 1, "                   ");
+				lcd->Printf(DriverStationLCD::kUser_Line3, 1, "                   ");
+				lcd->Printf(DriverStationLCD::kUser_Line4, 1, "                   ");
+				lcd->Printf(DriverStationLCD::kUser_Line5, 1, "                   ");
+				lcd->Printf(DriverStationLCD::kUser_Line6, 1, "                   ");
+				
+				update_time = GetTime();
 			}
 			
 		}

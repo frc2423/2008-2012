@@ -36,12 +36,6 @@
 #include <math.h>
 #include "KwarqsWheelServo.h"
 
-
-template <int N>
-KwarqsWheelServo * UglyServoHack<N>::that = NULL;
-
-
-
 /**
 	\brief Constructor
 	
@@ -83,6 +77,9 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_calibrating_offset(cal_offset),
 	m_invert_motor( invert_motor ? -1.0F : 1.0F )
 {
+	// initialize the calibration mutex
+	m_calibration_mutex = semBCreate(0, SEM_FULL);
+
 	// no calibration by default
 	CalibrationComplete();
 		
@@ -131,11 +128,9 @@ void KwarqsWheelServo::Calibrate()
 	// setup the interrupt handlers.. this is very braindead, why
 	// can't I just pass the *this* pointer in?
 	
-	tInterruptHandler handler;
+	tInterruptHandler handler = ;
 	
-	SETUP_UGLY_SERVO_HACK
-	
-	m_sensor.RequestInterrupts(handler);
+	m_sensor.RequestInterrupts(handler, this);
 		
 	m_sensor.SetUpSourceEdge(false, true);
 	m_sensor.EnableInterrupts();
@@ -145,6 +140,9 @@ void KwarqsWheelServo::Calibrate()
 
 void KwarqsWheelServo::CalibrationComplete()
 {
+	// no multithreading errors... 
+	Synchronized sync(m_calibration_mutex);
+
 	/*
 	if (m_calibrating && !m_in_manual_mode)
 	{
@@ -214,7 +212,7 @@ bool KwarqsWheelServo::GetSensor()
 // generally you won't need to use this.. 
 void KwarqsWheelServo::TuneParameters(float p, float i, float d)
 {
-	m_pidController->TuneParameters(p, i, d);
+	m_pidController->SetPID(p, i, d);
 }
 
 
@@ -265,4 +263,9 @@ int KwarqsWheelServo::m_uncalibrated_servos = 0;
 int KwarqsWheelServo::UncalibratedServoCount()
 {
 	return KwarqsWheelServo::m_uncalibrated_servos;
+}
+
+void KwarqsWheelServo::CalibrationIrqHandler(tNIRIO_u32 x, void * param)
+{
+	((KwarqsWheelServo *)param)->CalibrationComplete();
 }

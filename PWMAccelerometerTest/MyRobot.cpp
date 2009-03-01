@@ -1,6 +1,11 @@
 #include "WPILib.h"
 #include "DriverStationLCD.h"
 
+#include "PositionTracking.h"
+
+#include <cmath>
+#include <numeric>
+
 
 
 /**
@@ -14,20 +19,22 @@ class RobotDemo : public SimpleRobot
 	RobotDrive myRobot; // robot drive system
 	Joystick stick; // only joystick
 
+	DigitalInput in1, in2;
 	Counter countXhi, countXlow, countYhi, countYlow;
 	
 public:
 	RobotDemo(void):
 		myRobot(1, 2),	// these must be initialized in the same order
 		stick(1),
+		in1(3), in2(4)
 	{
 		GetWatchdog().SetExpiration(0.1);
 		
 		// specify the source
-		countXhi.SetUpSource(3);
-		countXlow.SetUpSource(3);
-		countYhi.SetUpSource(4);
-		countYlow.SetUpSource(4);
+		countXhi.SetUpSource(in1);
+		countXlow.SetUpSource(in1);
+		countYhi.SetUpSource(in2);
+		countYlow.SetUpSource(in2);
 		
 		// setup the counters
 		countXhi.SetSemiPeriodMode(true);
@@ -47,7 +54,9 @@ public:
 	void OperatorControl(void)
 	{
 		double tm = GetTime();
-		double vx = 0.0, vy = 0.0;
+		
+		AccelerationReset();
+		
 		
 		GetWatchdog().SetEnabled(true);
 		while (IsOperatorControl())
@@ -62,26 +71,35 @@ public:
 				double ayH = countYhi.GetPeriod();
 				double ayL = countYlow.GetPeriod();
 				
+				axH = axH - fmod(axH, 0.00001);
+				ayH = ayH - fmod(ayH, 0.00001);
+				
 				// convert to m/s^2 -- 50% duty cycle is 0g
-				double ax = (((axH / (axH + axL)) - .5) * 8.0) * 9.81;
-				double ay = (((ayH / (ayH + ayL)) - .5) * 8.0) * 9.81;
-								
+				double ax = (((axH / (0.01)) - .5) * 8.0) * 9.81;
+				double ay = (((ayH / (0.01)) - .5) * 8.0) * 9.81;
+				
+				//AccelerationUpdate( ax, ay, .1);
+				
+				//get the filtered acceleration, velocity and position
+				//GetAcceleration( &ax, &ay);
+				
+				
 				// or
 				// ax = (((axH / 0.01) - .5) * 8.0) * 9.81;
 				// ay = (((ayH / 0.01) - .5) * 8.0) * 9.81;
 								
 				DriverStationLCD * lcd = DriverStationLCD::GetInstance();
 				
-				lcd->PrintfLine(DriverStationLCD::kUser_Line3, "ax: %f m/s^2", ax);
-				lcd->PrintfLine(DriverStationLCD::kUser_Line4, "%.6f %.6f", axH, axL);
-				lcd->PrintfLine(DriverStationLCD::kUser_Line5, "ay: %f m/s^2", ay);
-				lcd->PrintfLine(DriverStationLCD::kUser_Line6, "%.6f %.6f", ayH, ayL);
+				lcd->Printf(DriverStationLCD::kUser_Line3, 1, "ax: %f m/s^2            ", ax);
+				lcd->Printf(DriverStationLCD::kUser_Line4, 1, "%.6f %.6f               ", axH, axL);
+				lcd->Printf(DriverStationLCD::kUser_Line5, 1, "ay: %f m/s^2            ", ay);
+				lcd->Printf(DriverStationLCD::kUser_Line6, 1, "%.6f %.6f               ", ayH, ayL);
 				
 				// euler' integration method.. bad bad bad
-				vx += ax / (axH + axL);
-				vy += ay / (ayH + ayL);
-				//lcd->PrintfLine(DriverStationLCD::kUser_Line5, "vx: %.1f", vx);
-				//lcd->PrintfLine(DriverStationLCD::kUser_Line6, "vy: %.1f", vy);
+				//vx += ax / (0.01);
+				//vy += ay / (0.01);
+				//lcd->Printf(DriverStationLCD::kUser_Line4, 1, "vx: %.1f", vx);
+				//lcd->Printf(DriverStationLCD::kUser_Line6, 1, "vy: %.1f", vy);
 				
 				lcd->UpdateLCD();
 				tm = GetTime();

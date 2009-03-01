@@ -100,6 +100,7 @@ void DriverStationLCD::Printf(Line line, UINT32 startingColumn, const char *writ
  * @param line The line on the LCD to print to.
  * @param writeFmt The printf format string describing how to print.
  */
+/*
 void DriverStationLCD::PrintfLine(Line line, const char *writeFmt, ...)
 {
 	va_list args;
@@ -121,5 +122,5 @@ void DriverStationLCD::PrintfLine(Line line, const char *writeFmt, ...)
 
 	va_end (args);
 }
-
+*/
 

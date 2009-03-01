@@ -11,6 +11,8 @@
 #include "KwarqsLib/DriverStationLCD.h"
 #include "KwarqsLib/DelayTime.h"
 
+#include "KwarqsLib/KwarqsBCDInput.h"
+
 #include "RecordedAutonomousControl.h"
 
 #include "ArcadeControl.h"
@@ -112,7 +114,8 @@ public:
 			currentTeleoperatedControl->OnEnable();
 		}
 		
-		DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kMain_Line, "%s", control->Name());
+		DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kMain_Line, 
+			"TCS: %d C: %s", control->Name(), GetBCDInput());
 		
 		return currentTeleoperatedControl;
 	}

@@ -43,8 +43,8 @@ public:
 	KwarqsWheelMotor(
 			UINT32 slot, UINT32 pwm_port, 
 			UINT32 encoder_port1, UINT32 encoder_port2, 
-			bool invert_motor, bool invert_encoder,
-			DriverStationLCD::Line line);
+			bool invert_motor, bool invert_encoder
+	);
 
 	/// Set the speed of the motor (-1 to 1)
 	void SetSpeed(float speed, double velocity);

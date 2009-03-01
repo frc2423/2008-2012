@@ -39,8 +39,8 @@
 
 // default constructor
 ArcadeDrive::ArcadeDrive() :
-	m_leftMotor(MOTOR_L_PARAMETERS, DriverStationLCD::kUser_Line3),
-	m_rightMotor(MOTOR_R_PARAMETERS, DriverStationLCD::kUser_Line4),
+	m_leftMotor(MOTOR_L_PARAMETERS),
+	m_rightMotor(MOTOR_R_PARAMETERS),
 	m_encoder(SLOT_1, 9, SLOT_1, 10),
 	m_tm(GetTime())
 {

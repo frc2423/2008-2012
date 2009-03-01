@@ -49,6 +49,7 @@ void ArcadeControl::Move()
 
 	if (m_stick.GetTrigger())
 	{
+	/*
 		// square the inputs (while preserving the sign) to increase fine control while permitting full power
 		if (moveValue >= 0.0)
 		{
@@ -66,6 +67,10 @@ void ArcadeControl::Move()
 		{
 			rotateValue = -(rotateValue * rotateValue);
 		}
+	*/
+		// full forward for traction control testing
+		moveValue = 1.0;
+		rotateValue = 0;
 	}
 	
 	m_driveController->Move(moveValue, 0, rotateValue, false);

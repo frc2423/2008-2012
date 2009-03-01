@@ -36,8 +36,8 @@
 #include <WPILib.h>
 
 #include "KwarqsWheelMotor.h"
+#include "KwarqsConstants.h"
 
-#define M_K 0.1
 
 /**
 	\brief Constructor
@@ -53,16 +53,19 @@ KwarqsWheelMotor::KwarqsWheelMotor(
 		UINT32 pwm_port, 
 		UINT32 encoder_port1, UINT32 encoder_port2,
 		bool invert_motor,
-		bool invert_encoder,
-		DriverStationLCD::Line line) :
+		bool invert_encoder) :
 	m_motor(slot, pwm_port),
 	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X),
 	m_invert(invert_motor ? -1.0F : 1.0F),
 	m_lastSpeed(0),
 	m_lastUpdate(GetTime()),
-	m_line(line)
 {
 	SetSpeed(0, 0);
+	
+	if (pwm_port == PWM_L_JAGUAR)
+		m_line = DriverStationLCD::kUser_Line3;
+	else
+		m_line = DriverStationLCD::kUser_Line4;
 	
 	m_encoder.SetDistancePerPulse(.0019);
 	m_encoder.SetReverseDirection(invert_encoder);
@@ -73,48 +76,107 @@ KwarqsWheelMotor::KwarqsWheelMotor(
 /// Set the speed of the motor (-1 to 1)? 
 void KwarqsWheelMotor::SetSpeed(float desired_speed, double velocity)
 {
+	const float input_speed = desired_speed;
 
 	if (GetTime() - m_lastUpdate > 0.025)
 	{
-#if 0
-#ifdef IMPLEMENTATION_1
+		const double encoder_velocity = m_encoder.GetRate();
+		const double encoder_acceleration = encoder_velocity/m_encoder.GetPeriod();
 	
+		switch (GetBCDInput())
+		{
+		
+		// no traction control
+		case 0:
+			m_lastSpeed = desired_speed;
+			break;
+			
+		
+		// filtered wheel speed (stage 1)
+		case 1:
+		
+			m_lastSpeed = m_lastSpeed + (desired_speed - m_lastSpeed)* 0.1;
+			break;
+			
+		// hard limit on encoder acceleration (stage 2)
+		case 2:
+		
+			if (encoder_acceleration < -MAX_ACCEL)
+			{
+				m_lastSpeed = m_lastSpeed * .5;
+			}
+			else if (encoder_acceleration > MAX_ACCEL)
+			{
+				m_lastSpeed = m_lastSpeed * .5;
+			}
+			else
+			{
+				m_lastSpeed = desired_speed;
+			}
+		
+			break;
+			
+		// the semi-real thing
+		case 3:
+		
+			
+			// this should be high to allow for quick response
+			#define K_2		.5
+			
+			// 20% slip is an optimal value according to several sources
+			#define SLIP_PCT .2
+			
+			
+			// if we're going too fast
+			if (velocity * (1 + SLIP_PCT) < encoder_velocity)
+			{
+				// if the user wants to go faster, ignore them
+				if (desired_speed > m_lastSpeed)
+				{
+					// go slower
+				}
+			}
+			
+			// if we're going too slow
+			else if (velocity * (1 - SLIP_PCT) > encoder_velocity)
+			{
+				// if the user wants to go slower, ignore them
+				if (desired_speed < m_lastSpeed)
+				{
+					// go faster
+				}
+			}
 
+			// PID style loop thing
+			m_lastSpeed = m_lastSpeed + (desired_speed - m_lastSpeed)* K_2;
 		
+			break;
+				
+		// the 'real' thing
+		case 4:
 		
-		m_lastSpeed = m_lastSpeed + (desired_speed - m_lastSpeed)* M_K;
+			break;
+			
+		// the 'ann' thing	
+		case 5:
 		
-		// don't need to bounds check this, its already done in PWM
-		m_motor.Set(m_lastSpeed * m_invert);
+			/// TODO: implement this
+		
+		// motors disabled
+		default:
+			m_lastSpeed = 0;
+		}
 	
-		
-
-#elif defined(IMPLEMENTATION_2)
-		
+		// print something out each time around
 		DriverStationLCD::GetInstance()->PrintfLine(
-				m_line,
-				"%.2f %.4f %d", 
-				m_encoder.GetDistance(),
-				m_encoder.GetRate(),
-				m_encoder.GetRaw()
-			);
-		
-#define ALPHA 0.1
-		
-		if (velocity * 1.1 < m_encoder.GetRate())
-		{
-			desired_speed *= (1 - ALPHA); 
-		}
-		else if (velocity * .9 > m_encoder.GetRate())
-		{
-			desired_speed *= (1 + ALPHA);
-		}
-
-		m_lastSpeed = m_lastSpeed + (desired_speed - m_lastSpeed)* M_K;
+			m_line,
+			"%.4f %.4f %.2f %.2f", 
+			encoder_velocity,
+			encoder_acceleration,
+			input_speed, 
+			m_lastSpeed
+		);
 	
-		
-#endif
-#endif
 		m_lastUpdate = GetTime();
 	}
 	

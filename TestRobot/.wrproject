@@ -246,12 +246,12 @@
     <buildtargets>
         <buildtarget buildtool="Linker" name="SimpleTemplate" passed="false" targetname="SimpleTemplate">
             <contents>
-                <buildtargetreference name="/Kwarqs2009/SimpleTemplate_partialImage"/>
+                <buildtargetreference name="/TestRobot/SimpleTemplate_partialImage"/>
             </contents>
         </buildtarget>
         <buildtarget buildtool="Partial Image Linker" name="SimpleTemplate_partialImage" passed="true" targetname="SimpleTemplate_partialImage">
             <contents>
-                <folder name="/Kwarqs2009" recursive="true"/>
+                <folder name="/TestRobot" recursive="true"/>
             </contents>
         </buildtarget>
     </buildtargets>

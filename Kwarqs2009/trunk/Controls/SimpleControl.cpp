@@ -40,9 +40,9 @@
 
 #include "SimpleControl.h"
 
-#include "../Framework/math.h"
-#include "../Framework/KwarqsConstants.h"
-#include "../Framework/DriverStationLCD.h"
+#include "../KwarqsLib/math.h"
+#include "../KwarqsLib/KwarqsConstants.h"
+#include "../KwarqsLib/DriverStationLCD.h"
 
 
 SimpleControl::SimpleControl(KwarqsDriveController * driveController) :
@@ -67,6 +67,6 @@ void SimpleControl::Move()
 	
 	m_driveController->Move(speed, desired_angle, rotation , m_stick.GetTop());
 	
-	DriverStationLCD::GetInstance()->Printf(DriverStationLCD::kUser_Line2, 1, "S: %.1f A: %.1f R: %.1f          ",
+	DriverStationLCD::GetInstance()->Printf(DriverStationLCD::kUser_Line3, 1, "S: %.1f A: %.1f R: %.1f          ",
 			speed, desired_angle, rotation);
 }

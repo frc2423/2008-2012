@@ -3,10 +3,10 @@
 #ifndef COMPASSDRIVE_H
 #define COMPASSDRIVE_H
 
-#include "../Framework/KwarqsConstants.h"
-#include "../Framework/KwarqsMovementControl.h"
-#include "../Framework/PositionInformation.h"
-#include "../Framework/KwarqsJoystick.h"
+#include "../KwarqsLib/KwarqsConstants.h"
+#include "../KwarqsLib/KwarqsMovementControl.h"
+#include "../KwarqsLib/PositionInformation.h"
+#include "../KwarqsLib/KwarqsJoystick.h"
 
 
 class CompassDrive : public KwarqsMovementControl {

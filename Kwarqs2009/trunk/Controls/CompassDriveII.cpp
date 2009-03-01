@@ -9,9 +9,9 @@
 
 #include "CompassDriveII.h"
 
-#include "../Framework/math.h"
-#include "../Framework/KwarqsConstants.h"
-#include "../Framework/DriverStationLCD.h"
+#include "../KwarqsLib/math.h"
+#include "../KwarqsLib/KwarqsConstants.h"
+#include "../KwarqsLib/DriverStationLCD.h"
 
 
 CompassDriveII::CompassDriveII(KwarqsDriveController * driveController) :

@@ -36,9 +36,9 @@
 #include <WPILib.h>
 #include "SwerveDrive.h"
 
-#include "Framework/KwarqsConstants.h"
-#include "Framework/math.h"
-#include "Framework/DriverStationLCD.h"
+#include "../KwarqsLib/KwarqsConstants.h"
+#include "../KwarqsLib/math.h"
+#include "../KwarqsLib/DriverStationLCD.h"
 
 // default constructor
 SwerveDrive::SwerveDrive(RobotChassis * chassis) :

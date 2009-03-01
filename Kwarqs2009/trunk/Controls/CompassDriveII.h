@@ -9,11 +9,11 @@
 #ifndef COMPASSDRIVE_II_H
 #define COMPASSDRIVE_II_H
 
-#include "../Framework/KwarqsNosePointer.h"
-#include "../Framework/KwarqsConstants.h"
-#include "../Framework/KwarqsMovementControl.h"
-#include "../Framework/PositionInformation.h"
-#include "../Framework/KwarqsJoystick.h"
+#include "../KwarqsLib/KwarqsNosePointer.h"
+#include "../KwarqsLib/KwarqsConstants.h"
+#include "../KwarqsLib/KwarqsMovementControl.h"
+#include "../KwarqsLib/PositionInformation.h"
+#include "../KwarqsLib/KwarqsJoystick.h"
 
 /**
 	\class CompassDriveII

@@ -8,9 +8,9 @@
 #ifndef ROBOTCHASSIS_H
 #define ROBOTCHASSIS_H
 
-#include "Framework/KwarqsWheelMotor.h"
-#include "Framework/KwarqsWheelServo.h"
-#include "Framework/KwarqsConstants.h"
+#include "KwarqsLib/KwarqsWheelMotor.h"
+#include "KwarqsLib/KwarqsWheelServo.h"
+#include "KwarqsLib/KwarqsConstants.h"
 
 /**
 	\brief Container class to hold shared chassis items
@@ -36,10 +36,10 @@ struct RobotChassis
 		servo_lr( SERVO_LR_PARAMETERS ),
 		servo_rr( SERVO_RR_PARAMETERS ),
 		
-		motor_lf(MOTOR_LF_PARAMETERS ),
-		motor_rf(MOTOR_RF_PARAMETERS ),
-		motor_lr(MOTOR_LR_PARAMETERS ),
-		motor_rr(MOTOR_RR_PARAMETERS )
+		motor_lf(MOTOR_LF_PARAMETERS , DriverStationLCD::kMain_Line),
+		motor_rf(MOTOR_RF_PARAMETERS , DriverStationLCD::kMain_Line),
+		motor_lr(MOTOR_LR_PARAMETERS , DriverStationLCD::kMain_Line),
+		motor_rr(MOTOR_RR_PARAMETERS , DriverStationLCD::kMain_Line)
 	{}
 };
 

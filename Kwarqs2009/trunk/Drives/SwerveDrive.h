@@ -8,8 +8,8 @@
 #ifndef SWERVEDRIVE_H
 #define SWERVEDRIVE_H
 
-#include "Framework/KwarqsDriveBase.h"
-#include "RobotChassis.h"
+#include "../KwarqsLib/KwarqsDriveBase.h"
+#include "../RobotChassis.h"
 
 /**
 	\class SwerveDrive

@@ -9,9 +9,9 @@
 #ifndef ARCADE_CONTROL_H
 #define ARCADE_CONTROL_H
 
-#include "../Framework/KwarqsConstants.h"
-#include "../Framework/KwarqsMovementControl.h"
-#include "../Framework/KwarqsJoystick.h"
+#include "../KwarqsLib/KwarqsConstants.h"
+#include "../KwarqsLib/KwarqsMovementControl.h"
+#include "../KwarqsLib/KwarqsJoystick.h"
 
 /**
 	\class SimpleControl

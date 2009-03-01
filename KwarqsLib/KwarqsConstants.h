@@ -101,6 +101,10 @@
 #define ENCODER_MOTOR_RR_1			7
 #define ENCODER_MOTOR_RR_2			8
 
+#define ENCODER_MOTOR_LF_INVERT		false
+#define ENCODER_MOTOR_LR_INVERT		false
+#define ENCODER_MOTOR_RF_INVERT		false
+#define ENCODER_MOTOR_RR_INVERT		false
 
 // servos
 #define SERVO_LF_SLOT				SLOT_1

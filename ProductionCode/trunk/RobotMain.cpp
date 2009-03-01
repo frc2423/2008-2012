@@ -28,7 +28,7 @@
 
 class KwarqsRobotMain : public SimpleRobot
 {
-	DriverStation * 		ds;
+	DriverStationLCD *		lcd;
 	KwarqsDriveController 	driveController;
 	
 	RobotChassis			chassis;
@@ -65,6 +65,8 @@ public:
 
 		To get things to happen, you need to add your class initialization
 		and startup code here. 
+		
+		This executes as soon as the code loads
 	*/
 	KwarqsRobotMain() :
 		ds(DriverStation::GetInstance()),
@@ -94,6 +96,8 @@ public:
 		//driveController.AddDrive(&speedLimiter, DriveEnabled);
 		driveController.AddDrive(&psuedoGearbox, DriveEnabled);
 		driveController.AddDrive(&swerveDrive, DriveEnabled);
+		
+		lcd = DriverStationLCD::GetInstance();
 	}
 
 	/**
@@ -163,7 +167,7 @@ public:
 					
 		}
 		
-		DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kMain_Line6, "%.1f %s                  ", 
+		lcd->PrintfLine(DriverStationLCD::kMain_Line6, "%.1f %s", 
 				PositionInformation::GetInstance()->GetNormalizedAngle(), control->Name());
 		
 		return currentTeleoperatedControl;
@@ -232,8 +236,6 @@ public:
 			
 			if (GetTime() - update_time > 0.2)
 			{
-				DriverStationLCD * lcd = DriverStationLCD::GetInstance();
-				
 				// update and clear
 				lcd->UpdateLCD();
 				lcd->Printf(DriverStationLCD::kUser_Line2, 1, "                   ");

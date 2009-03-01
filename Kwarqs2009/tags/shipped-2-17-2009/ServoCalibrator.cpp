@@ -1,8 +1,8 @@
 /**
 	\file 		ServoCalibrator.cpp
-	\author 	Dustin Spicuzza: last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-02-16 09:05:51 -0500 (Mon, 16 Feb 2009) $
-	\version 	$Rev: 166 $
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 */
 
 /*

@@ -1,8 +1,8 @@
 /**
 	\file 		RecordedAutonomousControl.h
-	\author 	Dustin Spicuzza: last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-03-01 01:00:41 -0500 (Sun, 01 Mar 2009) $
-	\version 	$Rev: 244 $
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 */
 
 

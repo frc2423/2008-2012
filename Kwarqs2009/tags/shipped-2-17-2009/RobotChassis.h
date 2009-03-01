@@ -1,8 +1,8 @@
 /**
 	\file 		RobotChassis.h
-	\author 	Dustin Spicuzza: last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-02-16 03:26:31 -0500 (Mon, 16 Feb 2009) $
-	\version 	$Rev: 164 $
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 */
 
 #ifndef ROBOTCHASSIS_H

@@ -84,7 +84,7 @@ public:
 	/// returns true if end of file has been reached
 	bool Eof()
 	{
-		return feof(m_file);
+		return feof(m_file) != 0;
 	}
 	
 	/// opens a file with the specified mode

@@ -41,7 +41,7 @@
 ArcadeDrive::ArcadeDrive() :
 	m_leftMotor(MOTOR_L_PARAMETERS, DriverStationLCD::kUser_Line3),
 	m_rightMotor(MOTOR_R_PARAMETERS, DriverStationLCD::kUser_Line4),
-	m_encoder(9,10),
+	m_encoder(SLOT_1, 9, SLOT_1, 10),
 	m_tm(GetTime())
 {
 	//m_encoder.SetDistancePerPulse(.001521);
@@ -68,11 +68,11 @@ void ArcadeDrive::Move(double &speed, double &heading, double &rotateValue, bool
 		if (rotateValue > 0.0)
 		{
 			leftMotorSpeed = speed - rotateValue;
-			rightMotorSpeed = max(speed, rotateValue);
+			rightMotorSpeed = std::max(speed, rotateValue);
 		}
 		else
 		{
-			leftMotorSpeed = max(speed, -rotateValue);
+			leftMotorSpeed = std::max(speed, -rotateValue);
 			rightMotorSpeed = speed + rotateValue;
 		}
 	}
@@ -80,13 +80,13 @@ void ArcadeDrive::Move(double &speed, double &heading, double &rotateValue, bool
 	{
 		if (rotateValue > 0.0)
 		{
-			leftMotorSpeed = - max(-speed, rotateValue);
+			leftMotorSpeed = - std::max(-speed, rotateValue);
 			rightMotorSpeed = speed + rotateValue;
 		}
 		else
 		{
 			leftMotorSpeed = speed - rotateValue;
-			rightMotorSpeed = - max(-speed, -rotateValue);
+			rightMotorSpeed = - std::max(-speed, -rotateValue);
 		}
 	}
 	
@@ -94,8 +94,8 @@ void ArcadeDrive::Move(double &speed, double &heading, double &rotateValue, bool
 	leftMotorSpeed = Limit(leftMotorSpeed);
 	rightMotorSpeed = -Limit(rightMotorSpeed);
 	
-	m_leftMotor.SetSpeed(leftMotorSpeed, m_encoder.GetRate());
-	m_rightMotor.SetSpeed(rightMotorSpeed, m_encoder.GetRate());
+	m_leftMotor.SetSpeed((float)leftMotorSpeed, m_encoder.GetRate());
+	m_rightMotor.SetSpeed((float)rightMotorSpeed, m_encoder.GetRate());
 	
 	if (GetTime() - m_tm)
 	{

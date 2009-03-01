@@ -76,7 +76,7 @@ void KwarqsWheelMotor::SetSpeed(float desired_speed, double velocity)
 
 	if (GetTime() - m_lastUpdate > 0.025)
 	{
-	
+#if 0
 #ifdef IMPLEMENTATION_1
 	
 
@@ -113,6 +113,7 @@ void KwarqsWheelMotor::SetSpeed(float desired_speed, double velocity)
 		m_lastSpeed = m_lastSpeed + (desired_speed - m_lastSpeed)* M_K;
 	
 		
+#endif
 #endif
 		m_lastUpdate = GetTime();
 	}

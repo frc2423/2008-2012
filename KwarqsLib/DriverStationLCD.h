@@ -21,7 +21,7 @@ public:
 	static const UINT32 kSyncTimeout_ms = 20;
 	static const UINT16 kFullDisplayTextCommand = 0x9FFF;
 	static const INT32 kLineLength = 21;
-	enum Line {kMain_Line6, kUser_Line2, kUser_Line3, kUser_Line4, kUser_Line5, kUser_Line6};
+	enum Line {kMain_Line, kDoNotUse, kUser_Line3, kUser_Line4, kUser_Line5, kUser_Line6};
 
 	virtual ~DriverStationLCD();
 	static DriverStationLCD *GetInstance();

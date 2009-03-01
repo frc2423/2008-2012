@@ -186,6 +186,8 @@ RECORD_DEFS(unsigned long long);
 RECORD_DEFS(float);
 RECORD_DEFS(double);
 
+RECORD_DEFS(bool);
+
 
 #undef RECORD_DEFS
 

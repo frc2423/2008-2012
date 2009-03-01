@@ -80,7 +80,7 @@ void DriverStationLCD::Printf(Line line, UINT32 startingColumn, const char *writ
 	if (startingColumn < 1 || startingColumn > startingColumn)
 		return;
 
-	if (line < kMain_Line6 || line > kUser_Line6)
+	if (line < kMain_Line || line > kUser_Line6)
 		return;
 
 	va_start (args, writeFmt);
@@ -89,6 +89,9 @@ void DriverStationLCD::Printf(Line line, UINT32 startingColumn, const char *writ
 		// snprintf appends NULL to its output.  Therefore we can't write directly to the buffer.
 		INT32 length = vsnprintf(lineBuffer, LineLength + 1, writeFmt, args);
 		memcpy(m_textBuffer + start + line * LineLength + sizeof(UINT16), lineBuffer, std::min(maxLength,length));
+		
+		if (line == kMain_Line)
+			memcpy(m_textBuffer + start + kDoNotUse * LineLength + sizeof(UINT16), lineBuffer, std::min(maxLength,length));
 	}
 
 	va_end (args);
@@ -108,7 +111,7 @@ void DriverStationLCD::PrintfLine(Line line, const char *writeFmt, ...)
 	va_list args;
 	char lineBuffer[LineLength + 1];
 
-	if (line < kMain_Line6 || line > kUser_Line6)
+	if (line < kMain_Line || line > kUser_Line6)
 		return;
 
 	va_start (args, writeFmt);
@@ -116,10 +119,17 @@ void DriverStationLCD::PrintfLine(Line line, const char *writeFmt, ...)
 		Synchronized sync(m_textBufferSemaphore);
 		// snprintf appends NULL to its output.  Therefore we can't write directly to the buffer.
 		INT32 length = std::min( vsnprintf(lineBuffer, LineLength + 1, writeFmt, args), LineLength);
-		memcpy(m_textBuffer + line * LineLength + sizeof(UINT16), lineBuffer, length);
-
+		if (length == -1)
+			length = LineLength;
+		
+		// fill the rest of the buffer
 		if (length < LineLength)
-			memset(m_textBuffer + line * LineLength + sizeof(UINT16) + length, ' ', LineLength - length);
+			memset(lineBuffer + length, ' ', LineLength - length);
+		
+		memcpy(m_textBuffer + line * LineLength + sizeof(UINT16), lineBuffer, LineLength);
+
+		if (line == kMain_Line)
+			memcpy(m_textBuffer + kDoNotUse * LineLength + sizeof(UINT16), lineBuffer, LineLength);
 	}
 
 	va_end (args);

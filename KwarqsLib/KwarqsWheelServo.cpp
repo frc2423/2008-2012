@@ -85,7 +85,7 @@ KwarqsWheelServo::KwarqsWheelServo(
 		
 
 	// create the PID controller
-	m_pidController = new TunablePIDController(0.95F, 0.0F, 0.0F, this, this);
+	m_pidController = new PIDController(0.95F, 0.0F, 0.0F, this, this);
 	
 	// set the PID parameters
 	m_pidController->SetContinuous();

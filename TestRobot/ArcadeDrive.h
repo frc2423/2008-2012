@@ -8,8 +8,8 @@
 #ifndef ARCADEDRIVE_H
 #define ARCADEDRIVE_H
 
-#include "Framework/KwarqsDriveBase.h"
-#include "Framework/KwarqsWheelMotor.h"
+#include "KwarqsLib/KwarqsDriveBase.h"
+#include "KwarqsLib/KwarqsWheelMotor.h"
 
 class ArcadeDrive : public KwarqsDriveBase {
 public:

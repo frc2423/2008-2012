@@ -35,12 +35,12 @@
 #include "WPILib.h"
 #include "ArcadeDrive.h"
 
-#include "Framework/KwarqsConstants.h"
+#include "KwarqsLib/KwarqsConstants.h"
 
 // default constructor
 ArcadeDrive::ArcadeDrive() :
-	m_leftMotor(MOTOR_L_PARAMETERS, DriverStationLCD::kUser_Line2),
-	m_rightMotor(MOTOR_R_PARAMETERS, DriverStationLCD::kUser_Line3),
+	m_leftMotor(MOTOR_L_PARAMETERS, DriverStationLCD::kUser_Line3),
+	m_rightMotor(MOTOR_R_PARAMETERS, DriverStationLCD::kUser_Line4),
 	m_encoder(9,10),
 	m_tm(GetTime())
 {

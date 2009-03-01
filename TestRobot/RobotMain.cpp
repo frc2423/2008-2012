@@ -7,16 +7,18 @@
 
 #include "WPILib.h"
 
-#include "Framework/KwarqsDriveController.h"
-#include "Framework/DriverStationLCD.h"
+#include "KwarqsLib/KwarqsDriveController.h"
+#include "KwarqsLib/DriverStationLCD.h"
 #include "KwarqsLib/DelayTime.h"
+
+#include "RecordedAutonomousControl.h"
 
 #include "ArcadeControl.h"
 #include "CompassDrive.h"
 #include "NullMovementControl.h"
 
 #include "SpeedLimiter.h"
-
+#include "DriveRecorder.h"
 #include "ArcadeDrive.h"
 
 class KwarqsRobotMain : public SimpleRobot
@@ -25,6 +27,8 @@ class KwarqsRobotMain : public SimpleRobot
 	KwarqsDriveController 	driveController;
 	
 	// control types
+	RecordedAutonomousControl recordedAutonomousControl;
+	
 	ArcadeControl 			arcadeControl;
 	//CompassDrive			compassDrive;
 	NullMovementControl		nullMovementControl;
@@ -32,6 +36,7 @@ class KwarqsRobotMain : public SimpleRobot
 	// drive types
 	
 	// filters
+	DriveRecorder			driveRecorder;
 	SpeedLimiter			speedLimiter;
 	
 	// motor drivers
@@ -53,6 +58,7 @@ public:
 	*/
 	KwarqsRobotMain() :
 		lcd( DriverStationLCD::GetInstance() ),
+		recordedAutonomousControl(&driveController),
 		arcadeControl(&driveController),
 		nullMovementControl(&driveController),
 		currentTeleoperatedControl(NULL)
@@ -67,6 +73,7 @@ public:
 		
 		// todo: need a better way to do this, not satisfied with this
 		//driveController.AddDrive(&speedLimiter, DriveEnabled);
+		driveController.AddDrive(&driveRecorder, DriveEnabled);
 		driveController.AddDrive(&arcadeDrive, DriveEnabled);
 	}
 
@@ -105,8 +112,7 @@ public:
 			currentTeleoperatedControl->OnEnable();
 		}
 		
-				DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kMain_Line6, "%.1f %s", 
-				PositionInformation::GetInstance()->GetNormalizedAngle(), control->Name());
+		DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kMain_Line, "%s", control->Name());
 		
 		return currentTeleoperatedControl;
 	}
@@ -163,8 +169,7 @@ public:
 			{
 				// update and clear
 				lcd->UpdateLCD();
-				lcd->Printf(DriverStationLCD::kMain_Line6, 1, "                   ");
-				lcd->Printf(DriverStationLCD::kUser_Line2, 1, "                   ");
+				lcd->Printf(DriverStationLCD::kMain_Line, 1, "                   ");
 				lcd->Printf(DriverStationLCD::kUser_Line3, 1, "                   ");
 				lcd->Printf(DriverStationLCD::kUser_Line4, 1, "                   ");
 				lcd->Printf(DriverStationLCD::kUser_Line5, 1, "                   ");

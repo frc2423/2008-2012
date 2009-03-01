@@ -39,6 +39,8 @@
 #include <cassert>
 #include "Serialization.h"
 
+#include <VisionAPI.h>
+
 /**
 	\class DataFile
 	\brief A simple wrapper around fopen

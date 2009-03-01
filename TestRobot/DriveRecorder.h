@@ -9,8 +9,11 @@
 #ifndef DRIVE_RECORDER_H
 #define DRIVE_RECORDER_H
 
+#include "KwarqsLib/DriverStationLCD.h"
+#include "KwarqsLib/KwarqsDriveBase.h"
 #include "KwarqsLib/DelayTime.h"
 #include "KwarqsLib/DataFile.h"
+#include "KwarqsLib/KwarqsJoystick.h"
 
 #include <vector>
 
@@ -38,7 +41,7 @@ struct DriveRecorderData {
 			file.Read(speed) && 
 			file.Read(angle) &&
 			file.Read(rotation) &&
-			file.Read(stop)
+			file.Read(stop);
 	}
 	
 	void Reset()
@@ -53,8 +56,8 @@ struct DriveRecorderData {
 /**
 	\class DriveRecorder
 */
-class DriveRecorder : public KwarqsDriveBase 
-{
+class DriveRecorder : public KwarqsDriveBase {
+public:
 	void Disable(){}
 	void Enable(){}
 
@@ -72,7 +75,7 @@ class DriveRecorder : public KwarqsDriveBase
 	
 private:
 
-	DISALLOW_COPY_AND_ASSIGN(DriveRecorder)
+	DISALLOW_COPY_AND_ASSIGN(DriveRecorder);
 
 	static void StaticTimerFn(void * param) { ((DriveRecorder*)param)->TimerFn(); }
 	void TimerFn();

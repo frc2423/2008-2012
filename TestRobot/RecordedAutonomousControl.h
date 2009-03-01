@@ -9,6 +9,8 @@
 #ifndef RECORDED_AUTONOMOUS_CONTROL_H
 #define RECORDED_AUTONOMOUS_CONTROL_H
 
+#include "KwarqsLib/KwarqsMovementControl.h"
+
 #include "DriveRecorder.h"
 
 class RecordedAutonomousControl : public KwarqsMovementControl {
@@ -30,7 +32,7 @@ private:
 	void TimerFn();
 
 	std::vector<DriveRecorderData> m_data;
-	size_t idx;
+	size_t m_idx;
 	
 	DriveRecorderData m_current_data;
 

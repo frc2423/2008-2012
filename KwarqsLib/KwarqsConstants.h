@@ -28,6 +28,9 @@
 #define BCD_IN_1 4
 #define BCD_IN_0 5
 
+#define DRIVE_RECORDER_STICK 		2
+#define DRIVE_RECORDER_SWITCH		1
+
 // analog sidecar
 #define GYRO_CHANNEL				1
 

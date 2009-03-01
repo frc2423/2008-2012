@@ -36,7 +36,8 @@
 #include <WPILib.h>
 #include "DriveRecorder.h"
 
-#include "KwarqsConstants.h"
+#include "KwarqsLib/KwarqsConstants.h"
+
 
 DriveRecorder::DriveRecorder() :
 	m_stick(DRIVE_RECORDER_STICK),
@@ -64,11 +65,12 @@ void DriveRecorder::Move(double &speed, double &angle, double &rotation, bool &s
 	if (!m_recording)
 	{
 		// if the right switches are set, start it
-		if (m_stick.GetTop() && m_ds->GetDigitalIn(DRIVE_RECORDER_ENABLE))
+		if (m_stick.GetTop() && m_ds->GetDigitalIn(DRIVE_RECORDER_SWITCH))
 		{
 			// create a unique filename that contains the date in it
 			char filename[128];
-			strftime(filename, "DriveRecorder-%Y%m%d-%H%M-%S.dat", localtime());
+			time_t the_time = time(NULL);
+			strftime(filename, 128, "DriveRecorder-%Y%m%d-%H%M-%S.dat", localtime(&the_time));
 		
 			// try to open a new file
 			if (m_file.Open(filename, DataFile::TruncateAndWrite))
@@ -83,12 +85,12 @@ void DriveRecorder::Move(double &speed, double &angle, double &rotation, bool &s
 	
 	if (m_recording)
 	{
-		double time_left = GetTime() - t_time;
+		double time_left = m_record_mode_endtime - GetTime();
 
 		// done
-		if (time_left < 0 || !m_ds->GetDigitalIn(DRIVE_RECORDER_ENABLE))
+		if (time_left < 0 || !m_ds->GetDigitalIn(DRIVE_RECORDER_SWITCH))
 		{
-			FlushToFile();
+			FlushDataToFile();
 		}
 		else if (time_left < 15)
 		{
@@ -96,7 +98,7 @@ void DriveRecorder::Move(double &speed, double &angle, double &rotation, bool &s
 		
 			// display countdown on LCD
 			if (m_lcdDelay.DoEvent())
-				lcd->PrintFLine(DriverStationLCD::kMainLine, "Recording left: %d", (int)ceil(time_left));
+				lcd->PrintfLine(DriverStationLCD::kMain_Line, "Recording left: %d", (int)ceil(time_left));
 		}
 		else
 		{
@@ -108,7 +110,7 @@ void DriveRecorder::Move(double &speed, double &angle, double &rotation, bool &s
 		
 			// display countdown on LCD
 			if (m_lcdDelay.DoEvent())
-				lcd->PrintFLine(DriverStationLCD::kMainLine, "Starting in %d", (int)ceil(time_left - 15));
+				lcd->PrintfLine(DriverStationLCD::kMain_Line, "Starting in %d", (int)ceil(time_left - 15));
 		}
 		
 		// store stuff for the notifier to pick up
@@ -126,7 +128,7 @@ void DriveRecorder::FlushDataToFile()
 	m_recording = false;
 	m_enabled = false;
 	
-	size_t sz = m_values.size();
+	size_t sz = m_data.size();
 	
 	if (sz > 0)
 	{
@@ -141,11 +143,11 @@ void DriveRecorder::FlushDataToFile()
 		}
 
 		m_file.Close();
-		printf("Recording complete (%d sets of data written).\n", m_values.size());
+		printf("Recording complete (%d sets of data written).\n", m_data.size());
 	}
 	
 	// clear the array, free the memory
-	m_values.clear();
+	m_data.clear();
 }
 
 

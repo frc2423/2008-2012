@@ -39,26 +39,21 @@
 
 RecordedAutonomousControl::RecordedAutonomousControl(KwarqsDriveController * controller) :
 	KwarqsMovementControl(controller),
-	m_notifier(DriveRecorder::StaticTimerFn, this),
+	m_notifier(RecordedAutonomousControl::StaticTimerFn, this),
 	m_mutex(semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE))
 {}
-
-void RecordedAutonomousControl::~RecordedAutonomousControl()
-{
-	delete m_notifier;
-}
 
 void RecordedAutonomousControl::OnEnable()
 {
 	m_data.clear();
 
 	// set this to default to zero movement
-	m_current_output.Reset();
+	m_current_data.Reset();
 	m_idx = 0;
 	
 	DataFile file;
 	
-	if (!file.Open("AutonomousMode.dat"))
+	if (!file.Open("AutonomousMode.dat", DataFile::ReadOnly))
 	{
 		fprintf(stderr, "Error opening AutonomousMode.dat file\n");
 		return;
@@ -83,7 +78,7 @@ void RecordedAutonomousControl::OnEnable()
 	// do this stupidly, it will work	
 	for (size_t i = 0; i < sz && !file.Eof(); i++)
 	{
-		if (!m_current_output.DoReadWith(file))
+		if (!m_current_data.DoReadWith(file))
 		{
 			if (!file.Eof())
 				fprintf(stderr, "Error reading from file\n");
@@ -92,12 +87,12 @@ void RecordedAutonomousControl::OnEnable()
 		}
 		
 		// copy the data onto the output array
-		m_data.push_back(m_current_output);
+		m_data.push_back(m_current_data);
 	}
 		
 	// setup the first data point
 	if (m_data.size())
-		m_current_output = m_data[m_idx++];
+		m_current_data = m_data[m_idx++];
 
 	// and.. begin the madness
 	m_notifier.StartPeriodic(DRIVERECORDER_PERIOD);
@@ -116,10 +111,10 @@ void RecordedAutonomousControl::TimerFn()
 	if (m_idx < m_data.size())
 	{
 		// read in the data
-		m_current_output = m_data[m_idx++];
+		m_current_data = m_data[m_idx++];
 	}
 	else
-		m_current_output.Reset();
+		m_current_data.Reset();
 }
 
 /// just reads the last data value out
@@ -128,10 +123,10 @@ void RecordedAutonomousControl::Move()
 	Synchronized sync(m_mutex);
 
 	m_driveController->Move(
-		m_current_output.speed, 
-		m_current_output.angle, 
-		m_current_output.rotation, 
-		m_current_output.stop
+		m_current_data.speed, 
+		m_current_data.angle, 
+		m_current_data.rotation, 
+		m_current_data.stop
 	);
 }
 

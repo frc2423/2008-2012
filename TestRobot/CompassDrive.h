@@ -1,6 +1,6 @@
 #include <WPILib.h>
-#include "Framework/KwarqsConstants.h"
-#include "Framework/KwarqsMovementControl.h"
+#include "KwarqsLib/KwarqsConstants.h"
+#include "KwarqsLib/KwarqsMovementControl.h"
 
 class CompassDrive: public KwarqsMovementControl
 {

@@ -8,11 +8,6 @@
 #ifndef KWARQS_WHEEL_SERVO_BASE_H
 #define KWARQS_WHEEL_SERVO_BASE_H
 
-#include "TunablePIDController.h"
-
-template <int i>
-class UglyServoHack;
-
 
 /**
 	\class KwarqsWheelServo
@@ -132,36 +127,5 @@ private:
 	
 	SEM_ID		m_calibration_mutex;
 };
-
-
-
-// ignore this, its not important. Really, just ignore it. Go away.
-template <int i>
-class UglyServoHack {
-public:
-	static void Handler(tNIRIO_u32 x, void * param)
-	{
-		if (UglyServoHack<i>::that)
-		{
-			UglyServoHack<i>::that->CalibrationComplete();
-			UglyServoHack<i>::that = NULL;
-		}
-	}
-	
-	static KwarqsWheelServo * that;
-};
-
-#define SUSH(N) 								\
-	if (UglyServoHack<N>::that == NULL)			\
-	{											\
-		UglyServoHack<N>::that = this;			\
-		handler = UglyServoHack<1>::Handler;	\
-	}
-
-#define SETUP_UGLY_SERVO_HACK						\
-	SUSH(1) else SUSH(2) else SUSH(3) else SUSH(4) 	\
-	else {											\
-		wpi_assert(0 && "too many servos created");	\
-	}
 
 #endif

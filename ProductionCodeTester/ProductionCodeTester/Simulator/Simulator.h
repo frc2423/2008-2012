@@ -130,6 +130,12 @@ private:
 	double 							m_time;
 	ControlInterface *				m_controlInterface;
 	
+	bool							m_hardware_routed;
+	
+	WheelSimulator					m_lf_wheel;
+	WheelSimulator					m_lr_wheel;
+	WheelSimulator					m_rf_wheel;
+	WheelSimulator					m_rr_wheel;
 };
 
 

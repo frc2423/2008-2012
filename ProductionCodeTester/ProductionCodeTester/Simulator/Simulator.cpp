@@ -13,6 +13,8 @@
 #include <WPILib/RobotBase.h>
 void StartRobotClass();
 
+#include <trunk/Framework/KwarqsConstants.h>
+
 #include <vector>
 using namespace std;
 
@@ -26,7 +28,8 @@ Simulator * Simulator::m_instance = NULL;
 
 Simulator::Simulator(ControlInterface * controlInterface) :
 	m_time(0),
-	m_controlInterface(controlInterface)
+	m_controlInterface(controlInterface),
+	m_hardware_routed(false)
 {}
 
 // does not return until simulation is complete
@@ -37,10 +40,7 @@ void Simulator::StartSimulation(ControlInterface * controlInterface)
 	// create the simulator
 	Simulator::m_instance = new Simulator(controlInterface);
 	StartRobotClass();
-	
-	// route the hardware to the right places
-	Simulator::m_instance->RouteHardware();
-	
+		
 	// begin the simulation by calling into the user's code
 	RobotBase::startRobotTask(NULL);
 	
@@ -51,12 +51,33 @@ void Simulator::StartSimulation(ControlInterface * controlInterface)
 
 void Simulator::RouteHardware()
 {
+	m_lf_wheel.Initialize( 
+		&m_controlInterface->simulationData.lf_wheel,
+	);
+	
+	m_lr_wheel.Initialize( 
+		&m_controlInterface->simulationData.lr_wheel 
+	);
+	
+	m_rf_wheel.Initialize( 
+		&m_controlInterface->simulationData.rf_wheel 
+	);
+	
+	m_rr_wheel.Initialize( 
+		&m_controlInterface->simulationData.rr_wheel,
+		
+	);
 
+	m_hardware_routed = true;
 }
 
 
 void Simulator::SimulateStep(double tm)
 {
+	if (!m_hardware_routed)
+		RouteHardware();
+
+
 	{ 
 		// perform calculations while protected by the lock
 		wxMutexLocker mtx(m_controlInterface->lock);
@@ -65,6 +86,12 @@ void Simulator::SimulateStep(double tm)
 		// first, calculate the next step for motors and such
 		//for (size_t i = 0; i < m_wheels.size(); i++)
 		//	m_wheels[i].NextStep();
+		
+		m_lf_wheel.Step();
+		m_lr_wheel.Step();
+		m_rf_wheel.Step();
+		m_rr_wheel.Step();
+		
 
 		// next, calculate the overall position of the robot
 		

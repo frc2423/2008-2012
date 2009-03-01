@@ -17,10 +17,12 @@ void falling_edge(void);
 void delay100ms(void);
 
 
-int got_something = 0;
+unsigned char sequence_end = 0;
+unsigned char receive_mode = 0;
 
 // whatever was received
 unsigned char received_byte = 0;
+unsigned char send_byte = 0;
 
 unsigned char tmp = 0;
 unsigned char idx = 0;
@@ -53,12 +55,33 @@ void main()
 	
 	delay100ms();
 	
+	// send a byte
 	enable_clk_interrupt();
-
+	asm("cli");
+	DDRH = 0x01;
+	PTH &= 0xFE;
+	
+	receive_mode = 0;
+	send_byte = 0xff;
+	
+	// todo: some timeout
+	while (!sequence_end);
+	sequence_end = 0;
+	
+	putchar('.');
 	
 	// re-enable input, see what happens
+	receive_mode = 1;
 	DDRH = 0x00;
 
+	while (!sequence_end);
+	
+	receive_mode = 0;
+
+	
+	putchar('.');
+	
+	//printf("Doing something\r\n");
 	
 	while (1)
 	{
@@ -68,15 +91,23 @@ void main()
 			asm("swi");
 		}
 	
-		if (got_something)
+		if (sequence_end)
 		{		
 			printf("Got something: %d %d\r\n", received_byte, bytes_received);
-			got_something = 0;
+			sequence_end = 0;
 		}
 	}
 
 	asm("swi");
 	
+}
+
+
+char odd_parity(unsigned char x)
+{
+	x ^= x >>  4;
+	x &= 0x0F;
+	return ((0x6996 >> x) & 1) == 0;
 }
 
 #pragma interrupt_handler falling_edge
@@ -87,8 +118,13 @@ void falling_edge()
 		// start bit
 		case 0:
 			// bit should be 0
-			if (PTH & 0x01)
-				error = 1;
+			if (receive_mode)
+			{
+				if (PTH & 0x01)
+					error = 1;
+			}
+			else
+				PTH &= 0xFE;
 			break;
 			
 		// data bits
@@ -100,24 +136,45 @@ void falling_edge()
 		case 6:
 		case 7:
 		case 8:
-			tmp |= ((PTH & 0x01) << (idx-1));
+			if (receive_mode)
+				tmp |= ((PTH & 0x01) << (idx-1));
+			else
+			{	
+				if ((send_byte >> (idx-1)) & 0x1)
+					PTH |= 0x01;
+	
+				else
+					PTH &= 0xFE;
+			}
 			break;
 		
 		// parity
-		case 10:
+		case 9:
+			if (!receive_mode)
+			{
+				// http://bits.stephan-brumme.com/parity.html
+				if (odd_parity(send_byte))
+					PTH |= 0x01;
+				else
+					PTH &= 0xFE;
+			}
 			break;
 		// stop bit
-		case 11:
-			if (!(PTH & 0x01))
+		case 10:
+			if (receive_mode)
 			{
-				error = 1;
-				break;
+				if (!(PTH & 0x01))
+				{
+					error = 1;
+					break;
+				}
+				
+				received_byte = tmp;
+				bytes_received += 1;
 			}
 			
-			received_byte = tmp;
-			idx = 0;
-			bytes_received += 1;
-			got_something += 1;
+			idx = 0-1;
+			sequence_end = 1;
 			
 			break;
 			

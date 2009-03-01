@@ -9,7 +9,11 @@
 #ifndef FRAMEWORK_KWARQS_WHEELMOTOR_H
 #define FRAMEWORK_KWARQS_WHEELMOTOR_H
 
-#define IMPLEMENTATION_1
+#include "filters.h"
+#include "DriverStationLCD.h"
+
+//#define IMPLEMENTATION_1
+#define IMPLEMENTATION_2
 
 /**
 	\class KwarqsWheelMotor
@@ -36,10 +40,14 @@ class KwarqsWheelMotor {
 public:
 
 	/// constructor: passes in the port for the speed controller and encoder
-	KwarqsWheelMotor(UINT32 slot, UINT32 pwm_port, UINT32 encoder_port1, UINT32 encoder_port2, bool invert_motor);
+	KwarqsWheelMotor(
+			UINT32 slot, UINT32 pwm_port, 
+			UINT32 encoder_port1, UINT32 encoder_port2, 
+			bool invert_motor, bool invert_encoder,
+			DriverStationLCD::Line line);
 
 	/// Set the speed of the motor (-1 to 1)
-	void SetSpeed(float speed);
+	void SetSpeed(float speed, double velocity);
 	
 	/// Get the speed that the motor was assigned to go via SetSpeed
 	float GetSetSpeed();
@@ -56,6 +64,9 @@ private:
 	
 	float m_lastSpeed;
 	double m_lastUpdate;
+	
+	LowPassFilter m_filter;
+	DriverStationLCD::Line m_line;
 	
 };
 

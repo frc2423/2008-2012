@@ -9,6 +9,7 @@
 #define ARCADEDRIVE_H
 
 #include "Framework/KwarqsDriveBase.h"
+#include "Framework/KwarqsWheelMotor.h"
 
 class ArcadeDrive : public KwarqsDriveBase {
 public:
@@ -44,8 +45,11 @@ private:
 	
 	double Limit(double num);
 	
-	SpeedController * m_leftMotor;
-	SpeedController * m_rightMotor;
+	KwarqsWheelMotor m_leftMotor;
+	KwarqsWheelMotor m_rightMotor;
+	
+	Encoder m_encoder;
+	double m_tm;
 
 };
 

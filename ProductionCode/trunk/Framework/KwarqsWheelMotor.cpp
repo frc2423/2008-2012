@@ -52,34 +52,72 @@ KwarqsWheelMotor::KwarqsWheelMotor(
 		UINT32 slot, 
 		UINT32 pwm_port, 
 		UINT32 encoder_port1, UINT32 encoder_port2,
-		bool invert_motor) :
+		bool invert_motor,
+		bool invert_encoder,
+		DriverStationLCD::Line line) :
 	m_motor(slot, pwm_port),
 	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X),
 	m_invert(invert_motor ? -1.0F : 1.0F),
 	m_lastSpeed(0),
-	m_lastUpdate(0)
+	m_lastUpdate(GetTime()),
+	m_line(line)
 {
-	SetSpeed(0);
+	SetSpeed(0, 0);
+	
+	m_encoder.SetDistancePerPulse(.0019);
+	m_encoder.SetReverseDirection(invert_encoder);
+	
 	m_encoder.Start();
 }
 
 /// Set the speed of the motor (-1 to 1)? 
-void KwarqsWheelMotor::SetSpeed(float desired_speed)
+void KwarqsWheelMotor::SetSpeed(float desired_speed, double velocity)
 {
+
+	if (GetTime() - m_lastUpdate > 0.025)
+	{
 	
 #ifdef IMPLEMENTATION_1
 	
-	if (GetTime() - m_lastUpdate > 0.05)
-	{
-		float speed = m_lastSpeed + (desired_speed - m_lastSpeed)* M_K;
+
+		
+		
+		m_lastSpeed = m_lastSpeed + (desired_speed - m_lastSpeed)* M_K;
 		
 		// don't need to bounds check this, its already done in PWM
-		m_motor.Set(speed * m_invert);
+		m_motor.Set(m_lastSpeed * m_invert);
 	
+		
+
+#elif defined(IMPLEMENTATION_2)
+		
+		DriverStationLCD::GetInstance()->PrintfLine(
+				m_line,
+				"%.2f %.4f %d", 
+				m_encoder.GetDistance(),
+				m_encoder.GetRate(),
+				m_encoder.GetRaw()
+			);
+		
+#define ALPHA 0.1
+		
+		if (velocity * 1.1 < m_encoder.GetRate())
+		{
+			desired_speed *= (1 - ALPHA); 
+		}
+		else if (velocity * .9 > m_encoder.GetRate())
+		{
+			desired_speed *= (1 + ALPHA);
+		}
+
+		m_lastSpeed = m_lastSpeed + (desired_speed - m_lastSpeed)* M_K;
+	
+		
+#endif
 		m_lastUpdate = GetTime();
 	}
-
-#endif
+	
+	m_motor.Set(m_lastSpeed * m_invert);
 
 }
 

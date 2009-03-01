@@ -38,18 +38,21 @@
 #include "Framework/KwarqsConstants.h"
 
 // default constructor
-ArcadeDrive::ArcadeDrive()
+ArcadeDrive::ArcadeDrive() :
+	m_leftMotor(MOTOR_L_PARAMETERS, DriverStationLCD::kUser_Line2),
+	m_rightMotor(MOTOR_R_PARAMETERS, DriverStationLCD::kUser_Line3),
+	m_encoder(9,10),
+	m_tm(GetTime())
 {
-	m_leftMotor = new Jaguar(LEFT_MOTOR_PWM);
-	m_rightMotor = new Jaguar(RIGHT_MOTOR_PWM);
+	//m_encoder.SetDistancePerPulse(.001521);
+	m_encoder.SetDistancePerPulse(.001239);
+	m_encoder.SetReverseDirection(true);
+	m_encoder.Start();
 }
 
 // destructor
 ArcadeDrive::~ArcadeDrive()
-{
-	delete m_leftMotor;
-	delete m_rightMotor;
-}
+{}
 
 void ArcadeDrive::Move(double &speed, double &heading, double &rotateValue, bool &stop)
 {
@@ -91,8 +94,18 @@ void ArcadeDrive::Move(double &speed, double &heading, double &rotateValue, bool
 	leftMotorSpeed = Limit(leftMotorSpeed);
 	rightMotorSpeed = -Limit(rightMotorSpeed);
 	
-	m_leftMotor->Set(leftMotorSpeed);
-	m_rightMotor->Set(rightMotorSpeed);
+	m_leftMotor.SetSpeed(leftMotorSpeed, m_encoder.GetRate());
+	m_rightMotor.SetSpeed(rightMotorSpeed, m_encoder.GetRate());
+	
+	if (GetTime() - m_tm)
+	{
+		DriverStationLCD::GetInstance()->PrintfLine(
+				DriverStationLCD::kUser_Line5, "%.2f %d",
+				m_encoder.GetDistance(),
+				m_encoder.GetRaw());
+		m_tm = GetTime();
+	}
+	
 }
 
 

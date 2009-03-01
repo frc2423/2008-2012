@@ -5,14 +5,16 @@
 
 #include <WPILib.h>
 
+#include "KwarqsConstants.h"
+
 inline int GetBCDInput()
 {
 	DriverStation * ds = DriverStation::GetInstance();
 	
-	int ret = (int)ds->GetDigitalIn(3) << 3;
-	ret |= (int)ds->GetDigitalIn(4) << 2;
-	ret |= (int)ds->GetDigitalIn(6) << 1;
-	ret |= (int)ds->GetDigitalIn(7);
+	int ret = (int)ds->GetDigitalIn(BCD_IN_3) << 3;
+	ret |= (int)ds->GetDigitalIn(BCD_IN_2) << 2;
+	ret |= (int)ds->GetDigitalIn(BCD_IN_1) << 1;
+	ret |= (int)ds->GetDigitalIn(BCD_IN_0);
 	
 	return ret;
 }

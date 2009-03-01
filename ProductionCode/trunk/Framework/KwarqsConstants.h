@@ -23,6 +23,11 @@
 
 #define CALIBRATION_SWITCH			1
 
+#define BCD_IN_3 1
+#define BCD_IN_2 2
+#define BCD_IN_1 4
+#define BCD_IN_0 5
+
 // analog sidecar
 #define GYRO_CHANNEL				1
 
@@ -38,6 +43,24 @@
 //
 
 // testbot:
+
+#define MOTOR_L_SLOT				SLOT_1
+#define MOTOR_R_SLOT				SLOT_1
+
+#define PWM_L_JAGUAR					1
+#define PWM_R_JAGUAR					2
+
+#define MOTOR_L_INVERT				false
+#define MOTOR_R_INVERT				false
+
+#define ENCODER_MOTOR_L_1			1
+#define ENCODER_MOTOR_L_2			2
+#define ENCODER_MOTOR_R_1			3
+#define ENCODER_MOTOR_R_2			4
+
+#define ENCODER_MOTOR_L_INVERT		true
+#define ENCODER_MOTOR_R_INVERT		false
+
 
 #define LEFT_MOTOR_PWM 1
 #define RIGHT_MOTOR_PWM 2
@@ -150,16 +173,23 @@
 #define SERVO_RF_PARAMETERS			SERVO_PARAMS(R,F)
 #define SERVO_RR_PARAMETERS			SERVO_PARAMS(R,R)
 
-#define MOTOR_PARAMS(lr, fr)		MOTOR_##lr##fr##_SLOT, \
-									PWM_##lr##fr##_JAGUAR, \
-									ENCODER_MOTOR_##lr##fr##_1, \
-									ENCODER_MOTOR_##lr##fr##_2, \
-									MOTOR_##lr##fr##_INVERT
 
-#define MOTOR_LF_PARAMETERS			MOTOR_PARAMS(L,F)
-#define MOTOR_LR_PARAMETERS			MOTOR_PARAMS(L,R)
-#define MOTOR_RF_PARAMETERS			MOTOR_PARAMS(R,F)
-#define MOTOR_RR_PARAMETERS			MOTOR_PARAMS(R,R)
+#define MOTOR_PARAMS(arg)			MOTOR_##arg##_SLOT, \
+									PWM_##arg##_JAGUAR, \
+									ENCODER_MOTOR_##arg##_1, \
+									ENCODER_MOTOR_##arg##_2, \
+									MOTOR_##arg##_INVERT, \
+									ENCODER_MOTOR_##arg##_INVERT
+
+#define MOTOR_LF_PARAMETERS			MOTOR_PARAMS(LF)
+#define MOTOR_LR_PARAMETERS			MOTOR_PARAMS(LR)
+#define MOTOR_RF_PARAMETERS			MOTOR_PARAMS(RF)
+#define MOTOR_RR_PARAMETERS			MOTOR_PARAMS(RR)
+
+#define MOTOR_L_PARAMETERS			MOTOR_PARAMS(L)
+#define MOTOR_R_PARAMETERS			MOTOR_PARAMS(R)
+
+
 
 
 #endif

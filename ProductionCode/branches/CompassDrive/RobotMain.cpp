@@ -8,8 +8,9 @@
 #include "WPILib.h"
 
 #include "Framework/KwarqsDriveController.h"
+#include "Framework/DriverStationLCD.h"
 
-//#include "ArcadeControl.h"
+#include "ArcadeControl.h"
 #include "CompassDrive.h"
 #include "NullMovementControl.h"
 
@@ -22,8 +23,8 @@ class KwarqsRobotMain : public SimpleRobot
 	KwarqsDriveController 	driveController;
 	
 	// control types
-	//ArcadeControl 			arcadeControl;
-	CompassDrive				compassDrive;
+	ArcadeControl 			arcadeControl;
+	//CompassDrive			compassDrive;
 	NullMovementControl		nullMovementControl;
 	
 	// drive types
@@ -47,7 +48,7 @@ public:
 		and startup code here. 
 	*/
 	KwarqsRobotMain() :
-		compassDrive(&driveController),
+		arcadeControl(&driveController),
 		nullMovementControl(&driveController),
 		currentTeleoperatedControl(NULL)
 	{
@@ -84,7 +85,7 @@ public:
 	KwarqsMovementControl * GetTeleoperatedMovementControl()
 	{	
 		// select the type (todo: need to read switches)
-		KwarqsMovementControl * control = &compassDrive;
+		KwarqsMovementControl * control = &arcadeControl;
 		
 		
 		// enable or disable it depending on whether it was previously
@@ -137,6 +138,8 @@ public:
 	*/
 	void OperatorControl()
 	{
+		double tm = GetTime();
+		
 		printf("Entered OperatorControl()\n");
 		GetWatchdog().SetEnabled(true);
 		
@@ -148,7 +151,14 @@ public:
 			driveController.EndMove();
 			
 			// wait period
-			Wait(0.0025);
+			//Wait(0.0025);
+			
+			if (GetTime() - tm > 0.2)
+			{
+				DriverStationLCD::GetInstance()->UpdateLCD();
+				tm = GetTime();
+			}
+			
 		}
 		
 		GetTeleoperatedMovementControl()->OnDisable();

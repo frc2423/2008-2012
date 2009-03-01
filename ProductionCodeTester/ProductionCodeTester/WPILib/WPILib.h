@@ -39,7 +39,7 @@
 #include "Jaguar.h"
 #include "Joystick.h"
 #include "Notifier.h"
-//#include "PIDController.h"
+#include "PIDController.h"
 #include "PIDOutput.h"
 #include "PIDSource.h"
 #include "PWM.h"

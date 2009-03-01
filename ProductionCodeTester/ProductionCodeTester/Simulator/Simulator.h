@@ -6,6 +6,8 @@
 #include <vector>
 #include <VxWorks/VxWorks.h>
 
+#include "WheelSimulator.h"
+
 struct FRCControlData;
 
 class Encoder;

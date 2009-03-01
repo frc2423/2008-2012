@@ -32,6 +32,7 @@ typedef int			SEM_ID;
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <time.h>
 
 #include <algorithm>
 

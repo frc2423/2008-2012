@@ -192,74 +192,54 @@
 				Name="trunk"
 				>
 				<File
+					RelativePath=".\trunk\ArcadeControl.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\trunk\ArcadeDrive.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\trunk\DriveRecorder.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\trunk\RecordedAutonomousControl.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\trunk\RobotMain.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\trunk\ServoCalibrator.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\trunk\SwerveDrive.cpp"
-					>
-				</File>
 				<Filter
-					Name="Controls"
+					Name="KwarqsLib"
 					>
 					<File
-						RelativePath=".\trunk\Controls\CompassDrive.cpp"
+						RelativePath=".\trunk\KwarqsLib\DriverStationLCD.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Controls\CompassDriveII.cpp"
+						RelativePath=".\trunk\KwarqsLib\KwarqsDriveController.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Controls\SimpleControl.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="Autonomous"
-					>
-				</Filter>
-				<Filter
-					Name="Framework"
-					>
-					<File
-						RelativePath=".\trunk\Framework\DriverStationLCD.cpp"
+						RelativePath=".\trunk\KwarqsLib\KwarqsMovementControl.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsDriveController.cpp"
+						RelativePath=".\trunk\KwarqsLib\KwarqsWheelMotor.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsGamePiece.cpp"
+						RelativePath=".\trunk\KwarqsLib\KwarqsWheelServo.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsMovementControl.cpp"
+						RelativePath=".\trunk\KwarqsLib\math.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsWheelMotor.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\trunk\Framework\KwarqsWheelServo.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\trunk\Framework\math.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\trunk\Framework\PositionInformation.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\trunk\Framework\TunablePIDController.cpp"
+						RelativePath=".\trunk\KwarqsLib\PositionInformation.cpp"
 						>
 					</File>
 				</Filter>
@@ -297,6 +277,10 @@
 				</File>
 				<File
 					RelativePath=".\WPILib\Joystick.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\WPILib\PIDController.cpp"
 					>
 				</File>
 				<File
@@ -339,36 +323,8 @@
 					RelativePath=".\Simulator\Simulator.cpp"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="VxWorks"
-				>
 				<File
-					RelativePath=".\VxWorks\moduleLib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\pstdint.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\semLib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\strLib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\taskLib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\unldLib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\VxWorks.h"
+					RelativePath=".\Simulator\WheelSimulator.cpp"
 					>
 				</File>
 			</Filter>
@@ -390,126 +346,102 @@
 				Name="trunk"
 				>
 				<File
-					RelativePath=".\trunk\PsuedoGearbox.h"
+					RelativePath=".\trunk\ArcadeControl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\trunk\RobotChassis.h"
+					RelativePath=".\trunk\ArcadeDrive.h"
 					>
 				</File>
 				<File
-					RelativePath=".\trunk\ServoCalibrator.h"
+					RelativePath=".\trunk\CompassDrive.h"
 					>
 				</File>
 				<File
-					RelativePath=".\trunk\SwerveDrive.h"
+					RelativePath=".\trunk\DriveRecorder.h"
+					>
+				</File>
+				<File
+					RelativePath=".\trunk\NullMovementControl.h"
+					>
+				</File>
+				<File
+					RelativePath=".\trunk\RecordedAutonomousControl.h"
+					>
+				</File>
+				<File
+					RelativePath=".\trunk\SpeedLimiter.h"
 					>
 				</File>
 				<Filter
-					Name="Autonomous"
+					Name="KwarqsLib"
 					>
 					<File
-						RelativePath=".\trunk\Autonomous\AutonomousDemo.h"
+						RelativePath=".\trunk\KwarqsLib\DataFile.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Autonomous\AutonomousRandomDemo.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="Controls"
-					>
-					<File
-						RelativePath=".\trunk\Controls\CompassDrive.h"
+						RelativePath=".\trunk\KwarqsLib\DelayTime.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Controls\CompassDriveII.h"
+						RelativePath=".\trunk\KwarqsLib\Deleter.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Controls\NullMovementControl.h"
+						RelativePath=".\trunk\KwarqsLib\DriverStationLCD.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Controls\SimpleControl.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="Framework"
-					>
-					<File
-						RelativePath=".\trunk\Framework\DataFile.h"
+						RelativePath=".\trunk\KwarqsLib\filters.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\Deleter.h"
+						RelativePath=".\trunk\KwarqsLib\KwarqsBCDInput.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\DriverStationLCD.h"
+						RelativePath=".\trunk\KwarqsLib\KwarqsConstants.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsBCDInput.h"
+						RelativePath=".\trunk\KwarqsLib\KwarqsDriveBase.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsConstants.h"
+						RelativePath=".\trunk\KwarqsLib\KwarqsDriveController.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsDriveBase.h"
+						RelativePath=".\trunk\KwarqsLib\KwarqsJoystick.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsDriveController.h"
+						RelativePath=".\trunk\KwarqsLib\KwarqsMovementControl.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsDSLCDStatus.h"
+						RelativePath=".\trunk\KwarqsLib\KwarqsNosePointer.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsGamePiece.h"
+						RelativePath=".\trunk\KwarqsLib\KwarqsWheelMotor.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsJoystick.h"
+						RelativePath=".\trunk\KwarqsLib\KwarqsWheelServo.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsMovementControl.h"
+						RelativePath=".\trunk\KwarqsLib\math.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsNosePointer.h"
+						RelativePath=".\trunk\KwarqsLib\PositionInformation.h"
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\Framework\KwarqsWheelMotor.h"
-						>
-					</File>
-					<File
-						RelativePath=".\trunk\Framework\KwarqsWheelServo.h"
-						>
-					</File>
-					<File
-						RelativePath=".\trunk\Framework\math.h"
-						>
-					</File>
-					<File
-						RelativePath=".\trunk\Framework\PositionInformation.h"
-						>
-					</File>
-					<File
-						RelativePath=".\trunk\Framework\Serialization.h"
-						>
-					</File>
-					<File
-						RelativePath=".\trunk\Framework\TunablePIDController.h"
+						RelativePath=".\trunk\KwarqsLib\Serialization.h"
 						>
 					</File>
 				</Filter>
@@ -675,6 +607,38 @@
 				</File>
 				<File
 					RelativePath=".\Simulator\Simulator.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Simulator\WheelSimulator.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="VxWorks"
+				>
+				<File
+					RelativePath=".\VxWorks\moduleLib.h"
+					>
+				</File>
+				<File
+					RelativePath=".\VxWorks\semLib.h"
+					>
+				</File>
+				<File
+					RelativePath=".\VxWorks\strLib.h"
+					>
+				</File>
+				<File
+					RelativePath=".\VxWorks\taskLib.h"
+					>
+				</File>
+				<File
+					RelativePath=".\VxWorks\unldLib.h"
+					>
+				</File>
+				<File
+					RelativePath=".\VxWorks\VxWorks.h"
 					>
 				</File>
 			</Filter>

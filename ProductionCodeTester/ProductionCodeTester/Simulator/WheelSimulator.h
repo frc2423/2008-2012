@@ -2,7 +2,7 @@
 #ifndef SIMULATOR_WHEEL_SIMULATOR_H
 #define SIMULATOR_WHEEL_SIMULATOR_H
 
-#include "SimulatorData.h"
+#include "SimulationData.h"
 
 class SpeedController;
 class Encoder;

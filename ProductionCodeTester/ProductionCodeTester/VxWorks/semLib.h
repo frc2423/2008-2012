@@ -8,7 +8,14 @@
 #define SEM_INVERSION_SAFE 		2
 #define SEM_Q_PRIORITY 			4
 
+#define SEM_FULL				0
+
 #define WAIT_FOREVER -1
+
+static inline SEM_ID semBCreate(int, int)
+{
+	return 0;
+}
 
 static inline
 SEM_ID semMCreate(int options)
@@ -28,5 +35,9 @@ int semGive(SEM_ID semId) { return 0; }
 static inline
 int semTake(SEM_ID semId, int timeout) { return 0; }
 
+static inline
+void semFlush(SEM_ID semId)
+{
+}
 
 #endif

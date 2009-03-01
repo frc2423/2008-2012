@@ -20,20 +20,22 @@ void WheelSimulator::Initialize(
 		SpeedController * motor,
 		Encoder * motorEncoder,
 		SpeedController * servo,
-		Encoder * servoEncoder)
+		Encoder * servoEncoder,
+		DigitalInput * hall_effect)
 {
 	m_info = info;
 	m_motor = motor;
 	m_motorEncoder = motorEncoder;
 	m_servo = servo;
 	m_servoEncoder = servoEncoder;
+	m_hall_effect = hall_effect;
 }
 	
 	
 void WheelSimulator::Step()
 {
-	m_info.driveMotorSpeed = motor.Get();
-	m_info.servoMotorSpeed = motor.Get();
+	m_info->driveMotorSpeed = m_motor->Get();
+	m_info->servoMotorSpeed = m_servo->Get();
 
 	// todo: fill in other parameters
 }

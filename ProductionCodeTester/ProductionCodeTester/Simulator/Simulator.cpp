@@ -13,7 +13,7 @@
 #include <WPILib/RobotBase.h>
 void StartRobotClass();
 
-#include <trunk/Framework/KwarqsConstants.h>
+#include <trunk/KwarqsLib/KwarqsConstants.h>
 
 #include <vector>
 using namespace std;
@@ -51,8 +51,14 @@ void Simulator::StartSimulation(ControlInterface * controlInterface)
 
 void Simulator::RouteHardware()
 {
+	/*
 	m_lf_wheel.Initialize( 
 		&m_controlInterface->simulationData.lf_wheel,
+		FindMotor(),
+		FindEncoder(),
+		FindMotor(),
+		FindEncoder(),
+		FindDigitalInput()
 	);
 	
 	m_lr_wheel.Initialize( 
@@ -69,13 +75,14 @@ void Simulator::RouteHardware()
 	);
 
 	m_hardware_routed = true;
+	*/
 }
 
 
 void Simulator::SimulateStep(double tm)
 {
-	if (!m_hardware_routed)
-		RouteHardware();
+	//if (!m_hardware_routed)
+	//	RouteHardware();
 
 
 	{ 
@@ -87,10 +94,10 @@ void Simulator::SimulateStep(double tm)
 		//for (size_t i = 0; i < m_wheels.size(); i++)
 		//	m_wheels[i].NextStep();
 		
-		m_lf_wheel.Step();
-		m_lr_wheel.Step();
-		m_rf_wheel.Step();
-		m_rr_wheel.Step();
+		//m_lf_wheel.Step();
+		//m_lr_wheel.Step();
+		//m_rf_wheel.Step();
+		//m_rr_wheel.Step();
 		
 
 		// next, calculate the overall position of the robot

@@ -292,7 +292,7 @@ void SimulationWindow::OnDrawTimer(wxTimerEvent &event)
 
 	wxString str = wxString::FromUTF8(newData.lcdText + 23, sizeof(newData.lcdText)-23);
 	
-	for (int i = 1;i < 5; i++)
+	for (size_t i = 1;i < 5; i++)
 	{
 		if (i*21+i-1 >= str.size())
 			break;

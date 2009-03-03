@@ -2,7 +2,7 @@
 #include "DriverStationLCD.h"
 
 #include "filters.h"
-
+#include <cmath>
 
 class RobotDemo : public SimpleRobot
 {
@@ -17,10 +17,10 @@ public:
 	{
 		double tm = GetTime();
 		
-		LowPassFilter filter1;
-		LowPassFilter filter2;
-		LowPassFilter filter3;
-		LowPassFilter filter4;
+		AverageWindowFilter<double, 20> filter1;
+		AverageWindowFilter<double, 20> filter2;
+		AverageWindowFilter<double, 20> filter3;
+		AverageWindowFilter<double, 20> filter4;
 		
 		GetWatchdog().SetEnabled(true);
 		while (IsOperatorControl())
@@ -42,15 +42,23 @@ public:
 						(int)m_ds->GetDigitalIn(7),
 						(int)m_ds->GetDigitalIn(8)
 				);
+				
+				const double c = 500.0 / 1000.0;
+				
+				filter1.AddPoint( ceil( m_ds->GetAnalogIn(1) * c));
+				filter2.AddPoint( ceil( m_ds->GetAnalogIn(2) * c));
+				filter3.AddPoint( ceil( m_ds->GetAnalogIn(3) * c));
+				filter4.AddPoint( ceil( m_ds->GetAnalogIn(4) * c));
+				
 								
 				lcd->PrintfLine(DriverStationLCD::kUser_Line3, "1: %.1f", 
-						filter1.Calculate( m_ds->GetAnalogIn(1)) );
+						filter1.GetAverage());
 				lcd->PrintfLine(DriverStationLCD::kUser_Line4, "2: %.1f", 
-						filter2.Calculate( m_ds->GetAnalogIn(2)) );
+						filter2.GetAverage());
 				lcd->PrintfLine(DriverStationLCD::kUser_Line5, "3: %.1f", 
-						filter3.Calculate( m_ds->GetAnalogIn(3)) );
+						filter3.GetAverage());
 				lcd->PrintfLine(DriverStationLCD::kUser_Line6, "4: %.1f", 
-						filter4.Calculate( m_ds->GetAnalogIn(4)) );
+						filter4.GetAverage());
 				
 				lcd->UpdateLCD();
 				

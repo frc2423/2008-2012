@@ -86,7 +86,7 @@ public:
 	*/
 	KwarqsMovementControl * GetAutonomousMovementControl()
 	{
-		return &nullMovementControl;
+		return &recordedAutonomousControl;
 	}
 	
 	
@@ -114,8 +114,8 @@ public:
 			currentTeleoperatedControl->OnEnable();
 		}
 		
-		DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kMain_Line, 
-			"TCS: %d C: %s", control->Name(), GetBCDInput());
+		//DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kMain_Line, 
+		//	"TCS: %d C: %s", GetBCDInput(), control->Name() );
 		
 		return currentTeleoperatedControl;
 	}

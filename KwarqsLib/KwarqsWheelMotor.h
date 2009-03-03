@@ -59,6 +59,8 @@ private:
 	
 	float m_invert;
 	
+	double m_lastEncoderVelocity;
+	
 	float m_lastSpeed;
 	double m_lastUpdate;
 	

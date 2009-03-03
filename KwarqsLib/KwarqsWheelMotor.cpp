@@ -59,8 +59,9 @@ KwarqsWheelMotor::KwarqsWheelMotor(
 	m_motor(slot, pwm_port),
 	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X),
 	m_invert(invert_motor ? -1.0F : 1.0F),
+	m_lastEncoderVelocity(0),
 	m_lastSpeed(0),
-	m_lastUpdate(GetTime()),
+	m_lastUpdate(GetTime())
 {
 	SetSpeed(0, 0);
 	
@@ -83,8 +84,11 @@ void KwarqsWheelMotor::SetSpeed(float desired_speed, double velocity)
 	if (GetTime() - m_lastUpdate > 0.025)
 	{
 		const double encoder_velocity = m_encoder.GetRate();
-		const double encoder_acceleration = encoder_velocity/m_encoder.GetPeriod();
+		const double encoder_acceleration = (encoder_velocity - m_lastEncoderVelocity)/0.025;
 	
+		m_lastEncoderVelocity = encoder_velocity;
+		
+		/*
 		switch (GetBCDInput())
 		{
 		
@@ -102,20 +106,27 @@ void KwarqsWheelMotor::SetSpeed(float desired_speed, double velocity)
 			
 		// hard limit on encoder acceleration (stage 2)
 		case 2:
+		*/
+			#define MAX_ACCEL 8
 		
+		//if (DriverStation::GetInstance()->GetDigitalIn()
+		/*
 			if (encoder_acceleration < -MAX_ACCEL)
 			{
-				m_lastSpeed = m_lastSpeed * .5;
+				m_lastSpeed = m_lastSpeed * .9;
 			}
 			else if (encoder_acceleration > MAX_ACCEL)
 			{
-				m_lastSpeed = m_lastSpeed * .5;
+				m_lastSpeed = m_lastSpeed * .9;
 			}
 			else
 			{
-				m_lastSpeed = desired_speed;
+				m_lastSpeed += (desired_speed - m_lastSpeed)* .7;
 			}
+		*/
+			m_lastSpeed += (desired_speed - m_lastSpeed)* .7;
 		
+			/*
 			break;
 			
 		// the semi-real thing
@@ -168,6 +179,8 @@ void KwarqsWheelMotor::SetSpeed(float desired_speed, double velocity)
 		default:
 			m_lastSpeed = 0;
 		}
+		
+		*/
 	
 		// print something out each time around
 		DriverStationLCD::GetInstance()->PrintfLine(

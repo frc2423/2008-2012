@@ -41,13 +41,20 @@
 ArcadeDrive::ArcadeDrive() :
 	m_leftMotor(MOTOR_L_PARAMETERS),
 	m_rightMotor(MOTOR_R_PARAMETERS),
-	m_encoder(SLOT_1, 9, SLOT_1, 10),
+	m_encoder1(SLOT_1, 9, SLOT_1, 10),
+	m_encoder2(SLOT_1, 11, SLOT_1, 12),
 	m_tm(GetTime())
 {
 	//m_encoder.SetDistancePerPulse(.001521);
-	m_encoder.SetDistancePerPulse(.001239);
-	m_encoder.SetReverseDirection(true);
-	m_encoder.Start();
+	//m_encoder1.SetDistancePerPulse(.001239);
+	//m_encoder1.SetReverseDirection(true);
+	
+	m_encoder1.SetDistancePerPulse(.001277);
+	m_encoder2.SetDistancePerPulse(.001277);
+	
+	
+	m_encoder1.Start();
+	m_encoder2.Start();
 }
 
 // destructor
@@ -68,11 +75,11 @@ void ArcadeDrive::Move(double &speed, double &heading, double &rotateValue, bool
 		if (rotateValue > 0.0)
 		{
 			leftMotorSpeed = speed - rotateValue;
-			rightMotorSpeed = std::max(speed, rotateValue);
+			rightMotorSpeed = max(speed, rotateValue);
 		}
 		else
 		{
-			leftMotorSpeed = std::max(speed, -rotateValue);
+			leftMotorSpeed = max(speed, -rotateValue);
 			rightMotorSpeed = speed + rotateValue;
 		}
 	}
@@ -80,13 +87,13 @@ void ArcadeDrive::Move(double &speed, double &heading, double &rotateValue, bool
 	{
 		if (rotateValue > 0.0)
 		{
-			leftMotorSpeed = - std::max(-speed, rotateValue);
+			leftMotorSpeed = - max(-speed, rotateValue);
 			rightMotorSpeed = speed + rotateValue;
 		}
 		else
 		{
 			leftMotorSpeed = speed - rotateValue;
-			rightMotorSpeed = - std::max(-speed, -rotateValue);
+			rightMotorSpeed = - max(-speed, -rotateValue);
 		}
 	}
 	
@@ -94,15 +101,21 @@ void ArcadeDrive::Move(double &speed, double &heading, double &rotateValue, bool
 	leftMotorSpeed = Limit(leftMotorSpeed);
 	rightMotorSpeed = -Limit(rightMotorSpeed);
 	
-	m_leftMotor.SetSpeed((float)leftMotorSpeed, m_encoder.GetRate());
-	m_rightMotor.SetSpeed((float)rightMotorSpeed, m_encoder.GetRate());
+	m_leftMotor.SetSpeed((float)leftMotorSpeed, 0);
+	m_rightMotor.SetSpeed((float)rightMotorSpeed, 0);
 	
 	if (GetTime() - m_tm)
 	{
 		DriverStationLCD::GetInstance()->PrintfLine(
 				DriverStationLCD::kUser_Line5, "%.2f %d",
-				m_encoder.GetDistance(),
-				m_encoder.GetRaw());
+				m_encoder1.GetDistance(),
+				m_encoder1.GetRaw());
+		
+		DriverStationLCD::GetInstance()->PrintfLine(
+				DriverStationLCD::kUser_Line6, "%.2f %d",
+				m_encoder2.GetDistance(),
+				m_encoder2.GetRaw());
+		
 		m_tm = GetTime();
 	}
 	

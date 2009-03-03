@@ -49,7 +49,7 @@ DriveRecorder::DriveRecorder() :
 	m_enabled(false),
 	m_lastupdate(0)
 {
-	m_mutex = semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE);
+	m_mutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);;
 }
 
 DriveRecorder::~DriveRecorder()
@@ -60,12 +60,10 @@ DriveRecorder::~DriveRecorder()
 
 void DriveRecorder::Move(double &speed, double &angle, double &rotation, bool &stop)
 {
-	Synchronized sync(m_mutex);
-
 	if (!m_recording)
 	{
 		// if the right switches are set, start it
-		if (m_stick.GetTop() && m_ds->GetDigitalIn(DRIVE_RECORDER_SWITCH))
+		if (m_stick.GetTop())
 		{
 			// create a unique filename that contains the date in it
 			char filename[128];
@@ -75,6 +73,8 @@ void DriveRecorder::Move(double &speed, double &angle, double &rotation, bool &s
 			// try to open a new file
 			if (m_file.Open(filename, DataFile::TruncateAndWrite))
 			{
+				Synchronized sync(m_mutex);
+				
 				m_recording = true;
 				m_enabled = false;
 				m_record_mode_endtime = GetTime() + 18;
@@ -88,12 +88,14 @@ void DriveRecorder::Move(double &speed, double &angle, double &rotation, bool &s
 		double time_left = m_record_mode_endtime - GetTime();
 
 		// done
-		if (time_left < 0 || !m_ds->GetDigitalIn(DRIVE_RECORDER_SWITCH))
+		if (time_left < 0) // || !m_ds->GetDigitalIn(DRIVE_RECORDER_SWITCH))
 		{
 			FlushDataToFile();
 		}
 		else if (time_left < 15)
 		{
+			Synchronized sync(m_mutex);
+			
 			m_enabled = true;
 		
 			// display countdown on LCD
@@ -114,10 +116,14 @@ void DriveRecorder::Move(double &speed, double &angle, double &rotation, bool &s
 		}
 		
 		// store stuff for the notifier to pick up
-		m_last_data.speed = speed;
-		m_last_data.angle = angle;
-		m_last_data.rotation = rotation;
-		m_last_data.stop = stop;
+		{
+			Synchronized sync(m_mutex);
+			
+			m_last_data.speed = speed;
+			m_last_data.angle = angle;
+			m_last_data.rotation = rotation;
+			m_last_data.stop = stop;
+		}
 	}
 
 }
@@ -126,28 +132,33 @@ void DriveRecorder::FlushDataToFile()
 {			
 	m_notifier->Stop();
 	m_recording = false;
-	m_enabled = false;
 	
-	size_t sz = m_data.size();
-	
-	if (sz > 0)
 	{
-		// do this stupidly, but it will work
-		if (!m_file.Write(sz))
-			fprintf(stderr, "Error writing recording\n");
-		else
+		Synchronized sync(m_mutex);
+		
+		m_enabled = false;
+		
+		size_t sz = m_data.size();
+		
+		if (sz > 0)
 		{
-			// assume there are never errors.. :o
-			for (size_t i = 0; i < sz; i++)
-				m_data[i].DoWriteWith(m_file);
-		}
-
-		m_file.Close();
-		printf("Recording complete (%d sets of data written).\n", m_data.size());
-	}
+			// do this stupidly, but it will work
+			if (!m_file.Write(sz))
+				fprintf(stderr, "Error writing recording\n");
+			else
+			{
+				// assume there are never errors.. :o
+				for (size_t i = 0; i < sz; i++)
+					m_data[i].DoWriteWith(m_file);
+			}
 	
-	// clear the array, free the memory
-	m_data.clear();
+			m_file.Close();
+			printf("Recording complete (%d sets of data written).\n", m_data.size());
+		}
+		
+		// clear the array, free the memory
+		m_data.clear();
+	}
 }
 
 

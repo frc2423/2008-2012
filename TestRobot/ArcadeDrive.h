@@ -48,7 +48,8 @@ private:
 	KwarqsWheelMotor m_leftMotor;
 	KwarqsWheelMotor m_rightMotor;
 	
-	Encoder m_encoder;
+	Encoder m_encoder1;
+	Encoder m_encoder2;
 	double m_tm;
 
 };

@@ -6,7 +6,7 @@
 #include <cmath>
 #include <numeric>
 
-
+#include "filters.h"
 
 /**
  * This is a demo program showing the use of the RobotBase class.
@@ -22,11 +22,16 @@ class RobotDemo : public SimpleRobot
 	DigitalInput in1, in2;
 	Counter countXhi, countXlow, countYhi, countYlow;
 	
+	LowPassFilter filterX;
+	LowPassFilter filterY;
+	
+	double avgX, avgY;
+	
 public:
 	RobotDemo(void):
 		myRobot(1, 2),	// these must be initialized in the same order
 		stick(1),
-		in1(3), in2(4)
+		in1(8), in2(7)
 	{
 		GetWatchdog().SetExpiration(0.1);
 		
@@ -47,6 +52,76 @@ public:
 		countYhi.Start();
 		countYlow.Start();
 	}
+	
+	void GetAcceleration(double &ax, double &ay)
+	{
+		double axH = countXhi.GetPeriod();
+		double axL = countXlow.GetPeriod();
+		double ayH = countYhi.GetPeriod();
+		double ayL = countYlow.GetPeriod();
+				
+		//axH = axH - fmod(axH, 0.00001);
+		//ayH = ayH - fmod(ayH, 0.00001);
+				
+				// convert to m/s^2 -- 50% duty cycle is 0g
+		ax = (((axH / (axH + axL)) - .5) * 8.0) * 9.81;
+		ay = (((ayH / (ayH + ayL)) - .5) * 8.0) * 9.81;
+	}
+	
+	void Autonomous(void)
+	{
+		GetWatchdog().SetEnabled(false);
+		
+		AverageWindowFilter<double, 20> fx, fy;
+		double ax, ay, lastAx = 0, lastAy = 0;
+		
+		int state = 0;
+		
+		while (IsAutonomous())
+		{
+			GetAcceleration(ax, ay);
+			fx.AddPoint( ax - avgX );
+			fy.AddPoint( ay - avgY );
+				
+			ax = fx.GetAverage();
+			ay = fy.GetAverage();
+			
+			switch (state)
+			{
+			case 0:
+				
+				myRobot.Drive(1.0, 0.0);
+				
+				
+				if (fabs(ay - lastAy) > 1.0)
+					++state;
+				
+				
+				break;
+				
+			case 1:
+				
+				myRobot.Drive(-.5, 0.0);
+				
+				Wait(3);
+				++state;
+				break;
+				
+			case 2:
+				
+				myRobot.Drive(0.0, 0.0);
+				break;
+				
+			}
+			
+			lastAx = ax;
+			lastAy = ay;
+			
+			Wait(0.05);
+		}
+		
+	}
+	
 
 	/**
 	 * Runs the motors with arcade steering. 
@@ -55,8 +130,29 @@ public:
 	{
 		double tm = GetTime();
 		
-		AccelerationReset();
+		//AccelerationReset();
 		
+		AverageWindowFilter<double, 20> fx, fy;
+		
+		GetWatchdog().SetEnabled(false);
+		
+		double ax = 0, lastAx = 0;
+		double ay = 0, lastAy = 0;
+		
+		for (int i = 0; i < 20; i++)
+		{
+			GetAcceleration(ax, ay);
+			fx.AddPoint(ax);
+			fy.AddPoint(ay);
+			
+			Wait(0.05);
+		}
+		
+		avgX = fx.GetAverage();
+		avgY = fy.GetAverage();
+		
+		double minX = 0, maxX = 0;
+		double minY = 0, maxY = 0;
 		
 		GetWatchdog().SetEnabled(true);
 		while (IsOperatorControl())
@@ -64,19 +160,23 @@ public:
 			GetWatchdog().Feed();
 			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			
-			if (GetTime() - tm > 0.1)
+			if (GetTime() - tm > 0.05)
 			{
-				double axH = countXhi.GetPeriod();
-				double axL = countXlow.GetPeriod();
-				double ayH = countYhi.GetPeriod();
-				double ayL = countYlow.GetPeriod();
+				GetAcceleration(ax, ay);
 				
-				axH = axH - fmod(axH, 0.00001);
-				ayH = ayH - fmod(ayH, 0.00001);
+				fx.AddPoint( ax - avgX );
+				fy.AddPoint( ay - avgY );
 				
-				// convert to m/s^2 -- 50% duty cycle is 0g
-				double ax = (((axH / (0.01)) - .5) * 8.0) * 9.81;
-				double ay = (((ayH / (0.01)) - .5) * 8.0) * 9.81;
+				ax = fx.GetAverage();
+				ay = fy.GetAverage();
+				
+				minX = min(fabs(ax - lastAx), minX);
+				maxX = max(fabs(ax - lastAx), maxX);
+				minY = min(fabs(ay - lastAy), minY);
+				maxY = max(fabs(ay - lastAy), maxY);
+				
+				lastAx = ax;
+				lastAy = ay;
 				
 				//AccelerationUpdate( ax, ay, .1);
 				
@@ -90,10 +190,12 @@ public:
 								
 				DriverStationLCD * lcd = DriverStationLCD::GetInstance();
 				
+				
+				
 				lcd->Printf(DriverStationLCD::kUser_Line3, 1, "ax: %f m/s^2            ", ax);
-				lcd->Printf(DriverStationLCD::kUser_Line4, 1, "%.6f %.6f               ", axH, axL);
+				lcd->Printf(DriverStationLCD::kUser_Line4, 1, "%.6f %.6f               ", minX, maxX);
 				lcd->Printf(DriverStationLCD::kUser_Line5, 1, "ay: %f m/s^2            ", ay);
-				lcd->Printf(DriverStationLCD::kUser_Line6, 1, "%.6f %.6f               ", ayH, ayL);
+				lcd->Printf(DriverStationLCD::kUser_Line6, 1, "%.6f %.6f               ", minY, maxY);
 				
 				// euler' integration method.. bad bad bad
 				//vx += ax / (0.01);

@@ -11,6 +11,8 @@
 #include "KwarqsLib/DriverStationLCD.h"
 #include "KwarqsLib/KwarqsBCDInput.h"
 #include "KwarqsLib/DelayEvent.h"
+#include "KwarqsLib/KwarqsTelemetry.h"
+#include "KwarqsLib/PositionInformation.h"
 
 #include "MaintenanceMode.h"
 
@@ -31,6 +33,8 @@
 #include "Drives/SwerveDrive.h"
 
 #include "KwarqsGameControl.h"
+
+#include "TelemetryData.h"
 
 
 
@@ -69,6 +73,11 @@ class KwarqsRobotMain : public SimpleRobot
 	KwarqsJoystick			m_stick;
 	
 	DelayEvent				m_lcdUpdateEvent;
+	DelayEvent				m_telemetryEvent;
+	
+	KwarqsTelemetry<TelemetryData> m_telemetry;
+	
+	PositionInformation *	m_info;
 
 public:
 
@@ -97,7 +106,11 @@ public:
 		annDrive(&chassis),
 		
 		currentTeleoperatedControl(NULL),
-		m_stick(1)
+		m_stick(1),
+		
+		m_telemetryEvent(0.05),
+		
+		m_info(PositionInformation::GetInstance())
 	{
 		GetWatchdog().SetExpiration(200);
 		
@@ -221,6 +234,9 @@ public:
 		{
 			movementControl->Move();
 			driveController.EndMove();
+			
+			// update telemetry
+			UpdateTelemetry();
 		}
 		
 		// disable it
@@ -261,13 +277,16 @@ public:
 				maintenanceMode.DoMaintenance(user_selection);
 			}
 			else
-			{
+			{			
 				// do the users preferred movement here
 				GetTeleoperatedMovementControl(user_selection)->Move();
 				driveController.EndMove();
 				
 				// and the game control
 				gameControl.PerformMovement();
+				
+				// update telemetry
+				UpdateTelemetry();	
 			}
 			
 			// allow the user to reset gyro position if needed
@@ -286,7 +305,6 @@ public:
 	{
 		if (m_lcdUpdateEvent.DoEvent())
 		{
-
 			// update and clear
 			lcd->UpdateLCD();
 			lcd->Printf(DriverStationLCD::kMain_Line,  1, "                   ");
@@ -294,6 +312,12 @@ public:
 			lcd->Printf(DriverStationLCD::kUser_Line4, 1, "                   ");
 			lcd->Printf(DriverStationLCD::kUser_Line5, 1, "                   ");
 		}
+	}
+	
+	void UpdateTelemetry()
+	{
+		if (m_telemetryEvent.DoEvent())
+			m_telemetry.AddData( TelemetryData(chassis, m_info) );
 	}
 	
 };

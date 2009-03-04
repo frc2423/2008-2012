@@ -91,3 +91,8 @@ UINT32 KwarqsWheelMotor::GetRawEncoder()
 	return m_encoder.Get();
 }
 
+float KwarqsWheelMotor::GetRawMotor()
+{
+	return m_motor.Get();
+}
+

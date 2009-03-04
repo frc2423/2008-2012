@@ -41,6 +41,9 @@ struct RobotChassis
 		motor_lr( MOTOR_LR_PARAMETERS ),
 		motor_rr( MOTOR_RR_PARAMETERS )
 	{}
+	
+private:
+	DISALLOW_COPY_AND_ASSIGN(RobotChassis);
 };
 
 #endif

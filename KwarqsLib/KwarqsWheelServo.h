@@ -76,12 +76,12 @@ public:
 	/// returns true if the wheel is at the sensor, false if not
 	bool GetSensor();
 	
-	int GetRaw()
+	int GetRawEncoder()
 	{
 		return m_encoder.GetRaw();
 	}
 	
-	void SetRaw(float value)
+	void SetRawMotor(float value)
 	{
 		Disable();
 		m_motor.Set(value);
@@ -98,6 +98,8 @@ public:
 	Victor 			m_motor;
 	
 private:
+	
+	DISALLOW_COPY_AND_ASSIGN(KwarqsWheelServo);
 	
 	// called when calibration is finished
 #ifdef AUTOCALIBRATE_SERVO

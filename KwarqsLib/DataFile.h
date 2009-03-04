@@ -87,6 +87,11 @@ public:
 		return feof(m_file) != 0;
 	}
 	
+	bool Flush()
+	{
+		return fflush(m_file) == 0;
+	}
+	
 	/// opens a file with the specified mode
 	bool Open(const char * filename, OpenMode mode)
 	{

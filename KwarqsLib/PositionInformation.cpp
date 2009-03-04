@@ -53,7 +53,7 @@ PositionInformation::PositionInformation() :
 	countYlow.Start();
 	
 	// create the mutex
-	m_mutex = semBCreate(0, SEM_FULL);
+	m_mutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 	
 	// get the acceleration bias
 	AverageWindowFilter<double, 20> fx, fy;

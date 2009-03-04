@@ -40,7 +40,7 @@
 RecordedAutonomousControl::RecordedAutonomousControl(KwarqsDriveController * controller) :
 	KwarqsMovementControl(controller),
 	m_notifier(RecordedAutonomousControl::StaticTimerFn, this),
-	m_mutex(semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE))
+	m_mutex(semBCreate(SEM_Q_PRIORITY, SEM_FULL))
 {}
 
 void RecordedAutonomousControl::OnEnable()

@@ -51,9 +51,13 @@ public:
 	
 	/// sets the speed with no filtering (except for invert)
 	void SetRaw(float speed);
+	
 	UINT32 GetRawEncoder();
+	float GetRawMotor();
 
 private:
+
+	DISALLOW_COPY_AND_ASSIGN(KwarqsWheelMotor);
 	
 	Jaguar m_motor;
 	Encoder m_encoder;

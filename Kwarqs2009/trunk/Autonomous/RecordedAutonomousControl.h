@@ -9,9 +9,9 @@
 #ifndef RECORDED_AUTONOMOUS_CONTROL_H
 #define RECORDED_AUTONOMOUS_CONTROL_H
 
-#include "KwarqsLib/KwarqsMovementControl.h"
+#include "../KwarqsLib/KwarqsMovementControl.h"
 
-#include "DriveRecorder.h"
+#include "../DriveFilters/DriveRecorder.h"
 
 class RecordedAutonomousControl : public KwarqsMovementControl {
 public:

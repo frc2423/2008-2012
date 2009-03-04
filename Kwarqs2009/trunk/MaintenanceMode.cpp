@@ -5,6 +5,7 @@
 	\version 	$Rev: 251 $
 */
 
+#include <WPILib.h>
 
 #include "KwarqsLib/KwarqsConstants.h"
 #include "MaintenanceMode.h"
@@ -13,7 +14,7 @@ DelayEvent lcdEvent;
 DelayEvent triggerDetect;
 
 MaintenanceMode::MaintenanceMode(RobotChassis * chassis) :
-	lcd(DriverStationLCD::GetInstance()),
+	m_lcd(DriverStationLCD::GetInstance()),
 	m_info(PositionInformation::GetInstance()),
 	m_stick(FIRST_JOYSTICK_PORT),
 	servoCalibrator(chassis),
@@ -36,8 +37,8 @@ void MaintenanceMode::DoMaintenance(int user_selection)
 	{		
 		case 1:
 		
-			if (m_lcdEvent->DoEvent())
-				lcd->PrintfLine(kMain_Line, "1. Auto Calibrate");
+			if (m_lcdEvent.DoEvent())
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "1. Auto Calibrate");
 		
 			// do the auto calibrate
 			servoCalibrator.DoAutoCalibrate();
@@ -45,8 +46,8 @@ void MaintenanceMode::DoMaintenance(int user_selection)
 			
 		case 2:
 		
-			if (m_lcdEvent->DoEvent())
-				lcd->PrintfLine(kMain_Line, "2. 4-pot Calibrate");
+			if (m_lcdEvent.DoEvent())
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "2. 4-pot Calibrate");
 		
 			// do the manual servo calibration
 			servoCalibrator.DoManualCalibrate();
@@ -56,17 +57,17 @@ void MaintenanceMode::DoMaintenance(int user_selection)
 		
 			// run the encoder test
 			
-			if (m_lcdEvent->DoEvent())
-				lcd->PrintfLine(kMain_Line, "3. Servo speed test");
+			if (m_lcdEvent.DoEvent())
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "3. Servo speed test");
 			
-			EncoderTest();
+			ServoSpeedTest();
 			break;
 			
 		case 4:
 		
 			// run the wheel speed test
-			if (m_lcdEvent->DoEvent())
-				lcd->PrintfLine(kMain_Line, "4. Wheel speed test");
+			if (m_lcdEvent.DoEvent())
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "4. Wheel speed test");
 			
 			WheelSpeedTest();
 			break;
@@ -74,43 +75,43 @@ void MaintenanceMode::DoMaintenance(int user_selection)
 		case 5:
 		
 			// display position-related information (gyro, accelerometer)
-			if (m_lcdEvent->DoEvent())
+			if (m_lcdEvent.DoEvent())
 			{
 				double ax, ay;
-				info->GetAcceleration(ax, ay);
+				m_info->GetAcceleration(ax, ay);
 			
-				lcd->PrintfLine(kMain_Line, "5. Position output");
-				lcd->PrintfLine(kUser_Line3, "Field @: %.1f", info->GetNormalizedFieldAngle());
-				lcd->PrintfLine(kUser_Line4, "Raw @: %.1f", info->GetNormalizedRawAngle());
-				lcd->PrintfLine(kUser_Line5, "accel X: %f", ax);
-				lcd->PrintfLine(kUser_Line6, "accel Y: %f", ay);
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "5. Position output");
+				m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "Field @: %.1f", m_info->GetNormalizedFieldAngle());
+				m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "Raw @: %.1f", m_info->GetNormalizedRawAngle());
+				m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "accel X: %f", ax);
+				m_lcd->PrintfLine(DriverStationLCD::kUser_Line6, "accel Y: %f", ay);
 			}
 		
 			break;
 			
 		default:
 			
-			if (m_lcdEvent->DoEvent())
+			if (m_lcdEvent.DoEvent())
 			{
 				// delay the recognition of the switch
 				if (m_stick.GetTrigger() && m_triggerEvent.DoEvent())
-					helpScreen++;
+					m_helpScreen++;
 				
-				lcd->PrintfLine(kMain_Line,  "Maintenance mode help");
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line,  "Maintenance mode help");
 				
-				if (helpScreen % 2)
+				if (m_helpScreen % 2)
 				{
-					lcd->PrintfLine(kUser_Line3, "1. Auto Calibrate");
-					lcd->PrintfLine(kUser_Line4, "2. 4-pot Calibrate");
-					lcd->PrintfLine(kUser_Line5, "3. Servo speed test");
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "1. Auto Calibrate");
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "2. 4-pot Calibrate");
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "3. Servo speed test");
 				}
 				else
 				{
-					lcd->PrintfLine(kUser_Line3, "4. Wheel speed test");
-					lcd->PrintfLine(kUser_line4, "5. Position output");
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "4. Wheel speed test");
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "5. Position output");
 				}
 				
-				lcd->Printf(kUser_Line6, "  Trigger for next ->"
+				m_lcd->PrintfLine(DriverStationLCD::kUser_Line6, "  Trigger for next ->");
 			}
 			
 			break;
@@ -122,7 +123,7 @@ void MaintenanceMode::WheelSpeedTest()
 	//if (m_stick.GetTrigger() && m_triggerEvent.DoEvent())
 }
 
-void MaintenanceMode:ServoSpeedTest()
+void MaintenanceMode::ServoSpeedTest()
 {
 /*
 	if (m_stick.GetTrigger() && m_triggerEvent.DoEvent())

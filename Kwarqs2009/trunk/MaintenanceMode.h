@@ -29,8 +29,11 @@ public:
 
 private:
 
-	DriverStationLCD * 	lcd;
-	PositionInformation * info;
+	void ServoSpeedTest();
+	void WheelSpeedTest();
+	
+	DriverStationLCD * 		m_lcd;
+	PositionInformation * 	m_info;
 
 	KwarqsJoystick		m_stick;
 	ServoCalibrator 	servoCalibrator;

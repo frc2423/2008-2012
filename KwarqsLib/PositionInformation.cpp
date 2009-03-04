@@ -25,6 +25,9 @@ PositionInformation::PositionInformation() :
 	m_accelerometerXIn(ACCELEROMETER_X_SLOT, ACCELEROMETER_X_INPUT),
 	m_accelerometerYIn(ACCELEROMETER_Y_SLOT, ACCELEROMETER_Y_INPUT),
 	
+	m_field1(FIELD_SW1_SLOT, FIELD_SW2_CHANNEL),
+	m_field2(FIELD_SW1_SLOT, FIELD_SW2_CHANNEL),
+	
 	m_gyro_offset(0.0),
 	m_field_offset(0.0),
 
@@ -54,6 +57,7 @@ PositionInformation::PositionInformation() :
 	
 	// get the acceleration bias
 	AverageWindowFilter<double, 20> fx, fy;
+	double ax = 0, ay = 0;
 	
 	for (int i = 0; i < 20; i++)
 	{
@@ -140,13 +144,13 @@ void PositionInformation::GetAcceleration(double &x, double &y)
 double PositionInformation::GetFieldAngle()
 {
 	Synchronized sync(m_mutex);
-	return (m_gyro.GetAngle() - m_gyro_angle) + m_field_offset;
+	return (m_gyro.GetAngle() - m_gyro_offset) + m_field_offset;
 }
 
 /// returns a normalized angle (0-360), relative to the field
 double PositionInformation::GetNormalizedFieldAngle()
 {
-	double angle = fmod(GetAngle(), 360.0);
+	double angle = fmod(GetFieldAngle(), 360.0);
 	if (angle < 0)
 		angle += 360;
 	return angle;
@@ -159,7 +163,7 @@ double PositionInformation::GetRawAngle()
 }
 
 /// returns the raw angle from the gyro, but normalized to 0-360
-double PositionInformation::GetNormalizedUnmodifiedAngle()
+double PositionInformation::GetNormalizedRawAngle()
 {
 	double angle = fmod(m_gyro.GetAngle(), 360.0);
 	if (angle < 0)
@@ -170,7 +174,7 @@ double PositionInformation::GetNormalizedUnmodifiedAngle()
 void PositionInformation::ResetHeading()
 {
 	Synchronized sync(m_mutex);
-	m_gyro_offset = GetAngle() - m_field_offset;
+	m_gyro_offset = m_gyro.GetAngle() - m_field_offset;
 }
 
 

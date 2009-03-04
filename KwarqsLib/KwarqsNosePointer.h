@@ -28,8 +28,9 @@ public:
 			setpoint = fmod(setpoint, 360.0);
 			if (setpoint < 0) setpoint += 360;
 		
+			/// @todo this needs to be customizable
 			// get the direction we're currently facing
-			double angle = m_position->GetNormalizedAngle()*-1;
+			double angle = m_position->GetNormalizedFieldAngle()*-1;
 			if (angle <0) angle += 360;
 			
 			

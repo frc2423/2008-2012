@@ -8,8 +8,8 @@
 #ifndef AnnDrive_H
 #define AnnDrive_H
 
-#include "Framework/KwarqsDriveBase.h"
-#include "RobotChassis.h"
+#include "../KwarqsLib/KwarqsDriveBase.h"
+#include "../RobotChassis.h"
 
 /**
 	\class AnnDrive

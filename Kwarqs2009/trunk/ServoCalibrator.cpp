@@ -42,11 +42,10 @@
 ServoCalibrator::ServoCalibrator(RobotChassis * chassis) :
 	m_stick(FIRST_JOYSTICK_PORT),
 	m_chassis(chassis),
+	m_ds(DriverStation::GetInstance()),
 	
 	m_lcd(DriverStationLCD::GetInstance()),
-	m_triggerEvent(0.5)
-	
-	m_time(0),
+	m_triggerEvent(0.5),
 	pot1offset(0),
 	pot2offset(0),
 	pot3offset(0),
@@ -92,10 +91,10 @@ void ServoCalibrator::DoManualCalibrate()
 	// filter out the pots
 	const double c = 500.0 / 1000.0;
 				
-	filter1.AddPoint( ceil( m_ds->GetAnalogIn(1) * c));
-	filter2.AddPoint( ceil( m_ds->GetAnalogIn(2) * c));
-	filter3.AddPoint( ceil( m_ds->GetAnalogIn(3) * c));
-	filter4.AddPoint( ceil( m_ds->GetAnalogIn(4) * c));
+	m_potfilter1.AddPoint( ceil( m_ds->GetAnalogIn(1) * c));
+	m_potfilter2.AddPoint( ceil( m_ds->GetAnalogIn(2) * c));
+	m_potfilter3.AddPoint( ceil( m_ds->GetAnalogIn(3) * c));
+	m_potfilter4.AddPoint( ceil( m_ds->GetAnalogIn(4) * c));
 
 	// hitting the trigger sets the calibration point
 	if (m_stick.GetTrigger() && m_triggerEvent.DoEvent())
@@ -105,17 +104,17 @@ void ServoCalibrator::DoManualCalibrate()
 		m_chassis->servo_rf.Reset();
 		m_chassis->servo_rr.Reset();
 		
-		pot1offset = filter1.GetAverage();
-		pot2offset = filter2.GetAverage();
-		pot3offset = filter3.GetAverage();
-		pot4offset = filter4.GetAverage();
+		pot1offset = m_potfilter1.GetAverage();
+		pot2offset = m_potfilter2.GetAverage();
+		pot3offset = m_potfilter3.GetAverage();
+		pot4offset = m_potfilter4.GetAverage();
 	}
 	
 	// adjust the pot input accordingly
-	double pot1 = filter1.GetAverage() - pot1offset;
-	double pot2 = filter2.GetAverage() - pot2offset;
-	double pot3 = filter3.GetAverage() - pot3offset;
-	double pot4 = filter4.GetAverage() - pot4offset;
+	double pot1 = m_potfilter1.GetAverage() - pot1offset;
+	double pot2 = m_potfilter2.GetAverage() - pot2offset;
+	double pot3 = m_potfilter3.GetAverage() - pot3offset;
+	double pot4 = m_potfilter4.GetAverage() - pot4offset;
 	
 	// ok, tell the servo to go to that angle
 	m_chassis->servo_lf.SetAngle(pot1);
@@ -134,28 +133,28 @@ void ServoCalibrator::ShowLCDOutput()
 			m_chassis->servo_lf.IsCalibrated() ? "OK " : "CAL",
 			m_chassis->servo_lf.GetSensor() ? "0" : "1",
 			m_chassis->servo_lf.GetSetAngle(),
-			m_chassis->servo_lf.GetCurrentAngle(),
+			m_chassis->servo_lf.GetCurrentAngle()
 		);
 		
 		m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "LR: %s %s %.1f %.1f",
 			m_chassis->servo_lr.IsCalibrated() ? "OK " : "CAL",
 			m_chassis->servo_lr.GetSensor() ? "0" : "1",
 			m_chassis->servo_lr.GetSetAngle(),
-			m_chassis->servo_lr.GetCurrentAngle(),
+			m_chassis->servo_lr.GetCurrentAngle()
 		);
 		
 		m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "RF: %s %s %.1f %.1f",
 			m_chassis->servo_rf.IsCalibrated() ? "OK " : "CAL",
 			m_chassis->servo_rf.GetSensor() ? "0" : "1",
 			m_chassis->servo_rf.GetSetAngle(),
-			m_chassis->servo_rf.GetCurrentAngle(),
+			m_chassis->servo_rf.GetCurrentAngle()
 		);
 		
 		m_lcd->PrintfLine(DriverStationLCD::kUser_Line6, "RR: %s %s %.1f %.1f",
 			m_chassis->servo_rr.IsCalibrated() ? "OK " : "CAL",
 			m_chassis->servo_rr.GetSensor() ? "0" : "1",
 			m_chassis->servo_rr.GetSetAngle(),
-			m_chassis->servo_rr.GetCurrentAngle(),
+			m_chassis->servo_rr.GetCurrentAngle()
 		);
 	}
 }

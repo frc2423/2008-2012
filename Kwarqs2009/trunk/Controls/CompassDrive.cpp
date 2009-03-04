@@ -28,7 +28,7 @@ void CompassDrive::Move()
 
 double CompassDrive::robotCompass()
 {
-	double robot_Compass = m_position->GetAngle();
+	double robot_Compass = m_position->GetFieldAngle();
 
 	robot_Compass = fmod(robot_Compass, 360);
 	if (robot_Compass < 0)

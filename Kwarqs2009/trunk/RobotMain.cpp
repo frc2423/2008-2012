@@ -62,6 +62,7 @@ class KwarqsRobotMain : public SimpleRobot
 	
 	// motor drivers
 	SwerveDrive				swerveDrive;
+	AnnDrive				annDrive;
 	
 	KwarqsMovementControl * currentTeleoperatedControl;
 	
@@ -80,7 +81,6 @@ public:
 		This executes as soon as the code loads
 	*/
 	KwarqsRobotMain() :
-		ds(DriverStation::GetInstance()),
 		maintenanceMode(&chassis),
 		
 		annControl(&driveController),
@@ -93,8 +93,8 @@ public:
 		autonomousDemo(&driveController),
 		autonomousRandomDemo(&driveController),
 		
-		annDrive(&chassis),
 		swerveDrive(&chassis),
+		annDrive(&chassis),
 		
 		currentTeleoperatedControl(NULL),
 		m_stick(1)
@@ -206,7 +206,7 @@ public:
 	{
 		GetWatchdog().SetEnabled(false);
 		
-		gameControl.Disable();
+		gameControl.TurnoffMotors();
 		psuedoGearbox.Enable();
 		
 	
@@ -234,8 +234,8 @@ public:
 	*/
 	void OperatorControl()
 	{
-		double update_time = GetTime();
 		bool last_mode = false;
+		int user_selection = 0;
 		
 		psuedoGearbox.Enable();
 		
@@ -247,7 +247,7 @@ public:
 			GetWatchdog().Feed();
 			
 			// get the user selection
-			int user_selection = GetBCDInput();
+			user_selection = GetBCDInput();
 			bool maintenance_mode = m_ds->GetDigitalIn(MAINTENANCE_MODE_SWITCH);
 			
 			if (last_mode != maintenance_mode)
@@ -257,7 +257,7 @@ public:
 			
 			if (maintenance_mode)
 			{
-				gameControl.Disable();
+				gameControl.TurnoffMotors();
 				maintenanceMode.DoMaintenance(user_selection);
 			}
 			else
@@ -277,14 +277,14 @@ public:
 			UpdateLCD();			
 		}
 		
-		GetTeleoperatedMovementControl()->OnDisable();
+		GetTeleoperatedMovementControl(user_selection)->OnDisable();
 		currentTeleoperatedControl = NULL;
 	}
 	
 	/// updates the lcd output
 	void UpdateLCD()
 	{
-		if (m_lcdUpdateEvent->DoEvent())
+		if (m_lcdUpdateEvent.DoEvent())
 		{
 
 			// update and clear

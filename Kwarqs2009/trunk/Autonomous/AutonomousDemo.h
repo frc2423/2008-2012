@@ -3,6 +3,9 @@
 #ifndef AUTONOMOUS_DEMO
 #define AUTONOMOUS_DEMO
 
+#include "../KwarqsLib/KwarqsNosePointer.h"
+#include "../KwarqsLib/KwarqsMovementControl.h"
+
 class AutonomousDemo : public KwarqsMovementControl {
 public:
 

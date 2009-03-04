@@ -58,9 +58,9 @@ KwarqsWheelMotor::KwarqsWheelMotor(
 		bool invert_encoder) :
 	m_motor(slot, pwm_port),
 	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X),
-	m_invert(invert_motor ? -1.0F : 1.0F),
+	m_invert(invert_motor ? -1.0F : 1.0F)
 {
-	SetSpeed(0, 0);
+	SetSpeed(0);
 	
 	//m_encoder.SetDistancePerPulse(.0019);
 	m_encoder.SetReverseDirection(invert_encoder);
@@ -86,7 +86,7 @@ void KwarqsWheelMotor::SetRaw(float speed)
 	m_motor.Set(speed * m_invert);
 }
 
-UINT32 KwarqsWheelMotor::GetRaw()
+UINT32 KwarqsWheelMotor::GetRawEncoder()
 {
 	return m_encoder.Get();
 }

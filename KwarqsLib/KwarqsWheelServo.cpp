@@ -135,7 +135,6 @@ void KwarqsWheelServo::AutoCalibrate()
 		return;
 	
 	m_calibrating = true;
-	KwarqsWheelServo::m_uncalibrated_servos++;
 	
 	// setup the interrupt handlers
 	m_sensor.RequestInterrupts(&KwarqsWheelServo::CalibrationIrqHandler, this);

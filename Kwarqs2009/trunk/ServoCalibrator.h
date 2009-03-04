@@ -13,6 +13,7 @@
 #include "RobotChassis.h"
 #include "KwarqsLib/KwarqsJoystick.h"
 #include "KwarqsLib/DriverStationLCD.h"
+#include "KwarqsLib/DelayEvent.h"
 
 class ServoCalibrator {
 public:
@@ -21,22 +22,25 @@ public:
 	
 	void DoAutoCalibrate();
 	void DoManualCalibrate();
+	
+	void Reset();
 
 private:
 
 	void ShowLCDOutput();
 
-	KwarqsJoystick m_stick;
-	RobotChassis * m_chassis;
-	DriverStationLCD * lcd;
+	KwarqsJoystick 		m_stick;
+	RobotChassis * 		m_chassis;
+	DriverStation * 	m_ds;
+	DriverStationLCD * 	m_lcd;
 
-	DelayEvent m_lcdDelay;
+	DelayEvent m_lcdEvent;
 	DelayEvent m_triggerEvent;
 	
-	AverageWindowFilter<double, 20> potfilter1;
-	AverageWindowFilter<double, 20> potfilter2;
-	AverageWindowFilter<double, 20> potfilter3;
-	AverageWindowFilter<double, 20> potfilter4;
+	AverageWindowFilter<double, 20> m_potfilter1;
+	AverageWindowFilter<double, 20> m_potfilter2;
+	AverageWindowFilter<double, 20> m_potfilter3;
+	AverageWindowFilter<double, 20> m_potfilter4;
 	
 	double pot1offset;
 	double pot2offset;

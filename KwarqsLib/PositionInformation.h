@@ -8,6 +8,7 @@
 #ifndef KWARQS_POSITION_INFORMATION_H
 #define KWARQS_POSITION_INFORMATION_H 
 
+#include "filters.h"
 #include "KwarqsConstants.h"
 #include "Deleter.h"
 
@@ -75,16 +76,25 @@ private:
 	
 	// called every N milliseconds to calculate the information needed
 	void CalculatePositionInformation();
+	void GetAccel(double &x, double &y);
 	
 	Notifier*		m_notifier;
 	
 	// Objects
 	Gyro 			m_gyro;
 	
+	DigitalInput	m_accelerometerXIn, m_accelerometerYIn;
+	Counter			countXhi, countXlow, countYhi, countYlow;
+	
+	// tells us our starting position
+	DigitalInput	m_field1, m_field2;
+
+	
 	// heading information
 	
 	// what is our starting position?
 	double			m_gyro_offset;
+	double			m_field_offset;
 	
 	// needed calculation variables for positioning
 	// NOTE: Anytime these are accessed, use the mutex to ensure

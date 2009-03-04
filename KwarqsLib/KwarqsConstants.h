@@ -80,6 +80,12 @@
 #define ACCELEROMETER_Y_SLOT		SLOT_1
 #define ACCELEROMETER_Y_INPUT		13
 
+// position switch
+#define FIELD_SW1_SLOT				SLOT_2
+#define FIELD_SW1_CHANNEL			12
+#define FIELD_SW2_SLOT				SLOT_2
+#define FIELD_SW2_CHANNEL			13
+
  
 // drive motors
 
@@ -119,10 +125,7 @@
 #define ENCODER_MOTOR_RF_INVERT		false
 #define ENCODER_MOTOR_RR_INVERT		false
 
-#define ENCODER_MOTOR_LF_P			0.95
-#define ENCODER_MOTOR_LR_P			0.95
-#define ENCODER_MOTOR_RF_P			0.95
-#define ENCODER_MOTOR_RR_P			0.95
+
 
 // servos
 #define SERVO_LF_SLOT				SLOT_1
@@ -154,6 +157,11 @@
 #define ENCODER_SERVO_RF_2			2
 #define ENCODER_SERVO_RR_1			3
 #define ENCODER_SERVO_RR_2			4
+
+#define ENCODER_SERVO_LF_P			0.95
+#define ENCODER_SERVO_LR_P			0.95
+#define ENCODER_SERVO_RF_P			0.95
+#define ENCODER_SERVO_RR_P			0.95
 
 // servo calibration signals (hall effect sensors)
 #define SERVO_LF_CAL_PORT			9
@@ -191,7 +199,8 @@
 									SERVO_##fr##_SCALE, \
 									SERVO_##fr##_TICKS, \
 									SERVO_##lr##fr##_INVERT_MOTOR, \
-									SERVO_##lr##fr##_INVERT_ENCODER
+									SERVO_##lr##fr##_INVERT_ENCODER, \
+									ENCODER_SERVO_##lr##fr##_P
 
 #define SERVO_LF_PARAMETERS 		SERVO_PARAMS(L,F)
 #define SERVO_LR_PARAMETERS			SERVO_PARAMS(L,R)
@@ -204,8 +213,7 @@
 									ENCODER_MOTOR_##arg##_1, \
 									ENCODER_MOTOR_##arg##_2, \
 									MOTOR_##arg##_INVERT, \
-									ENCODER_MOTOR_##arg##_INVERT, \
-									ENCODER_MOTOR_##arg##_P
+									ENCODER_MOTOR_##arg##_INVERT
 
 #define MOTOR_LF_PARAMETERS			MOTOR_PARAMS(LF)
 #define MOTOR_LR_PARAMETERS			MOTOR_PARAMS(LR)

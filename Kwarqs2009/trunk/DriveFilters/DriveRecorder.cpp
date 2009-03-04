@@ -36,7 +36,7 @@
 #include <WPILib.h>
 #include "DriveRecorder.h"
 
-#include "KwarqsLib/KwarqsConstants.h"
+#include "../KwarqsLib/KwarqsConstants.h"
 
 
 DriveRecorder::DriveRecorder() :

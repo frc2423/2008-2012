@@ -9,11 +9,11 @@
 #ifndef DRIVE_RECORDER_H
 #define DRIVE_RECORDER_H
 
-#include "KwarqsLib/DriverStationLCD.h"
-#include "KwarqsLib/KwarqsDriveBase.h"
-#include "KwarqsLib/DelayTime.h"
-#include "KwarqsLib/DataFile.h"
-#include "KwarqsLib/KwarqsJoystick.h"
+#include "../KwarqsLib/DriverStationLCD.h"
+#include "../KwarqsLib/KwarqsDriveBase.h"
+#include "../KwarqsLib/DelayEvent.h"
+#include "../KwarqsLib/DataFile.h"
+#include "../KwarqsLib/KwarqsJoystick.h"
 
 #include <vector>
 
@@ -107,7 +107,7 @@ private:
 	
 	DataFile m_file;
 	
-	DelayTime m_lcdDelay;	
+	DelayEvent m_lcdDelay;	
 };
 
 #endif

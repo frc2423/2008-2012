@@ -33,189 +33,135 @@
  */
 
 
-
 #include <WPILib.h>
+
 #include "ServoCalibrator.h"
-#include "Framework/DriverStationLCD.h"
-#include "Framework/KwarqsBCDInput.h"
-#include "Framework/KwarqsConstants.h"
-#include "Framework/math.h"
+#include "KwarqsLib/KwarqsConstants.h"
+#include "KwarqsLib/math.h"
 
 ServoCalibrator::ServoCalibrator(RobotChassis * chassis) :
 	m_stick(FIRST_JOYSTICK_PORT),
-	m_motorStick(SECOND_JOYSTICK_PORT),
 	m_chassis(chassis),
-	m_time(0)
-	//m_in_pot_mode(false),
-	//m_idx(0),
-	//m_pot_time(0)
+	
+	m_lcd(DriverStationLCD::GetInstance()),
+	m_triggerEvent(0.5)
+	
+	m_time(0),
+	pot1offset(0),
+	pot2offset(0),
+	pot3offset(0),
+	pot4offset(0),
+	m_begin_manual_calibrate(true)
+{}
+
+
+
+void ServoCalibrator::DoAutoCalibrate()
 {
-	//for (int i = 0; i < POT_ARRAY_SIZE; i++)
-	//	m_pot_array[i] = 0;
+	m_chassis->servo_lf.SetAngle(0);
+	m_chassis->servo_lr.SetAngle(0);
+	m_chassis->servo_rf.SetAngle(0);
+	m_chassis->servo_rr.SetAngle(0);
+
+	// debounce this input
+	if (m_stick.GetTrigger() && m_triggerEvent.DoEvent())
+	{
+		m_chassis->servo_lf.AutoCalibrate();
+		m_chassis->servo_lr.AutoCalibrate();
+		m_chassis->servo_rf.AutoCalibrate();
+		m_chassis->servo_rr.AutoCalibrate();
+	}
+	
+	ShowLCDOutput();
 }
 
-
-bool ServoCalibrator::ConvertStickToAngle(double &angle)
-{
-	double y = m_stick.GetY() * -1, x = m_stick.GetX();
-	
-	double speed = __hypot(x, y);
-	
-	double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0 );			
-	if (desired_angle < 0) desired_angle += 360;
-	
-	if (fabs(speed) < 0.01)
-		return false;
-	
-	angle = desired_angle;
-	return true;
-}
-
-void ServoCalibrator::Calibrate()
+void ServoCalibrator::DoManualCalibrate()
 {	
-	KwarqsWheelServo * servo = NULL;
-	KwarqsWheelMotor * motor = NULL;
-
-	int input = GetBCDInput();
-
-	switch (input)
+	// make sure the pots don't initially move the wheels around,
+	// that gets annoying really fast
+	if (m_begin_manual_calibrate)
 	{
-	case 1:
-		servo = &m_chassis->servo_lf;
-		motor = &m_chassis->motor_lf;
-		break;
+		pot1offset = m_chassis->servo_lf.GetSetAngle();
+		pot2offset = m_chassis->servo_lr.GetSetAngle();
+		pot3offset = m_chassis->servo_rf.GetSetAngle();
+		pot4offset = m_chassis->servo_rr.GetSetAngle();
 		
-	case 2:
-		servo = &m_chassis->servo_lr;
-		motor = &m_chassis->motor_lr;
-		break;
-		
-	case 3:
-		servo = &m_chassis->servo_rf;
-		motor = &m_chassis->motor_rf;
-		break;
-		
-	case 4:
-		servo = &m_chassis->servo_rr;
-		motor = &m_chassis->motor_rr;
-		break;
-		
-	default:
-		servo = NULL;
+		m_begin_manual_calibrate = false;
 	}
 
+	// filter out the pots
+	const double c = 500.0 / 1000.0;
+				
+	filter1.AddPoint( ceil( m_ds->GetAnalogIn(1) * c));
+	filter2.AddPoint( ceil( m_ds->GetAnalogIn(2) * c));
+	filter3.AddPoint( ceil( m_ds->GetAnalogIn(3) * c));
+	filter4.AddPoint( ceil( m_ds->GetAnalogIn(4) * c));
 
-	// do calibration
-	if (servo)
+	// hitting the trigger sets the calibration point
+	if (m_stick.GetTrigger() && m_triggerEvent.DoEvent())
 	{
-		double setPoint;
+		m_chassis->servo_lf.Reset();
+		m_chassis->servo_lr.Reset();
+		m_chassis->servo_rf.Reset();
+		m_chassis->servo_rr.Reset();
 		
-		if (m_stick.GetTop())
-			servo->Calibrate();
-		
-		if (m_stick.GetTrigger())
-		{
-			// adjust using the pot, filter the values
-			//if (GetTime() - m_pot_time > 0.1)
-			//{
-				servo->SetAngle( ceil( GetFilteredPotValue() /(1000.0/ 500.0) ) );
-			//	m_pot_time = GetTime();
-			//}
-			
-			m_in_pot_mode = true;
-		} 
-		else if (m_in_pot_mode)
-		{
-			servo->Reset();
-			m_in_pot_mode = false;
-		}
-		 // only change angle if desired
-		else if (ConvertStickToAngle(setPoint))
-			servo->SetAngle(setPoint);
-		
-		motor->SetSpeed(m_motorStick.GetY()*-1);
+		pot1offset = filter1.GetAverage();
+		pot2offset = filter2.GetAverage();
+		pot3offset = filter3.GetAverage();
+		pot4offset = filter4.GetAverage();
 	}
+	
+	// adjust the pot input accordingly
+	double pot1 = filter1.GetAverage() - pot1offset;
+	double pot2 = filter2.GetAverage() - pot2offset;
+	double pot3 = filter3.GetAverage() - pot3offset;
+	double pot4 = filter4.GetAverage() - pot4offset;
+	
+	// ok, tell the servo to go to that angle
+	m_chassis->servo_lf.SetAngle(pot1);
+	m_chassis->servo_lr.SetAngle(pot2);
+	m_chassis->servo_rf.SetAngle(pot3);
+	m_chassis->servo_rr.SetAngle(pot4);
+	
+	ShowLCDOutput();
+}
 
-	if (GetTime() - m_time > 0.1)
+void ServoCalibrator::ShowLCDOutput()
+{
+	if (m_lcdEvent.DoEvent())
 	{
-		DriverStationLCD * lcd = DriverStationLCD::GetInstance();
-
-		switch (input)
-		{
-		case 1:
-			lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Sel: Left Front(LF)  ");
-			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Left Front(LF)  ");
-			break;
-			
-		case 2:
-			lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Sel: Left Rear (LR)  ");
-			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Left Rear (LR)  ");
-			break;
-			
-		case 3:
-			lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Sel: Right Front (RF)");
-			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Right Front (RF)");
-			break;
-			
-		case 4:
-			lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Sel: Right Rear (RR) ");
-			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: Right Rear (RR) ");
-			break;
-			
-		default:
-			lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Sel: None (%d)       ", GetBCDInput());
-			lcd->PrintfLine(DriverStationLCD::kUser_Line2, "Sel: None (%d)       ", GetBCDInput());
-		}
-		
-		
-		lcd->PrintfLine(DriverStationLCD::kUser_Line3, "LF: %.1f %.1f %s %s            ",
+		m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "LF: %s %s %.1f %.1f",
+			m_chassis->servo_lf.IsCalibrated() ? "OK " : "CAL",
+			m_chassis->servo_lf.GetSensor() ? "0" : "1",
 			m_chassis->servo_lf.GetSetAngle(),
 			m_chassis->servo_lf.GetCurrentAngle(),
-			m_chassis->servo_lf.IsCalibrated() ? "C" : "NC",
-			m_chassis->servo_lf.GetSensor() ? "0" : "1" 
 		);
 		
-		lcd->PrintfLine(DriverStationLCD::kUser_Line4, "LR: %.1f %.1f %s %s            ",
+		m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "LR: %s %s %.1f %.1f",
+			m_chassis->servo_lr.IsCalibrated() ? "OK " : "CAL",
+			m_chassis->servo_lr.GetSensor() ? "0" : "1",
 			m_chassis->servo_lr.GetSetAngle(),
 			m_chassis->servo_lr.GetCurrentAngle(),
-			m_chassis->servo_lr.IsCalibrated() ? "C" : "NC",
-			m_chassis->servo_lr.GetSensor() ? "0" : "1" 
 		);
 		
-		lcd->PrintfLine(DriverStationLCD::kUser_Line5, "RF: %.1f %.1f %s %s            ",
+		m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "RF: %s %s %.1f %.1f",
+			m_chassis->servo_rf.IsCalibrated() ? "OK " : "CAL",
+			m_chassis->servo_rf.GetSensor() ? "0" : "1",
 			m_chassis->servo_rf.GetSetAngle(),
 			m_chassis->servo_rf.GetCurrentAngle(),
-			m_chassis->servo_rf.IsCalibrated() ? "C" : "NC",
-			m_chassis->servo_rf.GetSensor() ? "0" : "1" 
-		);
-
-		lcd->PrintfLine(DriverStationLCD::kUser_Line6, "RR: %.1f %.1f %s %s            ",
-			m_chassis->servo_rr.GetSetAngle(),
-			m_chassis->servo_rr.GetCurrentAngle(),
-			m_chassis->servo_rr.IsCalibrated() ? "C" : "NC",
-			m_chassis->servo_rr.GetSensor() ? "0" : "1" 
 		);
 		
-		lcd->UpdateLCD();
-		m_time = GetTime();
+		m_lcd->PrintfLine(DriverStationLCD::kUser_Line6, "RR: %s %s %.1f %.1f",
+			m_chassis->servo_rr.IsCalibrated() ? "OK " : "CAL",
+			m_chassis->servo_rr.GetSensor() ? "0" : "1",
+			m_chassis->servo_rr.GetSetAngle(),
+			m_chassis->servo_rr.GetCurrentAngle(),
+		);
 	}
 }
 
-double ServoCalibrator::GetFilteredPotValue()
+
+void ServoCalibrator::Reset()
 {
-	return DriverStation::GetInstance()->GetAnalogIn(1);
-	
-	/*
-	if (++m_idx > POT_ARRAY_SIZE)
-		m_idx = 0;
-	
-	m_pot_array[m_idx] = DriverStation::GetInstance()->GetAnalogIn(1);
-	
-	// average it
-	double sum = 0;
-	for (int i = 0; i < POT_ARRAY_SIZE; i++)
-		sum += m_pot_array[i];
-	
-	return sum/POT_ARRAY_SIZE;
-	*/
+	m_begin_manual_calibrate = true;
 }

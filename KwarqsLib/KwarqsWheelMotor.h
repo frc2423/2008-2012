@@ -44,13 +44,14 @@ public:
 	);
 
 	/// Set the speed of the motor (-1 to 1)
-	void SetSpeed(float speed, double velocity);
+	void SetSpeed(float speed);
 	
 	/// Get the speed that the motor was assigned to go via SetSpeed
 	float GetSetSpeed();
 	
-	/// Get the actual speed that the wheel is turning (via the encoder)
-	double GetActualSpeed();
+	/// sets the speed with no filtering (except for invert)
+	void SetRaw(float speed);
+	UINT32 GetRawEncoder();
 
 private:
 	
@@ -58,15 +59,6 @@ private:
 	Encoder m_encoder;
 	
 	float m_invert;
-	
-	double m_lastEncoderVelocity;
-	
-	float m_lastSpeed;
-	double m_lastUpdate;
-	
-	LowPassFilter m_filter;
-	DriverStationLCD::Line m_line;
-	
 };
 
 #endif

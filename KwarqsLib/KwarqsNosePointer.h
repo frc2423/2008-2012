@@ -1,6 +1,6 @@
 
-#ifndef FAKE_PID_CONTROLLER_H
-#define FAKE_PID_CONTROLLER_H
+#ifndef KWARQS_NOSEPOINTER_H
+#define KWARQS_NOSEPOINTER_H
 
 #include "PositionInformation.h"
 #include "math.h"

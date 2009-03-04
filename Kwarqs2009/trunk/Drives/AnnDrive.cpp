@@ -1,5 +1,5 @@
 /**
-	\file 		SwerveDrive.cpp
+	\file 		AnnDrive.cpp
 	\author 	Dustin Spicuzza: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
@@ -34,14 +34,13 @@
 
 
 #include <WPILib.h>
-#include "SwerveDrive.h"
+#include "AnnDrive.h"
 
 #include "../KwarqsLib/KwarqsConstants.h"
 #include "../KwarqsLib/math.h"
-#include "../KwarqsLib/DriverStationLCD.h"
 
 // default constructor
-SwerveDrive::SwerveDrive(RobotChassis * chassis) :
+AnnDrive::AnnDrive(RobotChassis * chassis) :
 	m_chassis(chassis),
 	m_time(GetTime())
 {}
@@ -51,51 +50,13 @@ SwerveDrive::SwerveDrive(RobotChassis * chassis) :
 
 
 
-void SwerveDrive::Move(
+void AnnDrive::Move(
 	double &speed, 
 	double &angle, 
 	double &rotation,
 	bool &stop
 )
 {
-	/*
-	if (GetTime() - m_time > 0.1)
-	{		
-		DriverStationLCD * lcd = DriverStationLCD::GetInstance();
-		
-		//lcd->Printf(DriverStationLCD::kUser_Line2, 1, "S: %.1f A: %.1f R: %.1f          ",
-		//		speed, angle, rotation);
-		
-		lcd->Printf(DriverStationLCD::kUser_Line3, 1, "LF: %.1f %.1f %.1f          ",
-			m_chassis->servo_lf.GetSetAngle(),
-			m_chassis->servo_lf.GetCurrentAngle(),
-			m_chassis->motor_lr.GetSetSpeed()
-		);
-		
-		lcd->Printf(DriverStationLCD::kUser_Line4, 1, "LR: %.1f %.1f %.1f          ",
-			m_chassis->servo_lr.GetSetAngle(),
-			m_chassis->servo_lr.GetCurrentAngle(),
-			m_chassis->motor_lr.GetSetSpeed()
-		);
-		
-		lcd->Printf(DriverStationLCD::kUser_Line5, 1, "RF: %.1f %.1f %.1f          ",
-			m_chassis->servo_rf.GetSetAngle(),
-			m_chassis->servo_rf.GetCurrentAngle(),
-			m_chassis->motor_lr.GetSetSpeed()
-		);
-
-		lcd->Printf(DriverStationLCD::kUser_Line6, 1, "RR: %.1f %.1f %.1f          ",
-			m_chassis->servo_rr.GetSetAngle(),
-			m_chassis->servo_rr.GetCurrentAngle(),
-			m_chassis->motor_lr.GetSetSpeed()
-		);
-		
-		lcd->UpdateLCD();
-		m_time = GetTime();
-	}
-	*/
-	
-	
 	if (stop)
 	{
 		Stop();
@@ -324,7 +285,7 @@ if (fabs(ry-rr_y)<almost_0)
 	
 }
 
-void SwerveDrive::Stop()
+void AnnDrive::Stop()
 {
 	/// @todo: turn the wheels against the current
 	/// acceleration vector and stop all motors. Is that actually

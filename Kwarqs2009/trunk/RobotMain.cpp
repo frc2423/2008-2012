@@ -5,26 +5,34 @@
 	\version 	$Rev$
 */
 
-#include "WPILib.h"
+#include <WPILib.h>
 
-#include "Framework/KwarqsDriveController.h"
-#include "Framework/DriverStationLCD.h"
+#include "KwarqsLib/KwarqsDriveController.h"
+#include "KwarqsLib/DriverStationLCD.h"
+#include "KwarqsLib/KwarqsBCDInput.h"
+#include "KwarqsLib/DelayEvent.h"
 
-#include "ServoCalibrator.h"
+#include "MaintenanceMode.h"
 
+#include "Autonomous/AutonomousDemo.h"
+#include "Autonomous/AutonomousRandomDemo.h"
+
+#include "Controls/AnnControl.h"
 #include "Controls/SimpleControl.h"
 #include "Controls/CompassDrive.h"
 #include "Controls/NullMovementControl.h"
 #include "Controls/CompassDriveII.h"
 
-#include "Autonomous/AutonomousDemo.h"
-#include "Autonomous/AutonomousRandomDemo.h"
 
-#include "Framework/KwarqsGamePiece.h"
-#include "Framework/KwarqsBCDInput.h"
 
-#include "PsuedoGearbox.h"
-#include "SwerveDrive.h"
+#include "DriveFilters/PsuedoGearbox.h"
+
+#include "Drives/AnnDrive.h"
+#include "Drives/SwerveDrive.h"
+
+#include "KwarqsGameControl.h"
+
+
 
 class KwarqsRobotMain : public SimpleRobot
 {
@@ -33,9 +41,10 @@ class KwarqsRobotMain : public SimpleRobot
 	
 	RobotChassis			chassis;
 	
-	ServoCalibrator			servoCalibrator;
+	MaintenanceMode			maintenanceMode;
 	
 	// control types
+	AnnControl				annControl;
 	SimpleControl 			simpleControl;
 	CompassDrive			compassDrive;
 	CompassDriveII			compassDriveII;
@@ -44,7 +53,7 @@ class KwarqsRobotMain : public SimpleRobot
 	AutonomousDemo			autonomousDemo;
 	AutonomousRandomDemo	autonomousRandomDemo;
 	
-	KwarqsGamePiece 		gamePiece;
+	KwarqsGameControl 		gameControl;
 	
 	// drive types
 	
@@ -57,6 +66,8 @@ class KwarqsRobotMain : public SimpleRobot
 	KwarqsMovementControl * currentTeleoperatedControl;
 	
 	KwarqsJoystick			m_stick;
+	
+	DelayEvent				m_lcdUpdateEvent;
 
 public:
 
@@ -70,7 +81,9 @@ public:
 	*/
 	KwarqsRobotMain() :
 		ds(DriverStation::GetInstance()),
-		servoCalibrator(&chassis),
+		maintenanceMode(&chassis),
+		
+		annControl(&driveController),
 		simpleControl(&driveController),
 		compassDrive(&driveController),
 		compassDriveII(&driveController),
@@ -80,7 +93,9 @@ public:
 		autonomousDemo(&driveController),
 		autonomousRandomDemo(&driveController),
 		
+		annDrive(&chassis),
 		swerveDrive(&chassis),
+		
 		currentTeleoperatedControl(NULL),
 		m_stick(1)
 	{
@@ -107,6 +122,10 @@ public:
 	*/
 	KwarqsMovementControl * GetAutonomousMovementControl()
 	{
+		
+		/// @todo read from a file, figure out which autonomous we want
+		/// to use from looking at that
+	
 		return &autonomousDemo;
 		
 		/*
@@ -131,13 +150,17 @@ public:
 		This will read switches on the operator control interface and 
 		determine which control type to use.
 	*/
-	KwarqsMovementControl * GetTeleoperatedMovementControl()
+	KwarqsMovementControl * GetTeleoperatedMovementControl(int user_selection)
 	{	
-		// select the type (todo: need to read switches)
+		// select the type that the user wants
 		KwarqsMovementControl * control;
 		
-		switch (GetBCDInput())
+		switch (user_selection)
 		{
+			case 6:
+				control = &annControl;
+				break;
+		
 			case 7:
 				control = &compassDriveII;
 				break;
@@ -164,11 +187,10 @@ public:
 			
 			currentTeleoperatedControl = control;
 			currentTeleoperatedControl->OnEnable();
-					
 		}
 		
-		lcd->PrintfLine(DriverStationLCD::kMain_Line6, "%.1f %s", 
-				PositionInformation::GetInstance()->GetNormalizedAngle(), control->Name());
+		lcd->PrintfLine(DriverStationLCD::kMain_Line, "%s %.1f", 
+				control->Name(), PositionInformation::GetInstance()->GetNormalizedFieldAngle());
 		
 		return currentTeleoperatedControl;
 	}
@@ -183,6 +205,8 @@ public:
 	void Autonomous()
 	{
 		GetWatchdog().SetEnabled(false);
+		
+		gameControl.Disable();
 		psuedoGearbox.Enable();
 		
 	
@@ -211,6 +235,7 @@ public:
 	void OperatorControl()
 	{
 		double update_time = GetTime();
+		bool last_mode = false;
 		
 		psuedoGearbox.Enable();
 		
@@ -221,36 +246,56 @@ public:
 		{
 			GetWatchdog().Feed();
 			
-			if (ds->GetDigitalIn(CALIBRATION_SWITCH))
-				servoCalibrator.Calibrate();
-			else
+			// get the user selection
+			int user_selection = GetBCDInput();
+			bool maintenance_mode = m_ds->GetDigitalIn(MAINTENANCE_MODE_SWITCH);
+			
+			if (last_mode != maintenance_mode)
 			{
-				//if (m_stick.GetRawButton(5) && m_stick.GetRawButton(6))
-				//	PositionInformation::GetInstance()->ResetHeading();
-				
-				GetTeleoperatedMovementControl()->Move();
-				driveController.EndMove();
-				
-				gamePiece.PerformMovement();
+				maintenanceMode.Reset();
 			}
 			
-			if (GetTime() - update_time > 0.2)
+			if (maintenance_mode)
 			{
-				// update and clear
-				lcd->UpdateLCD();
-				lcd->Printf(DriverStationLCD::kUser_Line2, 1, "                   ");
-				lcd->Printf(DriverStationLCD::kUser_Line3, 1, "                   ");
-				lcd->Printf(DriverStationLCD::kUser_Line4, 1, "                   ");
-				lcd->Printf(DriverStationLCD::kUser_Line5, 1, "                   ");
-				lcd->Printf(DriverStationLCD::kUser_Line6, 1, "                   ");
-				
-				update_time = GetTime();
+				gameControl.Disable();
+				maintenanceMode.DoMaintenance(user_selection);
 			}
+			else
+			{
+				// do the users preferred movement here
+				GetTeleoperatedMovementControl(user_selection)->Move();
+				driveController.EndMove();
+				
+				// and the game control
+				gameControl.PerformMovement();
+			}
+			
+			// allow the user to reset gyro position if needed
+			if (m_stick.GetRawButton(5) && m_stick.GetRawButton(6))
+				PositionInformation::GetInstance()->ResetHeading();
+			
+			UpdateLCD();			
 		}
 		
 		GetTeleoperatedMovementControl()->OnDisable();
 		currentTeleoperatedControl = NULL;
 	}
+	
+	/// updates the lcd output
+	void UpdateLCD()
+	{
+		if (m_lcdUpdateEvent->DoEvent())
+		{
+
+			// update and clear
+			lcd->UpdateLCD();
+			lcd->Printf(DriverStationLCD::kMain_Line,  1, "                   ");
+			lcd->Printf(DriverStationLCD::kUser_Line3, 1, "                   ");
+			lcd->Printf(DriverStationLCD::kUser_Line4, 1, "                   ");
+			lcd->Printf(DriverStationLCD::kUser_Line5, 1, "                   ");
+		}
+	}
+	
 };
 
 START_ROBOT_CLASS(KwarqsRobotMain);

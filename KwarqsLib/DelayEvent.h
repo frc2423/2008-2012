@@ -1,5 +1,5 @@
 /**
-	\file 		DelayTime.h
+	\file 		DelayEvent.h
 	\author 	Dustin Spicuzza: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
@@ -10,14 +10,14 @@
 #define KWARQSLIB_DELAY_TIME_H
 
 /**
-	\class DelayTime
+	\class DelayEvent
 	\brief Simple class to abstract all that delay stuff away so we don't
 	have to keep making silly variables to do it for us
 */
-class DelayTime {
+class DelayEvent {
 public:
 
-	DelayTime(double interval = 0.2) :
+	DelayEvent(double interval = 0.2) :
 		m_interval(interval),
 		m_lastUpdate(GetTime())
 	{}

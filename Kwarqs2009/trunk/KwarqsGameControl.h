@@ -1,26 +1,29 @@
 /**
-	\file 		KwarqsGamePiece.h
+	\file 		KwarqsGameControl.h
 	\author 	Dustin Spicuzza: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
 */
 
 
-#ifndef FRAMEWORK_KWARQS_GAMEPIECE_H
-#define FRAMEWORK_KWARQS_GAMEPIECE_H
+#ifndef KWARQSGAMECONTROL_H
+#define KWARQSGAMECONTROL_H
 
 /**
-	\class KwarqsGamePiece
+	\class KwarqsGameControl
 	\brief This encapsulates all of the game pieces
 	
 	This class is not fully defined yet, given we don't know what is
 	needed to control the game pieces. However, it should provide necessary
 	methods needed to do the actions during autonomous mode
 */
-class KwarqsGamePiece {
+class KwarqsGameControl {
 public:
 
-	KwarqsGamePiece();
+	KwarqsGameControl();
+	
+	/// Turns the drive motors off -- necessary for autonomous mode
+	void TurnoffMotors();
 	
 	/// called in operatorControl -- this reads any user input and performs
 	/// the necessary actions needed

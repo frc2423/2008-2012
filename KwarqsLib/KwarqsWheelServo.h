@@ -5,8 +5,11 @@
 	\version 	$Rev$
 */
 
-#ifndef KWARQS_WHEEL_SERVO_BASE_H
-#define KWARQS_WHEEL_SERVO_BASE_H
+#ifndef KWARQS_WHEEL_SERVO_H
+#define KWARQS_WHEEL_SERVO_H
+
+// define this to enable auto-calibrate mode
+#define AUTOCALIBRATE_SERVO
 
 
 /**
@@ -17,9 +20,6 @@
 	would be controlled. Will need at least two variants of this class,
 	since the front and rear motors are going to be different types so
 	they will need different tuning.
-	
-	At the moment, this class is set to auto-calibrate the wheel
-	as soon as it turns on. There is also a calibration function.
 	
 	Only a KwarqsDriveBase derived class should create these. 
 */
@@ -38,7 +38,8 @@ public:
 		double outputScale,
 		int encoderResolution,
 		bool invert_motor,
-		bool invert_encoder
+		bool invert_encoder,
+		float param_P
 	);
 	
 	virtual ~KwarqsWheelServo();
@@ -47,16 +48,15 @@ public:
 	void Enable();
 	void Disable();
 	
-	void EnableManualCalibration();
-	void DisableManualCalibration();
+	void Reset();
 	
-	/// only needs to be called if the servo needs to be recalibrated
-	void Calibrate();
+	/// Call this to tell the servo to automatically try to calibrate
+	void AutoCalibrate();
 	
 	/// lets you know if the servo is currently calibrated or not
 	bool IsCalibrated() { return m_calibrating; }
 	
-	void Reset() { CalibrationComplete(); }
+	
 	
 	/// Set the angle that the wheel should be pointing, where
 	/// 0 is straight ahead and angle increments positively 
@@ -99,10 +99,11 @@ public:
 	
 private:
 	
-	static int m_uncalibrated_servos;
-	
 	// called when calibration is finished
+#ifdef AUTOCALIBRATE_SERVO
 	static void CalibrationIrqHandler(tNIRIO_u32 x, void * param);
+#endif
+
 	void CalibrationComplete();
 
 	PIDController * m_pidController;

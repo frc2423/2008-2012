@@ -1,8 +1,11 @@
 /**
-	\file 		KwarqsWheelMotor.cpp
+	\file 		AnnControl.cpp
 	\author 	Dustin Spicuzza: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
+	
+	Simple control of a 'swerve drive' style robot. Requires a joystick that
+	has a twist in it. Ann added an idea. 
 */
 
 /*
@@ -32,62 +35,38 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
- 
+
 #include <WPILib.h>
 
+#include "AnnControl.h"
 
-#include "KwarqsBCDInput.h"
-#include "KwarqsWheelMotor.h"
-#include "KwarqsConstants.h"
+#include "../KwarqsLib/math.h"
+#include "../KwarqsLib/KwarqsConstants.h"
+#include "../KwarqsLib/DriverStationLCD.h"
 
 
-/**
-	\brief Constructor
+AnnControl::AnnControl(KwarqsDriveController * driveController) :
+	KwarqsMovementControl(driveController),
+	m_stick(FIRST_JOYSTICK_PORT)
+{}
+
+
+void AnnControl::Move()
+{	
+	double y = m_stick.GetY() * -1, x = m_stick.GetX();
+		
+	double speed = __hypot(x, y);
 	
-	@param slot					Slot for the PWM and encoder
-	@param pwm_port				PWM port for motor
-	@param encoder_port1		Encoder port
-	@param encoder_port2		Encoder port
-	@param invert_motor			Set to true if invert the motor
-*/
-KwarqsWheelMotor::KwarqsWheelMotor(
-		UINT32 slot, 
-		UINT32 pwm_port, 
-		UINT32 encoder_port1, UINT32 encoder_port2,
-		bool invert_motor,
-		bool invert_encoder) :
-	m_motor(slot, pwm_port),
-	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X),
-	m_invert(invert_motor ? -1.0F : 1.0F),
-{
-	SetSpeed(0, 0);
+	double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0 );			
+	if (desired_angle < 0) desired_angle += 360;
 	
-	//m_encoder.SetDistancePerPulse(.0019);
-	m_encoder.SetReverseDirection(invert_encoder);
+	if (fabs(speed) < 0.00001)
+		desired_angle = 0.0;
 	
-	/// @todo need the encoders for telemetry
-	m_encoder.Start();
+	double rotation = m_stick.GetTwist() * -1;
+	
+	m_driveController->Move(speed, desired_angle, rotation , m_stick.GetTop());
+	
+	DriverStationLCD::GetInstance()->Printf(DriverStationLCD::kUser_Line3, 1, "S: %.1f A: %.1f R: %.1f          ",
+			speed, desired_angle, rotation);
 }
-
-/// Set the speed of the motor (-1 to 1)? 
-void KwarqsWheelMotor::SetSpeed(float speed)
-{
-	m_motor.Set(speed * m_invert);
-}
-
-/// Get the speed that the motor was assigned to go via SetSpeed
-float KwarqsWheelMotor::GetSetSpeed()
-{
-	return m_motor.Get();
-}
-
-void KwarqsWheelMotor::SetRaw(float speed)
-{
-	m_motor.Set(speed * m_invert);
-}
-
-UINT32 KwarqsWheelMotor::GetRaw()
-{
-	return m_encoder.Get();
-}
-

@@ -48,13 +48,16 @@
 	@param encoder_port1		Encoder port
 	@param encoder_port2		Encoder port 
 	@param cal_port				Calibration port
-	
+	@param cal_offset			Calibration offset (ie, when it goes low what 
+								angle are we currently facing?)
 	@param outputScale			A value used to indicate the max error angle to 
 								generate a full-power correctional response
 	@param encoderResolution	The number of wheel counts that it takes for the wheel
 								to rotate 360 degrees
-	@param cal_offset			Calibration offset (ie, when it goes low what 
-								angle are we currently facing?)
+	@param invert_motor			Set to true to invert the speed of the motor (it is assumed
+								that positive moves to the left)
+	@param invert_encoder		Set to true to invert the output of the encoder
+	@param param_p				The P parameter of the PID loop
 	
 */
 KwarqsWheelServo::KwarqsWheelServo(
@@ -66,7 +69,8 @@ KwarqsWheelServo::KwarqsWheelServo(
 	double outputScale,
 	int encoderResolution,
 	bool invert_motor,
-	bool invert_encoder
+	bool invert_encoder,
+	float param_p
 ) :
 	m_motor(slot, pwm_port),
 	m_encoder(slot, encoder_port1, slot, encoder_port2, invert_encoder),
@@ -83,9 +87,8 @@ KwarqsWheelServo::KwarqsWheelServo(
 	// no calibration by default
 	CalibrationComplete();
 		
-
 	// create the PID controller
-	m_pidController = new PIDController(0.95F, 0.0F, 0.0F, this, this);
+	m_pidController = new PIDController(param_p, 0.0F, 0.0F, this, this);
 	
 	// set the PID parameters
 	m_pidController->SetContinuous();
@@ -93,9 +96,9 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_pidController->SetOutputRange(-360, 360);
 	m_pidController->SetTolerance(0.0025F);
 	
-	// enable it
-	m_pidController->Enable();
+	// enable the servo by default
 	m_encoder.Start();
+	m_pidController->Enable();
 }
 
 KwarqsWheelServo::~KwarqsWheelServo()
@@ -103,39 +106,43 @@ KwarqsWheelServo::~KwarqsWheelServo()
 	delete m_pidController;
 }
 
+/// Enables the servo
 void KwarqsWheelServo::Enable()
 {
 	m_pidController->Enable();
 }
 
+/// Disables the servo
 void KwarqsWheelServo::Disable()
 {
 	m_pidController->Disable();
 }
 
-void KwarqsWheelServo::Calibrate()
+/// Sets the current position as 0 degrees
+void KwarqsWheelServo::Reset()
 {
-	/*
-		disable this -- it no longer works
+	CalibrationComplete();
+}
 
-	// don't do this twice
+void KwarqsWheelServo::AutoCalibrate()
+{
+#ifdef AUTOCALIBRATE_SERVO
+
+	Synchronized sync(m_calibration_mutex);
+	
+	// obviously, don't do this twice
 	if (m_calibrating)
 		return;
 	
 	m_calibrating = true;
 	KwarqsWheelServo::m_uncalibrated_servos++;
 	
-	// setup the interrupt handlers.. this is very braindead, why
-	// can't I just pass the *this* pointer in?
-	
-	tInterruptHandler handler = ;
-	
-	m_sensor.RequestInterrupts(handler, this);
+	// setup the interrupt handlers
+	m_sensor.RequestInterrupts(&KwarqsWheelServo::CalibrationIrqHandler, this);
 		
 	m_sensor.SetUpSourceEdge(false, true);
 	m_sensor.EnableInterrupts();
-	
-	*/
+#endif
 }
 
 void KwarqsWheelServo::CalibrationComplete()
@@ -143,53 +150,22 @@ void KwarqsWheelServo::CalibrationComplete()
 	// no multithreading errors... 
 	Synchronized sync(m_calibration_mutex);
 
-	/*
-	if (m_calibrating && !m_in_manual_mode)
-	{
-		KwarqsWheelServo::m_uncalibrated_servos--;
+#ifdef AUTOCALIBRATE_SERVO
+	if (m_calibrating)
 		m_sensor.DisableInterrupts();
-	}
-	*/
+#endif
 
 	m_calibrated_offset = m_encoder.GetRaw() % m_encoderResolution;	
 	m_calibrating = false;
 }
 
-void KwarqsWheelServo::EnableManualCalibration()
-{
-	m_calibrating = true;
-	m_in_manual_mode = true;
-}
-
-void KwarqsWheelServo::DisableManualCalibration()
-{
-	if (m_in_manual_mode)
-	{
-		m_in_manual_mode = false;
-		CalibrationComplete();
-	}
-}
-
-
-
-/// Set the angle that the wheel should be pointing, where
-/// 0 is straight ahead and angle increments positively 
-/// counter clockwise
-void KwarqsWheelServo::SetAngle(double angle)
-{
-	// make sure you handle negative angles correctly.. otherwise
-	// we will enter bad oscillations
-	angle = fmod(angle, 360.0);
-	if (angle < 0)
-		angle += 360.0;
-	m_pidController->SetSetpoint((float)angle);
-}
 
 /// Get the angle that the wheel is supposed to be pointing
 double KwarqsWheelServo::GetSetAngle()
 {
 	return m_pidController->GetSetpoint();
 }
+
 
 /// Get the angle that the wheel is actually pointing
 double KwarqsWheelServo::GetCurrentAngle()
@@ -204,10 +180,27 @@ double KwarqsWheelServo::GetCurrentAngle()
 	return angle;
 }
 
+
+/// Returns true if the calibration sensor is active, false otherwise
 bool KwarqsWheelServo::GetSensor()
 {
 	return !m_sensor.Get();
 }
+
+
+/// Set the angle that the wheel should be pointing, where
+/// 0 is straight ahead and angle increments positively 
+/// counter clockwise
+void KwarqsWheelServo::SetAngle(double angle)
+{
+	// make sure you handle negative angles correctly.. otherwise
+	// we will get bad oscillations
+	angle = fmod(angle, 360.0);
+	if (angle < 0)
+		angle += 360.0;
+	m_pidController->SetSetpoint((float)angle);
+}
+
 
 // generally you won't need to use this.. 
 void KwarqsWheelServo::TuneParameters(float p, float i, float d)
@@ -220,21 +213,13 @@ void KwarqsWheelServo::TuneParameters(float p, float i, float d)
 void KwarqsWheelServo::PIDWrite(float output)
 {
 	// calibration mode
-	/*
+#ifdef AUTOCALIBRATE_SERVO
 	if (m_calibrating)
 	{
-		if (m_in_manual_mode)
-		{
-			Joystick * stick = Joystick::GetStickForPort(1);
-			
-			// power of 3 so its easier to calibrate the motor
-			m_motor.Set( pow(stick->GetY() * -1 * m_invert_motor, 3));
-		}
-		else
-			m_motor.Set(m_invert_motor);
+		m_motor.Set(m_invert_motor);
 		return;
 	}
-	*/
+#endif
 	
 	// the value received should be in the range of -360, 360 so we should
 	// just scale it to a value the victor can take.. but then we would not
@@ -256,16 +241,14 @@ double KwarqsWheelServo::PIDGet()
 	return GetCurrentAngle();
 }
 
-/** static functions **/
 
-int KwarqsWheelServo::m_uncalibrated_servos = 0;
+#ifdef AUTOCALIBRATE_SERVO
 
-int KwarqsWheelServo::UncalibratedServoCount()
-{
-	return KwarqsWheelServo::m_uncalibrated_servos;
-}
-
+/// IRQ handler for the calibration sensor
 void KwarqsWheelServo::CalibrationIrqHandler(tNIRIO_u32 x, void * param)
 {
 	((KwarqsWheelServo *)param)->CalibrationComplete();
 }
+
+#endif
+

@@ -10,7 +10,11 @@
 
 /**
 	\class KwarqsJoystick 
-	\brief A joystick class that implements a 'smart' dead zone
+	\brief A joystick class that implements a 'smart' dead zone, and
+	allows multiple classes to hold instances of the same Joystick
+	
+	See the Joystick class for a reference to the functions contained
+	in this class, its pretty much just a mirror of it.
 */
 class KwarqsJoystick {
 public:
@@ -45,20 +49,19 @@ public:
 		return DeadFilter(m_joystick->GetTwist());
 	}
 	
-	virtual bool GetTrigger(Joystick::JoystickHand hand = Joystick::kRightHand)
+	bool GetTrigger(Joystick::JoystickHand hand = Joystick::kRightHand)
 	{
 		return m_joystick->GetTrigger(hand);
 	}
 	
-	virtual bool GetTop(Joystick::JoystickHand hand = Joystick::kRightHand)
+	bool GetTop(Joystick::JoystickHand hand = Joystick::kRightHand)
 	{
 		return m_joystick->GetTop(hand);
 	}
 	
-	/// for use when this doesn't expose enough interfaces
-	Joystick * RawJoystick() 
+	bool GetRawButton(UINT32 button)
 	{
-		return m_joystick;
+		return m_joystick->GetRawButton(button);
 	}
 	
 private:

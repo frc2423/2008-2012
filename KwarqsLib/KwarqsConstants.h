@@ -21,21 +21,23 @@
 #define FIRST_JOYSTICK_PORT			1
 #define SECOND_JOYSTICK_PORT		2
 
-#define CALIBRATION_SWITCH			1
+#define MAINTENANCE_MODE_SWITCH		6
+#define TRACTION_CONTROL_SWITCH		7
+#define SWITCH_DRIVE_SWITCH			8
 
 #define BCD_IN_3 1
 #define BCD_IN_2 2
-#define BCD_IN_1 4
-#define BCD_IN_0 5
+#define BCD_IN_1 3
+#define BCD_IN_0 4
 
+/// @todo fix drive recorder definition
 #define DRIVE_RECORDER_STICK 		2
 #define DRIVE_RECORDER_SWITCH		1
 
 // analog sidecar
+#define GYRO_SLOT					SLOT_1
 #define GYRO_CHANNEL				1
 
-#define ACCELEROMETER_X_CHANNEL		3
-#define ACCELEROMETER_Y_CHANNEL		4	
 
 // digital sidecar
 //
@@ -45,13 +47,13 @@
 //	RR: right-rear
 //
 
-// testbot:
+// testbot settings
 
 #define MOTOR_L_SLOT				SLOT_1
 #define MOTOR_R_SLOT				SLOT_1
 
-#define PWM_L_JAGUAR					1
-#define PWM_R_JAGUAR					2
+#define PWM_L_JAGUAR				1
+#define PWM_R_JAGUAR				2
 
 #define MOTOR_L_INVERT				false
 #define MOTOR_R_INVERT				false
@@ -64,10 +66,21 @@
 #define ENCODER_MOTOR_L_INVERT		true
 #define ENCODER_MOTOR_R_INVERT		false
 
-
 #define LEFT_MOTOR_PWM 1
 #define RIGHT_MOTOR_PWM 2
 
+
+/**********************************************************
+ * 2009 constants
+ **********************************************************/
+
+// accelerometer (todo: need to change this to real values
+#define ACCELEROMETER_X_SLOT		SLOT_1
+#define ACCELEROMETER_X_INPUT		12
+#define ACCELEROMETER_Y_SLOT		SLOT_1
+#define ACCELEROMETER_Y_INPUT		13
+
+ 
 // drive motors
 
 #define MOTOR_LF_SLOT				SLOT_1
@@ -105,6 +118,11 @@
 #define ENCODER_MOTOR_LR_INVERT		false
 #define ENCODER_MOTOR_RF_INVERT		false
 #define ENCODER_MOTOR_RR_INVERT		false
+
+#define ENCODER_MOTOR_LF_P			0.95
+#define ENCODER_MOTOR_LR_P			0.95
+#define ENCODER_MOTOR_RF_P			0.95
+#define ENCODER_MOTOR_RR_P			0.95
 
 // servos
 #define SERVO_LF_SLOT				SLOT_1
@@ -186,7 +204,8 @@
 									ENCODER_MOTOR_##arg##_1, \
 									ENCODER_MOTOR_##arg##_2, \
 									MOTOR_##arg##_INVERT, \
-									ENCODER_MOTOR_##arg##_INVERT
+									ENCODER_MOTOR_##arg##_INVERT, \
+									ENCODER_MOTOR_##arg##_P
 
 #define MOTOR_LF_PARAMETERS			MOTOR_PARAMS(LF)
 #define MOTOR_LR_PARAMETERS			MOTOR_PARAMS(LR)

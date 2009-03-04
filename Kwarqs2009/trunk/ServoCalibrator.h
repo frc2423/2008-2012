@@ -11,28 +11,40 @@
 #define POT_ARRAY_SIZE 10
 
 #include "RobotChassis.h"
-#include "Framework/KwarqsJoystick.h"
+#include "KwarqsLib/KwarqsJoystick.h"
+#include "KwarqsLib/DriverStationLCD.h"
 
 class ServoCalibrator {
 public:
 
 	ServoCalibrator(RobotChassis * chassis);
-	void Calibrate();
+	
+	void DoAutoCalibrate();
+	void DoManualCalibrate();
 
 private:
-	
-	bool ConvertStickToAngle(double &angle);
-	double GetFilteredPotValue();
 
-	KwarqsJoystick m_stick, m_motorStick;
+	void ShowLCDOutput();
+
+	KwarqsJoystick m_stick;
 	RobotChassis * m_chassis;
-	double m_time;
+	DriverStationLCD * lcd;
+
+	DelayEvent m_lcdDelay;
+	DelayEvent m_triggerEvent;
 	
-	bool m_in_pot_mode;
+	AverageWindowFilter<double, 20> potfilter1;
+	AverageWindowFilter<double, 20> potfilter2;
+	AverageWindowFilter<double, 20> potfilter3;
+	AverageWindowFilter<double, 20> potfilter4;
 	
-	//double m_pot_array[POT_ARRAY_SIZE];
-	//int m_idx;
-	//double m_pot_time;
+	double pot1offset;
+	double pot2offset;
+	double pot3offset;
+	double pot4offset;
+	
+	bool m_begin_manual_calibrate;
+	
 	
 };
 

@@ -20,51 +20,59 @@ Deleter<PositionInformation> PositionInformation::deleter(&PositionInformation::
 // constructor
 PositionInformation::PositionInformation() :
 	m_notifier(NULL),
-	m_gyro(1, GYRO_CHANNEL),
-	//m_accelerometerX(ACCELEROMETER_X_CHANNEL),
-	//m_accelerometerY(ACCELEROMETER_Y_CHANNEL),
+	m_gyro(GYRO_SLOT, GYRO_CHANNEL),
+	
+	m_accelerometerXIn(ACCELEROMETER_X_SLOT, ACCELEROMETER_X_INPUT),
+	m_accelerometerYIn(ACCELEROMETER_Y_SLOT, ACCELEROMETER_Y_INPUT),
 	
 	m_gyro_offset(0.0),
-	
-	buffIndex(0),
-
-	xUpdate(0.0), yUpdate(0.0),
-
-	xVelocity(0.0), yVelocity(0.0),
-	xPos(0.0), yPos(0.0),
+	m_field_offset(0.0),
 
 	xBias(0.0), yBias(0.0)
 {
-	
 	m_gyro.SetSensitivity(0.007F);
-
-	/*
+	
+	// specify the source
+	countXhi.SetUpSource(m_accelerometerXIn);
+	countXlow.SetUpSource(m_accelerometerXIn);
+	countYhi.SetUpSource(m_accelerometerYIn);
+	countYlow.SetUpSource(m_accelerometerYIn);
+	
+	// setup the counters
+	countXhi.SetSemiPeriodMode(true);
+	countXlow.SetSemiPeriodMode(false);
+	countYhi.SetSemiPeriodMode(true);
+	countYlow.SetSemiPeriodMode(false);
+	
+	countXhi.Start();
+	countXlow.Start();
+	countYhi.Start();
+	countYlow.Start();
+	
 	// create the mutex
 	m_mutex = semBCreate(0, SEM_FULL);
-
-	// clear the array
-	for (int i = 0; i < ACCEL_HIST_LEN; i++)
-		xBuff[i] = yBuff[i] = 0.0;
 	
+	// get the acceleration bias
+	AverageWindowFilter<double, 20> fx, fy;
 	
-	// automatic calibration for acceleration
-	for (int i = 0; i < ACCEL_HIST_LEN; i++)
+	for (int i = 0; i < 20; i++)
 	{
-		CalculatePositionInformation();
-		Wait(PINFO_CALCULATION_PERIOD);
+		Wait(0.05);
+		GetAccel(ax, ay);
+		fx.AddPoint(ax);
+		fy.AddPoint(ay);
 	}
 	
-	EstimateAccelerationBias();
+	xBias = fx.GetAverage();
+	yBias = fy.GetAverage();
 	
-	printf("PositionInformation bias set to: accX:%1.4f accY:%1.4f ...\n", xBias, yBias);
-	
-	/// @todo need to get our alliance and position, and calculate the offset
-	/// of the gyro to the driver for absolute numbers
+	// start this up at least once
+	CalculatePositionInformation();
 
 	// start the calculations
 	m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
 	m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);
-	*/
+
 }
 
 // destructor
@@ -75,29 +83,68 @@ PositionInformation::~PositionInformation()
 }
 
 
-/// returns the position of the bot on the field in X/Y coordinates
-void PositionInformation::GetPosition(double * x, double * y)
+
+/// called every 50ms
+void PositionInformation::CalculatePositionInformation()
 {
 	Synchronized sync(m_mutex);
-	*x = xPos;
-	*y = yPos;
+	
+	double x, y;
+	GetAccel(x, y);
+
+	avgAx.AddPoint(x - xBias);
+	avgAy.AddPoint(y - yBias);
+	
+	// do the field offset here
+	bool f1 = m_field1.Get(), f2 = m_field2.Get();
+	
+	int pos = ((int)f1 << 1) | (int)f2; 
+	
+	// the field offset is added to the gyro angle
+	switch (pos)
+	{
+		case 0:
+			m_field_offset = 0;
+			break;
+			
+		case 1:
+			m_field_offset = 225;
+			break;
+			
+		case 2:
+			m_field_offset = 90;
+			break;
+			
+		case 3:
+			m_field_offset = 315;
+			break;
+	}
 }
 
-/// returns the angle the robot is moving, relative to the robot
-double PositionInformation::GetHeading()
+
+
+
+
+/// returns the acceleration of the bot in m/s^2
+void PositionInformation::GetAcceleration(double &x, double &y)
 {
 	Synchronized sync(m_mutex);
-	/// @todo should we use velocity or acceleration to get this?
-	return 0;
+	
+	x = avgAx.GetAverage();
+	y = avgAy.GetAverage();
 }
+
+
 
 /// returns the angle the robot is currently facing relative to the field
-double PositionInformation::GetAngle()
+double PositionInformation::GetFieldAngle()
 {
-	return m_gyro.GetAngle() - m_gyro_offset;
+	Synchronized sync(m_mutex);
+	return (m_gyro.GetAngle() - m_gyro_angle) + m_field_offset;
 }
 
-double PositionInformation::GetNormalizedAngle()
+/// returns a normalized angle (0-360), relative to the field
+double PositionInformation::GetNormalizedFieldAngle()
 {
 	double angle = fmod(GetAngle(), 360.0);
 	if (angle < 0)
@@ -105,102 +152,46 @@ double PositionInformation::GetNormalizedAngle()
 	return angle;
 }
 
-/// returns the acceration of the robot, relative to the robot
-void PositionInformation::GetAcceleration(double * x, double * y)
+/// returns the raw angle from the gyro
+double PositionInformation::GetRawAngle()
 {
-	Synchronized sync(m_mutex);
-	*x = xUpdate;
-	*y = yUpdate;
+	return m_gyro.GetAngle();
 }
 
-/// returns the velocity of the robot, relative to the robot
-void PositionInformation::GetVelocity(double * x, double * y)
+/// returns the raw angle from the gyro, but normalized to 0-360
+double PositionInformation::GetNormalizedUnmodifiedAngle()
+{
+	double angle = fmod(m_gyro.GetAngle(), 360.0);
+	if (angle < 0)
+		angle += 360;
+	return angle;
+}
+
+void PositionInformation::ResetHeading()
 {
 	Synchronized sync(m_mutex);
-	*x = xVelocity;
-	*y = yVelocity;
+	m_gyro_offset = GetAngle() - m_field_offset;
 }
+
+
+
+/// should only be called from mutex-protected functions
+void PositionInformation::GetAccel(double &ax, double &ay)
+{
+	double axH = countXhi.GetPeriod();
+	double axL = countXlow.GetPeriod();
+	double ayH = countYhi.GetPeriod();
+	double ayL = countYlow.GetPeriod();
+					
+	// convert to m/s^2 -- 50% duty cycle is 0g
+	ax = (((axH / (axH + axL)) - .5) * 8.0) * 9.81;
+	ay = (((ayH / (ayH + ayL)) - .5) * 8.0) * 9.81;
 	
-
-// called every N milliseconds to calculate the information needed
-void PositionInformation::CalculatePositionInformation()
-{
-  Synchronized sync(m_mutex);
-
-	wpi_assert(0 && "should not be called");
-// x = m_accelerometerX.GetAcceleration() * 9.81;
-//double y = m_accelerometerY.GetAcceleration() * 9.81;
-
-  double x = 0.0, y = 0.0;
-
-  double alpha = FILT_COEFF;
-  double mag;
-  
-  //mexPrintf("X: %f Y: %f\n",x,y);
-  
-  /* store the acclerations for estimating the bias */
-  yBuff[buffIndex] = y;
-  xBuff[buffIndex] = x;
-  buffIndex++;
-  if( buffIndex > ACCEL_HIST_LEN ) 
-      buffIndex = 0;
-
-  /* filter the accelerations and subtract the means */
-  xUpdate = alpha*( x - xBias ) + (1-alpha)*xUpdate;
-  yUpdate = alpha*( y - yBias ) + (1-alpha)*yUpdate;
-    
-  /* compute the magnitude of the acceleration to check if we are moving */
-  mag = __hypot(xUpdate, yUpdate);
-  
-  if( mag > MOTION_THRESH ) 
-  {
-      
-    /* update velocity and position */  
-    xVelocity += xUpdate*PINFO_CALCULATION_PERIOD;
-    xPos += xVelocity*PINFO_CALCULATION_PERIOD;
-    
-    yVelocity += yUpdate*PINFO_CALCULATION_PERIOD;
-    yPos += yVelocity*PINFO_CALCULATION_PERIOD;
-  }
-  else
-  {
-    xVelocity = 0;
-    yVelocity = 0;
-  }
+	// safety check here for infinity (if the timer is stalled)
+	if (ax > 1000000000 || ax < -1000000000)
+		ax = 0;
+	if (ay > 1000000000 || ay < -1000000000)
+		ay = 0;
 }
-
-// todo: this is used for calibration only, right? Or should it
-// be called every once in awhile?
-void PositionInformation::EstimateAccelerationBias()
-{
-  Synchronized sync(m_mutex);
-  int ind;
-  double xSum = 0, ySum = 0;
-  
-  for( ind = 0; ind < ACCEL_HIST_LEN; ind++ )
-  {
-    xSum += xBuff[ind];
-    ySum += yBuff[ind];
-      
-  }
-  
-  xBias = xSum/ACCEL_HIST_LEN;
-  yBias = ySum/ACCEL_HIST_LEN;  
-}
-
-void PositionInformation::GetAccelerationBias( double * x, double * y)
-{
-	*x = xBias;
-	*y = yBias;
-}
-
-void PositionInformation::SetAccelerationBias( double x, double y)
-{
-	xBias = x;
-	yBias = y;
-}
-
-
-
 
 

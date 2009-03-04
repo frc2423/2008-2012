@@ -36,10 +36,10 @@ struct RobotChassis
 		servo_lr( SERVO_LR_PARAMETERS ),
 		servo_rr( SERVO_RR_PARAMETERS ),
 		
-		motor_lf(MOTOR_LF_PARAMETERS , DriverStationLCD::kMain_Line),
-		motor_rf(MOTOR_RF_PARAMETERS , DriverStationLCD::kMain_Line),
-		motor_lr(MOTOR_LR_PARAMETERS , DriverStationLCD::kMain_Line),
-		motor_rr(MOTOR_RR_PARAMETERS , DriverStationLCD::kMain_Line)
+		motor_lf( MOTOR_LF_PARAMETERS ),
+		motor_rf( MOTOR_RF_PARAMETERS ),
+		motor_lr( MOTOR_LR_PARAMETERS ),
+		motor_rr( MOTOR_RR_PARAMETERS )
 	{}
 };
 

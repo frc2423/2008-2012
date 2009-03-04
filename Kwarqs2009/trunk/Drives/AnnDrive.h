@@ -1,25 +1,25 @@
 /**
-	\file 		SwerveDrive.h
+	\file 		AnnDrive.h
 	\author 	Dustin Spicuzza: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
 */
 
-#ifndef SWERVEDRIVE_H
-#define SWERVEDRIVE_H
+#ifndef AnnDrive_H
+#define AnnDrive_H
 
 #include "Framework/KwarqsDriveBase.h"
 #include "RobotChassis.h"
 
 /**
-	\class SwerveDrive
+	\class AnnDrive
 	\brief A class that controls a chassis with 4 independently steerable wheels
 */
-class SwerveDrive : public KwarqsDriveBase {
+class AnnDrive : public KwarqsDriveBase {
 public:
 	
 	// constructor/destructors
-	SwerveDrive(RobotChassis * chassis);
+	AnnDrive(RobotChassis * chassis);
 	
 	void Disable(){}
 	void Enable(){}
@@ -45,12 +45,12 @@ public:
 	void Move(double &speed, double &angle, double &rotation, bool &stop);
 
 	/// Return the name of the class
-	const char * Name() { return "SwerveDrive"; }
+	const char * Name() { return "AnnDrive"; }
 
 
 private:
 
-	SwerveDrive();
+	AnnDrive();
 	
 	void Stop();
 	void ShortestPath(double &speed, double &angle, double current_angle );

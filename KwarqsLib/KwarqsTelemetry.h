@@ -1,8 +1,8 @@
 /**
 	\file 		KwarqsTelemetry.h
-	\author 	Dustin Spicuzza: last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-03-04 03:28:27 -0500 (Wed, 04 Mar 2009) $
-	\version 	$Rev: 265 $
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 */
 
 /*

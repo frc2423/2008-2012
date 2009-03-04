@@ -1,8 +1,8 @@
 /**
 	\file 		MaintenanceMode.h
-	\author 	Dustin Spicuzza: last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-03-01 04:12:01 -0500 (Sun, 01 Mar 2009) $
-	\version 	$Rev: 251 $
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 */
 
 

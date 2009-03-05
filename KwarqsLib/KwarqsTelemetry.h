@@ -82,8 +82,8 @@ public:
 	/// queue up data to be recorded
 	void AddData(const Data &data)
 	{
-		Synchronized sync(m_mutex);
-		m_data.push_back(data);
+		//Synchronized sync(m_mutex);
+		//m_data.push_back(data);
 	}
 
 private:

@@ -67,11 +67,11 @@ public:
 		strftime(filename, 128, "Telemetry-%Y%m%d-%H%M-%S.dat", localtime(&the_time));
 			
 		// try to open a new file
-		if (m_file.Open(filename, DataFile::TruncateAndWrite))
-		{
-			m_notifier = new Notifier(KwarqsTelemetry::StaticTimerFn, this);
-			m_notifier->StartPeriodic((double)flush_period / 1000.0);
-		}
+		//if (m_file.Open(filename, DataFile::TruncateAndWrite))
+		//{
+		//	m_notifier = new Notifier(KwarqsTelemetry::StaticTimerFn, this);
+		//	m_notifier->StartPeriodic((double)flush_period / 1000.0);
+		//}
 	}
 
 	~KwarqsTelemetry()

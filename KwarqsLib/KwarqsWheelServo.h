@@ -54,7 +54,7 @@ public:
 	void AutoCalibrate();
 	
 	/// lets you know if the servo is currently calibrated or not
-	bool IsCalibrated() { return m_calibrating; }
+	bool IsCalibrated() { return !m_calibrating; }
 	
 	
 	
@@ -117,6 +117,7 @@ private:
 	DigitalInput 	m_sensor;
 	
 	double 		m_outputScale;
+	double		m_setAngle;
 	
 	int			m_encoderResolution;
 	

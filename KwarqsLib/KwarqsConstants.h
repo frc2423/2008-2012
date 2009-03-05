@@ -21,7 +21,7 @@
 #define FIRST_JOYSTICK_PORT			1
 #define SECOND_JOYSTICK_PORT		2
 
-#define MAINTENANCE_MODE_SWITCH		6
+#define MAINTENANCE_MODE_SWITCH		5
 #define TRACTION_CONTROL_SWITCH		7
 #define SWITCH_DRIVE_SWITCH			8
 
@@ -76,15 +76,15 @@
 
 // accelerometer (todo: need to change this to real values
 #define ACCELEROMETER_X_SLOT		SLOT_1
-#define ACCELEROMETER_X_INPUT		12
+#define ACCELEROMETER_X_INPUT		13
 #define ACCELEROMETER_Y_SLOT		SLOT_1
-#define ACCELEROMETER_Y_INPUT		13
+#define ACCELEROMETER_Y_INPUT		14
 
 // position switch
 #define FIELD_SW1_SLOT				SLOT_2
-#define FIELD_SW1_CHANNEL			12
+#define FIELD_SW1_CHANNEL			13
 #define FIELD_SW2_SLOT				SLOT_2
-#define FIELD_SW2_CHANNEL			13
+#define FIELD_SW2_CHANNEL			14
 
  
 // drive motors
@@ -112,9 +112,10 @@
 
 // encoder channels: motor
 #define ENCODER_MOTOR_LF_1			5
-#define ENCODER_MOTOR_LF_2			14
+#define ENCODER_MOTOR_LF_2			6
 #define ENCODER_MOTOR_LR_1			7
 #define ENCODER_MOTOR_LR_2			8
+
 #define ENCODER_MOTOR_RF_1			5
 #define ENCODER_MOTOR_RF_2			6
 #define ENCODER_MOTOR_RR_1			7
@@ -153,6 +154,7 @@
 #define ENCODER_SERVO_LF_2			2
 #define ENCODER_SERVO_LR_1			3
 #define ENCODER_SERVO_LR_2			4
+
 #define ENCODER_SERVO_RF_1			1
 #define ENCODER_SERVO_RF_2			2
 #define ENCODER_SERVO_RR_1			3

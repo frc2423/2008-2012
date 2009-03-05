@@ -35,6 +35,9 @@ PositionInformation::PositionInformation() :
 {
 	m_gyro.SetSensitivity(0.007F);
 	
+	// create the mutex
+	m_mutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
+	
 	// specify the source
 	countXhi.SetUpSource(m_accelerometerXIn);
 	countXlow.SetUpSource(m_accelerometerXIn);
@@ -51,9 +54,6 @@ PositionInformation::PositionInformation() :
 	countXlow.Start();
 	countYhi.Start();
 	countYlow.Start();
-	
-	// create the mutex
-	m_mutex = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
 	
 	// get the acceleration bias
 	AverageWindowFilter<double, 20> fx, fy;
@@ -74,9 +74,8 @@ PositionInformation::PositionInformation() :
 	CalculatePositionInformation();
 
 	// start the calculations
-	m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
-	m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);
-
+	//m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
+	//m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);
 }
 
 // destructor

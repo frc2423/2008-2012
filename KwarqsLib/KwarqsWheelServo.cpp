@@ -162,7 +162,8 @@ void KwarqsWheelServo::CalibrationComplete()
 /// Get the angle that the wheel is supposed to be pointing
 double KwarqsWheelServo::GetSetAngle()
 {
-	return m_pidController->GetSetpoint();
+	return m_setAngle;
+	//return m_pidController->GetSetpoint();
 }
 
 
@@ -196,7 +197,10 @@ void KwarqsWheelServo::SetAngle(double angle)
 	// we will get bad oscillations
 	angle = fmod(angle, 360.0);
 	if (angle < 0)
-		angle += 360.0;
+		angle += 360.0; 
+	
+	m_setAngle = angle;
+	
 	m_pidController->SetSetpoint((float)angle);
 }
 
@@ -213,10 +217,13 @@ void KwarqsWheelServo::PIDWrite(float output)
 {
 	// calibration mode
 #ifdef AUTOCALIBRATE_SERVO
-	if (m_calibrating)
 	{
-		m_motor.Set(m_invert_motor);
-		return;
+		Synchronized sync(m_calibration_mutex);
+		if (m_calibrating)
+		{
+			m_motor.Set(m_invert_motor);
+			return;
+		}
 	}
 #endif
 	
@@ -229,10 +236,10 @@ void KwarqsWheelServo::PIDWrite(float output)
 	output = output/(float)m_outputScale;
 	
 	// set the motor value
-	if (m_pidController->OnTarget())
-		m_motor.Set(0);
-	else
-		m_motor.Set(output * m_invert_motor);
+	//if (m_pidController->OnTarget())
+	//	m_motor.Set(0);
+	//else
+	m_motor.Set(output * m_invert_motor);
 }
 
 double KwarqsWheelServo::PIDGet()

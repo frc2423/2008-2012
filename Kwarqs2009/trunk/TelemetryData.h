@@ -34,9 +34,6 @@ struct WheelData {
 		motor_setpoint(motor.GetRawMotor())
 	{}
 	
-	explicit WheelData(const unsigned char * const buffer) :
-	{}
-	
 	void Serialize(unsigned char * buffer) const
 	{
 		record<UINT32>::serialize(servo_encoder_value, 	buffer + se_off);

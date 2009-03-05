@@ -163,4 +163,13 @@ void ServoCalibrator::ShowLCDOutput()
 void ServoCalibrator::Reset()
 {
 	m_begin_manual_calibrate = true;
+	
+	if (!m_chassis->servo_lf.IsCalibrated())
+		m_chassis->servo_lf.Reset();
+	if (!m_chassis->servo_lr.IsCalibrated())
+		m_chassis->servo_lr.Reset();
+	if (!m_chassis->servo_rf.IsCalibrated())
+		m_chassis->servo_rf.Reset();
+	if (!m_chassis->servo_rr.IsCalibrated())
+		m_chassis->servo_rr.Reset();
 }

@@ -311,6 +311,7 @@ public:
 			lcd->Printf(DriverStationLCD::kUser_Line3, 1, "                   ");
 			lcd->Printf(DriverStationLCD::kUser_Line4, 1, "                   ");
 			lcd->Printf(DriverStationLCD::kUser_Line5, 1, "                   ");
+			lcd->Printf(DriverStationLCD::kUser_Line6, 1, "                   ");
 		}
 	}
 	

@@ -33,8 +33,8 @@
  */
 
 
+#include <stdio.h>
 #include <WPILib.h>
-#include <VxWorks.h>
 
 #include "AnnDrive.h"
 

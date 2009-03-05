@@ -9,6 +9,7 @@
 #define SWERVEDRIVE_H
 
 #include "../KwarqsLib/KwarqsDriveBase.h"
+#include "../KwarqsLib/KwarqsJoystick.h"
 #include "../RobotChassis.h"
 
 /**
@@ -56,6 +57,8 @@ private:
 	void ShortestPath(double &speed, double &angle, double current_angle );
 	
 	RobotChassis * m_chassis;
+	
+	KwarqsJoystick m_stick;
 	
 	double m_time;
 };

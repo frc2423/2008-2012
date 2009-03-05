@@ -35,7 +35,7 @@ public:
 	void StartPeriodic(double period)
 	{
 		m_enabled = true;
-		m_single = true;
+		m_single = false;
 		m_period = period;
 		m_next_event = GetTime() + period;
 	}

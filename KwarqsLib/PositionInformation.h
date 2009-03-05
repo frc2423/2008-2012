@@ -54,6 +54,10 @@ public:
 	
 	/// returns the offset of the field
 	double GetFieldOffset();
+
+	/// translate an angle to an angle relative to the robot
+	double TranslateFieldToRobotAngle(double angle);
+
 	
 	/// returns the acceration of the robot, relative to the robot
 	/// Note: uses the parameters to return the values by reference

@@ -147,7 +147,7 @@ double PositionInformation::GetFieldAngle()
 	return (m_gyro.GetAngle() - m_gyro_offset) + m_field_offset;
 }
 
-/// returns a normalized angle (0-360), relative to the field
+/// returns the normalized angle (0-360), relative to the field
 double PositionInformation::GetNormalizedFieldAngle()
 {
 	double angle = fmod(GetFieldAngle(), 360.0);
@@ -180,9 +180,23 @@ double PositionInformation::GetFieldOffset()
 void PositionInformation::ResetHeading()
 {
 	Synchronized sync(m_mutex);
-	m_gyro_offset = m_gyro.GetAngle() - m_field_offset;
+	m_gyro_offset = m_gyro.GetAngle() + m_field_offset;
 }
 
+
+/// returns a normalized angle, relative to the robot
+double PositionInformation::TranslateFieldToRobotAngle(double angle)
+{
+	Synchronized sync(m_mutex);
+
+	angle = ((m_gyro.GetAngle() - m_gyro_offset) + m_field_offset) - angle;
+
+	angle = fmod(angle, 360.0);
+	if (angle < 0)
+		angle += 360;
+	
+	return angle;
+}
 
 
 /// should only be called from mutex-protected functions

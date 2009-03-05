@@ -88,6 +88,9 @@ void DriverStationLCD::Printf(Line line, UINT32 startingColumn, const char *writ
 		Synchronized sync(m_textBufferSemaphore);
 		// snprintf appends NULL to its output.  Therefore we can't write directly to the buffer.
 		INT32 length = vsnprintf(lineBuffer, LineLength + 1, writeFmt, args);
+		if (length == -1)
+			length = LineLength;
+
 		memcpy(m_textBuffer + start + line * LineLength + sizeof(UINT16), lineBuffer, std::min(maxLength,length));
 		
 		if (line == kMain_Line)

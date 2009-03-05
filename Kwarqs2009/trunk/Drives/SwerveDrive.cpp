@@ -39,13 +39,15 @@
 
 #include "SwerveDrive.h"
 
+#include "../KwarqsLib/PositionInformation.h"
 #include "../KwarqsLib/KwarqsConstants.h"
 #include "../KwarqsLib/math.h"
 
 // default constructor
 SwerveDrive::SwerveDrive(RobotChassis * chassis) :
 	m_chassis(chassis),
-	m_time(GetTime())
+	m_time(GetTime()),
+	m_stick(FIRST_JOYSTICK_PORT)
 {}
 
 /*
@@ -213,18 +215,40 @@ void SwerveDrive::Move(
 
 void SwerveDrive::Stop()
 {
-	/// @todo: turn the wheels against the current
-	/// acceleration vector and stop all motors. Is that actually
-	/// a good way to do it?
+	double y = m_stick.GetY() * -1, x = m_stick.GetX();
+		
+	double speed = __hypot(x, y);
+	double angle = (atan2(y, x) * (180/M_PI) - 90.0 );			
 	
-	// if the vector is near zero, then just spread all fours 
-	// and hope for the best
-
-	m_chassis->servo_lf.SetAngle(45);
-	m_chassis->servo_lr.SetAngle(315);
-	m_chassis->servo_rf.SetAngle(135);
-	m_chassis->servo_rr.SetAngle(225);
+	double lf_angle, lr_angle, rf_angle, rr_angle;
 	
+	if (fabs(speed) < 0.00001)
+	{
+		// pick a default if the driver isn't pointing
+		lf_angle = 45;
+		lr_angle = 315;
+		rf_angle = 135;
+		rr_angle = 225;
+	}
+	else
+	{
+		// translate the direction the driver is pointing
+		angle = PositionInformation::GetInstance()->TranslateFieldToRobotAngle(angle) - 90;
+	
+		lf_angle = lr_angle = rf_angle = rr_angle = angle;
+	}
+	
+	// find the shortest path to that spot, and do it
+	ShortestPath(speed, lf_angle, m_chassis->servo_lf.GetCurrentAngle());
+	ShortestPath(speed, lr_angle, m_chassis->servo_lr.GetCurrentAngle());
+	ShortestPath(speed, rf_angle, m_chassis->servo_rf.GetCurrentAngle());
+	ShortestPath(speed, rr_angle, m_chassis->servo_rr.GetCurrentAngle());
+	
+	m_chassis->servo_lf.SetAngle(lf_angle);
+	m_chassis->servo_lr.SetAngle(lr_angle);
+	m_chassis->servo_rf.SetAngle(rf_angle);
+	m_chassis->servo_rr.SetAngle(rr_angle);
+		
 	m_chassis->motor_lf.SetSpeed(0);
 	m_chassis->motor_lr.SetSpeed(0);
 	m_chassis->motor_rf.SetSpeed(0);

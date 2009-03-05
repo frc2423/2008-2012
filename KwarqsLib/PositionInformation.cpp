@@ -99,7 +99,8 @@ void PositionInformation::CalculatePositionInformation()
 	avgAy.AddPoint(y - yBias);
 	
 	// do the field offset here
-	bool f1 = m_field1.Get(), f2 = m_field2.Get();
+	bool f1 = m_field1.Get() ? true : false;
+	bool f2 = m_field2.Get() ? true : false;
 	
 	int pos = ((int)f1 << 1) | (int)f2; 
 	
@@ -164,7 +165,7 @@ double PositionInformation::GetRawAngle()
 /// returns the raw angle from the gyro, but normalized to 0-360
 double PositionInformation::GetNormalizedRawAngle()
 {
-	double angle = fmod(m_gyro.GetAngle(), 360.0);
+	double angle = fmod(m_gyro.GetAngle(), 360.0F);
 	if (angle < 0)
 		angle += 360;
 	return angle;

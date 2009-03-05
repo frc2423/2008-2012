@@ -45,6 +45,8 @@ private:
 
 	int 				m_helpScreen;
 
+	int					last_user_selection;
+
 };
 
 #endif

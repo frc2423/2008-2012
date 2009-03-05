@@ -34,6 +34,8 @@
 
 
 #include <WPILib.h>
+#include <VxWorks.h>
+
 #include "AnnDrive.h"
 
 #include "../KwarqsLib/KwarqsConstants.h"
@@ -170,10 +172,10 @@ double angle1, angle2;		//some temporaries for angles
 		m_chassis->servo_lr.SetAngle(angle);
 		m_chassis->servo_rr.SetAngle(angle);
 		
-		m_chassis->motor_lf.SetSpeed(speed);
-		m_chassis->motor_lr.SetSpeed(speed);
-		m_chassis->motor_rf.SetSpeed(speed);
-		m_chassis->motor_rr.SetSpeed(speed);
+		m_chassis->motor_lf.SetSpeed((float)speed);
+		m_chassis->motor_lr.SetSpeed((float)speed);
+		m_chassis->motor_rf.SetSpeed((float)speed);
+		m_chassis->motor_rr.SetSpeed((float)speed);
 		
 	}
 	else
@@ -184,7 +186,7 @@ double angle1, angle2;		//some temporaries for angles
 // determine smallest r
 // it should be at least as big as the length from the key point to any of the wheels
 
-small_r = max(key_d, length-key_d);	//just a temp val here, to use in next line
+small_r = std::max(key_d, length-key_d);	//just a temp val here, to use in next line
 small_r = sqrt( small_r*small_r + width*width/4.) + fudge; // add in the fudge factor
 
 
@@ -216,7 +218,7 @@ r_rr = sqrt((rr_x-rx)*(rr_x-rx) + (rr_y-ry)*(rr_y-ry));
 
 // find the biggest r, the distance of the wheel furthest away from the center of rotation
 
-	r_max = max(max(r_lf, r_lr), max(r_rf,  r_rr));
+r_max = std::max(std::max(r_lf, r_lr), std::max(r_rf,  r_rr));
 
 
 // set wheel speeds

@@ -269,6 +269,7 @@ public:
 			if (last_mode != maintenance_mode)
 			{
 				maintenanceMode.Reset();
+				last_mode = maintenance_mode;
 			}
 			
 			if (maintenance_mode)

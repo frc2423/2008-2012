@@ -160,10 +160,10 @@
 #define ENCODER_SERVO_RR_1			3
 #define ENCODER_SERVO_RR_2			4
 
-#define ENCODER_SERVO_LF_P			0.95
-#define ENCODER_SERVO_LR_P			0.95
-#define ENCODER_SERVO_RF_P			0.95
-#define ENCODER_SERVO_RR_P			0.95
+#define ENCODER_SERVO_LF_P			0.95F
+#define ENCODER_SERVO_LR_P			0.95F
+#define ENCODER_SERVO_RF_P			0.95F
+#define ENCODER_SERVO_RR_P			0.95F
 
 // servo calibration signals (hall effect sensors)
 #define SERVO_LF_CAL_PORT			9

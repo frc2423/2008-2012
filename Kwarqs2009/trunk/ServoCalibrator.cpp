@@ -129,28 +129,28 @@ void ServoCalibrator::ShowLCDOutput()
 {
 	if (m_lcdEvent.DoEvent())
 	{
-		m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "LF: %s %s %.1f %.1f",
+		m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "LF: %s %s %5.1f %5.1f",
 			m_chassis->servo_lf.IsCalibrated() ? "OK " : "CAL",
 			m_chassis->servo_lf.GetSensor() ? "0" : "1",
 			m_chassis->servo_lf.GetSetAngle(),
 			m_chassis->servo_lf.GetCurrentAngle()
 		);
 		
-		m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "LR: %s %s %.1f %.1f",
+		m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "LR: %s %s %5.1f %5.1f",
 			m_chassis->servo_lr.IsCalibrated() ? "OK " : "CAL",
 			m_chassis->servo_lr.GetSensor() ? "0" : "1",
 			m_chassis->servo_lr.GetSetAngle(),
 			m_chassis->servo_lr.GetCurrentAngle()
 		);
 		
-		m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "RF: %s %s %.1f %.1f",
+		m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "RF: %s %s %5.1f %5.1f",
 			m_chassis->servo_rf.IsCalibrated() ? "OK " : "CAL",
 			m_chassis->servo_rf.GetSensor() ? "0" : "1",
 			m_chassis->servo_rf.GetSetAngle(),
 			m_chassis->servo_rf.GetCurrentAngle()
 		);
 		
-		m_lcd->PrintfLine(DriverStationLCD::kUser_Line6, "RR: %s %s %.1f %.1f",
+		m_lcd->PrintfLine(DriverStationLCD::kUser_Line6, "RR: %s %s %5.1f %5.1f",
 			m_chassis->servo_rr.IsCalibrated() ? "OK " : "CAL",
 			m_chassis->servo_rr.GetSensor() ? "0" : "1",
 			m_chassis->servo_rr.GetSetAngle(),

@@ -19,7 +19,8 @@ MaintenanceMode::MaintenanceMode(RobotChassis * chassis) :
 	m_stick(FIRST_JOYSTICK_PORT),
 	servoCalibrator(chassis),
 	m_triggerEvent(0.5),
-	m_helpScreen(1)
+	m_helpScreen(1),
+	last_user_selection(-1)
 {}
 
 void MaintenanceMode::Reset()
@@ -33,6 +34,12 @@ void MaintenanceMode::Reset()
 
 void MaintenanceMode::DoMaintenance(int user_selection)
 {
+	if (user_selection != last_user_selection)
+	{
+		Reset();
+		last_user_selection = user_selection;
+	}
+
 	switch (user_selection)
 	{		
 		case 1:

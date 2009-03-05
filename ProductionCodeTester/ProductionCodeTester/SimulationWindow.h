@@ -3,6 +3,8 @@
 #ifndef SIMULATION_WINDOW_H
 #define SIMULATION_WINDOW_H
 
+
+#include <wx/joystick.h>
 #include <wx/spinctrl.h>
 #include "Simulator/ControlInterface.h"
 
@@ -27,6 +29,8 @@ private:
 	void OnClose(wxCloseEvent &event);
 	void OnStartClicked(wxCommandEvent &event);
 	void OnStepClicked(wxCommandEvent &event);
+
+	void OnEnableJoy1(wxCommandEvent &event);
 	
 	signed char GetJoystickValue(wxTextCtrl * ctrl);
 	
@@ -37,7 +41,11 @@ private:
 
 	void OnNewMode(wxSpinEvent &event);
 
+	wxJoystick				m_joystick1;
+
 	// xrc elements
+	wxCheckBox *			m_enableJoy1;
+
 	wxTextCtrl *			m_joy1X;
 	wxTextCtrl *			m_joy1Y;
 	wxTextCtrl *			m_joy1T;
@@ -45,6 +53,11 @@ private:
 	wxTextCtrl *			m_joy2X;
 	wxTextCtrl *			m_joy2Y;
 	wxTextCtrl *			m_joy2T;
+	
+	wxSpinCtrl *			m_analogIn1;
+	wxSpinCtrl *			m_analogIn2;
+	wxSpinCtrl *			m_analogIn3;
+	wxSpinCtrl *			m_analogIn4;
 	
 	wxCheckBox *			m_calibrateBox;
 	wxSpinCtrl *			m_mode;

@@ -12,7 +12,7 @@
 
 #define WAIT_FOREVER -1
 
-static inline SEM_ID semBCreate(int, int)
+static inline SEM_ID semBCreate(int semId, int)
 {
 	return 0;
 }
@@ -30,10 +30,19 @@ int semDelete(SEM_ID semId)
 }
 
 static inline
-int semGive(SEM_ID semId) { return 0; }
+int semGive(SEM_ID semId) 
+{
+	assert(semId);
+	return 0; 
+}
 
 static inline
-int semTake(SEM_ID semId, int timeout) { return 0; }
+int semTake(SEM_ID &semId, int timeout) 
+{ 
+	assert(!semId);
+	semId = 1;
+	return 0; 
+}
 
 static inline
 void semFlush(SEM_ID semId)

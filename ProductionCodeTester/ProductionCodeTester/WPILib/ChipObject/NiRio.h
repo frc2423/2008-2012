@@ -9,4 +9,6 @@ typedef UINT32		tNIRIO_u32;
 typedef int			tRioStatusCode;
 typedef int			tAccumulator;
 
+typedef void (*tInterruptHandler)(tNIRIO_u32 interruptAssertedMask, void *param);
+
 #endif

@@ -5,7 +5,6 @@
 // misc definitions
 typedef int STATUS;
 typedef void (*FUNCPTR)(void*);
-typedef void (*tInterruptHandler)(void*);
 
 
 // this sucks

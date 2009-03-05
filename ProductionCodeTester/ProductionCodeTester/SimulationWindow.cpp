@@ -1,4 +1,6 @@
 
+#include <ctime>
+#include <cstdlib>
 
 #include <wx/wx.h>
 #include <wx/xrc/xmlres.h>
@@ -19,6 +21,7 @@ DEFINE_EVENT_TYPE(EVT_ON_STEP)
 
 BEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_CLOSE( SimulationWindow::OnClose )
+	EVT_CHECKBOX( XRCID("m_enableJoy1"), SimulationWindow::OnEnableJoy1 )
 	EVT_BUTTON( XRCID("m_startButton"), SimulationWindow::OnStartClicked )
 	EVT_BUTTON( XRCID("m_stepButton"), SimulationWindow::OnStepClicked )
 	EVT_SPINCTRL( XRCID("m_mode"), SimulationWindow::OnNewMode)
@@ -37,8 +40,12 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	m_simulationTimer(this, 1),
 	m_drawTimer(this, 2)
 {
+	srand(time(NULL));
+
 	// initialize XRC elements..
 	wxXmlResource::Get()->LoadFrame(this, parent, wxT("SimulationWindow"));
+
+	XRC_INIT(m_enableJoy1, wxCheckBox);
 
 	XRC_INIT(m_joy1X, wxTextCtrl);
 	XRC_INIT(m_joy1Y, wxTextCtrl);
@@ -47,6 +54,11 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	XRC_INIT(m_joy2X, wxTextCtrl);
 	XRC_INIT(m_joy2Y, wxTextCtrl);
 	XRC_INIT(m_joy2T, wxTextCtrl);
+	
+	XRC_INIT(m_analogIn1, wxSpinCtrl);
+	XRC_INIT(m_analogIn2, wxSpinCtrl);
+	XRC_INIT(m_analogIn3, wxSpinCtrl);
+	XRC_INIT(m_analogIn4, wxSpinCtrl);
 	
 	XRC_INIT(m_calibrateBox, wxCheckBox);
 	XRC_INIT(m_mode, wxSpinCtrl);
@@ -154,7 +166,35 @@ void SimulationWindow::OnStepClicked(wxCommandEvent &event)
 	
 	m_simulationTimer.Start(25);
 }
+
+void SimulationWindow::OnEnableJoy1(wxCommandEvent &event)
+{
+	if (m_enableJoy1->IsChecked())
+	{
+		m_joy1X->Disable();
+		m_joy1Y->Disable();
+		m_joy1T->Disable();
+	}
+	else
+	{
+		m_joy1X->Enable();
+		m_joy1Y->Enable();
+		m_joy1T->Enable();
+	}
+}
+
+static 
+int AddNoise(int value)
+{
+	int ret = ((rand() % 10) - 5) + value;
 	
+	if (ret < 0)
+		ret = 0;
+	else if (ret > 1023)
+		ret = 1023;
+		
+	return ret;
+}
 	
 void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 {
@@ -178,33 +218,53 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 		data->enabled = m_enabledBox->IsChecked();
 		data->autonomous = m_autonomousBox->IsChecked();
 		
-		data->stick0Axis1 = GetJoystickValue(m_joy1X);
-		data->stick0Axis2 = GetJoystickValue(m_joy1Y);
-		data->stick0Axis4 = GetJoystickValue(m_joy1T);
-		data->stick2Axis1 = GetJoystickValue(m_joy2X);
-		data->stick2Axis2 = GetJoystickValue(m_joy2Y);
-		data->stick2Axis4 = GetJoystickValue(m_joy2T);
+		if (m_enableJoy1->IsChecked())
+		{
+			wxPoint pt = m_joystick1.GetPosition();
+
+			data->stick0Axis1 = pt.x;
+			data->stick0Axis2 = pt.y;
+			data->stick0Axis3 = m_joystick1.GetZPosition();
+
+			data->stick0Buttons = m_joystick1.GetButtonState();
+		}
+		else
+		{
+			data->stick0Axis1 = GetJoystickValue(m_joy1X);
+			data->stick0Axis2 = GetJoystickValue(m_joy1Y);
+			data->stick0Axis4 = GetJoystickValue(m_joy1T);
+		}
+
+		data->stick1Axis1 = GetJoystickValue(m_joy2X);
+		data->stick1Axis2 = GetJoystickValue(m_joy2Y);
+		data->stick1Axis4 = GetJoystickValue(m_joy2T);
 
 		data->dsDigitalIn = 0;
 
 		// port 1
 		if (m_calibrateBox->IsChecked())
-			data->dsDigitalIn |= 0x01;
+			data->dsDigitalIn |= 0x10;
 
 		int mode = m_mode->GetValue();
 
-		// port 7 is lsb
+		// port 4 is lsb
 		if (mode & 0x01)
-			data->dsDigitalIn |= 0x40;
-		// port 6
-		if (mode & 0x02)
-			data->dsDigitalIn |= 0x20;
-		// port 4
-		if (mode & 0x04)
 			data->dsDigitalIn |= 0x08;
 		// port 3
-		if (mode & 0x08)
+		if (mode & 0x02)
 			data->dsDigitalIn |= 0x04;
+		// port 2
+		if (mode & 0x04)
+			data->dsDigitalIn |= 0x02;
+		// port 1
+		if (mode & 0x08)
+			data->dsDigitalIn |= 0x01;
+			
+		// analog inputs
+		data->analog1 = AddNoise(m_analogIn1->GetValue());
+		data->analog2 = AddNoise(m_analogIn2->GetValue());
+		data->analog3 = AddNoise(m_analogIn3->GetValue());
+		data->analog4 = AddNoise(m_analogIn4->GetValue());
 	}
 	
 	m_controlInterface.Step();
@@ -304,5 +364,4 @@ void SimulationWindow::OnDrawTimer(wxTimerEvent &event)
 
 	m_data_ready = false;
 }
-
 

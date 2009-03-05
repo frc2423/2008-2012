@@ -12,6 +12,8 @@ class DigitalModule;
 #include "DigitalSource.h"
 #include <Simulator/Simulator.h>
 
+#include <ChipObject/NiRio.h>
+
 /**
  * Class to read a digital input.
  * This class will read digital inputs and return the current value on the channel. Other devices
@@ -29,6 +31,11 @@ public:
 	}
 	
 	UINT32 Get() { return m_lastValue; }
+
+	void RequestInterrupts(tInterruptHandler handler, void *param=NULL){}
+	void SetUpSourceEdge(bool risingEdge, bool fallingEdge){}
+	void EnableInterrupts(){}
+		void DisableInterrupts(){}
 	
 	bool m_lastValue;
 };

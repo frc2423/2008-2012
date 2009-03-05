@@ -8,6 +8,7 @@
 #define ANALOG_TRIGGER_OUTPUT_H_
 
 #include "DigitalSource.h"
+#include <ChipObject/NiRio.h>
 
 class AnalogTrigger;
 

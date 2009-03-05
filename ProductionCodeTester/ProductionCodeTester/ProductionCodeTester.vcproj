@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib comctl32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib rpcrt4.lib"
+				AdditionalDependencies="wsock32.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib comctl32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib rpcrt4.lib Winmm.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="C:\wxWidgets\lib\vc_lib"
 				GenerateDebugInformation="true"
@@ -136,7 +136,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib comctl32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib rpcrt4.lib"
+				AdditionalDependencies="wsock32.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib comctl32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib rpcrt4.lib Winmm.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="C:\wxWidgets\lib\vc_lib"
 				GenerateDebugInformation="true"
@@ -192,23 +192,19 @@
 				Name="trunk"
 				>
 				<File
-					RelativePath=".\trunk\ArcadeControl.cpp"
+					RelativePath=".\trunk\KwarqsGameControl.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\trunk\ArcadeDrive.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\trunk\DriveRecorder.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\trunk\RecordedAutonomousControl.cpp"
+					RelativePath=".\trunk\MaintenanceMode.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\trunk\RobotMain.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\trunk\ServoCalibrator.cpp"
 					>
 				</File>
 				<Filter
@@ -240,6 +236,58 @@
 					</File>
 					<File
 						RelativePath=".\trunk\KwarqsLib\PositionInformation.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Autonomous"
+					>
+					<File
+						RelativePath=".\trunk\Autonomous\RecordedAutonomousControl.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Controls"
+					>
+					<File
+						RelativePath=".\trunk\Controls\AnnControl.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Controls\CompassDrive.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Controls\CompassDriveII.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Controls\SimpleControl.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="DriveFilters"
+					>
+					<File
+						RelativePath=".\trunk\DriveFilters\DriveRecorder.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\DriveFilters\StopFilter.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Drives"
+					>
+					<File
+						RelativePath=".\trunk\Drives\AnnDrive.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Drives\SwerveDrive.cpp"
 						>
 					</File>
 				</Filter>
@@ -335,10 +383,6 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\MotorDisplay.h"
-				>
-			</File>
-			<File
 				RelativePath=".\SimulationWindow.h"
 				>
 			</File>
@@ -346,31 +390,23 @@
 				Name="trunk"
 				>
 				<File
-					RelativePath=".\trunk\ArcadeControl.h"
+					RelativePath=".\trunk\KwarqsGameControl.h"
 					>
 				</File>
 				<File
-					RelativePath=".\trunk\ArcadeDrive.h"
+					RelativePath=".\trunk\MaintenanceMode.h"
 					>
 				</File>
 				<File
-					RelativePath=".\trunk\CompassDrive.h"
+					RelativePath=".\trunk\RobotChassis.h"
 					>
 				</File>
 				<File
-					RelativePath=".\trunk\DriveRecorder.h"
+					RelativePath=".\trunk\ServoCalibrator.h"
 					>
 				</File>
 				<File
-					RelativePath=".\trunk\NullMovementControl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\trunk\RecordedAutonomousControl.h"
-					>
-				</File>
-				<File
-					RelativePath=".\trunk\SpeedLimiter.h"
+					RelativePath=".\trunk\TelemetryData.h"
 					>
 				</File>
 				<Filter
@@ -381,7 +417,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\trunk\KwarqsLib\DelayTime.h"
+						RelativePath=".\trunk\KwarqsLib\DelayEvent.h"
 						>
 					</File>
 					<File
@@ -425,6 +461,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\trunk\KwarqsLib\KwarqsTelemetry.h"
+						>
+					</File>
+					<File
 						RelativePath=".\trunk\KwarqsLib\KwarqsWheelMotor.h"
 						>
 					</File>
@@ -442,6 +482,74 @@
 					</File>
 					<File
 						RelativePath=".\trunk\KwarqsLib\Serialization.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Autonomous"
+					>
+					<File
+						RelativePath=".\trunk\Autonomous\AutonomousDemo.h"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Autonomous\AutonomousRandomDemo.h"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Autonomous\RecordedAutonomousControl.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Controls"
+					>
+					<File
+						RelativePath=".\trunk\Controls\AnnControl.h"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Controls\CompassDrive.h"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Controls\CompassDriveII.h"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Controls\NullMovementControl.h"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Controls\SimpleControl.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Drives"
+					>
+					<File
+						RelativePath=".\trunk\Drives\AnnDrive.h"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\Drives\SwerveDrive.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="DriveFilters"
+					>
+					<File
+						RelativePath=".\trunk\DriveFilters\DriveRecorder.h"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\DriveFilters\PsuedoGearbox.h"
+						>
+					</File>
+					<File
+						RelativePath=".\trunk\DriveFilters\StopFilter.h"
 						>
 					</File>
 				</Filter>

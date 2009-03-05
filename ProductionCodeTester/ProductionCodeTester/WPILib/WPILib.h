@@ -20,7 +20,7 @@
 //#include "AnalogTrigger.h"
 //#include "AnalogTriggerOutput.h"
 //#include "Compressor.h"
-//#include "Counter.h"
+#include "Counter.h"
 //#include "Dashboard.h"
 #include "DigitalInput.h"
 //#include "DigitalModule.h"

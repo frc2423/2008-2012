@@ -45,7 +45,7 @@ PIDController::PIDController(float Kp, float Ki, float Kd,
 
 	m_prevError = 0;
 	m_totalError = 0;
-	m_tolerance = .05;
+	m_tolerance = .05F;
 
 	m_result = 0;
 	
@@ -91,7 +91,7 @@ void PIDController::Calculate()
 		return;
 	if (m_pidOutput == 0)
 		return;
-	float input = m_pidInput->PIDGet();
+	float input = (float)m_pidInput->PIDGet();
 	
 	if (m_enabled)
 	{
@@ -114,7 +114,7 @@ void PIDController::Calculate()
 			m_totalError += m_error;
 
 				
-		m_result = m_P * m_error + m_I * m_totalError + m_D * (m_error - m_prevError);
+		m_result = m_P * m_error + m_I * (float)m_totalError + m_D * (m_error - m_prevError);
 		m_prevError = m_error;
 		
 		if (m_result > m_maximumOutput)

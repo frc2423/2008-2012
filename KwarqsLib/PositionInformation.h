@@ -52,6 +52,9 @@ public:
 	/// returns the raw gyro value, normalized to 0-360
 	double GetNormalizedRawAngle();
 	
+	/// returns the offset of the field
+	double GetFieldOffset();
+	
 	/// returns the acceration of the robot, relative to the robot
 	/// Note: uses the parameters to return the values by reference
 	void GetAcceleration(double &x, double &y);

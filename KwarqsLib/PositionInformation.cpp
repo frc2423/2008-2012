@@ -74,8 +74,8 @@ PositionInformation::PositionInformation() :
 	CalculatePositionInformation();
 
 	// start the calculations
-	//m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
-	//m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);
+	m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
+	m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);
 }
 
 // destructor
@@ -169,6 +169,12 @@ double PositionInformation::GetNormalizedRawAngle()
 	if (angle < 0)
 		angle += 360;
 	return angle;
+}
+
+double PositionInformation::GetFieldOffset()
+{
+	Synchronized sync(m_mutex);
+	return m_field_offset;
 }
 
 void PositionInformation::ResetHeading()

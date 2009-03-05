@@ -17,7 +17,7 @@
 class DelayEvent {
 public:
 
-	DelayEvent(double interval = 0.2) :
+	DelayEvent(double interval = 0.15) :
 		m_interval(interval),
 		m_lastUpdate(GetTime())
 	{}

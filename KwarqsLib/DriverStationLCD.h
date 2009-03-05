@@ -27,9 +27,12 @@ public:
 	static DriverStationLCD *GetInstance();
 
 	void UpdateLCD();
+	
 	void Printf(Line line, UINT32 startingColumn, const char *writeFmt, ...);
 	void PrintfLine(Line line, const char *writeFmt, ...);
 
+	void Clear();
+	
 protected:
 	DriverStationLCD();
 

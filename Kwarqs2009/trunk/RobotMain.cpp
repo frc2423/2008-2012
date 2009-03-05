@@ -108,6 +108,7 @@ public:
 		currentTeleoperatedControl(NULL),
 		m_stick(1),
 		
+		m_lcdUpdateEvent(0.3),
 		m_telemetryEvent(0.05),
 		
 		m_info(PositionInformation::GetInstance())
@@ -308,11 +309,7 @@ public:
 		{
 			// update and clear
 			lcd->UpdateLCD();
-			lcd->Printf(DriverStationLCD::kMain_Line,  1, "                   ");
-			lcd->Printf(DriverStationLCD::kUser_Line3, 1, "                   ");
-			lcd->Printf(DriverStationLCD::kUser_Line4, 1, "                   ");
-			lcd->Printf(DriverStationLCD::kUser_Line5, 1, "                   ");
-			lcd->Printf(DriverStationLCD::kUser_Line6, 1, "                   ");
+			lcd->Clear();
 		}
 	}
 	

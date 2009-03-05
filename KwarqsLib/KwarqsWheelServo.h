@@ -76,6 +76,7 @@ public:
 	/// returns true if the wheel is at the sensor, false if not
 	bool GetSensor();
 	
+	/// returns the raw encoder value
 	int GetRawEncoder()
 	{
 		return m_encoder.GetRaw();

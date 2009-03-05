@@ -109,6 +109,7 @@ KwarqsWheelServo::~KwarqsWheelServo()
 /// Enables the servo
 void KwarqsWheelServo::Enable()
 {
+	m_motor.Set(0);
 	m_pidController->Enable();
 }
 
@@ -116,6 +117,7 @@ void KwarqsWheelServo::Enable()
 void KwarqsWheelServo::Disable()
 {
 	m_pidController->Disable();
+	m_motor.Set(0);
 }
 
 /// Sets the current position as 0 degrees

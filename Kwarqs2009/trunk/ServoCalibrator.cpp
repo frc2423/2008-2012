@@ -76,25 +76,33 @@ void ServoCalibrator::DoAutoCalibrate()
 
 void ServoCalibrator::DoManualCalibrate()
 {	
+	// filter out the pots
+	const double c = 500.0 / 1000.0;
+
+	double pot1 = ceil( m_ds->GetAnalogIn(1) * c);
+	double pot2 = ceil( m_ds->GetAnalogIn(2) * c);
+	double pot3 = ceil( m_ds->GetAnalogIn(3) * c);
+	double pot4 = ceil( m_ds->GetAnalogIn(4) * c);
+
+
 	// make sure the pots don't initially move the wheels around,
-	// that gets annoying really fast
+	// that gets annoying really fast. We use the recent value
+	// instead of the filtered value because its more likely
+	// to be correct. Within the percentage of noise, of course :)
 	if (m_begin_manual_calibrate)
 	{
-		pot1offset = m_chassis->servo_lf.GetSetAngle();
-		pot2offset = m_chassis->servo_lr.GetSetAngle();
-		pot3offset = m_chassis->servo_rf.GetSetAngle();
-		pot4offset = m_chassis->servo_rr.GetSetAngle();
+		pot1offset = pot1 - m_chassis->servo_lf.GetSetAngle();
+		pot2offset = pot2 - m_chassis->servo_lr.GetSetAngle();
+		pot3offset = pot3 - m_chassis->servo_rf.GetSetAngle();
+		pot4offset = pot4 - m_chassis->servo_rr.GetSetAngle();
 		
 		m_begin_manual_calibrate = false;
 	}
-
-	// filter out the pots
-	const double c = 500.0 / 1000.0;
 				
-	m_potfilter1.AddPoint( ceil( m_ds->GetAnalogIn(1) * c));
-	m_potfilter2.AddPoint( ceil( m_ds->GetAnalogIn(2) * c));
-	m_potfilter3.AddPoint( ceil( m_ds->GetAnalogIn(3) * c));
-	m_potfilter4.AddPoint( ceil( m_ds->GetAnalogIn(4) * c));
+	m_potfilter1.AddPoint( pot1 );
+	m_potfilter2.AddPoint( pot2 );
+	m_potfilter3.AddPoint( pot3 );
+	m_potfilter4.AddPoint( pot4 );
 
 	// hitting the trigger sets the calibration point
 	if (m_stick.GetTrigger() && m_triggerEvent.DoEvent())
@@ -111,12 +119,12 @@ void ServoCalibrator::DoManualCalibrate()
 	}
 	
 	// adjust the pot input accordingly
-	double pot1 = m_potfilter1.GetAverage() - pot1offset;
-	double pot2 = m_potfilter2.GetAverage() - pot2offset;
-	double pot3 = m_potfilter3.GetAverage() - pot3offset;
-	double pot4 = m_potfilter4.GetAverage() - pot4offset;
+	pot1 = m_potfilter1.GetAverage() - pot1offset;
+	pot2 = m_potfilter2.GetAverage() - pot2offset;
+	pot3 = m_potfilter3.GetAverage() - pot3offset;
+	pot4 = m_potfilter4.GetAverage() - pot4offset;
 	
-	// ok, tell the servo to go to that angle
+	// finally tell the servo to go to that angle
 	m_chassis->servo_lf.SetAngle(pot1);
 	m_chassis->servo_lr.SetAngle(pot2);
 	m_chassis->servo_rf.SetAngle(pot3);

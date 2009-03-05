@@ -135,4 +135,10 @@ void DriverStationLCD::PrintfLine(Line line, const char *writeFmt, ...)
 	va_end (args);
 }
 
+/// clears the LCD screen (front and back)
+void DriverStationLCD::Clear()
+{
+	Synchronized sync(m_textBufferSemaphore);
+	memset(m_textBuffer + sizeof(UINT16), ' ', LineLength*6);
+}
 

@@ -166,6 +166,7 @@ void ServoCalibrator::DoServo(KwarqsWheelServo &servo)
 			servo.EnableManual();
 		else
 		{
+			// reset the servo params on the transition
 			servo.Reset();
 			servo.Enable();
 			servo.SetAngle(0);
@@ -176,6 +177,13 @@ void ServoCalibrator::DoServo(KwarqsWheelServo &servo)
 	
 	if (trig)
 		servo.SetRawMotor(m_stick.GetY()*-1);
+	else if (m_stick.GetTop())
+	{
+		double y = m_stick.GetY() * -1, x = m_stick.GetX();
+		double desired_angle = (atan2(y, x) * (180/M_PI) - 90.0 );
+		
+		servo.SetAngle(desired_angle);
+	}
 
 	ShowLCDOutput();
 }

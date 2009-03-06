@@ -267,10 +267,12 @@ void MaintenanceMode::ServoSpeedTest()
 		case 1:
 		case 2:
 		case 3:
+		case 4:
 			
 			if (print_to_lcd)
 				m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "Please wait...");
 			
+			// runs every second
 			if (m_servoEvent.DoEvent() )
 			{
 				m_lf_servo_vals.push_back(m_chassis->servo_lf.GetRawEncoder());
@@ -288,7 +290,7 @@ void MaintenanceMode::ServoSpeedTest()
 			
 			break;
 		
-		case 4:
+		case 5:
 		
 			// done, disable the servos
 			m_chassis->servo_lf.SetRawMotor(0);
@@ -300,14 +302,33 @@ void MaintenanceMode::ServoSpeedTest()
 
 			// fall through to the next case
 			
-		case 5:
+		case 6:
 			
 			if (print_to_lcd)
 			{
-				m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "LF: %d %d %d", m_lf_servo_vals[0], m_lf_servo_vals[1], m_lf_servo_vals[2]);
-				m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "LR: %d %d %d", m_lr_servo_vals[0], m_lr_servo_vals[1], m_lr_servo_vals[2]);
-				m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "RF: %d %d %d", m_rf_servo_vals[0], m_rf_servo_vals[1], m_rf_servo_vals[2]);
-				m_lcd->PrintfLine(DriverStationLCD::kUser_Line6, "RR: %d %d %d", m_rr_servo_vals[0], m_rr_servo_vals[1], m_rr_servo_vals[2]);
+				// print the measured distance
+				m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "LF: %d %d %d", 
+					m_lf_servo_vals[1] - m_lf_servo_vals[0], 
+					m_lf_servo_vals[2] - m_lf_servo_vals[1], 
+					m_lf_servo_vals[3] - m_lf_servo_vals[2] 
+				);
+				
+				m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "LR: %d %d %d",
+					m_lr_servo_vals[1] - m_lr_servo_vals[0], 
+					m_lr_servo_vals[2] - m_lr_servo_vals[1], 
+					m_lr_servo_vals[3] - m_lr_servo_vals[2] 
+				);
+				
+				m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "RF: %d %d %d",
+					m_rf_servo_vals[1] - m_rf_servo_vals[0], 
+					m_rf_servo_vals[2] - m_rf_servo_vals[1], 
+					m_rf_servo_vals[3] - m_rf_servo_vals[2] 
+				);
+				m_lcd->PrintfLine(DriverStationLCD::kUser_Line6, "RR: %d %d %d",
+					m_rr_servo_vals[1] - m_rr_servo_vals[0], 
+					m_rr_servo_vals[2] - m_rr_servo_vals[1], 
+					m_rr_servo_vals[3] - m_rr_servo_vals[2] 
+				);
 			}
 			break;
 	}

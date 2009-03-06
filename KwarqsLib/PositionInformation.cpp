@@ -112,7 +112,7 @@ void PositionInformation::UpdateFieldPosition()
 	m_field_position = ((int)f1 << 1) | (int)f2; 
 	
 	// the field offset is added to the gyro angle
-	switch (pos)
+	switch (m_field_position)
 	{
 		case 0:
 			m_field_offset = 0;

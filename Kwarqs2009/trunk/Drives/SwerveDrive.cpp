@@ -239,13 +239,14 @@ void SwerveDrive::Stop()
 	}
 	
 	// find the shortest path to that spot, and do it
-	if (!DriverStation::GetInstance()->GetDigitalIn(7))
-	{
-		ShortestPath(speed, lf_angle, m_chassis->servo_lf.GetCurrentAngle());
-		ShortestPath(speed, lr_angle, m_chassis->servo_lr.GetCurrentAngle());
-		ShortestPath(speed, rf_angle, m_chassis->servo_rf.GetCurrentAngle());
-		ShortestPath(speed, rr_angle, m_chassis->servo_rr.GetCurrentAngle());
-	}
+	
+	/// @todo amory wants to disable this, figure out how to do it without
+	/// disabling it in autonomous mode
+	ShortestPath(speed, lf_angle, m_chassis->servo_lf.GetCurrentAngle());
+	ShortestPath(speed, lr_angle, m_chassis->servo_lr.GetCurrentAngle());
+	ShortestPath(speed, rf_angle, m_chassis->servo_rf.GetCurrentAngle());
+	ShortestPath(speed, rr_angle, m_chassis->servo_rr.GetCurrentAngle());
+
 	
 	m_chassis->servo_lf.SetAngle(lf_angle);
 	m_chassis->servo_lr.SetAngle(lr_angle);

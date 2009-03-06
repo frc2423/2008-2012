@@ -25,7 +25,7 @@ PositionInformation::PositionInformation() :
 	m_accelerometerXIn(ACCELEROMETER_X_SLOT, ACCELEROMETER_X_INPUT),
 	m_accelerometerYIn(ACCELEROMETER_Y_SLOT, ACCELEROMETER_Y_INPUT),
 	
-	m_field1(FIELD_SW1_SLOT, FIELD_SW2_CHANNEL),
+	m_field1(FIELD_SW1_SLOT, FIELD_SW1_CHANNEL),
 	m_field2(FIELD_SW1_SLOT, FIELD_SW2_CHANNEL),
 	
 	m_gyro_offset(0.0),
@@ -74,8 +74,8 @@ PositionInformation::PositionInformation() :
 	CalculatePositionInformation();
 
 	// start the calculations
-	m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
-	m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);
+	//m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
+	//m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);
 }
 
 // destructor
@@ -99,6 +99,11 @@ void PositionInformation::CalculatePositionInformation()
 	avgAy.AddPoint(y - yBias);
 	
 	// do the field offset here
+
+}
+
+void PositionInformation::UpdateFieldPosition()
+{
 	bool f1 = m_field1.Get() ? true : false;
 	bool f2 = m_field2.Get() ? true : false;
 	
@@ -122,10 +127,8 @@ void PositionInformation::CalculatePositionInformation()
 		case 3:
 			m_field_offset = 315;
 			break;
-	}
+	}	
 }
-
-
 
 
 

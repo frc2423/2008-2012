@@ -14,8 +14,10 @@
 #define KWARQSLIB_KWARQS_CONSTANTS_H
 
 
-#define SLOT_1 4
-#define SLOT_2 6
+#define ANALOG_SLOT_1 1
+
+#define DIGITAL_SLOT_1 4
+#define DIGITAL_SLOT_2 6
 
 // operator station
 #define FIRST_JOYSTICK_PORT			1
@@ -35,7 +37,7 @@
 #define DRIVE_RECORDER_SWITCH		1
 
 // analog sidecar
-#define GYRO_SLOT					SLOT_1
+#define GYRO_SLOT					ANALOG_SLOT_1
 #define GYRO_CHANNEL				1
 
 
@@ -49,8 +51,8 @@
 
 // testbot settings
 
-#define MOTOR_L_SLOT				SLOT_1
-#define MOTOR_R_SLOT				SLOT_1
+#define MOTOR_L_SLOT				DIGITAL_SLOT_1
+#define MOTOR_R_SLOT				DIGITAL_SLOT_1
 
 #define PWM_L_JAGUAR				1
 #define PWM_R_JAGUAR				2
@@ -75,24 +77,24 @@
  **********************************************************/
 
 // accelerometer (todo: need to change this to real values
-#define ACCELEROMETER_X_SLOT		SLOT_1
+#define ACCELEROMETER_X_SLOT		DIGITAL_SLOT_1
 #define ACCELEROMETER_X_INPUT		13
-#define ACCELEROMETER_Y_SLOT		SLOT_1
+#define ACCELEROMETER_Y_SLOT		DIGITAL_SLOT_1
 #define ACCELEROMETER_Y_INPUT		14
 
 // position switch
-#define FIELD_SW1_SLOT				SLOT_2
+#define FIELD_SW1_SLOT				DIGITAL_SLOT_2
 #define FIELD_SW1_CHANNEL			13
-#define FIELD_SW2_SLOT				SLOT_2
+#define FIELD_SW2_SLOT				DIGITAL_SLOT_2
 #define FIELD_SW2_CHANNEL			14
 
  
 // drive motors
 
-#define MOTOR_LF_SLOT				SLOT_1
-#define MOTOR_LR_SLOT				SLOT_1
-#define MOTOR_RF_SLOT				SLOT_2
-#define MOTOR_RR_SLOT				SLOT_2
+#define MOTOR_LF_SLOT				DIGITAL_SLOT_1
+#define MOTOR_LR_SLOT				DIGITAL_SLOT_1
+#define MOTOR_RF_SLOT				DIGITAL_SLOT_2
+#define MOTOR_RR_SLOT				DIGITAL_SLOT_2
 
 #define MOTOR_LF_INVERT				true
 #define MOTOR_LR_INVERT				true
@@ -102,7 +104,7 @@
 #define PWM_LF_JAGUAR				1
 #define PWM_LR_JAGUAR				3
 #define PWM_RF_JAGUAR				1
-#define PWM_RR_JAGUAR				3
+#define PWM_RR_JAGUAR				7
 
 // displacement of motors from center of rotation
 #define LF_DISPLACEMENT				-0.5,1
@@ -129,10 +131,10 @@
 
 
 // servos
-#define SERVO_LF_SLOT				SLOT_1
-#define SERVO_LR_SLOT				SLOT_1
-#define SERVO_RF_SLOT				SLOT_2
-#define SERVO_RR_SLOT				SLOT_2
+#define SERVO_LF_SLOT				DIGITAL_SLOT_1
+#define SERVO_LR_SLOT				DIGITAL_SLOT_1
+#define SERVO_RF_SLOT				DIGITAL_SLOT_2
+#define SERVO_RR_SLOT				DIGITAL_SLOT_2
 
 #define SERVO_LF_VICTOR				2
 #define SERVO_LR_VICTOR				4
@@ -162,14 +164,14 @@
 
 #define ENCODER_SERVO_LF_P			0.95F
 #define ENCODER_SERVO_LR_P			0.95F
-#define ENCODER_SERVO_RF_P			0.95F
-#define ENCODER_SERVO_RR_P			0.95F
+#define ENCODER_SERVO_RF_P			0.5F
+#define ENCODER_SERVO_RR_P			0.5F
 
 // servo calibration signals (hall effect sensors)
 #define SERVO_LF_CAL_PORT			9
 #define SERVO_LR_CAL_PORT			10
-#define SERVO_RF_CAL_PORT			11
-#define SERVO_RR_CAL_PORT			10
+#define SERVO_RF_CAL_PORT			10
+#define SERVO_RR_CAL_PORT			9
 
 // angle that the calibration point represents (in degrees)
 #define SERVO_LF_CAL_OFFSET			0.0
@@ -183,12 +185,8 @@
 
 // servo constants (back)
 #define SERVO_R_SCALE				25.0
-#define SERVO_R_TICKS				3272
+#define SERVO_R_TICKS				3000
 
-// global servo constants
-#define SERVO_PID_P					0.95
-#define SERVO_PID_I					0.0
-#define SERVO_PID_D					0.0
 
 // aggregated parameters (just ignore these)
 

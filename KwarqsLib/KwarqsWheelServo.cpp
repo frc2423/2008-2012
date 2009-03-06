@@ -76,10 +76,12 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_encoder(slot, encoder_port1, slot, encoder_port2, invert_encoder),
 	m_sensor(slot, cal_port),
 	m_outputScale(outputScale),
+	m_setAngle(0),
 	m_encoderResolution(encoderResolution),
 	m_calibrating(false),
 	m_calibrating_offset(cal_offset),
 	m_invert_motor( invert_motor ? -1.0F : 1.0F )
+	
 {
 	// initialize the calibration mutex
 	m_calibration_mutex = semBCreate(0, SEM_FULL);
@@ -126,6 +128,11 @@ void KwarqsWheelServo::Reset()
 	CalibrationComplete();
 }
 
+void KwarqsWheelServo::EnableManual()
+{
+	m_pidController->Disable();
+}
+
 void KwarqsWheelServo::AutoCalibrate()
 {
 #ifdef AUTOCALIBRATE_SERVO
@@ -165,7 +172,6 @@ void KwarqsWheelServo::CalibrationComplete()
 double KwarqsWheelServo::GetSetAngle()
 {
 	return m_setAngle;
-	//return m_pidController->GetSetpoint();
 }
 
 
@@ -238,16 +244,27 @@ void KwarqsWheelServo::PIDWrite(float output)
 	output = output/(float)m_outputScale;
 	
 	// set the motor value
-	//if (m_pidController->OnTarget())
-	//	m_motor.Set(0);
-	//else
-	m_motor.Set(output * m_invert_motor);
+	
+	if (OnTarget())
+		m_motor.Set(0);
+	else
+		m_motor.Set(output * m_invert_motor);
 }
 
 double KwarqsWheelServo::PIDGet()
 {
 	return GetCurrentAngle();
 }
+
+
+bool KwarqsWheelServo::OnTarget()
+{
+	bool temp;
+	temp = (fabs(m_setAngle - GetCurrentAngle())< 0.0025 / 100 * 720);
+
+	return temp;
+}
+
 
 
 #ifdef AUTOCALIBRATE_SERVO

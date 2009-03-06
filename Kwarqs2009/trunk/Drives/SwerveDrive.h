@@ -58,9 +58,11 @@ private:
 	
 	RobotChassis * m_chassis;
 	
-	KwarqsJoystick m_stick;
+	
 	
 	double m_time;
+	
+	KwarqsJoystick m_stick;
 };
 
 

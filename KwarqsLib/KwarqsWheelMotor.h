@@ -12,6 +12,8 @@
 #include "filters.h"
 #include "DriverStationLCD.h"
 
+#include "DelayEvent.h"
+
 /**
 	\class KwarqsWheelMotor
 	\brief A class that is used to control the speed of a motor
@@ -62,7 +64,11 @@ private:
 	Jaguar m_motor;
 	Encoder m_encoder;
 	
+	double m_lastSpeed;
+	
 	float m_invert;
+	
+	DelayEvent m_motorDelay;
 };
 
 #endif

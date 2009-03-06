@@ -50,7 +50,8 @@ ServoCalibrator::ServoCalibrator(RobotChassis * chassis) :
 	pot2offset(0),
 	pot3offset(0),
 	pot4offset(0),
-	m_begin_manual_calibrate(true)
+	m_begin_manual_calibrate(true),
+	last_trig(false)
 {}
 
 
@@ -126,12 +127,59 @@ void ServoCalibrator::DoManualCalibrate()
 	
 	// finally tell the servo to go to that angle
 	m_chassis->servo_lf.SetAngle(pot1);
-	m_chassis->servo_lr.SetAngle(pot2);
-	m_chassis->servo_rf.SetAngle(pot3);
+	m_chassis->servo_lr.SetAngle(pot3);
+	m_chassis->servo_rf.SetAngle(pot2);
 	m_chassis->servo_rr.SetAngle(pot4);
 	
 	ShowLCDOutput();
 }
+
+void ServoCalibrator::DoLFServo()
+{
+	DoServo(m_chassis->servo_lf);
+}
+
+void ServoCalibrator::DoLRServo()
+{
+	DoServo(m_chassis->servo_lr);
+}
+
+void ServoCalibrator::DoRFServo()
+{
+	DoServo(m_chassis->servo_rf);
+}
+
+void ServoCalibrator::DoRRServo()
+{
+	DoServo(m_chassis->servo_rr);
+}
+
+
+void ServoCalibrator::DoServo(KwarqsWheelServo &servo)
+{
+	
+	bool trig = m_stick.GetTrigger();
+			
+	if (last_trig != trig)
+	{
+		if (trig)
+			servo.EnableManual();
+		else
+		{
+			servo.Reset();
+			servo.Enable();
+			servo.SetAngle(0);
+		}
+		
+		last_trig = trig;
+	}
+	
+	if (trig)
+		servo.SetRawMotor(m_stick.GetY()*-1);
+
+	ShowLCDOutput();
+}
+
 
 void ServoCalibrator::ShowLCDOutput()
 {

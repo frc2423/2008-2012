@@ -28,9 +28,9 @@ public:
 		bool stop = false;
 	
 		// rotate to 180 in two seconds
-		if (elapsed < 1)
+		if (elapsed < 0.5)
 		{
-			speed = 1;
+			speed = .5;
 			angle = 0;
 			rotation = 0;
 		}

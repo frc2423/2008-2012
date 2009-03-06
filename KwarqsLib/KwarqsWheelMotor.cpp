@@ -58,7 +58,8 @@ KwarqsWheelMotor::KwarqsWheelMotor(
 		bool invert_encoder) :
 	m_motor(slot, pwm_port),
 	m_encoder(slot, encoder_port1, slot, encoder_port2, false, Encoder::k1X),
-	m_invert(invert_motor ? -1.0F : 1.0F)
+	m_invert(invert_motor ? -1.0F : 1.0F),
+	m_motorDelay(0.025)
 {
 	SetSpeed(0);
 	
@@ -72,6 +73,9 @@ KwarqsWheelMotor::KwarqsWheelMotor(
 /// Set the speed of the motor (-1 to 1)? 
 void KwarqsWheelMotor::SetSpeed(float speed)
 {
+	//if (m_motorDelay.DoEvent())
+	//	m_lastSpeed = m_lastSpeed + (speed - m_lastSpeed)* 0.1;
+	
 	m_motor.Set(speed * m_invert);
 }
 

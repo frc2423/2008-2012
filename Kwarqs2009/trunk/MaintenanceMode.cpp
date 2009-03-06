@@ -61,17 +61,21 @@ void MaintenanceMode::Reset()
 	{
 		case 1:
 		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
 			servoCalibrator.Reset();
 			break;
 
-		case 3:
+		case 7:
 			m_chassis->servo_lf.Enable();
 			m_chassis->servo_lr.Enable();
 			m_chassis->servo_rf.Enable();
 			m_chassis->servo_rr.Enable();
 			break;
 			
-		case 4:
+		case 8:
 			break;
 
 		default:
@@ -117,24 +121,61 @@ void MaintenanceMode::DoMaintenance(int user_selection)
 			
 		case 3:
 		
+			if (print_to_lcd)
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "3. LF Servo");
+		
+			// do the manual servo calibration
+			servoCalibrator.DoLFServo();
+			break;
+		
+		case 4:
+		
+			if (print_to_lcd)
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "4. LR Servo");
+		
+			// do the manual servo calibration
+			servoCalibrator.DoLRServo();
+			break;
+			
+		case 5:
+		
+			if (print_to_lcd)
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "5. RF Servo");
+		
+			// do the manual servo calibration
+			servoCalibrator.DoRFServo();
+			break;
+			
+		case 6:
+		
+			if (print_to_lcd)
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "6. RR Servo");
+		
+			// do the manual servo calibration
+			servoCalibrator.DoRRServo();
+			break;
+			
+			
+		case 7:
+		
 			// run the encoder test
 			
 			if (print_to_lcd)
-				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "3. Servo speed test");
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "7. Servo speed test");
 			
 			ServoSpeedTest();
 			break;
 			
-		case 4:
+		case 8:
 		
 			// run the wheel speed test
 			if (print_to_lcd)
-				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "4. Wheel speed test");
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "8. Wheel speed test");
 			
 			WheelSpeedTest();
 			break;
 			
-		case 5:
+		case 9:
 		
 			// display position-related information (gyro, accelerometer)
 			if (print_to_lcd)
@@ -142,7 +183,7 @@ void MaintenanceMode::DoMaintenance(int user_selection)
 				double ax, ay;
 				m_info->GetAcceleration(ax, ay);
 			
-				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "5. Position output");
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "9. Position output");
 				m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "Field @: %.1f (+%d)", m_info->GetNormalizedFieldAngle(), (int)m_info->GetFieldOffset());
 				m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "Raw @: %.1f", m_info->GetNormalizedRawAngle());
 				m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "accel X: %f", ax);
@@ -161,16 +202,25 @@ void MaintenanceMode::DoMaintenance(int user_selection)
 				
 				m_lcd->PrintfLine(DriverStationLCD::kMain_Line,  "Maintenance mode help");
 				
-				if (m_helpScreen % 2)
+				switch (m_helpScreen %3)
 				{
+				case 1:
 					m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "1. Auto Calibrate");
 					m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "2. 4-pot Calibrate");
-					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "3. Servo speed test");
-				}
-				else
-				{
-					m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "4. Wheel speed test");
-					m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "5. Position output");
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "3. LF Servo");
+					break;
+				
+				case 2:
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "4. LR Servo");
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "5. RF Servo");
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "6. RR Servo");
+				
+				case 0:
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "7. Servo speed test");
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line3, "8. Wheel speed test");
+					m_lcd->PrintfLine(DriverStationLCD::kUser_Line4, "9. Position output");
+					break;
+					
 				}
 				
 				m_lcd->PrintfLine(DriverStationLCD::kUser_Line6, "  Trigger for next ->");

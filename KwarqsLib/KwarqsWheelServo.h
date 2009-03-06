@@ -48,6 +48,8 @@ public:
 	void Enable();
 	void Disable();
 	
+	void EnableManual();
+	
 	void Reset();
 	
 	/// Call this to tell the servo to automatically try to calibrate
@@ -84,9 +86,10 @@ public:
 	
 	void SetRawMotor(float value)
 	{
-		Disable();
 		m_motor.Set(value);
 	}
+	
+	bool OnTarget();
 
 	
 	// only accessed by the PIDController class

@@ -23,9 +23,16 @@ public:
 	void DoAutoCalibrate();
 	void DoManualCalibrate();
 	
+	void DoLFServo();
+	void DoLRServo();
+	void DoRFServo();
+	void DoRRServo();
+	
 	void Reset();
 
 private:
+	
+	void DoServo(KwarqsWheelServo &servo);
 
 	void ShowLCDOutput();
 
@@ -49,7 +56,7 @@ private:
 	
 	bool m_begin_manual_calibrate;
 	
-	
+	bool last_trig;
 };
 
 #endif

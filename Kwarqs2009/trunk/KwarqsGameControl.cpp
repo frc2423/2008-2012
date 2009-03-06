@@ -11,8 +11,8 @@
 #include "KwarqsGameControl.h"
 
 KwarqsGameControl::KwarqsGameControl() :
-	m_low_arm_motor(SLOT_2, 6),
-	m_upper_arm_motor(SLOT_2, 5)
+	m_low_arm_motor(DIGITAL_SLOT_2, 6),
+	m_upper_arm_motor(DIGITAL_SLOT_2, 5)
 {
 	// we intentionally do not use a KwarqsJoystick here
 	m_stick = Joystick::GetStickForPort(SECOND_JOYSTICK_PORT);

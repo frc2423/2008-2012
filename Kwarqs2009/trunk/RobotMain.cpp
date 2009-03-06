@@ -48,7 +48,7 @@ class KwarqsRobotMain : public SimpleRobot
 	MaintenanceMode			maintenanceMode;
 	
 	// control types
-	AnnControl				annControl;
+	//AnnControl				annControl;
 	SimpleControl 			simpleControl;
 	CompassDrive			compassDrive;
 	CompassDriveII			compassDriveII;
@@ -66,7 +66,7 @@ class KwarqsRobotMain : public SimpleRobot
 	
 	// motor drivers
 	SwerveDrive				swerveDrive;
-	AnnDrive				annDrive;
+	//AnnDrive				annDrive;
 	
 	KwarqsMovementControl * currentTeleoperatedControl;
 	
@@ -92,7 +92,7 @@ public:
 	KwarqsRobotMain() :
 		maintenanceMode(&chassis),
 		
-		annControl(&driveController),
+		//annControl(&driveController),
 		simpleControl(&driveController),
 		compassDrive(&driveController),
 		compassDriveII(&driveController),
@@ -103,7 +103,7 @@ public:
 		autonomousRandomDemo(&driveController),
 		
 		swerveDrive(&chassis),
-		annDrive(&chassis),
+		//annDrive(&chassis),
 		
 		currentTeleoperatedControl(NULL),
 		m_stick(1),
@@ -171,9 +171,9 @@ public:
 		
 		switch (user_selection)
 		{
-			case 6:
-				control = &annControl;
-				break;
+			//case 6:
+			//	control = &annControl;
+			//	break;
 		
 			case 7:
 				control = &compassDriveII;
@@ -233,6 +233,8 @@ public:
 		
 		while (IsAutonomous())
 		{
+			m_info->UpdateFieldPosition();
+			
 			movementControl->Move();
 			driveController.EndMove();
 			
@@ -262,6 +264,8 @@ public:
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
+			
+			m_info->UpdateFieldPosition();
 			
 			// get the user selection
 			user_selection = GetBCDInput();

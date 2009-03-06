@@ -66,6 +66,8 @@ public:
 	
 	void ResetHeading();
 	
+	void UpdateFieldPosition();
+	
 private:
 
 	// this is private, since this is a singleton class

@@ -318,8 +318,8 @@ public:
 	
 	void UpdateTelemetry()
 	{
-		if (m_telemetryEvent.DoEvent())
-			m_telemetry.AddData( TelemetryData(chassis, m_info) );
+		//if (m_telemetryEvent.DoEvent())
+		//	m_telemetry.AddData( TelemetryData(chassis, m_info) );
 	}
 	
 };

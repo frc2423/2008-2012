@@ -119,15 +119,15 @@ void PositionInformation::UpdateFieldPosition()
 			break;
 			
 		case 1:
-			m_field_offset = 225;
+			m_field_offset = -225;
 			break;
 			
 		case 2:
-			m_field_offset = 90;
+			m_field_offset = -90;
 			break;
 			
 		case 3:
-			m_field_offset = 315;
+			m_field_offset = -315;
 			break;
 	}	
 }
@@ -198,8 +198,11 @@ double PositionInformation::TranslateFieldToRobotAngle(double angle)
 {
 	Synchronized sync(m_mutex);
 
+	// gyro is opposite
+	angle *= -1;
+	
 	angle = ((m_gyro.GetAngle() - m_gyro_offset) + m_field_offset) - angle;
-
+	
 	angle = fmod(angle, 360.0);
 	if (angle < 0)
 		angle += 360;

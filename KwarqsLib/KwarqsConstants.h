@@ -169,8 +169,8 @@
 #define ENCODER_SERVO_RR_2			4
 
 #define ENCODER_SERVO_LF_P			0.95F
-#define ENCODER_SERVO_LR_P			0.95F
-#define ENCODER_SERVO_RF_P			0.5F
+#define ENCODER_SERVO_LR_P			0.5F
+#define ENCODER_SERVO_RF_P			0.95F
 #define ENCODER_SERVO_RR_P			0.5F
 
 // servo calibration signals (hall effect sensors)
@@ -180,17 +180,21 @@
 #define SERVO_RR_CAL_PORT			9
 
 // angle that the calibration point represents (in degrees)
-#define SERVO_LF_CAL_OFFSET			0.0
-#define SERVO_LR_CAL_OFFSET			0.0	
-#define SERVO_RF_CAL_OFFSET			0.0
-#define SERVO_RR_CAL_OFFSET			0.0
+#define SERVO_LF_CAL_OFFSET			3
+#define SERVO_LR_CAL_OFFSET			2	
+#define SERVO_RF_CAL_OFFSET			7
+#define SERVO_RR_CAL_OFFSET			-5
 
 // servo constants (front)
-#define SERVO_F_SCALE				25.0
+//#define SERVO_F_SCALE				25.0
+#define SERVO_LF_SCALE				10.0
+#define SERVO_RF_SCALE				10.0
 #define SERVO_F_TICKS				3272
 
 // servo constants (back)
-#define SERVO_R_SCALE				25.0
+//#define SERVO_R_SCALE				25.0
+#define SERVO_LR_SCALE				25.0
+#define SERVO_RR_SCALE				25.0
 #define SERVO_R_TICKS				3000
 
 
@@ -202,7 +206,7 @@
 									ENCODER_SERVO_##lr##fr##_2, \
 									SERVO_##lr##fr##_CAL_PORT, \
 									SERVO_##lr##fr##_CAL_OFFSET, \
-									SERVO_##fr##_SCALE, \
+									SERVO_##lr##fr##_SCALE, \
 									SERVO_##fr##_TICKS, \
 									SERVO_##lr##fr##_INVERT_MOTOR, \
 									SERVO_##lr##fr##_INVERT_ENCODER, \

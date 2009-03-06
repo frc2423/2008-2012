@@ -53,13 +53,14 @@ public:
 	void Move0(double &speed, double &angle, double &rotation, double elapsed)
 	{
 	
-		if (elapsed < 0.5)
+		/*
+		if (elapsed < 1)
 		{
 			speed = .5;
 			angle = 45;
 			rotation = 0;
 		}
-		else if (elapsed < 4)
+		else if (elapsed < 3)
 		{
 			speed = 1;
 			angle = 45;
@@ -71,28 +72,41 @@ public:
 			angle = 45;
 			rotation = m_nosePointer.GetRotation(180);
 		}
+		*/
+		
+		speed = .5;
+		angle = 45;
+		rotation = 0;
+		
+		
 	}
 	
 	// starting from the top left corner
 	void Move1(double &speed, double &angle, double &rotation, double elapsed)
 	{
-		if (elapsed < 0.5)
+		if (elapsed < 1)
 		{
 			speed = .5;
 			angle = 245;
+			rotation = m_nosePointer.GetRotation(315);
+		}
+		else if (elapsed < 3)
+		{
+			speed = 1;
+			angle = 270;
 			rotation = m_nosePointer.GetRotation(0);
 		}
-		else if (elapsed < 2)
+		else if (elapsed < 6)
 		{
 			speed = 1;
 			angle = 270;
 			rotation = m_nosePointer.GetRotation(90);
 		}
-		else if (elapsed < 3.5)
+		else
 		{
-			speed = 1;
-			angle = 270;
-			rotation = m_nosePointer.GetRotation(90);
+			speed = 0;
+			angle = 0;
+			rotation = -.75;
 		}
 		
 		// spin from then on
@@ -101,46 +115,58 @@ public:
 	// starting from the middle, facing left
 	void Move2(double &speed, double &angle, double &rotation, double elapsed)
 	{
-		if (elapsed < 0.5)
+		if (elapsed < 1.5)
 		{
 			speed = .5;
 			angle = 45;
 			rotation = m_nosePointer.GetRotation(45);
 		}
-		else if (elapsed < 2)
+		else if (elapsed < 3)
 		{
 			speed = 1;
 			angle = 0;
-			rotation = m_nosePointer.GetRotation(180);
+			rotation = m_nosePointer.GetRotation(0);
 		}
-		else if (elapsed < 3.5)
+		else if (elapsed < 6)
 		{
 			speed = 1;
 			angle = -45;
 			rotation = m_nosePointer.GetRotation(180);
+		}
+		else
+		{
+			speed = 0;
+			angle = 0;
+			rotation = .75;
 		}
 	}
 	
 	// starting from the bottom left corner
 	void Move3(double &speed, double &angle, double &rotation, double elapsed)
 	{
-		if (elapsed < 0.5)
+		if (elapsed < 1)
 		{
 			speed = .5;
 			angle = 300;
+			rotation = m_nosePointer.GetRotation(270);
+		}
+		else if (elapsed < 3)
+		{
+			speed = 1;
+			angle = 270;
 			rotation = m_nosePointer.GetRotation(180);
 		}
-		else if (elapsed < 2)
+		else if (elapsed < 6)
 		{
 			speed = 1;
 			angle = 270;
 			rotation = m_nosePointer.GetRotation(90);
 		}
-		else if (elapsed < 3.5)
+		else
 		{
-			speed = 1;
-			angle = 270;
-			rotation = m_nosePointer.GetRotation(90);
+			speed = 0;
+			angle = 0;
+			rotation = -.75;
 		}
 	}
 	
@@ -189,11 +215,11 @@ public:
 		angle = m_info->TranslateFieldToRobotAngle(angle);
 		
 		// let the speed semi-gradually ramp up
-		if (m_speedEvent.DoEvent())
-			m_lastSpeed = m_lastSpeed + (speed - m_lastSpeed) * .1;
+		//if (m_speedEvent.DoEvent())
+		//	m_lastSpeed = m_lastSpeed + (speed - m_lastSpeed) * .1;
 			
 		// send it on
-		m_driveController->Move(m_lastSpeed, angle, rotation, false);
+		m_driveController->Move(speed, angle, rotation, false);
 	}
 	
 	

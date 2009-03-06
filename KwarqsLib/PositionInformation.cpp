@@ -31,7 +31,8 @@ PositionInformation::PositionInformation() :
 	m_gyro_offset(0.0),
 	m_field_offset(0.0),
 
-	xBias(0.0), yBias(0.0)
+	xBias(0.0), yBias(0.0),
+	m_field_position(0)
 {
 	m_gyro.SetSensitivity(0.007F);
 	
@@ -72,6 +73,7 @@ PositionInformation::PositionInformation() :
 	
 	// start this up at least once
 	CalculatePositionInformation();
+	UpdateFieldPosition();
 
 	// start the calculations
 	//m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
@@ -107,7 +109,7 @@ void PositionInformation::UpdateFieldPosition()
 	bool f1 = m_field1.Get() ? true : false;
 	bool f2 = m_field2.Get() ? true : false;
 	
-	int pos = ((int)f1 << 1) | (int)f2; 
+	m_field_position = ((int)f1 << 1) | (int)f2; 
 	
 	// the field offset is added to the gyro angle
 	switch (pos)
@@ -130,6 +132,10 @@ void PositionInformation::UpdateFieldPosition()
 	}	
 }
 
+int PositionInformation::GetFieldPosition()
+{
+	return m_field_position;
+}
 
 
 /// returns the acceleration of the bot in m/s^2

@@ -42,7 +42,7 @@ public:
 			return;
 	
 		// low speed action (boring)
-		speed *= .6;
+		speed *= .5;
 		rotation *= .5;
 	}
 

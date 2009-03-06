@@ -14,10 +14,10 @@
 #define KWARQSLIB_KWARQS_CONSTANTS_H
 
 
-#define ANALOG_SLOT_1 1
+#define ANALOG_SLOT_1 				1
 
-#define DIGITAL_SLOT_1 4
-#define DIGITAL_SLOT_2 6
+#define DIGITAL_SLOT_1 				4
+#define DIGITAL_SLOT_2 				6
 
 // operator station
 #define FIRST_JOYSTICK_PORT			1
@@ -27,10 +27,10 @@
 #define TRACTION_CONTROL_SWITCH		7
 #define SWITCH_DRIVE_SWITCH			8
 
-#define BCD_IN_3 1
-#define BCD_IN_2 2
-#define BCD_IN_1 3
-#define BCD_IN_0 4
+#define BCD_IN_3 					1
+#define BCD_IN_2 					2
+#define BCD_IN_1 					3
+#define BCD_IN_0 					4
 
 /// @todo fix drive recorder definition
 #define DRIVE_RECORDER_STICK 		2
@@ -68,8 +68,8 @@
 #define ENCODER_MOTOR_L_INVERT		true
 #define ENCODER_MOTOR_R_INVERT		false
 
-#define LEFT_MOTOR_PWM 1
-#define RIGHT_MOTOR_PWM 2
+#define LEFT_MOTOR_PWM 				1
+#define RIGHT_MOTOR_PWM 			2
 
 
 /**********************************************************
@@ -107,10 +107,16 @@
 #define PWM_RR_JAGUAR				7
 
 // displacement of motors from center of rotation
-#define LF_DISPLACEMENT				-0.5,1
-#define LR_DISPLACEMENT				-0.5,-1
-#define RF_DISPLACEMENT				0.5,1
-#define RR_DISPLACEMENT				0.5,-1
+//#define LF_DISPLACEMENT				-0.5,1
+//#define LR_DISPLACEMENT				-0.5,-1
+//#define RF_DISPLACEMENT				0.5,1
+//#define RR_DISPLACEMENT				0.5,-1
+
+#define LF_DISPLACEMENT				-1,	1
+#define LR_DISPLACEMENT				-1,	0.5
+#define RF_DISPLACEMENT				1,	1
+#define RR_DISPLACEMENT				1,	0.5
+
 
 // encoder channels: motor
 #define ENCODER_MOTOR_LF_1			5

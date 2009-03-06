@@ -68,6 +68,9 @@ public:
 	
 	void UpdateFieldPosition();
 	
+	/// returns 0-3 depending on the switches
+	int GetFieldPosition();
+	
 private:
 
 	// this is private, since this is a singleton class
@@ -116,6 +119,8 @@ private:
 	
 	// mutex used to provide access
 	SEM_ID			m_mutex;
+	
+	int m_field_position;
 };
 
 #endif

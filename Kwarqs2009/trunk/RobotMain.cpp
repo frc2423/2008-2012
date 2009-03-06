@@ -220,9 +220,9 @@ public:
 	{
 		GetWatchdog().SetEnabled(false);
 		
+		m_info->UpdateFieldPosition();
 		gameControl.TurnoffMotors();
 		psuedoGearbox.Enable();
-		
 	
 		// this only gets selected at the beginning of autonomous mode,
 		// it doesn't make any sense to allow it to change in the middle!
@@ -233,7 +233,6 @@ public:
 		
 		while (IsAutonomous())
 		{
-			m_info->UpdateFieldPosition();
 			
 			movementControl->Move();
 			driveController.EndMove();

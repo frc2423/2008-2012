@@ -52,8 +52,6 @@ public:
 	// this should never run
 	void Move0(double &speed, double &angle, double &rotation, double elapsed)
 	{
-	
-		/*
 		if (elapsed < 1)
 		{
 			speed = .5;
@@ -71,14 +69,7 @@ public:
 			speed = .5;
 			angle = 45;
 			rotation = m_nosePointer.GetRotation(180);
-		}
-		*/
-		
-		speed = .5;
-		angle = 45;
-		rotation = 0;
-		
-		
+		}	
 	}
 	
 	// starting from the top left corner
@@ -115,19 +106,26 @@ public:
 	// starting from the middle, facing left
 	void Move2(double &speed, double &angle, double &rotation, double elapsed)
 	{
-		if (elapsed < 1.5)
+		if (elapsed < 0.5)
 		{
+			// get off the carpet so we can turn
 			speed = .5;
+			angle = 90;
+			rotation = 0;
+		}
+		else if (elapsed < 2)
+		{
+			speed = 1;
 			angle = 45;
 			rotation = m_nosePointer.GetRotation(45);
 		}
-		else if (elapsed < 3)
+		else if (elapsed < 3.5)
 		{
 			speed = 1;
 			angle = 0;
 			rotation = m_nosePointer.GetRotation(0);
 		}
-		else if (elapsed < 6)
+		else if (elapsed < 6.5)
 		{
 			speed = 1;
 			angle = -45;

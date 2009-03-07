@@ -214,6 +214,7 @@ void MaintenanceMode::DoMaintenance(int user_selection)
 					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "4. LR Servo");
 					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "5. RF Servo");
 					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "6. RR Servo");
+					break;
 				
 				case 0:
 					m_lcd->PrintfLine(DriverStationLCD::kUser_Line5, "7. Servo speed test");

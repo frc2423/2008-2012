@@ -42,9 +42,9 @@ public:
 				lcd->PrintfLine(DriverStationLCD::kUser_Line4, "2: %.1f", 
 						m_ds->GetAnalogIn(2));
 				lcd->PrintfLine(DriverStationLCD::kUser_Line5, "3: %.1f", 
-						m_ds->GetAnalogIn(2));
+						m_ds->GetAnalogIn(3));
 				lcd->PrintfLine(DriverStationLCD::kUser_Line6, "4: %.1f", 
-						m_ds->GetAnalogIn(2));
+						m_ds->GetAnalogIn(4));
 				
 				lcd->UpdateLCD();
 				

@@ -14,6 +14,7 @@
 #include "../KwarqsLib/KwarqsMovementControl.h"
 #include "../KwarqsLib/PositionInformation.h"
 #include "../KwarqsLib/KwarqsJoystick.h"
+#include "../KwarqsLib/DelayEvent.h"
 
 /**
 	\class CompassDriveII
@@ -46,6 +47,9 @@ private:
 	PositionInformation * m_position;
 	
 	KwarqsNosePointer m_nosePointer;
+	
+	DelayEvent 	m_motorDelay;
+	double m_lastSpeed;
 };
 
 #endif

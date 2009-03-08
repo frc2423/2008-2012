@@ -45,6 +45,24 @@ void CompassDriveII::Move()
 		rotation = m_nosePointer.GetRotation(face_angle);
 	}
 	
+	if (DriverStation::GetInstance()->GetDigitalIn(8))
+	{
+	
+		if (m_motorDelay.DoEvent())
+		{
+			double accel = (speed - m_lastSpeed)*0.4;
+			
+			if (accel < -0.4)
+				m_lastSpeed = m_lastSpeed - 0.4;
+			else if (accel > 0.4)
+				m_lastSpeed = m_lastSpeed + 0.4;
+			else
+				m_lastSpeed = m_lastSpeed + accel;
+		}
+		
+		speed = pow(m_lastSpeed,3.0);
+	}
+	
 	m_driveController->Move(speed, wheel_Direction, rotation, m_stick.GetTop());
 }
 

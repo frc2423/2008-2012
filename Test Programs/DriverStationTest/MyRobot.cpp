@@ -23,6 +23,8 @@ public:
 			{
 				DriverStationLCD * lcd = DriverStationLCD::GetInstance();
 				
+				lcd->PrintfLine(DriverStationLCD::kMain_Line6, "Press select button");
+				
 				lcd->PrintfLine(DriverStationLCD::kUser_Line2, 
 						"%d %d %d %d %d %d %d %d",
 						(int)m_ds->GetDigitalIn(1),

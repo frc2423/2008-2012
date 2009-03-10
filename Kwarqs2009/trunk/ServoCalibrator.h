@@ -8,12 +8,13 @@
 #ifndef SERVOCALIBRATOR_H
 #define SERVOCALIBRATOR_H
 
-#define POT_ARRAY_SIZE 10
 
 #include "RobotChassis.h"
 #include "KwarqsLib/KwarqsJoystick.h"
 #include "KwarqsLib/DriverStationLCD.h"
 #include "KwarqsLib/DelayEvent.h"
+
+#include "KwarqsLib/filters.h"
 
 class ServoCalibrator {
 public:

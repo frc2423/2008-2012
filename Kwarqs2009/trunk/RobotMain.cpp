@@ -16,7 +16,6 @@
 #include "MaintenanceMode.h"
 
 #include "Autonomous/AutonomousDemo.h"
-#include "Autonomous/AutonomousRandomDemo.h"
 
 #include "Controls/AnnControl.h"
 #include "Controls/SimpleControl.h"
@@ -56,7 +55,6 @@ class KwarqsRobotMain : public SimpleRobot
 	NullMovementControl		nullMovementControl;
 	
 	AutonomousDemo			autonomousDemo;
-	AutonomousRandomDemo	autonomousRandomDemo;
 	
 	KwarqsGameControl 		gameControl;
 	
@@ -101,7 +99,6 @@ public:
 		nullMovementControl(&driveController),
 		
 		autonomousDemo(&driveController),
-		autonomousRandomDemo(&driveController),
 		
 		swerveDrive(&chassis),
 		//annDrive(&chassis),

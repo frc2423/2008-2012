@@ -1,6 +1,12 @@
+/**
+	\file 		Deleter.h
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
 
-#ifndef KWARQS_DELETER_H
-#define KWARQS_DELETER_H
+#ifndef KWARQSLIB_DELETER_H
+#define KWARQSLIB_DELETER_H
 
 /// this class is used to delete arbitrary pointers on destruction
 template <typename T>

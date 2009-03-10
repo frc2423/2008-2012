@@ -11,7 +11,6 @@
 #include "KwarqsLib/DriverStationLCD.h"
 #include "KwarqsLib/KwarqsBCDInput.h"
 #include "KwarqsLib/DelayEvent.h"
-#include "KwarqsLib/KwarqsTelemetry.h"
 #include "KwarqsLib/PositionInformation.h"
 
 #include "MaintenanceMode.h"
@@ -34,7 +33,9 @@
 
 #include "KwarqsGameControl.h"
 
-#include "TelemetryData.h"
+// todo: this never worked quite right, due to late implementation
+//#include "KwarqsLib/KwarqsTelemetry.h"
+//#include "TelemetryData.h"
 
 
 
@@ -75,7 +76,7 @@ class KwarqsRobotMain : public SimpleRobot
 	DelayEvent				m_lcdUpdateEvent;
 	DelayEvent				m_telemetryEvent;
 	
-	KwarqsTelemetry<TelemetryData> m_telemetry;
+	//KwarqsTelemetry<TelemetryData> m_telemetry;
 	
 	PositionInformation *	m_info;
 
@@ -121,7 +122,7 @@ public:
 		// be called in -- anything that touches the motors should
 		// be called last
 		
-		// todo: need a better way to do this, not satisfied with this
+		/// @todo need a better way to do this, not satisfied with this
 		//driveController.AddDrive(&speedLimiter, DriveEnabled);
 		driveController.AddDrive(&psuedoGearbox, DriveEnabled);
 		driveController.AddDrive(&swerveDrive, DriveEnabled);
@@ -141,20 +142,6 @@ public:
 		/// to use from looking at that
 	
 		return &autonomousDemo;
-		
-		/*
-		switch (GetBCDInput())
-		{
-			case 1:
-				
-				
-			case 2:
-				return &autonomousRandomDemo;
-				
-			default:
-				return &nullMovementControl;
-		}
-		*/
 	}
 	
 	
@@ -203,6 +190,7 @@ public:
 			currentTeleoperatedControl->OnEnable();
 		}
 		
+		// show the driver the current control and the gyro angle
 		lcd->PrintfLine(DriverStationLCD::kMain_Line, "%s %.1f", 
 				control->Name(), PositionInformation::GetInstance()->GetNormalizedFieldAngle());
 		

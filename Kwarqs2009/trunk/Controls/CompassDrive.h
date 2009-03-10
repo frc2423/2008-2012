@@ -1,4 +1,9 @@
-
+/**
+	\file 		CompassDrive.h
+	\author 	Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
 
 #ifndef COMPASSDRIVE_H
 #define COMPASSDRIVE_H

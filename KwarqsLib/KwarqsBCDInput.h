@@ -1,4 +1,9 @@
-
+/**
+	\file 		KwarqsBCDInput.h
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
 
 #ifndef KWARQSLIB_KWARQS_BCD_ENCODER_H
 #define KWARQSLIB_KWARQS_BCD_ENCODER_H
@@ -7,9 +12,14 @@
 
 #include "KwarqsConstants.h"
 
-// todo: make this more general, probably should add
-// to some input class
 
+/**
+	\brief Reads the input from a BCD thumbwheel on the driver station
+
+	@todo make this more general, probably should add to some input 
+	class or manager
+	
+*/
 inline int GetBCDInput()
 {
 	DriverStation * ds = DriverStation::GetInstance();

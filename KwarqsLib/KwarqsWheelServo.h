@@ -16,12 +16,8 @@
 	\class KwarqsWheelServo
 	\brief Controls the direction of the wheel, relative to the robot
 	
-	Ideally, this will be controlled by a PID loop just like a real servo
-	would be controlled. Will need at least two variants of this class,
-	since the front and rear motors are going to be different types so
-	they will need different tuning.
-	
-	Only a KwarqsDriveBase derived class should create these. 
+	This will be controlled by a PID loop just like a real servo
+	would be controlled.
 */
 class KwarqsWheelServo : public PIDSource, public PIDOutput {
 public:
@@ -79,16 +75,12 @@ public:
 	bool GetSensor();
 	
 	/// returns the raw encoder value
-	int GetRawEncoder()
-	{
-		return m_encoder.GetRaw();
-	}
+	int GetRawEncoder();
+
+	/// allows you to set the raw motor value
+	void SetRawMotor(float value);
 	
-	void SetRawMotor(float value)
-	{
-		m_motor.Set(value);
-	}
-	
+	/// returns true if on target
 	bool OnTarget();
 
 	

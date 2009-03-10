@@ -33,7 +33,10 @@ private:
 	double y, a;
 };
 
-
+/**
+	\class AverageWindowFilter
+	\brief Implements a simple average window filter
+*/
 template <typename Type, size_t num_points>
 class AverageWindowFilter 
 {

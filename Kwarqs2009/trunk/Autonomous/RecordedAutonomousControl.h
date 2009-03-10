@@ -13,6 +13,10 @@
 
 #include "../DriveFilters/DriveRecorder.h"
 
+/**
+	\class RecordedAutonomousControl
+	\brief This class plays back a movement recorded to a file
+*/
 class RecordedAutonomousControl : public KwarqsMovementControl {
 public:
 

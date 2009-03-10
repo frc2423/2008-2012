@@ -13,7 +13,7 @@
 	\class PsuedoGearbox
 	\brief This is a trivially simple filter drive class that limits the 
 	speed of the robot. There is a question of whether this belongs here 
-	or not. I feel.. no. 
+	or not. I feel.. no. Oh well. 
 */
 class PsuedoGearbox : public KwarqsDriveBase 
 {
@@ -41,7 +41,7 @@ public:
 		if (!m_enabled || m_stick.GetTrigger())
 			return;
 	
-		// low speed action (boring)
+		// low speed action (boring, but makes robot easier to drive)
 		speed *= .5;
 		rotation *= .5;
 	}

@@ -25,6 +25,8 @@
 	
 	Call GetInstance() to get a pointer to the instance of this class. 
 	
+	Unfortunately, we've had bad luck with the accelerometer.
+	
 */
 class PositionInformation {
 public:

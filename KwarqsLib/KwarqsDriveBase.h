@@ -21,27 +21,6 @@
 	The ultimate goal for this is for a number of different classes to
 	be able to modify the speed/direction of the bot, without having to
 	modify any of the other classes. 
-	
-	Proposed classes include:
-	
-	KwarqsDrive
-		This class actually interacts with the wheels and motors (via 
-		KwarqsWheelMotor and KwarqsWheelServoBase objects) to make the
-		robot move. We may make more than one of these. 
-		
-	KwarqsDriveCompensation
-		This class adjusts the incoming speed/direction from the user/other 
-		according to the drift or other error conditions of the robot movement,
-		and passes it to a lower level KwarqsDriveBase object
-		
-		Open question: is this the only type of compensation that would be 
-		useful to have? Or should it be more fine grained (ie, have access 
-		to individual motors and get their error). I think a more coarse
-		approach is better, but maybe not. 
-		
-	KwarqsDriveLogger
-		This class takes incoming movements, and logs them to a file for later
-		analysis. 
 */
 class KwarqsDriveBase {
 public:

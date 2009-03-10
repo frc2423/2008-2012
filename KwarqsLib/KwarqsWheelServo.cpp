@@ -195,6 +195,16 @@ bool KwarqsWheelServo::GetSensor()
 	return !m_sensor.Get();
 }
 
+int KwarqsWheelServo::GetRawEncoder()
+{
+	return m_encoder.GetRaw();
+}
+
+void KwarqsWheelServo::SetRawMotor(float value)
+{
+	m_motor.Set(value);
+}
+
 
 /// Set the angle that the wheel should be pointing, where
 /// 0 is straight ahead and angle increments positively 

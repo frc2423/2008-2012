@@ -23,11 +23,6 @@
 	them. 
 	
 	Output: This should only use the KwarqsDriveBase object to move the robot.
-	
-	@note Joysticks should be created using the static function
-	Joystick::GetStickForPort(), so that Joystick objects are more easily shared 
-	between classes. 
-	
 */
 class KwarqsMovementControl {
 public:

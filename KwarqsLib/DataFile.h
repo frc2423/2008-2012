@@ -39,6 +39,7 @@
 #include <cassert>
 #include "Serialization.h"
 
+// needed for Priv_SetWriteFileAllowed()
 #include <VisionAPI.h>
 
 /**

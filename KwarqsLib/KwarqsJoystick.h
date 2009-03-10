@@ -1,3 +1,9 @@
+/**
+	\file 		KwarqsJoystick.h
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
 
 #ifndef KWARQS_JOYSTICK_H
 #define KWARQS_JOYSTICK_H
@@ -10,8 +16,8 @@
 
 /**
 	\class KwarqsJoystick 
-	\brief A joystick class that implements a 'smart' dead zone, and
-	allows multiple classes to hold instances of the same Joystick
+	\brief A joystick class that implements a 'smarter' dead zone, and
+	allows multiple classes to easily hold instances of the same Joystick.
 	
 	See the Joystick class for a reference to the functions contained
 	in this class, its pretty much just a mirror of it.

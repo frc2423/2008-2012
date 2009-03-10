@@ -11,11 +11,7 @@
 
 /**
 	\class KwarqsGameControl
-	\brief This encapsulates all of the game pieces
-	
-	This class is not fully defined yet, given we don't know what is
-	needed to control the game pieces. However, it should provide necessary
-	methods needed to do the actions during autonomous mode
+	\brief This encapsulates all of the game piece control
 */
 class KwarqsGameControl {
 public:

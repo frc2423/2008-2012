@@ -5,14 +5,9 @@
 	\version 	$Rev$
 */
 
+#ifndef KWARQSLIB_KWARQSWHEELMOTOR_H
+#define KWARQSLIB_KWARQSWHEELMOTOR_H
 
-#ifndef KWARQSLIB_KWARQS_WHEELMOTOR_H
-#define KWARQSLIB_KWARQS_WHEELMOTOR_H
-
-#include "filters.h"
-#include "DriverStationLCD.h"
-
-#include "DelayEvent.h"
 
 /**
 	\class KwarqsWheelMotor
@@ -67,8 +62,6 @@ private:
 	double m_lastSpeed;
 	
 	float m_invert;
-	
-	DelayEvent m_motorDelay;
 };
 
 #endif

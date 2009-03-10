@@ -80,44 +80,6 @@ void SwerveDrive::Move(
 	bool &stop
 )
 {
-	/*
-	if (GetTime() - m_time > 0.1)
-	{		
-		DriverStationLCD * lcd = DriverStationLCD::GetInstance();
-		
-		//lcd->Printf(DriverStationLCD::kUser_Line2, 1, "S: %.1f A: %.1f R: %.1f          ",
-		//		speed, angle, rotation);
-		
-		lcd->Printf(DriverStationLCD::kUser_Line3, 1, "LF: %.1f %.1f %.1f          ",
-			m_chassis->servo_lf.GetSetAngle(),
-			m_chassis->servo_lf.GetCurrentAngle(),
-			m_chassis->motor_lr.GetSetSpeed()
-		);
-		
-		lcd->Printf(DriverStationLCD::kUser_Line4, 1, "LR: %.1f %.1f %.1f          ",
-			m_chassis->servo_lr.GetSetAngle(),
-			m_chassis->servo_lr.GetCurrentAngle(),
-			m_chassis->motor_lr.GetSetSpeed()
-		);
-		
-		lcd->Printf(DriverStationLCD::kUser_Line5, 1, "RF: %.1f %.1f %.1f          ",
-			m_chassis->servo_rf.GetSetAngle(),
-			m_chassis->servo_rf.GetCurrentAngle(),
-			m_chassis->motor_lr.GetSetSpeed()
-		);
-
-		lcd->Printf(DriverStationLCD::kUser_Line6, 1, "RR: %.1f %.1f %.1f          ",
-			m_chassis->servo_rr.GetSetAngle(),
-			m_chassis->servo_rr.GetCurrentAngle(),
-			m_chassis->motor_lr.GetSetSpeed()
-		);
-		
-		lcd->UpdateLCD();
-		m_time = GetTime();
-	}
-	*/
-	
-	
 	if (stop)
 	{
 		Stop();
@@ -239,9 +201,6 @@ void SwerveDrive::Stop()
 	}
 	
 	// find the shortest path to that spot, and do it
-	
-	/// @todo amory wants to disable this, figure out how to do it without
-	/// disabling it in autonomous mode
 	ShortestPath(speed, lf_angle, m_chassis->servo_lf.GetCurrentAngle());
 	ShortestPath(speed, lr_angle, m_chassis->servo_lr.GetCurrentAngle());
 	ShortestPath(speed, rf_angle, m_chassis->servo_rf.GetCurrentAngle());

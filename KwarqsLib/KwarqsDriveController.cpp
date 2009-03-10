@@ -1,5 +1,5 @@
 /**
-	\file 		KwarqsDriveController.h
+	\file 		KwarqsDriveController.cpp
 	\author 	Dustin Spicuzza: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
@@ -35,6 +35,7 @@ void KwarqsDriveController::DisableDrive(KwarqsDriveBase * drive)
 		}
 }
 
+// todo: this doesn't work
 void KwarqsDriveController::EnableDrive(KwarqsDriveBase * drive)
 {
 	//DriveIterator i = m_enabledDrives.begin();

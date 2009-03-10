@@ -1,6 +1,6 @@
 /**
 	\file 		CompassDriveII.cpp
-	\author 	Dustin Spicuzza: last changed by $Author$
+	\author 	Amory Galili: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
 */

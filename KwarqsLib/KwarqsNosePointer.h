@@ -1,3 +1,9 @@
+/**
+	\file 		KwarqsNosePointer.h
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
 
 #ifndef KWARQS_NOSEPOINTER_H
 #define KWARQS_NOSEPOINTER_H
@@ -8,7 +14,7 @@
 /**
 	\class KwarqsNosePointer
 	\brief This calculates a rotation to get your nose pointing in a 
-	particular direction relative to the field
+	particular direction relative to the field. Uses PID control
 */
 class KwarqsNosePointer {
 public:

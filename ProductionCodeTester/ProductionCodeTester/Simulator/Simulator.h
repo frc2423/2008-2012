@@ -21,11 +21,16 @@
 #include <vector>
 #include <VxWorks/VxWorks.h>
 
-#include "WheelSimulator.h"
-
 struct FRCControlData;
 
+class Encoder;
+class Gyro;
+class PWM;
+class DigitalInput;
+class DigitalOutput;
+class AnalogChannel;
 
+class Notifier;
 
 struct ControlInterface;
 class SimulationWindow;
@@ -34,8 +39,10 @@ class SimulationWindow;
 class Simulator {
 public:
 
-	// singleton instance of this class
-	static Simulator * m_instance;	
+	static Simulator * GetInstance()
+	{
+		return Simulator::m_instance;
+	}
 	
 	/// \name API For Simulation data
 	/// @{
@@ -54,25 +61,31 @@ public:
 	}
 	
 	// set LCD output data
-	static void SetLCDData(const char * userDsLcdData, int userDsLcdDataLength);
+	void SetLCDData(const char * userDsLcdData, int userDsLcdDataLength);
 	
 	// retrieves control information
-	static int GetControlData(FRCControlData *data, char *userData);
+	int GetControlData(FRCControlData *data, char *userData);
 	
-	static void AddEncoder(Encoder * e, UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 _bChannel);
-	static void DeleteEncoder(Encoder * e);
+	void AddEncoder(Encoder * e, UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 _bChannel);
+	void DeleteEncoder(Encoder * e);
 	
-	static void AddPWM(PWM * p, UINT32 slot, UINT32 channel);
-	static void DeletePWM(PWM * p);
+	void AddPWM(PWM * p, UINT32 slot, UINT32 channel);
+	void DeletePWM(PWM * p);
 	
-	static void AddGyro(Gyro * g, UINT32 slot, UINT32 channel);
-	static void DeleteGyro(Gyro * g);
+	void AddGyro(Gyro * g, UINT32 slot, UINT32 channel);
+	void DeleteGyro(Gyro * g);
 	
-	static void AddNotifier(Notifier * n);
-	static void DeleteNotifier(Notifier * n);
+	void AddNotifier(Notifier * n);
+	void DeleteNotifier(Notifier * n);
 	
-	static void AddDigitalInput(DigitalInput * di, UINT32 slot, UINT32 channel);
-	static void DeleteDigitalInput(DigitalInput * di);
+	void AddDigitalInput(DigitalInput * di, UINT32 slot, UINT32 channel);
+	void DeleteDigitalInput(DigitalInput * di);
+	
+	void AddDigitalOutput(DigitalOutput * d, UINT32 slot, UINT32 channel);
+	void DeleteDigitalOutput(DigitalOutput * d);
+	
+	void AddAnalogChannel(AnalogChannel * ac, UINT32 slot, UINT32 channel);
+	void DeleteAnalogChannel(AnalogChannel * ac);
 	
 	/// @}
 	
@@ -88,9 +101,15 @@ private:
 	Simulator();
 	Simulator(ControlInterface * controlInterface);
 	
+	// singleton instance of this class
+	static Simulator * m_instance;
+	
 	void SimulateStep(double tm);
 	
-	static void FillDigitalIoSlot(UINT32 slot, UINT32 channel);
+	void FillDigitalIoSlot(UINT32 slot, UINT32 channel);
+	void FreeDigitalIoSlot(UINT32 slot, UINT32 channel);
+	void FillAnalogIoSlot(UINT32 slot, UINT32 channel);
+	void FreeAnalogIoSlot(UINT32 slot, UINT32 channel);
 	
 	std::vector <Notifier*> 		m_notifiers;
 	

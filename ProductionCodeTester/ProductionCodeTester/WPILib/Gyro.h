@@ -26,12 +26,13 @@ public:
 	explicit Gyro(UINT32 slot, UINT32 channel)
 	{
 		m_ok = false;
-		Simulator::AddGyro(this, slot, channel);
+		Simulator::GetInstance()->AddGyro(this, slot, channel);
 	}
 	virtual ~Gyro()
 	{
 		m_ok = true;
-		Simulator::DeleteGyro(this);
+		if (Simulator::GetInstance())
+			Simulator::GetInstance()->DeleteGyro(this);
 	}
 	
 	float GetAngle() { 

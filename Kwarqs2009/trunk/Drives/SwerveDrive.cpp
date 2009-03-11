@@ -169,10 +169,10 @@ void SwerveDrive::Move(
 	m_chassis->servo_rf.SetAngle(rf_angle);
 	m_chassis->servo_rr.SetAngle(rr_angle);
 	
-	m_chassis->motor_lf.SetSpeed(speeds[0]);
-	m_chassis->motor_lr.SetSpeed(speeds[1]);
-	m_chassis->motor_rf.SetSpeed(speeds[2]);
-	m_chassis->motor_rr.SetSpeed(speeds[3]);
+	m_chassis->motor_lf.SetSpeed((float)speeds[0]);
+	m_chassis->motor_lr.SetSpeed((float)speeds[1]);
+	m_chassis->motor_rf.SetSpeed((float)speeds[2]);
+	m_chassis->motor_rr.SetSpeed((float)speeds[3]);
 }
 
 void SwerveDrive::Stop()

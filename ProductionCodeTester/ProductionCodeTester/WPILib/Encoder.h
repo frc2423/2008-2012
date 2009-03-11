@@ -34,12 +34,13 @@ public:
 		m_reverseDirection = reverseDirection;
 		m_encodingType = encodingType;
 		
-		Simulator::AddEncoder(this, aSlot, aChannel, bSlot, _bChannel);
+		Simulator::GetInstance()->AddEncoder(this, aSlot, aChannel, bSlot, _bChannel);
 	}
 	
 	virtual ~Encoder()
 	{
-		Simulator::DeleteEncoder(this);
+		if (Simulator::GetInstance())
+			Simulator::GetInstance()->DeleteEncoder(this);
 	}
 
 	// CounterBase interface

@@ -7,6 +7,8 @@
 #ifndef DIGITAL_SOURCE_H
 #define DIGITAL_SOURCE_H
 
+
+
 /**
  * DigitalSource Interface.
  * The DigitalSource represents all the possible inputs for a counter or a quadrature encoder. The source may be

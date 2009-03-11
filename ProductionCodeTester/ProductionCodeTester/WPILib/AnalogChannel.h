@@ -7,6 +7,8 @@
 #ifndef ANALOG_CHANNEL_H_
 #define ANALOG_CHANNEL_H_
 
+#include <Simulator/Simulator.h>
+
 #include "SensorBase.h"
 #include "PIDSource.h"
 
@@ -31,17 +33,24 @@ public:
 	static const UINT32 kAccumulatorNumChannels = 2;
 	static const UINT32 kAccumulatorChannels[kAccumulatorNumChannels];
 
-	AnalogChannel(UINT32 slot, UINT32 channel){}
-	explicit AnalogChannel(UINT32 channel){}
-	virtual ~AnalogChannel(){}
+	AnalogChannel(UINT32 slot, UINT32 channel){
+		Simulator::GetInstance()->AddAnalogChannel(this, slot, channel);
+	}
+	explicit AnalogChannel(UINT32 channel){
+		Simulator::GetInstance()->AddAnalogChannel(this, SensorBase::GetDefaultAnalogModule(), channel);
+	}
+	virtual ~AnalogChannel(){
+		if (Simulator::GetInstance())
+			Simulator::GetInstance()->DeleteAnalogChannel(this);
+	}
 
 	AnalogModule *GetModule();
 
 	INT16 GetValue();
 	INT32 GetAverageValue();
 
-	float GetVoltage();
-	float GetAverageVoltage() { return 12.5; }
+	float GetVoltage() { return m_value; }
+	float GetAverageVoltage() { return m_value; }
 
 	UINT32 GetSlot();
 	UINT32 GetChannel();
@@ -65,13 +74,8 @@ public:
 	void GetAccumulatorOutput(INT64 *value, UINT32 *count);
 	
 	double PIDGet(){ return GetAverageVoltage(); }
-
-private:
-	void InitChannel(UINT32 slot, UINT32 channel);
-	UINT32 m_channel;
-	AnalogModule *m_module;
-	tAccumulator *m_accumulator;
-	INT64 m_accumulatorOffset;
+	
+	float m_value;
 };
 
 #endif

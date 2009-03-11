@@ -18,6 +18,8 @@
 #ifndef SIMULATOR_SIMULATIONDATA_H
 #define SIMULATOR_SIMULATIONDATA_H
 
+#include <vector>
+
 #define ANALOG_SLOT_1 	1
 #define ANALOG_SLOT_2 	2
 #define DIGITAL_SLOT_1 	4
@@ -25,6 +27,9 @@
 
 #define DIGITAL_PWM_CHANNELS 	10
 #define DIGITAL_IO_CHANNELS 	14
+#define DIGITAL_RELAY_CHANNELS 	8
+
+#define ANALOG_IO_CHANNELS 		8
 
 
 class Encoder;
@@ -107,18 +112,18 @@ struct RelayData {
 
 struct DigitalModuleData {
 
-	DigitalIOData 	io[14];
-	PWMData 		pwm[10];
-	RelayData		relay[8];
+	DigitalIOData 	io[DIGITAL_IO_CHANNELS];
+	PWMData 		pwm[DIGITAL_PWM_CHANNELS];
+	RelayData		relay[DIGITAL_RELAY_CHANNELS];
 	
 	// only called by the simulation
 	void Transfer()
 	{
-		for (size_t i = 0; i < 14; i++)
+		for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
 			io[i].Transfer();
-		for (size_t i = 0; i < 10; i++)
+		for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
 			pwm[i].Transfer();
-		for (size_t i = 0; i < 8; i++)
+		for (size_t i = 0; i < DIGITAL_RELAY_CHANNELS; i++)
 			relay[i].Transfer();
 	}
 };
@@ -131,7 +136,7 @@ struct AnalogIOData {
 	float value;	// 0-5v
 	
 	AnalogIOData() :
-		used(false), value(0.0)
+		analogChannel(NULL), used(false), value(5.0)
 	{}
 	
 	// only called by the simulation
@@ -140,9 +145,13 @@ struct AnalogIOData {
 
 struct AnalogModuleData 
 {
-	AnalogIOData io[8];
+	AnalogIOData io[ANALOG_IO_CHANNELS];
 	
-	void Transfer();
+	void Transfer()
+	{
+		for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
+			io[i].Transfer();
+	}
 };
 
 
@@ -157,8 +166,8 @@ struct SimulationData
 	DigitalModuleData 	digitalModule[2];	
 	
 	// encoders, gyros
-	vector<EncoderInfo> encoders;
-	vector<GyroInfo>	gyros;
+	std::vector<EncoderInfo> encoders;
+	std::vector<GyroInfo>	gyros;
 	
 	
 	// default constructor

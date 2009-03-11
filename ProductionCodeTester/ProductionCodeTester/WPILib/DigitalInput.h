@@ -9,6 +9,7 @@
 
 class DigitalModule;
 
+#include "SensorBase.h"
 #include "DigitalSource.h"
 #include <Simulator/Simulator.h>
 
@@ -23,21 +24,28 @@ class DigitalModule;
  */
 class DigitalInput : public DigitalSource {
 public:
-	DigitalInput(UINT32 slot, UINT32 channel){
-		Simulator::AddDigitalInput(this, slot, channel);
+	explicit DigitalInput(UINT32 channel) : m_value(false)
+	{
+		Simulator::GetInstance()->AddDigitalInput(this, SensorBase::GetDefaultDigitalModule(), channel);
 	}
-	~DigitalInput(){
-		Simulator::DeleteDigitalInput(this);
+	DigitalInput(UINT32 slot, UINT32 channel) : m_value(false)
+	{
+		Simulator::GetInstance()->AddDigitalInput(this, slot, channel);
+	}
+	~DigitalInput()
+	{
+		if (Simulator::GetInstance())
+			Simulator::GetInstance()->DeleteDigitalInput(this);
 	}
 	
-	UINT32 Get() { return m_lastValue; }
+	UINT32 Get() { return m_value ? 1 : 0; }
 
 	void RequestInterrupts(tInterruptHandler handler, void *param=NULL){}
 	void SetUpSourceEdge(bool risingEdge, bool fallingEdge){}
 	void EnableInterrupts(){}
-		void DisableInterrupts(){}
+	void DisableInterrupts(){}
 	
-	bool m_lastValue;
+	bool m_value;
 };
 
 UINT32 GetDigitalInput(UINT32 slot, UINT32 channel);

@@ -274,10 +274,6 @@
 						RelativePath=".\trunk\DriveFilters\DriveRecorder.cpp"
 						>
 					</File>
-					<File
-						RelativePath=".\trunk\DriveFilters\StopFilter.cpp"
-						>
-					</File>
 				</Filter>
 				<Filter
 					Name="Drives"
@@ -368,11 +364,11 @@
 				Name="Simulator"
 				>
 				<File
-					RelativePath=".\Simulator\Simulator.cpp"
+					RelativePath=".\Simulator\SimulationData.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Simulator\WheelSimulator.cpp"
+					RelativePath=".\Simulator\Simulator.cpp"
 					>
 				</File>
 			</Filter>
@@ -548,15 +544,15 @@
 						RelativePath=".\trunk\DriveFilters\PsuedoGearbox.h"
 						>
 					</File>
-					<File
-						RelativePath=".\trunk\DriveFilters\StopFilter.h"
-						>
-					</File>
 				</Filter>
 			</Filter>
 			<Filter
 				Name="WPILib"
 				>
+				<File
+					RelativePath=".\WPILib\AnalogChannel.h"
+					>
+				</File>
 				<File
 					RelativePath=".\WPILib\AnalogTriggerOutput.h"
 					>
@@ -714,11 +710,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Simulator\Simulator.h"
+					RelativePath=".\Simulator\SimulationData.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Simulator\WheelSimulator.h"
+					RelativePath=".\Simulator\Simulator.h"
 					>
 				</File>
 			</Filter>

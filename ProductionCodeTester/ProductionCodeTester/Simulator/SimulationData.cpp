@@ -17,6 +17,7 @@
 
 
 #include <WPILib/DigitalInput.h>
+#include <WPILib/DigitalOutput.h>
 #include <WPILib/Encoder.h>
 #include <WPILib/Gyro.h>
 #include <WPILib/Notifier.h>
@@ -28,7 +29,7 @@
 
 void EncoderInfo::Transfer()
 {
-	m_encoder->m_count = count;
+	encoder->m_count = count;
 }
 
 void GyroInfo::Transfer()
@@ -39,9 +40,9 @@ void GyroInfo::Transfer()
 void DigitalIOData::Transfer()
 {
 	if (digitalInput)
-		digitalInput->m_lastValue = value;
+		digitalInput->m_value = value;
 	else if (digitalOutput)
-		value = digitalOutput->m_lastValue;
+		value = digitalOutput->m_value;
 }
 
 void PWMData::Transfer()
@@ -54,7 +55,7 @@ void RelayData::Transfer()
 
 }
 
-void AnalogModuleData::Transfer()
+void AnalogIOData::Transfer()
 {
 	if (analogChannel)
 		analogChannel->m_value = value;

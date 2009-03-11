@@ -6,7 +6,7 @@
 
 int getControlData(FRCControlData *data, char *userData, int wait_ms)
 {
-	return Simulator::GetControlData(data, userData);
+	return Simulator::GetInstance()->GetControlData(data, userData);
 }
 
 int setStatusData(float battery, UINT8 dsDigitalOut, const char *userData, int userDataLength, int wait_ms)
@@ -16,7 +16,7 @@ int setStatusData(float battery, UINT8 dsDigitalOut, const char *userData, int u
 
 int setUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength, int wait_ms)
 {
-	Simulator::SetLCDData(userDsLcdData, userDsLcdDataLength);
+	Simulator::GetInstance()->SetLCDData(userDsLcdData, userDsLcdDataLength);
 	return 0;
 }
 

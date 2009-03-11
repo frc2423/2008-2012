@@ -34,17 +34,18 @@ public:
 	explicit PWM(UINT32 channel) 
 	{ 
 		m_speed = 0; 
-		Simulator::AddPWM(this, 4, channel);
+		Simulator::GetInstance()->AddPWM(this, SensorBase::GetDefaultDigitalModule(), channel);
 	}
 	
 	PWM(UINT32 slot, UINT32 channel) 
 	{ 
 		m_speed = 0; 
-		Simulator::AddPWM(this, slot, channel);
+		Simulator::GetInstance()->AddPWM(this, slot, channel);
 	}
 	
 	virtual ~PWM() {
-		Simulator::DeletePWM(this);
+		if (Simulator::GetInstance())
+			Simulator::GetInstance()->DeletePWM(this);
 	}
 
 	void SetPeriodMultiplier(PeriodMultiplier mult);

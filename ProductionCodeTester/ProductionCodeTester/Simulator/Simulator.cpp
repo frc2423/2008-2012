@@ -1,4 +1,21 @@
 
+/*
+    WPILib Test Harness
+    Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License v3 as published by
+    the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "Simulator.h"
 #include "ControlInterface.h"
 
@@ -49,62 +66,16 @@ void Simulator::StartSimulation(ControlInterface * controlInterface)
 	Simulator::m_instance = NULL;
 }
 
-void Simulator::RouteHardware()
-{
-	/*
-	m_lf_wheel.Initialize( 
-		&m_controlInterface->simulationData.lf_wheel,
-		FindMotor(),
-		FindEncoder(),
-		FindMotor(),
-		FindEncoder(),
-		FindDigitalInput()
-	);
-	
-	m_lr_wheel.Initialize( 
-		&m_controlInterface->simulationData.lr_wheel 
-	);
-	
-	m_rf_wheel.Initialize( 
-		&m_controlInterface->simulationData.rf_wheel 
-	);
-	
-	m_rr_wheel.Initialize( 
-		&m_controlInterface->simulationData.rr_wheel,
-		
-	);
-
-	m_hardware_routed = true;
-	*/
-}
-
-
 void Simulator::SimulateStep(double tm)
 {
-	//if (!m_hardware_routed)
-	//	RouteHardware();
-
-
 	{ 
 		// perform calculations while protected by the lock
 		wxMutexLocker mtx(m_controlInterface->lock);
 
-		
-		// first, calculate the next step for motors and such
-		//for (size_t i = 0; i < m_wheels.size(); i++)
-		//	m_wheels[i].NextStep();
-		
-		//m_lf_wheel.Step();
-		//m_lr_wheel.Step();
-		//m_rf_wheel.Step();
-		//m_rr_wheel.Step();
-		
-
-		// next, calculate the overall position of the robot
-		
-		
-		// if in single-step mode, then wait for the signal
-		// to step
+		// transfer the data back and forth as needed
+		m_controlInterface->simulationData.Transfer();
+	
+		// todo: physics calculations and such
 	
 	}
 
@@ -125,7 +96,7 @@ void Simulator::SimulateStep(double tm)
 	for (size_t i = 0; i < m_notifiers.size(); i++)
 		m_notifiers[i]->TryEvent(m_time);
 
-	// returning from this function gives control to the control loop
+	// note: returning from this function gives control to the control loop
 }
 
 bool Simulator::ShouldContinue()
@@ -154,54 +125,68 @@ int Simulator::GetControlData(FRCControlData *data, char *userData)
 	return 0;
 }
 
+
+void Simulator::FillDigitalIoSlot(UINT32 slot, UINT32 channel)
+{	
+	assert(slot == DIGITAL_SLOT_1 || slot == DIGITAL_SLOT_2);
+	assert(channel > 0 && channel <= DIGITAL_IO_CHANNELS);
+		
+	DigitalModuleData &mod = (slot == DIGITAL_SLOT_1 ? 
+		Simulator::m_instance->m_controlInterface->simulationData.digitalModule[0] :
+		Simulator::m_instance->m_controlInterface->simulationData.digitalModule[1]);
+
+	assert(!mod.io[channel-1].used && "io channel already used");		
+	mod.io[channel-1].used = true;
+}
+
+void Simulator::FillDigitalIoSlot(UINT32 slot, UINT32 channel)
+{	
+	assert(slot == DIGITAL_SLOT_1 || slot == DIGITAL_SLOT_2);
+	assert(channel > 0 && channel <= DIGITAL_IO_CHANNELS);
+		
+	DigitalModuleData &mod = (slot == DIGITAL_SLOT_1 ? 
+		Simulator::m_instance->m_controlInterface->simulationData.digitalModule[0] :
+		Simulator::m_instance->m_controlInterface->simulationData.digitalModule[1]);
+
+	assert(!mod.io[channel-1].used && "io channel already used");		
+	mod.io[channel-1].used = true;
+}
+
+
+
 /********************************************************************
  * Annoying copy/paste routines, but necessary evil
  ********************************************************************/
-
+ 
 void Simulator::AddEncoder(Encoder * e, UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 _bChannel)
 {
 	assert(Simulator::m_instance);
 	if (!Simulator::m_instance)
 		return;
-
-	Simulator::m_instance->m_encoders.push_back(EncoderInfo(e, aSlot, aChannel, bSlot, _bChannel));
+	
+	{
+		wxMutexLocker mtx(Simulator::m_instance->m_controlInterface->lock);
+		
+		Simulator::FillDigitalSlot(aSlot, aChannel);
+		Simulator::FillDigitalSlot(bSlot, bChannel);
+		
+		Simulator::m_instance->m_controlInterface->simulationData.encoders.push_back(EncoderInfo(e, aSlot, aChannel, bSlot, _bChannel));
+	}
 }
 
 void Simulator::DeleteEncoder(Encoder * e)
 {
 	if (!Simulator::m_instance)
 		return;
-	
-	vector<EncoderInfo> * encoders = &Simulator::m_instance->m_encoders;
+		
+	wxMutexLocker mtx(Simulator::m_instance->m_controlInterface->lock);
+		
+	vector<EncoderInfo> * encoders = &Simulator::m_instance->m_controlInterface->simulationData.m_encoders;
 	
 	for (size_t i = 0; i < encoders->size(); i++)
 		if ((*encoders)[i].encoder == e)
 		{
 			encoders->erase(encoders->begin() + i);
-			break;
-		}
-}
-
-void Simulator::AddPWM(PWM * p, UINT32 slot, UINT32 channel)
-{
-	assert(Simulator::m_instance);
-	if (!Simulator::m_instance)
-		return;
-		
-	Simulator::m_instance->m_pwms.push_back(PWMInfo(p, slot, channel));
-}
-
-void Simulator::DeletePWM(PWM * p)
-{
-	if (!Simulator::m_instance)
-		return;
-	
-	vector<PWMInfo> * pwms = &Simulator::m_instance->m_pwms;
-	
-	for (size_t i = 0; i < pwms->size(); i++)
-		if ((*pwms)[i].pwm == p)
-		{
-			pwms->erase(pwms->begin() + i);
 			break;
 		}
 }
@@ -230,6 +215,117 @@ void Simulator::DeleteGyro(Gyro * g)
 		}
 }
 
+
+
+void Simulator::AddPWM(PWM * p, UINT32 slot, UINT32 channel)
+{
+	assert(Simulator::m_instance);
+	if (!Simulator::m_instance)
+		return;
+	
+	{
+		wxMutexLocker mtx(Simulator::m_instance->m_controlInterface->lock);
+		
+		assert(slot == DIGITAL_SLOT_1 || slot == DIGITAL_SLOT_2);
+		assert(channel > 0 && channel <= DIGITAL_PWM_CHANNELS);
+		
+		DigitalModuleData &mod = (slot == DIGITAL_SLOT_1 ? 
+			Simulator::m_instance->m_controlInterface->simulationData.digitalModule[0] :
+			Simulator::m_instance->m_controlInterface->simulationData.digitalModule[1]);
+
+		assert(!mod.pwm[channel-1].pwm && "pwm already used");
+			
+		mod.pwm[channel-1].pwm = p;
+	}
+}
+
+void Simulator::DeletePWM(PWM * p)
+{
+	if (!Simulator::m_instance)
+		return;
+		
+	{
+		wxMutexLocker mtx(Simulator::m_instance->m_controlInterface->lock);
+		
+		DigitalModuleData &mod = Simulator::m_instance->m_controlInterface->simulationData.digitalModule[0];
+	
+		for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+			if (mod.pwm[i].pwm == p)
+			{
+				mod.pwm[i].pwm = NULL;
+				mod.pwm[i].speed = 0;
+				return;
+			}
+			
+		mod = Simulator::m_instance->m_controlInterface->simulationData.digitalModule[1];
+			
+		for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+			if (mod.pwm[i].pwm == p)
+			{
+				mod.pwm[i].pwm = NULL;
+				mod.pwm[i].speed = 0;
+				return;
+			}
+	}
+}
+
+
+
+void Simulator::AddDigitalInput(DigitalInput * di, UINT32 slot, UINT32 channel)
+{
+	assert(Simulator::m_instance);
+	if (!Simulator::m_instance)
+		return;
+	
+	{
+		wxMutexLocker mtx(Simulator::m_instance->m_controlInterface->lock);
+		
+		assert(slot == DIGITAL_SLOT_1 || slot == DIGITAL_SLOT_2);
+		assert(channel > 0 && channel <= DIGITAL_IO_CHANNELS);
+		
+		DigitalModuleData &mod = (slot == DIGITAL_SLOT_1 ? 
+			Simulator::m_instance->m_controlInterface->simulationData.digitalModule[0] :
+			Simulator::m_instance->m_controlInterface->simulationData.digitalModule[1]);
+
+		assert(!mod.io[channel].digitalInput && 
+				!mod.io[channel].digitalOutput && "io already used");
+			
+		mod.io[channel].io = p;
+	}
+}
+
+void Simulator::DeleteDigitalInput(DigitalInput * di)
+{
+	if (!Simulator::m_instance)
+		return;
+		
+	{
+		wxMutexLocker mtx(Simulator::m_instance->m_controlInterface->lock);
+		
+		DigitalModuleData &mod = Simulator::m_instance->m_controlInterface->simulationData.digitalModule[0];
+	
+		for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+			if (mod.io[i].io == p)
+			{
+				mod.io[i].io = NULL;
+				mod.io[i].speed = 0;
+				return;
+			}
+			
+		mod = Simulator::m_instance->m_controlInterface->simulationData.digitalModule[1];
+			
+		for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+			if (mod.io[i].io == p)
+			{
+				mod.io[i].io = NULL;
+				mod.io[i].speed = 0;
+				return;
+			}
+	}
+}
+
+
+
 void Simulator::AddNotifier(Notifier * n)
 {
 	assert(Simulator::m_instance);
@@ -254,29 +350,6 @@ void Simulator::DeleteNotifier(Notifier * n)
 		}
 }
 
-void Simulator::AddDigitalInput(DigitalInput * di, UINT32 slot, UINT32 channel)
-{
-	assert(Simulator::m_instance);
-	if (!Simulator::m_instance)
-		return;
-		
-	Simulator::m_instance->m_digitalInputs.push_back(DigitalInputInfo(di, slot, channel));
-}
-
-void Simulator::DeleteDigitalInput(DigitalInput * di)
-{
-	if (!Simulator::m_instance)
-		return;
-		
-	vector<DigitalInputInfo> * digitalInputs = &Simulator::m_instance->m_digitalInputs;
-	
-	for (size_t i = 0; i < digitalInputs->size(); i++)
-		if ((*digitalInputs)[i].digitalInput == di)
-		{
-			digitalInputs->erase(digitalInputs->begin() + i);
-			break;
-		}
-}
 	
 
 	

@@ -1,4 +1,19 @@
+/*
+    WPILib Test Harness
+    Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License v3 as published by
+    the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef SIMULATOR_SIMULATOR_H
 #define SIMULATOR_SIMULATOR_H
@@ -10,55 +25,10 @@
 
 struct FRCControlData;
 
-class Encoder;
-class PWM;
-class Gyro;
-class Notifier;
-class DigitalInput;
+
 
 struct ControlInterface;
 class SimulationWindow;
-
-struct EncoderInfo {
-	Encoder * encoder;
-	UINT32 slota, slotb;
-	UINT32 channela, channelb;
-	
-	EncoderInfo(Encoder * e, UINT32 sa, UINT32 ca, UINT32 sb, UINT32 cb) :
-		encoder(e), slota(sa), channela(ca), slotb(sb), channelb(cb)
-	{}
-};
-
-struct PWMInfo {
-	PWM * pwm;
-	UINT32 slot;
-	UINT32 channel;
-	
-	PWMInfo(PWM * p, UINT32 s, UINT32 c) :
-		pwm(p), slot(s), channel(c)
-	{}
-};
-
-struct GyroInfo {
-	Gyro * gyro;
-	UINT32 slot;
-	UINT32 channel;
-	
-	GyroInfo(Gyro * g, UINT32 s, UINT32 c) :
-		gyro(g), slot(s), channel(c)
-	{}
-};
-
-struct DigitalInputInfo {
-	DigitalInput * digitalInput;
-	UINT32 slot;
-	UINT32 channel;
-	
-	DigitalInputInfo(DigitalInput * di, UINT32 s, UINT32 c) :
-		digitalInput(di), slot(s), channel(c)
-	{}
-};
-
 
 /// provided to decouple the GUI related code from the simulation code
 class Simulator {
@@ -120,24 +90,13 @@ private:
 	
 	void SimulateStep(double tm);
 	
-	void RouteHardware();
-
-	std::vector <EncoderInfo> 		m_encoders;
-	std::vector <PWMInfo> 			m_pwms;
-	std::vector <GyroInfo> 			m_gyros;
+	static void FillDigitalIoSlot(UINT32 slot, UINT32 channel);
+	
 	std::vector <Notifier*> 		m_notifiers;
-	std::vector <DigitalInputInfo> 	m_digitalInputs;
 	
 	// current time
 	double 							m_time;
 	ControlInterface *				m_controlInterface;
-	
-	bool							m_hardware_routed;
-	
-	WheelSimulator					m_lf_wheel;
-	WheelSimulator					m_lr_wheel;
-	WheelSimulator					m_rf_wheel;
-	WheelSimulator					m_rr_wheel;
 };
 
 

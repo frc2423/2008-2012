@@ -24,6 +24,7 @@
 #include "Simulator/ControlInterface.h"
 
 #include "MotorDisplay.h"
+#include "Slider.h"
 
 
 class SimulationWindow : public wxFrame, public wxThreadHelper
@@ -47,54 +48,75 @@ private:
 
 	void OnEnableJoy1(wxCommandEvent &event);
 	
-	signed char GetJoystickValue(wxTextCtrl * ctrl);
-	
 	void OnSimulationTimer(wxTimerEvent &event);
 	void OnStep(wxCommandEvent &event);
 
 	void OnDrawTimer(wxTimerEvent &event);
 
-	void OnNewMode(wxSpinEvent &event);
+	void OnJoystick(wxJoystickEvent &event);
+	double ConvertJoystickByte(int value, int min, int max);
+	signed char GetJoystickValue(double val);
 
 	wxJoystick				m_joystick1;
 
-	// xrc elements
-	wxCheckBox *			m_enableJoy1;
+	// UI elements
+	Slider *				m_joy1_x;
+	Slider *				m_joy1_y;
+	Slider *				m_joy1_z;
+	Slider *				m_joy1_t;
 
-	wxTextCtrl *			m_joy1X;
-	wxTextCtrl *			m_joy1Y;
-	wxTextCtrl *			m_joy1T;
+	wxCheckBox *			m_joy1_1;
+	wxCheckBox *			m_joy1_2;
+	wxCheckBox *			m_joy1_3;
+	wxCheckBox *			m_joy1_4;
+
+	wxCheckBox *			m_joy1_enable;
+
 	
-	wxTextCtrl *			m_joy2X;
-	wxTextCtrl *			m_joy2Y;
-	wxTextCtrl *			m_joy2T;
+	Slider *				m_joy2_x;
+	Slider *				m_joy2_y;
+	Slider *				m_joy2_z;
+	Slider *				m_joy2_t;
+
+	wxCheckBox *			m_joy2_1;
+	wxCheckBox *			m_joy2_2;
+	wxCheckBox *			m_joy2_3;
+	wxCheckBox *			m_joy2_4;
 	
-	wxSpinCtrl *			m_analogIn1;
-	wxSpinCtrl *			m_analogIn2;
-	wxSpinCtrl *			m_analogIn3;
-	wxSpinCtrl *			m_analogIn4;
+	// driver station inputs
+	wxCheckBox *			m_ds_i_1;
+	wxCheckBox *			m_ds_i_2;
+	wxCheckBox *			m_ds_i_3;
+	wxCheckBox *			m_ds_i_4;
+	wxCheckBox *			m_ds_i_5;
+	wxCheckBox *			m_ds_i_6;
+	wxCheckBox *			m_ds_i_7;
+	wxCheckBox *			m_ds_i_8;
+
+	Slider *				m_ds_ai_1;
+	Slider *				m_ds_ai_2;
+	Slider *				m_ds_ai_3;
+	Slider *				m_ds_ai_4;
 	
-	wxCheckBox *			m_calibrateBox;
-	wxSpinCtrl *			m_mode;
-	
+	// control inputs
 	wxCheckBox * 			m_enabledBox;
 	wxCheckBox *			m_autonomousBox;
 	
 	wxButton *				m_startButton;
 	wxTextCtrl *			m_stepText;
-	wxTextCtrl * 			m_timeText;
 
 	wxStatusBar *			m_statusBar;
 
-	wxSizer *				m_motorsSizer;
-	wxSizer *				m_displaySizer;
-
 	wxTextCtrl *			m_lcdTop;
 	wxTextCtrl *			m_lcdBottom;
-	
-	ControlInterface		m_controlInterface;
 
-	MotorDisplay			*m_motor1;
+	// analog inputs
+	Slider					* m_slot1Analog[ANALOG_IO_CHANNELS];
+	Slider					* m_slot2Analog[ANALOG_IO_CHANNELS];
+
+	// pwm displays
+	Slider					* m_slot1PWM[DIGITAL_PWM_CHANNELS];
+	Slider					* m_slot2PWM[DIGITAL_PWM_CHANNELS];
 
 	// simulation thread variables
 	wxMutex					m_threadMutex;
@@ -103,6 +125,8 @@ private:
 	bool					m_data_ready;
 	bool 					m_started;
 	size_t					m_stepsLeft;
+
+	ControlInterface		m_controlInterface;
 	
 	wxTimer					m_simulationTimer;
 	wxTimer					m_drawTimer;

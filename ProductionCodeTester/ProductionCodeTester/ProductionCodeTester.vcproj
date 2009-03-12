@@ -188,6 +188,10 @@
 				RelativePath=".\SimulationWindow.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\Slider.cpp"
+				>
+			</File>
 			<Filter
 				Name="trunk"
 				>
@@ -379,7 +383,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\MotorDisplay.h"
+				>
+			</File>
+			<File
 				RelativePath=".\SimulationWindow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Slider.h"
 				>
 			</File>
 			<Filter

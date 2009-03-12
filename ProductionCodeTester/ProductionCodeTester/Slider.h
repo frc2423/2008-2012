@@ -15,31 +15,43 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MOTOR_DISPLAY_H
-#define MOTOR_DISPLAY_H
+#ifndef SLIDER_H
+#define SLIDER_H
 
-class MotorDisplay : public wxControl {
+class Slider : public wxControl {
 public:
 
-	MotorDisplay(wxWindow * parent, wxWindowID id = wxID_ANY);
+	Slider(
+		wxWindow * parent, 
+		wxWindowID id = wxID_ANY, 
+		double min = 0, 
+		double max = 5, 
+		bool readonly = false);
 
-	void SetReadOnly(bool readOnly);
-
+	void SetReadOnly(bool readonly = true);
+	void SetMinMax(double min, double max);
 	void SetValue(double value);
+	double GetValue();
 
 private:
 
-	MotorDisplay();
+	Slider();
 	
+	void OnKeyDown(wxKeyEvent &event);
 	void OnMove(wxMouseEvent &event);
 	void OnClick(wxMouseEvent &event);
-	
+
 	void OnPaint(wxPaintEvent &event);
 	void OnEraseBackground(wxEraseEvent &event);
 	void UpdateDisplay(wxDC * dc = NULL);
 
-	double	m_value;
-	bool	m_readOnly;
+	double m_maxValue;
+	double m_minValue;
+	double m_value;
+	
+	wxString m_strValue;
+
+	bool m_readOnly;
 
 	DECLARE_EVENT_TABLE()
 };

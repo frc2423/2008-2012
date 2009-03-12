@@ -37,17 +37,31 @@ DEFINE_EVENT_TYPE(EVT_ON_STEP)
 
 BEGIN_EVENT_TABLE(SimulationWindow, wxFrame)
 	EVT_CLOSE( SimulationWindow::OnClose )
-	EVT_CHECKBOX( XRCID("m_enableJoy1"), SimulationWindow::OnEnableJoy1 )
+	EVT_CHECKBOX( XRCID("m_joy1_enable"), SimulationWindow::OnEnableJoy1 )
 	EVT_BUTTON( XRCID("m_startButton"), SimulationWindow::OnStartClicked )
 	EVT_BUTTON( XRCID("m_stepButton"), SimulationWindow::OnStepClicked )
-	EVT_SPINCTRL( XRCID("m_mode"), SimulationWindow::OnNewMode)
 	EVT_COMMAND( 42, EVT_ON_STEP, SimulationWindow::OnStep )
 	EVT_TIMER( 1, SimulationWindow::OnSimulationTimer)
 	EVT_TIMER( 2, SimulationWindow::OnDrawTimer)
+
+	EVT_JOYSTICK_EVENTS(SimulationWindow::OnJoystick)
 END_EVENT_TABLE()
 
 
 #define XRC_INIT(name, type)	name = XRCCTRL(*this, #name, type)
+
+#define INIT_JOY(name)										\
+	m_joy##name = new Slider(p, wxID_ANY, -1, 1, false);	\
+	wxXmlResource::Get()->AttachUnknownControl(				\
+			wxT("m_joy") wxT(#name),								\
+			m_joy##name , p);
+
+#define INIT_DS_ANALOG(name)										\
+	m_ds_ai_##name = new Slider(p, wxID_ANY, 0, 5, false);	\
+	wxXmlResource::Get()->AttachUnknownControl(				\
+	wxT("m_ds_ai_") wxT(#name),								\
+			m_ds_ai_##name , p);
+
 
 SimulationWindow::SimulationWindow(wxWindow *parent) :
 	m_threadCondition(m_threadMutex),
@@ -61,25 +75,45 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	// initialize XRC elements..
 	wxXmlResource::Get()->LoadFrame(this, parent, wxT("SimulationWindow"));
 
-	XRC_INIT(m_enableJoy1, wxCheckBox);
+	wxPanel * p = XRCCTRL(*this, "m_topPanel", wxPanel);
 
-	XRC_INIT(m_joy1X, wxTextCtrl);
-	XRC_INIT(m_joy1Y, wxTextCtrl);
-	XRC_INIT(m_joy1T, wxTextCtrl);
-	
-	XRC_INIT(m_joy2X, wxTextCtrl);
-	XRC_INIT(m_joy2Y, wxTextCtrl);
-	XRC_INIT(m_joy2T, wxTextCtrl);
-	
-	XRC_INIT(m_analogIn1, wxSpinCtrl);
-	XRC_INIT(m_analogIn2, wxSpinCtrl);
-	XRC_INIT(m_analogIn3, wxSpinCtrl);
-	XRC_INIT(m_analogIn4, wxSpinCtrl);
-	
-	XRC_INIT(m_calibrateBox, wxCheckBox);
-	XRC_INIT(m_mode, wxSpinCtrl);
+	XRC_INIT(m_joy1_enable, wxCheckBox);
+
+	INIT_JOY(1_x)
+	INIT_JOY(1_y)
+	INIT_JOY(1_z)
+	INIT_JOY(1_t)
+
+	XRC_INIT(m_joy1_1, wxCheckBox);
+	XRC_INIT(m_joy1_2, wxCheckBox);
+	XRC_INIT(m_joy1_3, wxCheckBox);
+	XRC_INIT(m_joy1_4, wxCheckBox);
+
+	INIT_JOY(2_x)
+	INIT_JOY(2_y)
+	INIT_JOY(2_z)
+	INIT_JOY(2_t)
+
+	XRC_INIT(m_joy2_1, wxCheckBox);
+	XRC_INIT(m_joy2_2, wxCheckBox);
+	XRC_INIT(m_joy2_3, wxCheckBox);
+	XRC_INIT(m_joy2_4, wxCheckBox);
+
+	XRC_INIT(m_ds_i_1, wxCheckBox);
+	XRC_INIT(m_ds_i_2, wxCheckBox);
+	XRC_INIT(m_ds_i_3, wxCheckBox);
+	XRC_INIT(m_ds_i_4, wxCheckBox);
+	XRC_INIT(m_ds_i_5, wxCheckBox);
+	XRC_INIT(m_ds_i_6, wxCheckBox);
+	XRC_INIT(m_ds_i_7, wxCheckBox);
+	XRC_INIT(m_ds_i_8, wxCheckBox);
+
+	INIT_DS_ANALOG(1)
+	INIT_DS_ANALOG(2)
+	INIT_DS_ANALOG(3)
+	INIT_DS_ANALOG(4)
+
 	XRC_INIT(m_stepText, wxTextCtrl);
-	XRC_INIT(m_timeText, wxTextCtrl);
 	
 	XRC_INIT(m_startButton, wxButton);
 	XRC_INIT(m_statusBar, wxStatusBar);
@@ -89,57 +123,70 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 
 	XRC_INIT(m_lcdTop, wxTextCtrl);
 	XRC_INIT(m_lcdBottom, wxTextCtrl);
-
-	wxStaticText * tmp;
-	
-	tmp = XRCCTRL(*this, "m_getMotorsSizer", wxStaticText);
-	m_motorsSizer = tmp->GetContainingSizer();
-
-	tmp = XRCCTRL(*this, "m_getDisplaySizer", wxStaticText);
-	m_displaySizer = tmp->GetContainingSizer();
 	
 	// setup validation
-	m_joy1X->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-	m_joy1Y->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-	m_joy1T->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-	
-	m_joy2X->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-	m_joy2Y->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-	m_joy2T->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-	
 	m_stepText->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
-	m_timeText->SetValidator(wxTextValidator(wxFILTER_NUMERIC));
 	
 	// statusbar
 	m_statusBar->SetFieldsCount(2);
 	m_statusBar->SetStatusText(wxT("Stopped"), 0);
 	m_statusBar->SetStatusText(wxT("0.0s"), 1);
 
-	wxPanel * p = XRCCTRL(*this, "m_topPanel", wxPanel);
-	m_motor1 = new MotorDisplay(p);
-	m_motorsSizer->Add( m_motor1 );
+	// initialize analog inputs
 
-	//SetAutoLayout(true);
+	// slot 1
+	for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
+	{
+		m_slot1Analog[i] = new Slider(p, wxID_ANY, 0, 5, false);
+		wxXmlResource::Get()->AttachUnknownControl(
+			wxString::Format(wxT("m_analog_1_%d"), i+1), 
+			m_slot1Analog[i], p);
+	}
 
-	//
+	// slot 2
+	for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
+	{
+		m_slot2Analog[i] = new Slider(p, wxID_ANY, 0, 5, false);
+		wxXmlResource::Get()->AttachUnknownControl(
+			wxString::Format(wxT("m_analog_2_%d"), i+1), 
+			m_slot2Analog[i], p);
+	}
+
+
+	// initialize pwm outputs
+
+	// slot 4
+	for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+	{
+		m_slot1PWM[i] = new Slider(p, wxID_ANY, -1, 1, true);
+		wxXmlResource::Get()->AttachUnknownControl(
+			wxString::Format(wxT("m_pwm_1_%d"), i+1), 
+			m_slot1PWM[i], p);
+	}
+
+	// slot 6
+	for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+	{
+		m_slot2PWM[i] = new Slider(p, wxID_ANY, -1, 1, true);
+		wxXmlResource::Get()->AttachUnknownControl(
+			wxString::Format(wxT("m_pwm_2_%d"), i+1), 
+			m_slot2PWM[i], p);
+	}
+
+	p->Fit();
 	p->Layout();
 
-	//Fit();
-	//SetAutoLayout(true);
-	//Layout();
+	Layout();
 
 	// initialize the simulation thread
 	BeginSimulation();
 	
 	// anything else that needs to be done
 
+	m_joystick1.SetCapture(this);
+
 	// try to update regularly
 	m_drawTimer.Start(200);
-}
-
-void SimulationWindow::OnNewMode(wxSpinEvent &event)
-{
-	m_motor1->SetValue(((double)m_mode->GetValue() - 5.0)/5.0);
 }
 
 void SimulationWindow::OnClose(wxCloseEvent &event)
@@ -185,31 +232,21 @@ void SimulationWindow::OnStepClicked(wxCommandEvent &event)
 
 void SimulationWindow::OnEnableJoy1(wxCommandEvent &event)
 {
-	if (m_enableJoy1->IsChecked())
-	{
-		m_joy1X->Disable();
-		m_joy1Y->Disable();
-		m_joy1T->Disable();
-	}
-	else
-	{
-		m_joy1X->Enable();
-		m_joy1Y->Enable();
-		m_joy1T->Enable();
-	}
-}
+	bool enable = m_joy1_enable->IsChecked();
 
-static 
-int AddNoise(int value)
-{
-	int ret = ((rand() % 10) - 5) + value;
-	
-	if (ret < 0)
-		ret = 0;
-	else if (ret > 1023)
-		ret = 1023;
-		
-	return ret;
+	m_joy1_x->SetReadOnly( enable );
+	m_joy1_y->SetReadOnly( enable );
+	m_joy1_z->SetReadOnly( enable );
+	m_joy1_t->SetReadOnly( enable );
+
+	m_joy1_1->Enable( !enable );
+	m_joy1_2->Enable( !enable );
+	m_joy1_3->Enable( !enable );
+	m_joy1_4->Enable( !enable );
+
+	if (enable)
+		m_joystick1.SetCapture(this);
+
 }
 	
 void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
@@ -234,53 +271,98 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 		data->enabled = m_enabledBox->IsChecked();
 		data->autonomous = m_autonomousBox->IsChecked();
 		
-		if (m_enableJoy1->IsChecked())
-		{
-			wxPoint pt = m_joystick1.GetPosition();
 
-			data->stick0Axis1 = pt.x;
-			data->stick0Axis2 = pt.y;
-			data->stick0Axis3 = m_joystick1.GetZPosition();
+		data->stick0Axis1 = GetJoystickValue(m_joy1_x->GetValue());
+		data->stick0Axis2 = GetJoystickValue(m_joy1_y->GetValue());
+		data->stick0Axis3 = GetJoystickValue(m_joy1_z->GetValue());
+		data->stick0Axis4 = GetJoystickValue(m_joy1_t->GetValue());
 
+		if (m_joy1_enable->IsChecked())
 			data->stick0Buttons = m_joystick1.GetButtonState();
-		}
 		else
-		{
-			data->stick0Axis1 = GetJoystickValue(m_joy1X);
-			data->stick0Axis2 = GetJoystickValue(m_joy1Y);
-			data->stick0Axis4 = GetJoystickValue(m_joy1T);
-		}
+			data->stick0Buttons = 
+				((int) m_joy1_4->IsChecked() << 4) |
+				((int) m_joy1_3->IsChecked() << 3) |
+				((int) m_joy1_2->IsChecked() << 2) |
+				(int) m_joy1_1->IsChecked();				
 
-		data->stick1Axis1 = GetJoystickValue(m_joy2X);
-		data->stick1Axis2 = GetJoystickValue(m_joy2Y);
-		data->stick1Axis4 = GetJoystickValue(m_joy2T);
+		data->stick1Axis1 = GetJoystickValue(m_joy2_x->GetValue());
+		data->stick1Axis2 = GetJoystickValue(m_joy2_y->GetValue());
+		data->stick1Axis3 = GetJoystickValue(m_joy2_z->GetValue());
+		data->stick1Axis4 = GetJoystickValue(m_joy2_t->GetValue());
+
+		data->stick1Buttons = 
+				((int) m_joy2_4->IsChecked() << 4) |
+				((int) m_joy2_3->IsChecked() << 3) |
+				((int) m_joy2_2->IsChecked() << 2) |
+				(int) m_joy2_1->IsChecked();
 
 		data->dsDigitalIn = 0;
 
-		// port 1
-		if (m_calibrateBox->IsChecked())
+		if (m_ds_i_1->IsChecked())
+			data->dsDigitalIn |= 0x01;
+
+		if (m_ds_i_2->IsChecked())
+			data->dsDigitalIn |= 0x02;
+
+		if (m_ds_i_3->IsChecked())
+			data->dsDigitalIn |= 0x04;
+
+		if (m_ds_i_4->IsChecked())
+			data->dsDigitalIn |= 0x08;
+
+		if (m_ds_i_5->IsChecked())
 			data->dsDigitalIn |= 0x10;
 
-		int mode = m_mode->GetValue();
+		if (m_ds_i_6->IsChecked())
+			data->dsDigitalIn |= 0x20;
 
-		// port 4 is lsb
-		if (mode & 0x01)
-			data->dsDigitalIn |= 0x08;
-		// port 3
-		if (mode & 0x02)
-			data->dsDigitalIn |= 0x04;
-		// port 2
-		if (mode & 0x04)
-			data->dsDigitalIn |= 0x02;
-		// port 1
-		if (mode & 0x08)
-			data->dsDigitalIn |= 0x01;
+		if (m_ds_i_7->IsChecked())
+			data->dsDigitalIn |= 0x40;
+
+		if (m_ds_i_8->IsChecked())
+			data->dsDigitalIn |= 0x80;
+
 			
 		// analog inputs
-		data->analog1 = AddNoise(m_analogIn1->GetValue());
-		data->analog2 = AddNoise(m_analogIn2->GetValue());
-		data->analog3 = AddNoise(m_analogIn3->GetValue());
-		data->analog4 = AddNoise(m_analogIn4->GetValue());
+		data->analog1 = (m_ds_ai_1->GetValue() * 1024) / 5.0;
+		data->analog2 = (m_ds_ai_2->GetValue() * 1024) / 5.0;
+		data->analog3 = (m_ds_ai_3->GetValue() * 1024) / 5.0;
+		data->analog4 = (m_ds_ai_4->GetValue() * 1024) / 5.0;
+
+		// slot 1
+		{
+			AnalogModuleData &mod = m_controlInterface.simulationData.analogModule[0];
+		
+			for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
+				mod.io[i].value = m_slot1Analog[i]->GetValue();
+		}
+
+		// slot 2
+		{
+			AnalogModuleData &mod = m_controlInterface.simulationData.analogModule[1];
+		
+			for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
+				mod.io[i].value = m_slot2Analog[i]->GetValue();
+		}
+
+		// slot 4
+		{
+			DigitalModuleData &mod = m_controlInterface.simulationData.digitalModule[0];
+		
+			for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+				m_slot1PWM[i]->SetValue( mod.pwm[i].speed );
+		}
+		
+
+		// slot 6
+		{
+			DigitalModuleData &mod = m_controlInterface.simulationData.digitalModule[1];
+		
+			for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+				m_slot2PWM[i]->SetValue( mod.pwm[i].speed );
+		}
+
 	}
 	
 	m_controlInterface.Step();
@@ -335,18 +417,27 @@ wxThread::ExitCode SimulationWindow::Entry()
 }
 
 
-signed char SimulationWindow::GetJoystickValue(wxTextCtrl * ctrl)
+signed char SimulationWindow::GetJoystickValue(double val)
 {
-	double x;
+	if (val < 0)
+		return (signed char)(val * 128.0);
 		
-	if (!ctrl->GetValue().ToDouble(&x))
-		return 0;
-
-	if (x < 0)
-		return (signed char)(x * 128.0);
-		
-	return (signed char)(x * 127.0);
+	return (signed char)(val * 127.0);
 }
+
+double SimulationWindow::ConvertJoystickByte(int value, int min, int max)
+{
+	// scale the result down
+	double result = (double)value / ((double)(max - min)/2) - 1;
+
+	if (result > 1.0)
+		result = 1.0;
+	else if (result < -1.0)
+		result = -1.0;
+
+	return result;
+}
+
 
 void SimulationWindow::OnDrawTimer(wxTimerEvent &event)
 {
@@ -379,5 +470,26 @@ void SimulationWindow::OnDrawTimer(wxTimerEvent &event)
 	m_lcdBottom->SetValue(str);
 
 	m_data_ready = false;
+}
+
+void SimulationWindow::OnJoystick(wxJoystickEvent &event)
+{
+	if (!m_joy1_enable->IsChecked())
+		return;
+
+	wxPoint pt = m_joystick1.GetPosition();
+
+	m_joy1_x->SetValue( ConvertJoystickByte(pt.x, m_joystick1.GetXMin(), m_joystick1.GetXMax()) );
+	m_joy1_y->SetValue( ConvertJoystickByte(pt.y, m_joystick1.GetYMin(), m_joystick1.GetYMax()) );
+	m_joy1_z->SetValue( ConvertJoystickByte(m_joystick1.GetZPosition(), m_joystick1.GetZMin(), m_joystick1.GetZMax()) );
+	m_joy1_t->SetValue( ConvertJoystickByte(m_joystick1.GetRudderPosition(), m_joystick1.GetRudderMin(), m_joystick1.GetRudderMax()) );
+
+	int buttons = m_joystick1.GetButtonState();
+
+	m_joy1_1->SetValue( (buttons & 0x01) == 0x01);
+	m_joy1_2->SetValue( (buttons & 0x02) == 0x02);
+	m_joy1_3->SetValue( (buttons & 0x04) == 0x04);
+	m_joy1_4->SetValue( (buttons & 0x08) == 0x08);
+
 }
 

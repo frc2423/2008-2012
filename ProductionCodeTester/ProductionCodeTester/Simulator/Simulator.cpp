@@ -256,25 +256,29 @@ void Simulator::DeletePWM(PWM * p)
 {
 	wxMutexLocker mtx(m_controlInterface->lock);
 	
-	DigitalModuleData &mod = m_controlInterface->simulationData.digitalModule[0];
+	{
+		DigitalModuleData &mod = m_controlInterface->simulationData.digitalModule[0];
 
-	for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
-		if (mod.pwm[i].pwm == p)
-		{
-			mod.pwm[i].pwm = NULL;
-			mod.pwm[i].speed = 0;
-			return;
-		}
+		for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+			if (mod.pwm[i].pwm == p)
+			{
+				mod.pwm[i].pwm = NULL;
+				mod.pwm[i].speed = 0;
+				return;
+			}
+	}
 		
-	mod = m_controlInterface->simulationData.digitalModule[1];
-		
-	for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
-		if (mod.pwm[i].pwm == p)
-		{
-			mod.pwm[i].pwm = NULL;
-			mod.pwm[i].speed = 0;
-			return;
-		}
+	{
+		DigitalModuleData &mod = m_controlInterface->simulationData.digitalModule[1];
+
+		for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+			if (mod.pwm[i].pwm == p)
+			{
+				mod.pwm[i].pwm = NULL;
+				mod.pwm[i].speed = 0;
+				return;
+			}
+	}
 }
 
 
@@ -303,25 +307,29 @@ void Simulator::DeleteDigitalInput(DigitalInput * di)
 {
 	wxMutexLocker mtx(m_controlInterface->lock);
 	
-	DigitalModuleData &mod = m_controlInterface->simulationData.digitalModule[0];
+	{
+		DigitalModuleData &mod = m_controlInterface->simulationData.digitalModule[0];
 
-	for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
-		if (mod.io[i].digitalInput == di)
-		{
-			mod.io[i].digitalInput = NULL;
-			mod.io[i].used = false;
-			return;
-		}
+		for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+			if (mod.io[i].digitalInput == di)
+			{
+				mod.io[i].digitalInput = NULL;
+				mod.io[i].used = false;
+				return;
+			}
+	}
 		
-	mod = m_controlInterface->simulationData.digitalModule[1];
-		
-	for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
-		if (mod.io[i].digitalInput == di)
-		{
-			mod.io[i].digitalInput = NULL;
-			mod.io[i].used = false;
-			return;
-		}
+	{
+		DigitalModuleData &mod = m_controlInterface->simulationData.digitalModule[1];
+
+		for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+			if (mod.io[i].digitalInput == di)
+			{
+				mod.io[i].digitalInput = NULL;
+				mod.io[i].used = false;
+				return;
+			}
+	}
 }
 
 void Simulator::AddDigitalOutput(DigitalOutput * di, UINT32 slot, UINT32 channel)
@@ -348,25 +356,29 @@ void Simulator::DeleteDigitalOutput(DigitalOutput * di)
 {
 	wxMutexLocker mtx(m_controlInterface->lock);
 	
-	DigitalModuleData &mod = m_controlInterface->simulationData.digitalModule[0];
+	{
+		DigitalModuleData &mod = m_controlInterface->simulationData.digitalModule[0];
 
-	for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
-		if (mod.io[i].digitalOutput == di)
-		{
-			mod.io[i].digitalOutput = NULL;
-			mod.io[i].used = false;
-			return;
-		}
+		for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+			if (mod.io[i].digitalOutput == di)
+			{
+				mod.io[i].digitalOutput = NULL;
+				mod.io[i].used = false;
+				return;
+			}
+	}
 		
-	mod = m_controlInterface->simulationData.digitalModule[1];
-		
-	for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
-		if (mod.io[i].digitalOutput == di)
-		{
-			mod.io[i].digitalOutput = NULL;
-			mod.io[i].used = false;
-			return;
-		}
+	{
+		DigitalModuleData &mod = m_controlInterface->simulationData.digitalModule[1];
+
+		for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+			if (mod.io[i].digitalOutput == di)
+			{
+				mod.io[i].digitalOutput = NULL;
+				mod.io[i].used = false;
+				return;
+			}
+	}
 }
 
 
@@ -393,25 +405,29 @@ void Simulator::DeleteAnalogChannel(AnalogChannel * ac)
 {
 	wxMutexLocker mtx(m_controlInterface->lock);
 	
-	AnalogModuleData &mod = m_controlInterface->simulationData.analogModule[0];
+	{
+		AnalogModuleData &mod = m_controlInterface->simulationData.analogModule[0];
 
-	for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
-		if (mod.io[i].analogChannel == ac)
-		{
-			mod.io[i].analogChannel = NULL;
-			mod.io[i].used = false;
-			return;
-		}
+		for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
+			if (mod.io[i].analogChannel == ac)
+			{
+				mod.io[i].analogChannel = NULL;
+				mod.io[i].used = false;
+				return;
+			}
+	}
 		
-	mod = m_controlInterface->simulationData.analogModule[1];
-		
-	for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
-		if (mod.io[i].analogChannel == ac)
-		{
-			mod.io[i].analogChannel = NULL;
-			mod.io[i].used = false;
-			return;
-		}
+	{
+		AnalogModuleData &mod = m_controlInterface->simulationData.analogModule[1];
+
+		for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
+			if (mod.io[i].analogChannel == ac)
+			{
+				mod.io[i].analogChannel = NULL;
+				mod.io[i].used = false;
+				return;
+			}
+	}
 }
 
 

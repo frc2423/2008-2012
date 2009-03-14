@@ -43,14 +43,11 @@ bool MyApp::OnInit()
 {
 	// initialize XRC
 	wxXmlResource::Get()->InitAllHandlers();
-    wxXmlResource::Get()->Load(wxT("ProductionCodeTester.xrc"));
+    wxXmlResource::Get()->Load(wxT("WPILibTestHarness.xrc"));
 
 	// create the window
 	SimulationWindow * simulationWindow = new SimulationWindow(NULL);
 	simulationWindow->Show();
-
-	// hook the close event and we're done
-	//simulationWindow->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(MyApp::OnClose), NULL, this);
 
 	return true;
 }

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="ProductionCodeTester"
+	Name="WPILibTestHarness"
 	ProjectGUID="{480A3AFE-4578-4A07-B461-691214CAF324}"
-	RootNamespace="ProductionCodeTester"
+	RootNamespace="WPILibTestHarness"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
 	>

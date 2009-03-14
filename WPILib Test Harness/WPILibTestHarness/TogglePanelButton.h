@@ -15,47 +15,33 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SLIDER_H
-#define SLIDER_H
+#ifndef TOGGLEPANELBUTTON_H
+#define TOGGLEPANELBUTTON_H
 
-class Slider : public wxControl {
+class TogglePanelButton : public wxControl {
 public:
 
-	Slider(
-		wxWindow * parent, 
-		wxWindowID id = wxID_ANY, 
-		double min = 0, 
-		double max = 5, 
-		bool readonly = false);
+	TogglePanelButton(wxWindow * parent, wxWindowID id = wxID_ANY);
+
+	bool GetValue();
+	void SetValue(bool value);
 
 	void SetReadOnly(bool readonly = true);
-	void SetEnabled(bool enabled = true);
-
-	void SetMinMax(double min, double max);
-
-	void SetValue(double value);
-	double GetValue();
 
 private:
 
-	Slider();
-	
-	void OnKeyDown(wxKeyEvent &event);
-	void OnMove(wxMouseEvent &event);
 	void OnClick(wxMouseEvent &event);
 
-	void OnPaint(wxPaintEvent &event);
 	void OnEraseBackground(wxEraseEvent &event);
-	void UpdateDisplay(wxDC * dc = NULL);
+	void OnPaint(wxPaintEvent &event);
 
-	double m_maxValue;
-	double m_minValue;
-	double m_value;
-	
-	wxString m_strValue;
+	void UpdateDisplay(wxDC * dc);
 
+	bool m_value;
 	bool m_readOnly;
-	bool m_enabled;
+
+	wxColour m_onColor;
+	wxColour m_offColor;
 
 	DECLARE_EVENT_TABLE()
 };

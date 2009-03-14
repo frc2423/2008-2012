@@ -28,10 +28,11 @@ BEGIN_EVENT_TABLE(Slider, wxWindow)
 END_EVENT_TABLE()
 
 Slider::Slider(wxWindow * parent, wxWindowID id, double min, double max, bool readonly) :
-	m_value(0),
+	m_value(-1.0),
 	m_maxValue(max),
 	m_minValue(min),
-	m_readOnly(readonly)
+	m_readOnly(readonly),
+	m_enabled(true)
 {
 	assert(min < max);
 
@@ -51,6 +52,15 @@ Slider::Slider(wxWindow * parent, wxWindowID id, double min, double max, bool re
 void Slider::SetReadOnly(bool readOnly)
 {
 	m_readOnly = readOnly;
+}
+
+void Slider::SetEnabled(bool enabled)
+{
+	if (m_enabled != enabled)
+	{
+		m_enabled = enabled;
+		UpdateDisplay();
+	}
 }
 
 void Slider::OnKeyDown(wxKeyEvent &event)
@@ -123,6 +133,9 @@ double Slider::GetValue()
 
 void Slider::SetValue(double value)
 {	
+	if (value == m_value)
+		return;
+
 	if (value < m_minValue)
 		m_value = m_minValue;
 	else if (value > m_maxValue)
@@ -155,53 +168,58 @@ void Slider::UpdateDisplay(wxDC * dc)
 	
 	dc->DrawRectangle(0, 0, w, h);
 	
-	// figure out where zero lives
-	wxCoord zero = 0;
-
-	if (m_minValue < 0)
+	if (m_enabled)
 	{
-		if (m_maxValue < 0)
+		// figure out where zero lives
+		wxCoord zero = 0;
+
+		if (m_minValue < 0)
 		{
-			zero = w;
+			if (m_maxValue < 0)
+			{
+				zero = w;
+			}
+			else
+			{
+				zero = -1*(m_minValue / (m_maxValue - m_minValue)) *  (double)w;
+			}
+		}
+	
+		if (m_value > 0)
+		{
+			dc->SetBrush(*wxGREEN_BRUSH);
+
+			// the positive width available
+			double pw = m_maxValue - (m_minValue < 0 ? 0 : m_minValue);
+			dc->DrawRectangle( zero, 0, ((pw - (m_maxValue - m_value))/pw) * (w - zero)  , h );
+		}
+		else if (m_value < 0)
+		{
+			dc->SetBrush(*wxRED_BRUSH);
+
+			// the negative width available
+			double nw = -1* ( m_minValue - (m_maxValue > 0 ? 0 : m_maxValue));
+
+			// use an integer here to guarantee accuracy
+			wxCoord ww = ((nw + (m_minValue - m_value))/nw) * zero;
+
+			dc->DrawRectangle( zero - ww, 0, ww , h );
 		}
 		else
 		{
-			zero = -1*(m_minValue / (m_maxValue - m_minValue)) *  (double)w;
+			dc->DrawLine(zero, 0, zero, h);
 		}
-	}
-	
-	if (m_value > 0)
-	{
-		dc->SetBrush(*wxGREEN_BRUSH);
-
-		// the positive width available
-		double pw = m_maxValue - (m_minValue < 0 ? 0 : m_minValue);
-		dc->DrawRectangle( zero, 0, ((pw - (m_maxValue - m_value))/pw) * (w - zero)  , h );
-	}
-	else if (m_value < 0)
-	{
-		dc->SetBrush(*wxRED_BRUSH);
-
-		// the negative width available
-		double nw = -1* ( m_minValue - (m_maxValue > 0 ? 0 : m_maxValue));
-
-		// use an integer here to guarantee accuracy
-		wxCoord ww = ((nw + (m_minValue - m_value))/nw) * zero;
-
-		dc->DrawRectangle( zero - ww, 0, ww , h );
-	}
-	else
-	{
-		dc->DrawLine(zero, 0, zero, h);
 	}
 
 
 	// draw text
-
-	
 	wxSize extent = dc->GetTextExtent(wxT("-0.00"));
 	
-	dc->DrawText(m_strValue, w - extent.x, (h - extent.y)/2);
+	if (m_enabled)
+		dc->DrawText(m_strValue, w - extent.x, (h - extent.y)/2);
+	else
+		dc->DrawText(wxT("--"), w - extent.x, (h - extent.y)/2);
+		
 		
 	if (do_delete)
 		delete dc;

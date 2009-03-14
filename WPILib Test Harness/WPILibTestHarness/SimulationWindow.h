@@ -25,6 +25,7 @@
 
 #include "MotorDisplay.h"
 #include "Slider.h"
+#include "TogglePanelButton.h"
 
 
 class SimulationWindow : public wxFrame, public wxThreadHelper
@@ -117,6 +118,13 @@ private:
 	// pwm displays
 	Slider					* m_slot1PWM[DIGITAL_PWM_CHANNELS];
 	Slider					* m_slot2PWM[DIGITAL_PWM_CHANNELS];
+
+	// digital displays
+	TogglePanelButton		* m_slot1DIO[DIGITAL_IO_CHANNELS];
+	wxStaticText			* m_slot1DIO_lbl[DIGITAL_IO_CHANNELS];
+
+	TogglePanelButton		* m_slot2DIO[DIGITAL_IO_CHANNELS];
+	wxStaticText			* m_slot2DIO_lbl[DIGITAL_IO_CHANNELS];
 
 	// simulation thread variables
 	wxMutex					m_threadMutex;

@@ -133,12 +133,13 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	m_statusBar->SetStatusText(wxT("0.0s"), 1);
 
 	// initialize analog inputs
+	wxXmlResource * xmlRes = wxXmlResource::Get();
 
 	// slot 1
 	for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
 	{
 		m_slot1Analog[i] = new Slider(p, wxID_ANY, 0, 5, false);
-		wxXmlResource::Get()->AttachUnknownControl(
+		xmlRes->AttachUnknownControl(
 			wxString::Format(wxT("m_analog_1_%d"), i+1), 
 			m_slot1Analog[i], p);
 	}
@@ -147,7 +148,7 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
 	{
 		m_slot2Analog[i] = new Slider(p, wxID_ANY, 0, 5, false);
-		wxXmlResource::Get()->AttachUnknownControl(
+		xmlRes->AttachUnknownControl(
 			wxString::Format(wxT("m_analog_2_%d"), i+1), 
 			m_slot2Analog[i], p);
 	}
@@ -159,7 +160,7 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
 	{
 		m_slot1PWM[i] = new Slider(p, wxID_ANY, -1, 1, true);
-		wxXmlResource::Get()->AttachUnknownControl(
+		xmlRes->AttachUnknownControl(
 			wxString::Format(wxT("m_pwm_1_%d"), i+1), 
 			m_slot1PWM[i], p);
 	}
@@ -168,10 +169,37 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
 	{
 		m_slot2PWM[i] = new Slider(p, wxID_ANY, -1, 1, true);
-		wxXmlResource::Get()->AttachUnknownControl(
+		xmlRes->AttachUnknownControl(
 			wxString::Format(wxT("m_pwm_2_%d"), i+1), 
 			m_slot2PWM[i], p);
 	}
+
+	// initialize digital channels
+
+	// slot 4
+	for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+	{
+		m_slot1DIO[i] = new TogglePanelButton(p, wxID_ANY);
+		xmlRes->AttachUnknownControl(
+			wxString::Format(wxT("m_dio_1_%d"), i+1), 
+			m_slot1DIO[i], p);
+
+		m_slot1DIO_lbl[i] = wxStaticCast(FindWindow(xmlRes->GetXRCID(wxString::Format(wxT("m_diol_1_%d"), i+1))), 
+			wxStaticText);
+	}
+
+	// slot 6
+	for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+	{
+		m_slot2DIO[i] = new TogglePanelButton(p, wxID_ANY);
+		xmlRes->AttachUnknownControl(
+			wxString::Format(wxT("m_dio_2_%d"), i+1), 
+			m_slot2DIO[i], p);
+
+		m_slot2DIO_lbl[i] = wxStaticCast(FindWindow(xmlRes->GetXRCID(wxString::Format(wxT("m_diol_2_%d"), i+1))), 
+			wxStaticText);
+	}
+
 
 	p->Fit();
 	p->Layout();
@@ -271,7 +299,7 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 		data->enabled = m_enabledBox->IsChecked();
 		data->autonomous = m_autonomousBox->IsChecked();
 		
-
+		// joystick values
 		data->stick0Axis1 = GetJoystickValue(m_joy1_x->GetValue());
 		data->stick0Axis2 = GetJoystickValue(m_joy1_y->GetValue());
 		data->stick0Axis3 = GetJoystickValue(m_joy1_z->GetValue());
@@ -299,6 +327,7 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 
 		data->dsDigitalIn = 0;
 
+		// driver station I/O
 		if (m_ds_i_1->IsChecked())
 			data->dsDigitalIn |= 0x01;
 
@@ -335,7 +364,10 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 			AnalogModuleData &mod = m_controlInterface.simulationData.analogModule[0];
 		
 			for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
+			{
+				m_slot1Analog[i]->SetEnabled( mod.io[i].used );
 				mod.io[i].value = m_slot1Analog[i]->GetValue();
+			}
 		}
 
 		// slot 2
@@ -343,15 +375,48 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 			AnalogModuleData &mod = m_controlInterface.simulationData.analogModule[1];
 		
 			for (size_t i = 0; i < ANALOG_IO_CHANNELS; i++)
+			{
+				m_slot2Analog[i]->SetEnabled( mod.io[i].used );
 				mod.io[i].value = m_slot2Analog[i]->GetValue();
+			}
 		}
 
 		// slot 4
 		{
 			DigitalModuleData &mod = m_controlInterface.simulationData.digitalModule[0];
 		
+			// pwm
 			for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+			{
+				m_slot1PWM[i]->SetEnabled( mod.pwm[i].pwm != NULL );
 				m_slot1PWM[i]->SetValue( mod.pwm[i].speed );
+			}
+
+			// digital io
+			for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+			{
+				if (mod.io[i].digitalInput)
+				{
+					mod.io[i].value = m_slot1DIO[i]->GetValue();
+					m_slot1DIO_lbl[i]->SetLabel(wxT("IN"));
+				}
+				else if (mod.io[i].digitalOutput)
+				{
+					m_slot1DIO[i]->SetReadOnly(true);
+					m_slot1DIO[i]->SetValue( mod.io[i].value );
+					m_slot1DIO_lbl[i]->SetLabel(wxT("OUT"));
+				}
+				else
+				{
+					m_slot1DIO[i]->SetReadOnly(true);
+					m_slot1DIO[i]->SetValue(false);
+
+					if (mod.io[i].used)
+						m_slot1DIO_lbl[i]->SetLabel(wxT("EN"));
+					else
+						m_slot1DIO_lbl[i]->SetLabel(wxT("--"));
+				}
+			}
 		}
 		
 
@@ -359,8 +424,38 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 		{
 			DigitalModuleData &mod = m_controlInterface.simulationData.digitalModule[1];
 		
+			// pwm
 			for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+			{
+				m_slot2PWM[i]->SetEnabled( mod.pwm[i].pwm != NULL );
 				m_slot2PWM[i]->SetValue( mod.pwm[i].speed );
+			}
+
+			// digital io
+			for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+			{
+				if (mod.io[i].digitalInput)
+				{
+					mod.io[i].value = m_slot2DIO[i]->GetValue();
+					m_slot2DIO_lbl[i]->SetLabel(wxT("IN"));
+				}
+				else if (mod.io[i].digitalOutput)
+				{
+					m_slot2DIO[i]->SetReadOnly(true);
+					m_slot2DIO[i]->SetValue( mod.io[i].value );
+					m_slot2DIO_lbl[i]->SetLabel(wxT("OUT"));
+				}
+				else
+				{
+					m_slot2DIO[i]->SetReadOnly(true);
+					m_slot2DIO[i]->SetValue(false);
+					
+					if (mod.io[i].used)
+						m_slot2DIO_lbl[i]->SetLabel(wxT("EN"));
+					else
+						m_slot2DIO_lbl[i]->SetLabel(wxT("--"));
+				}
+			}
 		}
 
 	}

@@ -192,6 +192,10 @@
 				RelativePath=".\Slider.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\TogglePanelButton.cpp"
+				>
+			</File>
 			<Filter
 				Name="trunk"
 				>
@@ -392,6 +396,10 @@
 			</File>
 			<File
 				RelativePath=".\Slider.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TogglePanelButton.h"
 				>
 			</File>
 			<Filter

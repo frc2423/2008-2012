@@ -10,4 +10,10 @@ double GetTime()
 	return Simulator::GetTime();
 }
 
+static inline
+double GetClock()
+{
+	return Simulator::GetTime();
+}
+
 #endif

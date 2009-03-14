@@ -125,6 +125,9 @@ private:
 
 	TogglePanelButton		* m_slot2DIO[DIGITAL_IO_CHANNELS];
 	wxStaticText			* m_slot2DIO_lbl[DIGITAL_IO_CHANNELS];
+	
+	// solenoids
+	TogglePanelButton		* m_solenoids[SOLENOID_IO_CHANNELS];
 
 	// simulation thread variables
 	wxMutex					m_threadMutex;

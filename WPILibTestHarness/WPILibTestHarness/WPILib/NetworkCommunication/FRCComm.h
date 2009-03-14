@@ -122,7 +122,7 @@ extern "C" {
 	int setStatusData(float battery, UINT8 dsDigitalOut, const char *userData, int userDataLength, int wait_ms);
 	int setUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength, int wait_ms);
 
-	void setNewDataSem(SEM_ID);
+	void setNewDataSem(SEM_ID*);
 	void setResyncSem(SEM_ID);
 	void signalResyncActionDone(void);
 
@@ -131,6 +131,8 @@ extern "C" {
 	void setResyncOccurRef(UINT32 refnum);
 
 	void FRC_NetworkCommunication_getVersionString(char *version);
+	
+	void PacketReady();
 };
 
 #endif

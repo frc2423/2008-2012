@@ -27,6 +27,7 @@ public:
 	void SetValue(bool value);
 
 	void SetReadOnly(bool readonly = true);
+	void SetEnabled(bool enabled = true);
 
 private:
 
@@ -36,9 +37,12 @@ private:
 	void OnPaint(wxPaintEvent &event);
 
 	void UpdateDisplay(wxDC * dc);
+	
+	void UpdateCursor();
 
 	bool m_value;
 	bool m_readOnly;
+	bool m_enabled;
 
 	wxColour m_onColor;
 	wxColour m_offColor;

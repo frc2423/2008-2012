@@ -47,6 +47,8 @@ private:
 	void OnPaint(wxPaintEvent &event);
 	void OnEraseBackground(wxEraseEvent &event);
 	void UpdateDisplay(wxDC * dc = NULL);
+	
+	void UpdateCursor();
 
 	double m_maxValue;
 	double m_minValue;

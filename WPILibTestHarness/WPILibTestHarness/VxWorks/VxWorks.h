@@ -35,6 +35,13 @@ typedef int			SEM_ID;
 
 #include <algorithm>
 
+#ifndef TRUE
+#	define TRUE 1
+#endif
+
+#define OK		0
+
+
 static inline void bzero( void * s, size_t n ) { memset(s, n, 0); }
 
 

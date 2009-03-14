@@ -23,6 +23,7 @@
 #include <WPILib/Notifier.h>
 #include <WPILib/PWM.h>
 #include <WPILib/AnalogChannel.h>
+#include <WPILib/Solenoid.h>
 
 #include "SimulationData.h"
 
@@ -59,4 +60,10 @@ void AnalogIOData::Transfer()
 {
 	if (analogChannel)
 		analogChannel->m_value = value;
+}
+
+void SolenoidData::Transfer()
+{
+	if (solenoid)
+		value = solenoid->m_value;
 }

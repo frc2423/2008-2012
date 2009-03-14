@@ -43,7 +43,36 @@ bool MyApp::OnInit()
 {
 	// initialize XRC
 	wxXmlResource::Get()->InitAllHandlers();
-    wxXmlResource::Get()->Load(wxT("WPILibTestHarness.xrc"));
+    
+
+	// try and find the silly xrc file
+	wxFileName file(wxGetCwd());
+	file.SetFullName(wxT("WPILibTestHarness.xrc"));
+
+	if (!file.IsFileReadable() || 
+		!wxXmlResource::Get()->Load(file.GetFullPath()))
+	{
+
+	// try going up
+	file.AppendDir(wxT("WPILibTestHarness"));
+
+	if (!file.IsFileReadable() || 
+		!wxXmlResource::Get()->Load(file.GetFullPath()))
+	{
+
+	// try going back a dir
+	file.RemoveLastDir();
+	file.RemoveLastDir();
+	file.AppendDir(wxT("WPILibTestHarness"));
+
+	if (!file.IsFileReadable() || 
+		!wxXmlResource::Get()->Load(file.GetFullPath()))
+	{		
+		wxMessageBox(wxT("WPILibTestHarness.xrc was not found! This file must be in the current working directory or this program cannot execute!"), wxT("Error finding XRC file"));
+		return false;
+	}
+	}
+	}
 
 	// create the window
 	SimulationWindow * simulationWindow = new SimulationWindow(NULL);

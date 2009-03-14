@@ -24,12 +24,15 @@
 #define ANALOG_SLOT_2 	2
 #define DIGITAL_SLOT_1 	4
 #define DIGITAL_SLOT_2 	6
+#define SOLENOID_SLOT_1 8
 
 #define DIGITAL_PWM_CHANNELS 	10
 #define DIGITAL_IO_CHANNELS 	14
 #define DIGITAL_RELAY_CHANNELS 	8
 
 #define ANALOG_IO_CHANNELS 		8
+
+#define SOLENOID_IO_CHANNELS	8
 
 
 class Encoder;
@@ -38,6 +41,7 @@ class PWM;
 class DigitalInput;
 class DigitalOutput;
 class AnalogChannel;
+class Solenoid;
 
 
 struct EncoderInfo {
@@ -154,6 +158,30 @@ struct AnalogModuleData
 	}
 };
 
+struct SolenoidData {
+	Solenoid * solenoid;
+
+	bool value;
+	
+	SolenoidData() : 
+		solenoid(NULL), value(false)
+	{}
+	
+	// only called by the simulation
+	void Transfer();
+};
+
+struct SolenoidModule {
+	SolenoidData solenoids[SOLENOID_IO_CHANNELS];
+
+	void Transfer()
+	{
+		for (size_t i = 0; i < SOLENOID_IO_CHANNELS; i++)
+			solenoids[i].Transfer();
+	}
+};
+
+
 
 // this is copied by value, so don't make it too obscene
 struct SimulationData
@@ -163,7 +191,8 @@ struct SimulationData
 
 	// raw io
 	AnalogModuleData 	analogModule[2];
-	DigitalModuleData 	digitalModule[2];	
+	DigitalModuleData 	digitalModule[2];
+	SolenoidModule		solenoidModule;
 	
 	// encoders, gyros
 	std::vector<EncoderInfo> encoders;
@@ -184,6 +213,8 @@ struct SimulationData
 		
 		analogModule[0].Transfer();
 		analogModule[1].Transfer();
+		
+		solenoidModule.Transfer();
 		
 		for (size_t i = 0; i < encoders.size(); i++)
 			encoders[i].Transfer();

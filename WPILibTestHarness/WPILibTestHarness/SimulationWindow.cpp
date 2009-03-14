@@ -83,6 +83,11 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	INIT_JOY(1_y)
 	INIT_JOY(1_z)
 	INIT_JOY(1_t)
+	
+	m_joy1_x->SetReadOnly(true);
+	m_joy1_y->SetReadOnly(true);
+	m_joy1_z->SetReadOnly(true);
+	m_joy1_t->SetReadOnly(true);
 
 	XRC_INIT(m_joy1_1, wxCheckBox);
 	XRC_INIT(m_joy1_2, wxCheckBox);
@@ -173,6 +178,17 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 			wxString::Format(wxT("m_pwm_2_%d"), i+1), 
 			m_slot2PWM[i], p);
 	}
+	
+	// slot 8 (solenoids)
+	for (size_t i = 0; i < SOLENOID_IO_CHANNELS; i++)
+	{
+		m_solenoids[i] = new TogglePanelButton(p, wxID_ANY);
+		m_solenoids[i]->SetReadOnly(true);
+		xmlRes->AttachUnknownControl(
+			wxString::Format(wxT("m_sol_%d"), i+1), 
+			m_solenoids[i], p);
+	}
+	
 
 	// initialize digital channels
 
@@ -214,7 +230,7 @@ SimulationWindow::SimulationWindow(wxWindow *parent) :
 	m_joystick1.SetCapture(this);
 
 	// try to update regularly
-	m_drawTimer.Start(200);
+	m_drawTimer.Start(150);
 }
 
 void SimulationWindow::OnClose(wxCloseEvent &event)
@@ -231,7 +247,7 @@ void SimulationWindow::OnStartClicked(wxCommandEvent &event)
 	{
 		m_startButton->SetLabel(wxT("Stop"));
 		m_statusBar->SetStatusText(wxT("Running"), 0);
-		m_simulationTimer.Start(25);
+		m_simulationTimer.Start(SIMULATOR_STEP_TIMER);
 	}
 	else
 	{
@@ -255,7 +271,7 @@ void SimulationWindow::OnStepClicked(wxCommandEvent &event)
 	m_statusBar->SetStatusText(wxT("Running"), 0);
 	m_stepsLeft = l;
 	
-	m_simulationTimer.Start(25);
+	m_simulationTimer.Start(SIMULATOR_STEP_TIMER);
 }
 
 void SimulationWindow::OnEnableJoy1(wxCommandEvent &event)
@@ -385,79 +401,21 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 		{
 			DigitalModuleData &mod = m_controlInterface.simulationData.digitalModule[0];
 		
-			// pwm
-			for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
-			{
-				m_slot1PWM[i]->SetEnabled( mod.pwm[i].pwm != NULL );
-				m_slot1PWM[i]->SetValue( mod.pwm[i].speed );
-			}
-
 			// digital io
 			for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
-			{
 				if (mod.io[i].digitalInput)
-				{
 					mod.io[i].value = m_slot1DIO[i]->GetValue();
-					m_slot1DIO_lbl[i]->SetLabel(wxT("IN"));
-				}
-				else if (mod.io[i].digitalOutput)
-				{
-					m_slot1DIO[i]->SetReadOnly(true);
-					m_slot1DIO[i]->SetValue( mod.io[i].value );
-					m_slot1DIO_lbl[i]->SetLabel(wxT("OUT"));
-				}
-				else
-				{
-					m_slot1DIO[i]->SetReadOnly(true);
-					m_slot1DIO[i]->SetValue(false);
-
-					if (mod.io[i].used)
-						m_slot1DIO_lbl[i]->SetLabel(wxT("EN"));
-					else
-						m_slot1DIO_lbl[i]->SetLabel(wxT("--"));
-				}
-			}
 		}
 		
-
 		// slot 6
 		{
 			DigitalModuleData &mod = m_controlInterface.simulationData.digitalModule[1];
 		
-			// pwm
-			for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
-			{
-				m_slot2PWM[i]->SetEnabled( mod.pwm[i].pwm != NULL );
-				m_slot2PWM[i]->SetValue( mod.pwm[i].speed );
-			}
-
 			// digital io
 			for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
-			{
 				if (mod.io[i].digitalInput)
-				{
 					mod.io[i].value = m_slot2DIO[i]->GetValue();
-					m_slot2DIO_lbl[i]->SetLabel(wxT("IN"));
-				}
-				else if (mod.io[i].digitalOutput)
-				{
-					m_slot2DIO[i]->SetReadOnly(true);
-					m_slot2DIO[i]->SetValue( mod.io[i].value );
-					m_slot2DIO_lbl[i]->SetLabel(wxT("OUT"));
-				}
-				else
-				{
-					m_slot2DIO[i]->SetReadOnly(true);
-					m_slot2DIO[i]->SetValue(false);
-					
-					if (mod.io[i].used)
-						m_slot2DIO_lbl[i]->SetLabel(wxT("EN"));
-					else
-						m_slot2DIO_lbl[i]->SetLabel(wxT("--"));
-				}
-			}
 		}
-
 	}
 	
 	m_controlInterface.Step();
@@ -465,7 +423,6 @@ void SimulationWindow::OnSimulationTimer(wxTimerEvent &event)
 	
 void SimulationWindow::OnStep(wxCommandEvent &event)
 {
-	m_statusBar->SetStatusText(wxString::Format(wxT("%.3f"), Simulator::GetTime()), 1);
 	m_data_ready = true;
 }
 
@@ -546,9 +503,117 @@ void SimulationWindow::OnDrawTimer(wxTimerEvent &event)
 		wxMutexLocker mtx(m_controlInterface.lock);
 		newData = m_controlInterface.simulationData;
 	}
+	
+	m_statusBar->SetStatusText(wxString::Format(wxT("%.3f"), Simulator::GetTime()), 1);
 
 	// then do the drawing
+	
+	// slot 4
+	{
+		DigitalModuleData &mod = m_controlInterface.simulationData.digitalModule[0];
+	
+		// pwm
+		for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+		{
+			m_slot1PWM[i]->SetEnabled( mod.pwm[i].pwm != NULL );
+			m_slot1PWM[i]->SetValue( mod.pwm[i].speed );
+		}
 
+		// digital io
+		for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+		{
+			bool en = true;
+		
+			if (mod.io[i].digitalInput)
+				m_slot1DIO_lbl[i]->SetLabel(wxT("IN"));
+			
+			else if (mod.io[i].digitalOutput)
+			{
+				m_slot1DIO[i]->SetReadOnly(true);
+				m_slot1DIO[i]->SetValue( mod.io[i].value );
+				m_slot1DIO_lbl[i]->SetLabel(wxT("OUT"));
+			}
+			else
+			{
+				m_slot1DIO[i]->SetReadOnly(true);
+				m_slot1DIO[i]->SetValue(false);
+
+				if (mod.io[i].used)
+					m_slot1DIO_lbl[i]->SetLabel(wxT("EN"));
+				else
+				{
+					m_slot1DIO_lbl[i]->SetLabel(wxT("--"));
+					en = false;
+				}
+			}
+			
+			m_slot1DIO[i]->SetEnabled(en);
+		}
+	}
+	
+	
+	// slot 6
+	{
+		DigitalModuleData &mod = newData.digitalModule[1];
+	
+		// pwm
+		for (size_t i = 0; i < DIGITAL_PWM_CHANNELS; i++)
+		{
+			m_slot2PWM[i]->SetEnabled( mod.pwm[i].pwm != NULL );
+			m_slot2PWM[i]->SetValue( mod.pwm[i].speed );
+		}
+
+		// digital io
+		for (size_t i = 0; i < DIGITAL_IO_CHANNELS; i++)
+		{
+			bool en = true;
+		
+			if (mod.io[i].digitalInput)
+				m_slot2DIO_lbl[i]->SetLabel(wxT("IN"));
+			
+			else if (mod.io[i].digitalOutput)
+			{
+				m_slot2DIO[i]->SetReadOnly(true);
+				m_slot2DIO[i]->SetValue( mod.io[i].value );
+				m_slot2DIO_lbl[i]->SetLabel(wxT("OUT"));
+			}
+			else
+			{
+				m_slot2DIO[i]->SetReadOnly(true);
+				m_slot2DIO[i]->SetValue(false);
+				
+				if (mod.io[i].used)
+					m_slot2DIO_lbl[i]->SetLabel(wxT("EN"));
+				else
+				{
+					m_slot2DIO_lbl[i]->SetLabel(wxT("--"));
+					en = false;
+				}
+			}
+			
+			m_slot2DIO[i]->SetEnabled(en);
+		}
+	}
+	
+	
+	// slot 8
+	{
+		SolenoidModule &mod = newData.solenoidModule;
+	
+		for (size_t i = 0; i < SOLENOID_IO_CHANNELS; i++)
+		{
+			if (mod.solenoids[i].solenoid)
+			{
+				m_solenoids[i]->SetValue( mod.solenoids[i].value );
+				m_solenoids[i]->SetEnabled(true);
+			}
+			else
+				m_solenoids[i]->SetEnabled(false);
+		}
+	}
+	
+	
+	
 	// lcd text
 	m_lcdTop->SetValue(wxString::FromUTF8(newData.lcdText + 2, 21));
 

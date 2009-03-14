@@ -29,6 +29,7 @@ class PWM;
 class DigitalInput;
 class DigitalOutput;
 class AnalogChannel;
+class Solenoid;
 
 class Notifier;
 
@@ -86,6 +87,9 @@ public:
 	
 	void AddAnalogChannel(AnalogChannel * ac, UINT32 slot, UINT32 channel);
 	void DeleteAnalogChannel(AnalogChannel * ac);
+	
+	void AddSolenoid(Solenoid * s, UINT32 slot, UINT32 channel);
+	void DeleteSolenoid(Solenoid * s);
 	
 	/// @}
 	

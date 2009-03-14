@@ -47,11 +47,16 @@ Slider::Slider(wxWindow * parent, wxWindowID id, double min, double max, bool re
 	SetMinSize(wxSize(75, (y*3)/2));
 	
 	SetValue(0.0);
+	UpdateCursor();
 }
 
 void Slider::SetReadOnly(bool readOnly)
 {
-	m_readOnly = readOnly;
+	if (m_readOnly != readOnly)
+	{	
+		m_readOnly = readOnly;
+		UpdateCursor();
+	}
 }
 
 void Slider::SetEnabled(bool enabled)
@@ -59,6 +64,8 @@ void Slider::SetEnabled(bool enabled)
 	if (m_enabled != enabled)
 	{
 		m_enabled = enabled;
+		
+		UpdateCursor();
 		UpdateDisplay();
 	}
 }
@@ -223,6 +230,16 @@ void Slider::UpdateDisplay(wxDC * dc)
 		
 	if (do_delete)
 		delete dc;
+}
+
+void Slider::UpdateCursor()
+{
+	if (!m_enabled)
+		SetCursor(wxCursor(wxCURSOR_NO_ENTRY));
+	else if (m_readOnly)
+		SetCursor(*wxSTANDARD_CURSOR);
+	else
+		SetCursor(wxCursor(wxCURSOR_HAND));
 }
 
 

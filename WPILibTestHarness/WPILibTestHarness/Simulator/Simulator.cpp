@@ -30,8 +30,6 @@
 #include <WPILib/RobotBase.h>
 void StartRobotClass();
 
-#include <trunk/KwarqsLib/KwarqsConstants.h>
-
 #include <vector>
 using namespace std;
 
@@ -73,9 +71,11 @@ void Simulator::SimulateStep(double tm)
 
 		// transfer the data back and forth as needed
 		m_controlInterface->simulationData.Transfer();
+
+		PacketReady();
 	
 		// todo: physics calculations and such
-	
+		
 	}
 
 	// send event
@@ -430,7 +430,37 @@ void Simulator::DeleteAnalogChannel(AnalogChannel * ac)
 	}
 }
 
+void Simulator::AddSolenoid(Solenoid * p, UINT32 slot, UINT32 channel)
+{
 
+	wxMutexLocker mtx(m_controlInterface->lock);
+	
+	assert(slot == SOLENOID_SLOT_1);
+	assert(channel > 0 && channel <= SOLENOID_IO_CHANNELS);
+	
+	DigitalModuleData &mod = (slot == DIGITAL_SLOT_1 ? 
+		m_controlInterface->simulationData.digitalModule[0] :
+		m_controlInterface->simulationData.digitalModule[1]);
+
+	assert(!m_controlInterface->simulationData.solenoidModule.solenoids[channel-1].solenoid && "Solenoid already used");
+		
+	m_controlInterface->simulationData.solenoidModule.solenoids[channel-1].solenoid = p;
+}
+
+void Simulator::DeleteSolenoid(Solenoid * p)
+{
+	wxMutexLocker mtx(m_controlInterface->lock);
+
+	SolenoidModule &mod = m_controlInterface->simulationData.solenoidModule;
+
+	for (size_t i = 0; i < SOLENOID_IO_CHANNELS; i++)
+		if (mod.solenoids[i].solenoid == p)
+		{
+			mod.solenoids[i].solenoid = NULL;
+			mod.solenoids[i].value = false;
+			return;
+		}
+}
 
 
 

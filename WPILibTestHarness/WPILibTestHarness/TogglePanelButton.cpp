@@ -29,6 +29,7 @@ END_EVENT_TABLE()
 TogglePanelButton::TogglePanelButton(wxWindow * parent, wxWindowID id ) :
 	m_value(false),
 	m_readOnly(false),
+	m_enabled(true),
 	m_onColor(*wxGREEN),
 	m_offColor(wxT("FOREST GREEN"))
 {
@@ -58,7 +59,22 @@ void TogglePanelButton::SetValue(bool value)
 
 void TogglePanelButton::SetReadOnly(bool readonly)
 {
-	m_readOnly = readonly;
+	if (m_readOnly != readonly)
+	{
+		m_readOnly = readonly;
+		UpdateCursor();
+	}
+}
+
+void TogglePanelButton::SetEnabled(bool enable)
+{
+	if (m_enabled != enable)
+	{
+		m_enabled = enable;
+		
+		UpdateDisplay(NULL);
+		UpdateCursor();
+	}
 }
 
 void TogglePanelButton::OnClick(wxMouseEvent &event)
@@ -96,7 +112,9 @@ void TogglePanelButton::UpdateDisplay(wxDC * in)
 
 	dc->SetPen(*wxBLACK_PEN);
 
-	if (m_value)
+	if (!m_enabled)
+		dc->SetBrush(*wxBLACK_BRUSH);
+	else if (m_value)
 		dc->SetBrush(*wxTheBrushList->FindOrCreateBrush(m_onColor, wxSOLID));
 	else
 		dc->SetBrush(*wxTheBrushList->FindOrCreateBrush(m_offColor, wxSOLID));
@@ -106,3 +124,14 @@ void TogglePanelButton::UpdateDisplay(wxDC * in)
 	if (!in)
 		delete dc;
 }
+
+void TogglePanelButton::UpdateCursor()
+{
+	if (!m_enabled)
+		SetCursor(wxCursor(wxCURSOR_NO_ENTRY));
+	else if (m_readOnly)
+		SetCursor(*wxSTANDARD_CURSOR);
+	else
+		SetCursor(wxCursor(wxCURSOR_HAND));
+}
+

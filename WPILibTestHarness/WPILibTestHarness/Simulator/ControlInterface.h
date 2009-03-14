@@ -27,8 +27,9 @@
 
 DECLARE_EVENT_TYPE(EVT_ON_STEP, -1)
 
-// 25ms default step size
-#define SIMULATOR_STEP_SIZE 0.025
+// 10ms default step size
+#define SIMULATOR_STEP_SIZE 0.01
+#define SIMULATOR_STEP_TIMER 10
 
 
 struct ControlInterface {

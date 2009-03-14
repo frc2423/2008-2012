@@ -2,7 +2,7 @@
 <resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
 	<object class="wxFrame" name="SimulationWindow">
 		<style>wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL</style>
-		<size>700,550</size>
+		<size>750,550</size>
 		<title>WPILib Test Harness</title>
 		<object class="wxPanel" name="m_topPanel">
 			<style>wxTAB_TRAVERSAL</style>
@@ -1328,6 +1328,156 @@
 								</object>
 							</object>
 						</object>
+						<object class="sizeritem">
+							<option>1</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxStaticBoxSizer">
+								<orient>wxVERTICAL</orient>
+								<label>Slot 8</label>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText29211">
+												<label>Solenoid</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxFlexGridSizer">
+												<rows>8</rows>
+												<cols>2</cols>
+												<vgap>5</vgap>
+												<hgap>5</hgap>
+												<growablecols></growablecols>
+												<growablerows></growablerows>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3321211">
+														<label>1</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_1" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33121211">
+														<label>2</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_2" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331121211">
+														<label>3</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_3" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311121211">
+														<label>4</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_4" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111121211">
+														<label>5</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_5" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111121211">
+														<label>6</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_6" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111121211">
+														<label>7</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_7" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111111311">
+														<label>8</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_8" />
+												</object>
+											</object>
+										</object>
+									</object>
+								</object>
+							</object>
+						</object>
 					</object>
 				</object>
 				<object class="sizeritem">
@@ -1837,7 +1987,7 @@
 											<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
 											<object class="wxStaticText" name="m_staticText10">
-												<label>Steps</label>
+												<label>10ms Steps</label>
 											</object>
 										</object>
 										<object class="sizeritem">

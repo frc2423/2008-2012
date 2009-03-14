@@ -1,6 +1,8 @@
 /*
     WPILib Test Harness
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
+	
+	$Id$
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License v3 as published by

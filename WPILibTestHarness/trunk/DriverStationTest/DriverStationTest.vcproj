@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="DefaultCode"
+	Name="DriverStationTest"
 	ProjectGUID="{11A97600-9A0C-44D1-B438-03B4A0CF08EE}"
 	RootNamespace="DefaultCode"
 	Keyword="Win32Proj"
@@ -136,7 +136,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="wsock32.lib kernel32.lib user32.lib gdi32.lib comdlg32.lib comctl32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib rpcrt4.lib Winmm.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="c:\wxWidgets\lib\vc_lib"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

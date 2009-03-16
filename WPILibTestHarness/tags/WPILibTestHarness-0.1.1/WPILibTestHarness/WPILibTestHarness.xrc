@@ -1,0 +1,2034 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<resource xmlns="http://www.wxwindows.org/wxxrc" version="2.3.0.1">
+	<object class="wxFrame" name="SimulationWindow">
+		<style>wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL</style>
+		<size>750,550</size>
+		<title>WPILib Test Harness</title>
+		<object class="wxPanel" name="m_topPanel">
+			<style>wxTAB_TRAVERSAL</style>
+			<object class="wxBoxSizer">
+				<orient>wxVERTICAL</orient>
+				<object class="sizeritem">
+					<option>1</option>
+					<flag>wxEXPAND</flag>
+					<border>5</border>
+					<object class="wxBoxSizer">
+						<orient>wxHORIZONTAL</orient>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxStaticBoxSizer">
+								<orient>wxVERTICAL</orient>
+								<label>Slot 1</label>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText25">
+										<label>Analog Input</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxFlexGridSizer">
+										<rows>8</rows>
+										<cols>2</cols>
+										<vgap>5</vgap>
+										<hgap>5</hgap>
+										<growablecols></growablecols>
+										<growablerows></growablerows>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText33">
+												<label>1</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_1_1" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText331">
+												<label>2</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_1_2" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText3311">
+												<label>3</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_1_3" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText33111">
+												<label>4</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_1_4" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText331111">
+												<label>5</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_1_5" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText3311111">
+												<label>6</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_1_6" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText33111111">
+												<label>7</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_1_7" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText331111111">
+												<label>8</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_1_8" />
+										</object>
+									</object>
+								</object>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxStaticBoxSizer">
+								<orient>wxVERTICAL</orient>
+								<label>Slot 2</label>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxStaticText" name="m_staticText251">
+										<label>Analog Input</label>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxFlexGridSizer">
+										<rows>8</rows>
+										<cols>2</cols>
+										<vgap>5</vgap>
+										<hgap>5</hgap>
+										<growablecols></growablecols>
+										<growablerows></growablerows>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText332">
+												<label>1</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_2_1" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText3312">
+												<label>2</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_2_2" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText33112">
+												<label>3</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_2_3" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText331112">
+												<label>4</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_2_4" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText3311112">
+												<label>5</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_2_5" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText33111112">
+												<label>6</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_2_6" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText331111112">
+												<label>7</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_2_7" />
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText3311111111">
+												<label>8</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALIGN_CENTER</flag>
+											<border>5</border>
+											<object class="unknown" name="m_analog_2_8" />
+										</object>
+									</object>
+								</object>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxStaticBoxSizer">
+								<orient>wxHORIZONTAL</orient>
+								<label>Slot 4</label>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText29">
+												<label>PWM</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxFlexGridSizer">
+												<rows>8</rows>
+												<cols>2</cols>
+												<vgap>5</vgap>
+												<hgap>5</hgap>
+												<growablecols></growablecols>
+												<growablerows></growablerows>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3321">
+														<label>1</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_1_1" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33121">
+														<label>2</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_1_2" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331121">
+														<label>3</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_1_3" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311121">
+														<label>4</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_1_4" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111121">
+														<label>5</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_1_5" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111121">
+														<label>6</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_1_6" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111121">
+														<label>7</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_1_7" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111111">
+														<label>8</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_1_8" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111111111">
+														<label>9</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_1_9" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111111111">
+														<label>10</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_1_10" />
+												</object>
+											</object>
+										</object>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND|wxLEFT</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText292">
+												<label>Digital I/O</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxFlexGridSizer">
+												<rows>14</rows>
+												<cols>6</cols>
+												<vgap>5</vgap>
+												<hgap>5</hgap>
+												<growablecols></growablecols>
+												<growablerows></growablerows>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33212">
+														<label>1</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_1" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_1">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331212">
+														<label>8</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_8" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_8">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311212">
+														<label>2</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_2" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_2">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111212">
+														<label>9</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_9" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_9">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111212">
+														<label>3</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_3" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_3">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111212">
+														<label>10</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_10" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_10">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111212">
+														<label>4</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_4" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_4">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111111113">
+														<label>11</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_11" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_11">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111111113">
+														<label>5</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_5" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_5">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111111112">
+														<label>12</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_12" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_12">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111111111121">
+														<label>6</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag></flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_6" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_6">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111111111216">
+														<label>13</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag></flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_13" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_13">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111111111211">
+														<label>7</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag></flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_7" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_7">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111111111212">
+														<label>14</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag></flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_1_14" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_1_14">
+														<label>IN</label>
+													</object>
+												</object>
+											</object>
+										</object>
+									</object>
+								</object>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxStaticBoxSizer">
+								<orient>wxHORIZONTAL</orient>
+								<label>Slot 6</label>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText291">
+												<label>PWM</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>1</option>
+											<flag>wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxFlexGridSizer">
+												<rows>8</rows>
+												<cols>2</cols>
+												<vgap>5</vgap>
+												<hgap>5</hgap>
+												<growablecols></growablecols>
+												<growablerows></growablerows>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33211">
+														<label>1</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_2_1" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331211">
+														<label>2</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_2_2" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311211">
+														<label>3</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_2_3" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111211">
+														<label>4</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_2_4" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111211">
+														<label>5</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_2_5" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111211">
+														<label>6</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_2_6" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111211">
+														<label>7</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_2_7" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111111112">
+														<label>8</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_2_8" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111111112">
+														<label>9</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_2_9" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111111111">
+														<label>10</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_pwm_2_10" />
+												</object>
+											</object>
+										</object>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND|wxLEFT</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText2921">
+												<label>Digital I/O</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxFlexGridSizer">
+												<rows>14</rows>
+												<cols>6</cols>
+												<vgap>5</vgap>
+												<hgap>5</hgap>
+												<growablecols></growablecols>
+												<growablerows></growablerows>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText332121">
+														<label>1</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_1" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_1">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3312121">
+														<label>8</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_8" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_8">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33112121">
+														<label>2</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_2" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_2">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331112121">
+														<label>9</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_9" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_9">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311112121">
+														<label>3</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_3" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_3">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111112121">
+														<label>10</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_10" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_10">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111112121">
+														<label>4</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_4" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_4">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111111131">
+														<label>11</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_11" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_11">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111111131">
+														<label>5</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_5" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_5">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111111111122">
+														<label>12</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_12" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_12">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111111111213">
+														<label>6</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag></flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_6" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_6">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111111112161">
+														<label>13</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag></flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_13" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_13">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111111112111">
+														<label>7</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag></flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_7" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_7">
+														<label>IN</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111111112121">
+														<label>14</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag></flag>
+													<border>5</border>
+													<object class="unknown" name="m_dio_2_14" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_diol_2_14">
+														<label>IN</label>
+													</object>
+												</object>
+											</object>
+										</object>
+									</object>
+								</object>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>1</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxStaticBoxSizer">
+								<orient>wxVERTICAL</orient>
+								<label>Slot 8</label>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText29211">
+												<label>Solenoid</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxFlexGridSizer">
+												<rows>8</rows>
+												<cols>2</cols>
+												<vgap>5</vgap>
+												<hgap>5</hgap>
+												<growablecols></growablecols>
+												<growablerows></growablerows>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3321211">
+														<label>1</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_1" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33121211">
+														<label>2</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_2" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331121211">
+														<label>3</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_3" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311121211">
+														<label>4</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_4" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111121211">
+														<label>5</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_5" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331111121211">
+														<label>6</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_6" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3311111121211">
+														<label>7</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_7" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33111111111311">
+														<label>8</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_sol_8" />
+												</object>
+											</object>
+										</object>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
+				</object>
+				<object class="sizeritem">
+					<option>0</option>
+					<flag>wxEXPAND</flag>
+					<border>5</border>
+					<object class="wxBoxSizer">
+						<orient>wxHORIZONTAL</orient>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxStaticBoxSizer">
+								<orient>wxVERTICAL</orient>
+								<label>Joystick 1/2</label>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxHORIZONTAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxBoxSizer">
+												<orient>wxVERTICAL</orient>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxEXPAND</flag>
+													<border>5</border>
+													<object class="wxFlexGridSizer">
+														<rows>4</rows>
+														<cols>2</cols>
+														<vgap>5</vgap>
+														<hgap>5</hgap>
+														<growablecols></growablecols>
+														<growablerows></growablerows>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="wxStaticText" name="m_staticText333">
+																<label>X</label>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="unknown" name="m_joy1_x" />
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="wxStaticText" name="m_staticText3313">
+																<label>Y</label>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="unknown" name="m_joy1_y" />
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="wxStaticText" name="m_staticText33113">
+																<label>Z</label>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="unknown" name="m_joy1_z" />
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="wxStaticText" name="m_staticText331113">
+																<label>T</label>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="unknown" name="m_joy1_t" />
+														</object>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxEXPAND</flag>
+													<border>5</border>
+													<object class="wxFlexGridSizer">
+														<rows>2</rows>
+														<cols>2</cols>
+														<vgap>0</vgap>
+														<hgap>0</hgap>
+														<growablecols></growablecols>
+														<growablerows></growablerows>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALL</flag>
+															<border>5</border>
+															<object class="wxCheckBox" name="m_joy1_1">
+																<enabled>0</enabled>
+																<label>1</label>
+																<checked>0</checked>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALL</flag>
+															<border>5</border>
+															<object class="wxCheckBox" name="m_joy1_2">
+																<enabled>0</enabled>
+																<label>2</label>
+																<checked>0</checked>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALL</flag>
+															<border>5</border>
+															<object class="wxCheckBox" name="m_joy1_3">
+																<enabled>0</enabled>
+																<label>3</label>
+																<checked>0</checked>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALL</flag>
+															<border>5</border>
+															<object class="wxCheckBox" name="m_joy1_4">
+																<enabled>0</enabled>
+																<label>4</label>
+																<checked>0</checked>
+															</object>
+														</object>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALL</flag>
+													<border>5</border>
+													<object class="wxCheckBox" name="m_joy1_enable">
+														<label>Use real stick</label>
+														<checked>1</checked>
+													</object>
+												</object>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxBoxSizer">
+												<orient>wxVERTICAL</orient>
+												<object class="sizeritem">
+													<option>1</option>
+													<flag>wxEXPAND</flag>
+													<border>5</border>
+													<object class="wxFlexGridSizer">
+														<rows>4</rows>
+														<cols>1</cols>
+														<vgap>5</vgap>
+														<hgap>5</hgap>
+														<growablecols></growablecols>
+														<growablerows></growablerows>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="unknown" name="m_joy2_x" />
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="unknown" name="m_joy2_y" />
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="unknown" name="m_joy2_z" />
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALIGN_CENTER</flag>
+															<border>5</border>
+															<object class="unknown" name="m_joy2_t" />
+														</object>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>1</option>
+													<flag>wxEXPAND</flag>
+													<border>5</border>
+													<object class="wxFlexGridSizer">
+														<rows>2</rows>
+														<cols>2</cols>
+														<vgap>0</vgap>
+														<hgap>0</hgap>
+														<growablecols></growablecols>
+														<growablerows></growablerows>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALL</flag>
+															<border>5</border>
+															<object class="wxCheckBox" name="m_joy2_1">
+																<label>1</label>
+																<checked>0</checked>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALL</flag>
+															<border>5</border>
+															<object class="wxCheckBox" name="m_joy2_2">
+																<label>2</label>
+																<checked>0</checked>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALL</flag>
+															<border>5</border>
+															<object class="wxCheckBox" name="m_joy2_3">
+																<label>3</label>
+																<checked>0</checked>
+															</object>
+														</object>
+														<object class="sizeritem">
+															<option>0</option>
+															<flag>wxALL</flag>
+															<border>5</border>
+															<object class="wxCheckBox" name="m_joy2_4">
+																<label>4</label>
+																<checked>0</checked>
+															</object>
+														</object>
+													</object>
+												</object>
+											</object>
+										</object>
+									</object>
+								</object>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>1</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxStaticBoxSizer">
+								<orient>wxHORIZONTAL</orient>
+								<label>DriverStation LCD and I/O</label>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxTextCtrl" name="m_lcdTop">
+												<size>175,-1</size>
+												<font>
+													<family>teletype</family>
+													<style>normal</style>
+													<weight>normal</weight>
+													<underlined>0</underlined>
+													<face>Courier New</face>
+												</font>
+												<value></value>
+												<maxlength>0</maxlength>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxTextCtrl" name="m_lcdBottom">
+												<style>wxTE_MULTILINE|wxTE_NO_VSCROLL|wxTE_READONLY</style>
+												<size>175,80</size>
+												<font>
+													<size>8</size>
+													<family>teletype</family>
+													<style>normal</style>
+													<weight>normal</weight>
+													<underlined>0</underlined>
+													<face>Courier New</face>
+												</font>
+												<value></value>
+												<maxlength>0</maxlength>
+											</object>
+										</object>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>1</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxVERTICAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxFlexGridSizer">
+												<rows>2</rows>
+												<cols>4</cols>
+												<vgap>0</vgap>
+												<hgap>0</hgap>
+												<growablecols></growablecols>
+												<growablerows></growablerows>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALL</flag>
+													<border>5</border>
+													<object class="wxCheckBox" name="m_ds_i_1">
+														<label>I1</label>
+														<checked>0</checked>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALL</flag>
+													<border>5</border>
+													<object class="wxCheckBox" name="m_ds_i_2">
+														<label>I2</label>
+														<checked>0</checked>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALL</flag>
+													<border>5</border>
+													<object class="wxCheckBox" name="m_ds_i_3">
+														<label>I3</label>
+														<checked>0</checked>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALL</flag>
+													<border>5</border>
+													<object class="wxCheckBox" name="m_ds_i_4">
+														<label>I4</label>
+														<checked>0</checked>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALL</flag>
+													<border>5</border>
+													<object class="wxCheckBox" name="m_ds_i_5">
+														<label>I5</label>
+														<checked>0</checked>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALL</flag>
+													<border>5</border>
+													<object class="wxCheckBox" name="m_ds_i_6">
+														<label>I6</label>
+														<checked>0</checked>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALL</flag>
+													<border>5</border>
+													<object class="wxCheckBox" name="m_ds_i_7">
+														<label>I7</label>
+														<checked>0</checked>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALL</flag>
+													<border>5</border>
+													<object class="wxCheckBox" name="m_ds_i_8">
+														<label>I8</label>
+														<checked>0</checked>
+													</object>
+												</object>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>1</option>
+											<flag>wxEXPAND</flag>
+											<border>5</border>
+											<object class="wxFlexGridSizer">
+												<rows>4</rows>
+												<cols>2</cols>
+												<vgap>5</vgap>
+												<hgap>5</hgap>
+												<growablecols></growablecols>
+												<growablerows></growablerows>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText334">
+														<label>A1</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_ds_ai_1" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText3314">
+														<label>A2</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_ds_ai_2" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText33114">
+														<label>A3</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_ds_ai_3" />
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="wxStaticText" name="m_staticText331114">
+														<label>A4</label>
+													</object>
+												</object>
+												<object class="sizeritem">
+													<option>0</option>
+													<flag>wxALIGN_CENTER</flag>
+													<border>5</border>
+													<object class="unknown" name="m_ds_ai_4" />
+												</object>
+											</object>
+										</object>
+									</object>
+								</object>
+							</object>
+						</object>
+						<object class="sizeritem">
+							<option>0</option>
+							<flag>wxALL|wxEXPAND</flag>
+							<border>5</border>
+							<object class="wxStaticBoxSizer">
+								<orient>wxVERTICAL</orient>
+								<label>Simulation</label>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxButton" name="m_startButton">
+										<label>Start</label>
+										<default>0</default>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxButton" name="m_stepButton">
+										<label>Step</label>
+										<default>0</default>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxEXPAND</flag>
+									<border>5</border>
+									<object class="wxBoxSizer">
+										<orient>wxHORIZONTAL</orient>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<object class="wxStaticText" name="m_staticText10">
+												<label>10ms Steps</label>
+											</object>
+										</object>
+										<object class="sizeritem">
+											<option>0</option>
+											<flag>wxALL</flag>
+											<border>5</border>
+											<object class="wxTextCtrl" name="m_stepText">
+												<size>30,-1</size>
+												<value>1</value>
+												<maxlength>0</maxlength>
+											</object>
+										</object>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxCheckBox" name="m_enabledBox">
+										<label>Enabled</label>
+										<checked>1</checked>
+									</object>
+								</object>
+								<object class="sizeritem">
+									<option>0</option>
+									<flag>wxALL</flag>
+									<border>5</border>
+									<object class="wxCheckBox" name="m_autonomousBox">
+										<label>Autonomous</label>
+										<checked>0</checked>
+									</object>
+								</object>
+							</object>
+						</object>
+					</object>
+				</object>
+			</object>
+		</object>
+		<object class="wxStatusBar" name="m_statusBar">
+			<style>wxST_SIZEGRIP</style>
+			<fields>1</fields>
+		</object>
+	</object>
+</resource>

@@ -22,6 +22,7 @@
 #include "Controls/CompassDrive.h"
 #include "Controls/NullMovementControl.h"
 #include "Controls/CompassDriveII.h"
+#include "Controls/CompassController.h"
 
 
 
@@ -52,6 +53,7 @@ class KwarqsRobotMain : public SimpleRobot
 	SimpleControl 			simpleControl;
 	CompassDrive			compassDrive;
 	CompassDriveII			compassDriveII;
+	CompassController		compassController;
 	NullMovementControl		nullMovementControl;
 	
 	AutonomousDemo			autonomousDemo;
@@ -95,6 +97,7 @@ public:
 		simpleControl(&driveController),
 		compassDrive(&driveController),
 		compassDriveII(&driveController),
+		compassController(&driveController),
 		
 		nullMovementControl(&driveController),
 		
@@ -155,9 +158,13 @@ public:
 		
 		switch (user_selection)
 		{
-			//case 6:
+			//case 5:
 			//	control = &annControl;
 			//	break;
+			
+			case 6:
+				control = &compassController;
+				break;
 		
 			case 7:
 				control = &compassDriveII;

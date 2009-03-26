@@ -34,17 +34,18 @@ void CompassDriveII::Move()
 	// special compass drive II thing: adjust the front of the
 	// robot to where the nose should be
 	double y2 = m_stick2.GetY() * -1, x2 = m_stick2.GetX();
-	double rotation = 0;
+	
 	
 	// if we're meant to be rotating, do so
-	if (fabs(__hypot(x2, y2)) > 0.0)
+	if (fabs(__hypot(x2, y2)) > 0.25)
 	{
-		double face_angle = (atan2(y2, x2) * (180/M_PI) - 90.0 );			
-		if (face_angle < 0) face_angle += 360;
-
-		rotation = m_nosePointer.GetRotation(face_angle);
+		double m_noseAngle = (atan2(y2, x2) * (180/M_PI) - 90.0 );			
+		if (m_noseAngle < 0) m_noseAngle += 360;
 	}
 	
+	double rotation = m_nosePointer.GetRotation(m_noseAngle);
+	
+	// silly non-working traction control
 	if (DriverStation::GetInstance()->GetDigitalIn(8))
 	{
 	

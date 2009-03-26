@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kwarqs2009", "Kwarqs2009\Kwarqs2009.vcproj", "{0128766F-FB98-4614-B28A-7BAE7A04D9DB}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WPILibTestHarness", "WPILibTestHarness\WPILibTestHarness.vcproj", "{480A3AFE-4578-4A07-B461-691214CAF324}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0128766F-FB98-4614-B28A-7BAE7A04D9DB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0128766F-FB98-4614-B28A-7BAE7A04D9DB}.Debug|Win32.Build.0 = Debug|Win32
+		{0128766F-FB98-4614-B28A-7BAE7A04D9DB}.Release|Win32.ActiveCfg = Release|Win32
+		{0128766F-FB98-4614-B28A-7BAE7A04D9DB}.Release|Win32.Build.0 = Release|Win32
+		{480A3AFE-4578-4A07-B461-691214CAF324}.Debug|Win32.ActiveCfg = Debug|Win32
+		{480A3AFE-4578-4A07-B461-691214CAF324}.Debug|Win32.Build.0 = Debug|Win32
+		{480A3AFE-4578-4A07-B461-691214CAF324}.Release|Win32.ActiveCfg = Release|Win32
+		{480A3AFE-4578-4A07-B461-691214CAF324}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

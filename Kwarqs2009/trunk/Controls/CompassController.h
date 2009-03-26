@@ -1,13 +1,13 @@
 /**
-	\file 		CompassDriveII.h
+	\file 		CompassController.h
 	\author 	Amory Galili: last changed by $Author$
 	\date 		Last changed on $Date$
 	\version 	$Rev$
 */
 
 
-#ifndef COMPASSDRIVE_II_H
-#define COMPASSDRIVE_II_H
+#ifndef COMPASSCONTROLLER_H
+#define COMPASSCONTROLLER_H
 
 #include "../KwarqsLib/KwarqsNosePointer.h"
 #include "../KwarqsLib/KwarqsConstants.h"
@@ -17,20 +17,20 @@
 #include "../KwarqsLib/DelayEvent.h"
 
 /**
-	\class CompassDriveII
+	\class CompassController
 	\brief A very simple control system to demonstrate that things work
 */
-class CompassDriveII : public KwarqsMovementControl {
+class CompassController : public KwarqsMovementControl {
 public:
 
 	// constructor
-	CompassDriveII(KwarqsDriveController * driveController);
+	CompassController(KwarqsDriveController * driveController);
 
 	/// required method
 	void Move();
 	
 	/// required method
-	const char * Name() { return "CompassDriveII"; }
+	const char * Name() { return "CompassController"; }
 	
 private:
 
@@ -40,18 +40,14 @@ private:
 	double robotCompass();
 
 
-	// joystick used for control
-	KwarqsJoystick m_stick;
-	KwarqsJoystick m_stick2;
+	KwarqsJoystick m_controller;
 	
 	PositionInformation * m_position;
 	
 	KwarqsNosePointer m_nosePointer;
 	
-	DelayEvent 	m_motorDelay;
-	
-	double m_lastSpeed;
-	double m_noseAngle;
+	DelayEvent m_spinEvent;
+	double m_noseDirection;
 };
 
 #endif

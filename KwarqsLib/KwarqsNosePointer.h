@@ -8,8 +8,10 @@
 #ifndef KWARQS_NOSEPOINTER_H
 #define KWARQS_NOSEPOINTER_H
 
+#include "DriverStationLCD.h"
 #include "PositionInformation.h"
 #include "math.h"
+#include "DelayEvent.h"
 
 /**
 	\class KwarqsNosePointer
@@ -20,25 +22,29 @@ class KwarqsNosePointer {
 public:
 
 	KwarqsNosePointer() : 
-		last_sample_time(0),
+		m_sampleEvent(0.05),
 		m_result(0),
 		m_position(PositionInformation::GetInstance())
 	{}
 	
-	
+	/**
+		Pass this an angle, and this will calculate a rotation parameter
+		needed to point the robot in that direction. The angle is relative
+		to the field. 
+	*/
 	double GetRotation(double setpoint)
 	{
-		if (GetTime() - last_sample_time > 0.05)
+		if (m_sampleEvent.DoEvent())
 		{
 			// normalize the direction we want to go to
 			setpoint = fmod(setpoint, 360.0);
 			if (setpoint < 0) setpoint += 360;
+			
 		
 			/// @todo this needs to be customizable
 			// get the direction we're currently facing
 			double angle = m_position->GetNormalizedFieldAngle()*-1;
-			if (angle <0) angle += 360;
-			
+			if (angle < 0) angle += 360;
 			
 			
 			// get the difference between the angles
@@ -69,9 +75,9 @@ public:
 				else
 					m_result = (sqrt(error)) / sqrt(190.0);
 			}
-			
 		
-			last_sample_time = GetTime();
+			// print something useful out
+			DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kUser_Line6, "@: %5.1f To: %5.1f", angle, setpoint);
 		}
 			
 		// return the calculation
@@ -80,7 +86,7 @@ public:
 	
 private:
 
-	double last_sample_time;
+	DelayEvent m_sampleEvent;
 	double m_result;
 	
 	PositionInformation * m_position;

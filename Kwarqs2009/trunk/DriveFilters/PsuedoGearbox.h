@@ -21,6 +21,7 @@ public:
 
 	PsuedoGearbox() :
 		m_stick(FIRST_JOYSTICK_PORT),
+		m_controller(CONTROLLER_JOYSTICK_PORT),
 		m_enabled(true)
 	{}
 
@@ -38,7 +39,7 @@ public:
 	virtual void Move(double &speed, double &angle, double &rotation, bool &stop)
 	{
 		// don't touch this (turbo mode)
-		if (!m_enabled || m_stick.GetTrigger())
+		if (!m_enabled || m_stick.GetTrigger() || m_controller.GetRawButton(2))
 			return;
 	
 		// low speed action (boring, but makes robot easier to drive)
@@ -52,16 +53,9 @@ public:
 private:
 
 	KwarqsJoystick m_stick;
+	KwarqsJoystick m_controller;
+
 	bool m_enabled;
-	
-	double DeadFilter(double val, double max)
-	{
-		if (fabs(val) > max)
-			return max;
-		
-		return val * max;
-	}
-	
 };
 
 #endif

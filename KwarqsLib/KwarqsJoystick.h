@@ -70,6 +70,11 @@ public:
 		return m_joystick->GetRawButton(button);
 	}
 	
+	float GetRawAxis(UINT32 axis)
+	{
+		return m_joystick->GetRawAxis(axis);
+	}
+	
 private:
 
 	float DeadFilter(float val)

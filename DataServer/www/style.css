@@ -1,0 +1,65 @@
+
+body, input, table{
+	font-family: Verdana, sans-serif;
+	font-size: 0.9em;
+	background: #f5f5f5;
+}
+
+.group {
+	border: 1px solid #cfcfcf;
+	width: 15em;
+	margin-right: 1em;
+	margin-bottom: 1em;
+	float: left;
+	background: #ffffff;
+}
+
+.group table {
+	width: 100%;
+	background: #ffffff;
+}
+
+.grouphdr {
+	background: #080808;
+	color: #ffffff;
+	padding: 0.25em;
+	cursor: pointer;
+}
+
+.grouphdr span {
+	font-family: courier, monospace;
+	background: #ffffff;
+	color: #000000;
+	width: 1em;
+	padding: 0.1em;
+	text-align: right;
+}
+
+.selectbar, .selectbar_hl {
+	
+	float: right;
+}
+
+.selectbar div, .selectbar_hl div {
+	width: 10em;
+	cursor: pointer;
+}
+
+.selectbar div{
+	border: 1px solid #dfdfdf;
+}
+
+.selectbar_hl div{
+	border: 1px solid #bfbfbf;
+}
+
+.selectbar div div
+{
+	background: #dddddd;
+}
+
+.selectbar_hl div div
+{
+	background: #bbbbbb;
+}
+

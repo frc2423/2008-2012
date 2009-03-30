@@ -69,6 +69,18 @@ void request_handler::handle_request(const request& req, reply& rep)
 		request_path += "index.html";
 	}
 
+	if (req.method == "GET")
+		handle_get_request(request_path, rep);
+	else
+		handle_post_request(request_path, rep);
+		
+	// finish setting up the reply
+	rep.persistent = prefers_persistent;
+}
+
+
+void request_handler::handle_get_request(const std::string &request_path, reply &rep)
+{
 	// Determine the file extension.
 	std::size_t last_slash_pos = request_path.find_last_of("/");
 	std::size_t last_dot_pos = request_path.find_last_of(".");
@@ -91,15 +103,40 @@ void request_handler::handle_request(const request& req, reply& rep)
 	rep.status = reply::ok;
 	rep.content.clear();
 	rep.headers.clear();
-	rep.persistent = prefers_persistent;
 	
-	char buf[512];
+	
+	char buf[1024];
 	while (is.read(buf, sizeof(buf)).gcount() > 0)
 		rep.content.append(buf, is.gcount());
 	rep.headers.resize(1);
 	rep.headers[0].name = "Content-Type";
 	rep.headers[0].value = mime_types::extension_to_type(extension);
+	
+	if (request_path == "/index.html")
+	{
+		// substitute the inner html element with our custom one
+	}
 }
+
+// this is intended for AJAX requests only, so it doesn't return anything
+// but machine data to the user
+void request_handler::handle_post_request(const std::string &request_path, reply &rep)
+{
+	if (request_path != "/varcontrol")
+	{
+		rep = reply::stock_reply(reply::not_found, true);
+		return;
+	}
+	
+	// get the various post variables somehow
+	
+	// setup a 200 OK message
+	rep = reply::stock_reply(reply::ok, true);
+	
+	// modify the proxy variable, that fn will set the content
+	rep.content = DataServer::GetInstance()->SetVariable( grpname, varname, value );
+}
+
 
 bool request_handler::url_decode(const std::string& in, std::string& out)
 {

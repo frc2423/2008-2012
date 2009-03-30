@@ -7,6 +7,8 @@
 
 #include "AllocateFlags.h"
 
+#include "server/server.hpp"
+
 /**
 	\class DataAdjuster
 	\brief Singleton class used to allow users to remotely modify variables
@@ -67,7 +69,12 @@ public:
 
 	/// @todo other types of variables: enums, bools, etc
 
-
+	/// Set the port that the HTTP server should listen on
+	void SetPort(std::string port);
+	
+	/// Set the root directory for web files
+	void SetRootDir(std::string dir);
+	
 private:
 
 	static DataAdjuster * m_instance;
@@ -83,20 +90,23 @@ private:
 
 	
 
-	static void DataAdjusterThreadStart(void * param);
-	void DataAdjusterListener();
+	static void DataServerThreadStart(void * param);
+	void ThreadFn();
 	
 	void ParsePacket(unsigned char * pkt);
 	
 	
-	std::map< string , shared_ptr< std::map< string , IntData > > > m_ints;
-	std::map< string , shared_ptr< std::map< string , FloatData > > > m_floats;
-
-	
-	std::vector<IntData> 	m_ints;
-	std::vector<FloatData> 	m_floats;
+	std::map< string , shared_ptr< std::map< string , IntDataFlags > > > m_ints;
+	std::map< string , shared_ptr< std::map< string , FloatDataFlags > > > m_floats;
 	
 	SEM_ID					m_mutex;
+	
+	// server data
+	std::string				m_port;
+	std::string				m_rootDir;
+	
+	// generated HTML for the server
+	std::string				m_html;
 };
 
 #endif

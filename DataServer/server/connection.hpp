@@ -28,51 +28,71 @@ class connection_manager;
 
 /// Represents a single connection from a client.
 class connection
-  : public boost::enable_shared_from_this<connection>,
-    private boost::noncopyable
+	: public boost::enable_shared_from_this<connection>,
+		private boost::noncopyable
 {
+	typedef boost::array<char, 8192> input_buffer;
+
 public:
-  /// Construct a connection with the given io_service.
-  explicit connection(boost::asio::io_service& io_service,
-      connection_manager& manager, request_handler& handler);
+	/// Construct a connection with the given io_service.
+	explicit connection(boost::asio::io_service& io_service,
+			connection_manager& manager, request_handler& handler);
 
-  /// Get the socket associated with the connection.
-  boost::asio::ip::tcp::socket& socket();
+	~connection();
 
-  /// Start the first asynchronous operation for the connection.
-  void start();
+	/// Get the socket associated with the connection.
+	boost::asio::ip::tcp::socket& socket();
 
-  /// Stop all asynchronous operations associated with the connection.
-  void stop();
+	/// Start the first asynchronous operation for the connection.
+	void start();
+
+	/// Stop all asynchronous operations associated with the connection.
+	void stop();
 
 private:
-  /// Handle completion of a read operation.
-  void handle_read(const boost::system::error_code& e,
-      std::size_t bytes_transferred);
+	/// Starts the io timeout routine
+	void set_io_timeout();
 
-  /// Handle completion of a write operation.
-  void handle_write(const boost::system::error_code& e);
+	/// Handle completion of a read operation.
+	void handle_read(const boost::system::error_code& e,
+			std::size_t bytes_transferred);
 
-  /// Socket for the connection.
-  boost::asio::ip::tcp::socket socket_;
+	/// Handle completion of a write operation.
+	void handle_write(const boost::system::error_code& e);
+	
+	/// Handle an I/O timeout
+	void handle_io_timeout(const boost::system::error_code& e);
 
-  /// The manager for this connection.
-  connection_manager& connection_manager_;
+	/// parse the input
+	void parse_input_data();
 
-  /// The handler used to process the incoming request.
-  request_handler& request_handler_;
+	/// Socket for the connection.
+	boost::asio::ip::tcp::socket socket_;
+	
+	/// Read timeout
+	boost::asio::deadline_timer io_timeout_;
 
-  /// Buffer for incoming data.
-  boost::array<char, 8192> buffer_;
+	/// The manager for this connection.
+	connection_manager& connection_manager_;
 
-  /// The incoming request.
-  request request_;
+	/// The handler used to process the incoming request.
+	request_handler& request_handler_;
 
-  /// The parser for the incoming request.
-  request_parser request_parser_;
+	/// Buffer for incoming data.
+	input_buffer buffer_;
+	
+	/// Buffer parameters (used by parse_input_data)
+	size_t buffer_start_ptr_;
+	size_t buffer_end_ptr_;
 
-  /// The reply to be sent back to the client.
-  reply reply_;
+	/// The incoming request.
+	request request_;
+
+	/// The parser for the incoming request.
+	request_parser request_parser_;
+
+	/// The reply to be sent back to the client.
+	reply reply_;
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;

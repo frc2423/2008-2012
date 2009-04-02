@@ -11,7 +11,6 @@
 #ifndef HTTP_REQUEST_PARSER_HPP
 #define HTTP_REQUEST_PARSER_HPP
 
-#include <boost/logic/tribool.hpp>
 #include <boost/tuple/tuple.hpp>
 
 namespace http {
@@ -28,28 +27,35 @@ public:
 
 	/// Reset to initial parser state.
 	void reset();
+	
+	enum ParserResult {
+		NeedMoreData,
+		Success,
+		BadRequest,
+		LengthRequired
+	};
 
-	/// Parse some data. The tribool return value is true when a complete request
+	/// Parse some data. The return value is true when a complete request
 	/// has been parsed, false if the data is invalid, indeterminate when more
 	/// data is required. The InputIterator return value indicates how much of the
 	/// input has been consumed.
 	template <typename InputIterator>
-	boost::tuple<boost::tribool, InputIterator> parse(request& req,
+	boost::tuple<ParserResult, InputIterator> parse(request& req,
 			InputIterator begin, InputIterator end)
 	{
 		while (begin != end)
 		{
-			boost::tribool result = consume(req, *begin++);
-			if (result || !result)
+			ParserResult result = consume(req, *begin++);
+			if (result != NeedMoreData)
 				return boost::make_tuple(result, begin);
 		}
-		boost::tribool result = boost::indeterminate;
-		return boost::make_tuple(result, begin);
+		
+		return boost::make_tuple(NeedMoreData, begin);
 	}
 
 private:
 	/// Handle the next character of input.
-	boost::tribool consume(request& req, char input);
+	ParserResult consume(request& req, char input);
 
 	/// Check if a byte is an HTTP character.
 	static bool is_char(int c);
@@ -86,8 +92,12 @@ private:
 		space_before_header_value,
 		header_value,
 		expecting_newline_2,
-		expecting_newline_3
+		expecting_newline_3,
+		expecting_content
 	} state_;
+	
+	size_t content_received_;
+	size_t expected_content_bytes_;
 };
 
 } // namespace server

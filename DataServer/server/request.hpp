@@ -27,6 +27,8 @@ struct request
 	int http_version_minor;
 	std::vector<header> headers;
 	
+	std::string post_content;
+	
 	// set to true if the request is persistent
 	bool persistent;
 };

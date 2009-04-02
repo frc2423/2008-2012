@@ -41,6 +41,8 @@ const std::string forbidden =
 	"HTTP/1.1 403 Forbidden\r\n";
 const std::string not_found =
 	"HTTP/1.1 404 Not Found\r\n";
+const std::string length_required =
+	"HTTP/1.1 411 Length Required\r\n";
 const std::string internal_server_error =
 	"HTTP/1.1 500 Internal Server Error\r\n";
 const std::string not_implemented =
@@ -78,6 +80,8 @@ boost::asio::const_buffer to_buffer(reply::status_type status)
 		return boost::asio::buffer(forbidden);
 	case reply::not_found:
 		return boost::asio::buffer(not_found);
+	case reply::length_required:
+		return boost::asio::buffer(length_required);
 	case reply::internal_server_error:
 		return boost::asio::buffer(internal_server_error);
 	case reply::not_implemented:
@@ -200,6 +204,11 @@ const char not_found[] =
 	"<head><title>Not Found</title></head>"
 	"<body><h1>404 Not Found</h1></body>"
 	"</html>";
+const char length_required[] =
+	"<html>"
+	"<head><title>Length Required</title></head>"
+	"<body><h1>411 Length Required</h1></body>"
+	"</html>";
 const char internal_server_error[] =
 	"<html>"
 	"<head><title>Internal Server Error</title></head>"
@@ -249,6 +258,8 @@ std::string to_string(reply::status_type status)
 		return forbidden;
 	case reply::not_found:
 		return not_found;
+	case reply::length_required:
+		return length_required;
 	case reply::internal_server_error:
 		return internal_server_error;
 	case reply::not_implemented:
@@ -278,6 +289,7 @@ reply reply::stock_reply(reply::status_type status, bool prefers_persistent)
 	case reply::bad_request:
 	case reply::unauthorized:
 	case reply::forbidden:
+	case reply::length_required:
 	case reply::internal_server_error:
 	case reply::not_implemented:
 	case reply::bad_gateway:

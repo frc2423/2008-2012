@@ -100,7 +100,7 @@ void connection::handle_read(const boost::system::error_code& e,
 
 void connection::parse_input_data()
 {
-	boost::tribool result;
+	request_parser::ParserResult result;
 	input_buffer::iterator next;
 	boost::tie(result, next) = request_parser_.parse(request_, 
 		buffer_.data() + buffer_start_ptr_, 
@@ -109,29 +109,38 @@ void connection::parse_input_data()
 	// move the buffer pointer
 	buffer_start_ptr_ = next - buffer_.data();
 
-	if (result)
+	switch (result)
 	{
-		// successful 
-		request_handler_.handle_request(request_, reply_);
-		boost::asio::async_write(socket_, reply_.to_buffers(),
-				boost::bind(&connection::handle_write, shared_from_this(),
-					boost::asio::placeholders::error));
-	}
-	else if (!result)
-	{
-		// bad request, respond with an error, and don't let this be persistent
-		reply_ = reply::stock_reply(reply::bad_request, false);
-		boost::asio::async_write(socket_, reply_.to_buffers(),
-				boost::bind(&connection::handle_write, shared_from_this(),
-					boost::asio::placeholders::error));
-	}
-	else
-	{
-		// read more data
-		socket_.async_read_some(boost::asio::buffer(buffer_),
-				boost::bind(&connection::handle_read, shared_from_this(),
-					boost::asio::placeholders::error,
-					boost::asio::placeholders::bytes_transferred));
+		case request_parser::Success:
+			// successful 
+			request_handler_.handle_request(request_, reply_);
+			boost::asio::async_write(socket_, reply_.to_buffers(),
+					boost::bind(&connection::handle_write, shared_from_this(),
+						boost::asio::placeholders::error));
+			break;
+		
+		case request_parser_::LengthRequired:
+			reply_ = reply::stock_reply(reply::length_required, false);
+			boost::asio::async_write(socket_, reply_.to_buffers(),
+					boost::bind(&connection::handle_write, shared_from_this(),
+						boost::asio::placeholders::error));
+			break;
+			
+		case request_parser::BadRequest:
+			reply_ = reply::stock_reply(reply::bad_request, false);				
+			boost::asio::async_write(socket_, reply_.to_buffers(),
+					boost::bind(&connection::handle_write, shared_from_this(),
+						boost::asio::placeholders::error));
+			break;
+		
+		case request_parser::NeedMoreData:
+		
+			// read more data
+			socket_.async_read_some(boost::asio::buffer(buffer_),
+					boost::bind(&connection::handle_read, shared_from_this(),
+						boost::asio::placeholders::error,
+						boost::asio::placeholders::bytes_transferred));
+			break;
 	}
 	
 	// don't forget to start the timeout again

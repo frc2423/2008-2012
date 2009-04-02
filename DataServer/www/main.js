@@ -121,22 +121,43 @@ function dragFn(that, e)
 		if (x < 0) x = 0;
 		
 		// determine the value by converting the mouse position into a ratio
-		var val = (x / ($(that).width() - 10) ) * diff;
+		params[5] = (x / ($(that).width() - 10) ) * diff;
 		
-		val = Math.round(val / params[4]) * params[4] + params[2];
+		params[5] = Math.round(params[5] / params[4]) * params[4] + params[2];
 		
 		// ensure its not too big
-		if (val > params[3])
-			val = params[3];
+		if (params[5] > params[3])
+			params[5] = params[3];
 		
 		// then convert it back and display it
-		$(that).children("div:first-child").width((val / diff)*100 + "%");
+		$(that).children("div:first-child").width((params[5] / diff)*100 + "%");
 		if (params[6] == 0)
-			$(that).children("span").html(val);
+			$(that).children("span").html(params[5]);
 		else
-			$(that).children("span").html(val.toFixed(params[6]));
+			$(that).children("span").html(params[5].toFixed(params[6]));
 		
-		// TODO: submit the value via ajax
+		// TODO: submit the value via ajax, but only do like 1 request per 50ms or something
+		if ($(that).data('ajaxprocess') != true)
+		{
+			$(that).data('ajaxprocess') = true;
+		
+			setTimeout(
+				function(){
+					$(that).data('ajaxprocess') = false;
+					$.ajax({
+						url: "/varcontrol",
+						data: "group=" + params[0] + "&name=" + params[1] + "&value=" + params[5],
+						error: function(x, status, e) {
+							// display something somewhere to indicate an error
+						},
+						success: function(msg) {
+							// display something somewhere to indicate success
+						}
+					});
+				},
+				50
+			);
+		}
 	}
 }
 

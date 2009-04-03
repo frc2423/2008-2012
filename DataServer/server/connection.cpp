@@ -15,9 +15,6 @@
 #include "connection_manager.hpp"
 #include "request_handler.hpp"
 
-
-#include <iostream>
-
 namespace http {
 namespace server {
 
@@ -29,14 +26,10 @@ connection::connection(boost::asio::io_service& io_service,
 		request_handler_(handler),
 		buffer_start_ptr_(0),
 		buffer_end_ptr_(0)
-{
-	std::cout << "new connection started" << std::endl;
-}
+{}
 
 connection::~connection()
-{
-	std::cout << "connection_destroyed" << std::endl;
-}
+{}
 
 boost::asio::ip::tcp::socket& connection::socket()
 {
@@ -119,7 +112,7 @@ void connection::parse_input_data()
 						boost::asio::placeholders::error));
 			break;
 		
-		case request_parser_::LengthRequired:
+		case request_parser::LengthRequired:
 			reply_ = reply::stock_reply(reply::length_required, false);
 			boost::asio::async_write(socket_, reply_.to_buffers(),
 					boost::bind(&connection::handle_write, shared_from_this(),
@@ -167,8 +160,6 @@ void connection::handle_write(const boost::system::error_code& e)
 			// otherwise interpret the next request
 			start();
 			do_abort = false;
-
-			std::cout << "waiting for next request (persistent)" << std::endl;
 		}
 	}
 
@@ -181,10 +172,7 @@ void connection::handle_write(const boost::system::error_code& e)
 void connection::handle_io_timeout(const boost::system::error_code &e)
 {
 	if (e != boost::asio::error::operation_aborted)
-	{
 		connection_manager_.stop(shared_from_this());
-		std::cout << "I/O timeout occurred" << std::endl;
-	}
 }
 
 } // namespace server

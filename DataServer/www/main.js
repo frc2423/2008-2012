@@ -137,16 +137,19 @@ function dragFn(that, e)
 			$(that).children("span").html(params[5].toFixed(params[6]));
 		
 		// TODO: submit the value via ajax, but only do like 1 request per 50ms or something
-		if ($(that).data('ajaxprocess') != true)
+		if (that.ajaxprocess != true)
 		{
-			$(that).data('ajaxprocess') = true;
-		
+			that.ajaxprocess = true;
 			setTimeout(
 				function(){
-					$(that).data('ajaxprocess') = false;
 					$.ajax({
+						type: "POST",
 						url: "/varcontrol",
-						data: "group=" + params[0] + "&name=" + params[1] + "&value=" + params[5],
+						data: 
+							"group=" + params[0].substr(1) + 
+							"&var=" + params[1].substr(1) + 
+							"&value=" + params[5] +
+							"&instance=" + current_instance,
 						error: function(x, status, e) {
 							// display something somewhere to indicate an error
 						},
@@ -154,6 +157,8 @@ function dragFn(that, e)
 							// display something somewhere to indicate success
 						}
 					});
+					
+					that.ajaxprocess = false;
 				},
 				50
 			);

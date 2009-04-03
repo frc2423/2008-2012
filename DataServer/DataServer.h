@@ -21,13 +21,18 @@
 #define DATASERVER_H
 
 #include <string>
-#include <map>
+#include <vector>
 
+#include <boost/thread.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include "AllocateFlags.h"
+#include "DataProxyInfo.h"
 
-#include "server/server.hpp"
+namespace http {
+	namespace server {
+		class request_handler;
+	}
+}
 
 /**
 	\class DataServer
@@ -37,6 +42,27 @@
 	@todo Make values persistent, by writing to file?
 */
 class DataServer {
+
+	// various type definitions
+	typedef boost::lock_guard<boost::mutex>			lock_guard;
+	
+	struct DataProxyVariable {
+		std::string 								name;
+		boost::shared_ptr<DataProxyInfo> 			info;
+	};
+	
+	typedef boost::shared_ptr< DataProxyVariable > 	DataProxyVariablePtr;
+	
+	struct DataProxyGroup {
+		std::string 								name;
+		std::vector< DataProxyVariablePtr > 		variables;
+	};
+	
+	typedef boost::shared_ptr< DataProxyGroup >		DataProxyGroupPtr;
+	typedef std::vector< DataProxyGroupPtr >		DataProxyGroups;
+
+	friend class http::server::request_handler;
+
 public:
 
 	/// you should call this after initializing all variables, otherwise the
@@ -70,10 +96,10 @@ public:
 	
 
 	/// Set the port that the HTTP server should listen on
-	void SetPort(std::string port);
+	void SetPort(unsigned int port);
 	
 	/// Set the root directory for web files
-	void SetRootDir(std::string dir);
+	void SetRootDir(const std::string &dir);
 	
 private:
 
@@ -82,33 +108,24 @@ private:
 	
 	static DataServer * GetInstance();
 
-	void InitProxy( DataProxyInfo * proxy, const char * groupName, const char * name);
 
-	
+	void InitProxy(
+		DataProxyInfo * proxy, 
+		const std::string &groupName, 
+		const std::string &name);
+
+
+	void EnableInternal();
 
 	static void DataServerThreadStart(void * param);
 	void ThreadFn();
 	
-	static void ProcessData(const std::string &post_data);
+	static std::string ProcessRequest(const std::string &post_data);
+	std::string get_html();
+
+	bool ModifyProxy(size_t group, size_t variable, const std::string &value);
 	
 	
-	
-	struct DataProxyVariable {
-		std::string 						name;
-		boost::shared_ptr<DataProxyInfo> 	info;
-	};
-	
-	typedef boost::shared_ptr< DataProxyVariable > 		DataProxyVariablePtr;
-	
-	struct DataProxyGroup {
-		std::string 						name;
-		std::vector< DataProxyVariablePtr > variables;
-	};
-	
-	typedef boost::shared_ptr< DataProxyGroup >			DataProxyGroupPtr;
-	typedef std::vector< DataProxyGroupPtr >			DataProxyGroups;
-	
-	DataProxyGroups 		m_groups;
 	
 	// server data
 	std::string				m_port;
@@ -125,6 +142,13 @@ private:
 	
 	/// global access lock
 	boost::mutex			m_mutex;
+	
+	/// thread
+	boost::shared_ptr< boost::thread > m_thread;
+	
+	/// storage of the proxied data
+	DataProxyGroups 		m_groups;
+	
 };
 
 #endif

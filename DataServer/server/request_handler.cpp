@@ -14,9 +14,12 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include "mime_types.hpp"
 #include "reply.hpp"
 #include "request.hpp"
+
+#include "../DataServer.h"
 
 namespace http {
 namespace server {
@@ -30,7 +33,7 @@ void request_handler::handle_request(const request& req, reply& rep)
 {
 	bool prefers_persistent = true;
 
-	if (req.method != "GET")
+	if (req.method != "GET" && req.method != "POST")
 	{
 		rep = reply::stock_reply(reply::not_implemented, prefers_persistent);
 		return;
@@ -72,7 +75,14 @@ void request_handler::handle_request(const request& req, reply& rep)
 	if (req.method == "GET")
 		handle_get_request(request_path, rep);
 	else
-		handle_post_request(request_path, rep);
+	{
+		std::string post_data;
+		if (url_decode(req.post_content, post_data))
+			handle_post_request(request_path, post_data, rep);
+		else
+			rep = reply::stock_reply(reply::bad_request, prefers_persistent);
+
+	}
 		
 	// finish setting up the reply
 	rep.persistent = prefers_persistent;
@@ -95,7 +105,7 @@ void request_handler::handle_get_request(const std::string &request_path, reply 
 	std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
 	if (!is)
 	{
-		rep = reply::stock_reply(reply::not_found, prefers_persistent);
+		rep = reply::stock_reply(reply::not_found, true);
 		return;
 	}
 
@@ -115,12 +125,13 @@ void request_handler::handle_get_request(const std::string &request_path, reply 
 	if (request_path == "/index.html")
 	{
 		// substitute the inner html element with our custom one
+		boost::replace_first(rep.content, "<!--variables-->", DataServer::GetInstance()->get_html());
 	}
 }
 
 // this is intended for AJAX requests only, so it doesn't return anything
 // but machine data to the user
-void request_handler::handle_post_request(const std::string &request_path, reply &rep)
+void request_handler::handle_post_request(const std::string &request_path, const std::string &post_data, reply &rep)
 {
 	if (request_path != "/varcontrol")
 	{
@@ -128,13 +139,10 @@ void request_handler::handle_post_request(const std::string &request_path, reply
 		return;
 	}
 	
-	// get the various post variables somehow
-	
 	// setup a 200 OK message
 	rep = reply::stock_reply(reply::ok, true);
 	
-	// modify the proxy variable, that fn will set the content
-	rep.content = DataServer::GetInstance()->SetVariable( grpname, varname, value );
+	rep.content = DataServer::GetInstance()->ProcessRequest(post_data);
 }
 
 

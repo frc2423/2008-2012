@@ -34,6 +34,10 @@ public:
 private:
 	/// The directory containing the files to be served.
 	std::string doc_root_;
+	
+	void handle_get_request(const std::string &, reply &rep);
+	
+	void handle_post_request(const std::string &, const std::string &, reply &rep);
 
 	/// Perform URL-decoding on a string. Returns false if the encoding was
 	/// invalid.

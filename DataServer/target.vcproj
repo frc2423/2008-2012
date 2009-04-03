@@ -173,7 +173,11 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\win_main.cpp"
+				RelativePath=".\DataServer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\main.cpp"
 				>
 			</File>
 			<Filter
@@ -214,6 +218,22 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\DataProxyInfo.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DataServer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VariableProxy.h"
+				>
+			</File>
+			<File
+				RelativePath=".\VariableProxyFlags.h"
+				>
+			</File>
 			<Filter
 				Name="server"
 				>

@@ -69,7 +69,7 @@ struct VariableProxyImpl {
 	/// a more explicit way of obtaining the value
 	T GetValue()
 	{
-		boost::lock_guard(*m_mutex);
+		boost::lock_guard<boost::mutex> lock(*m_mutex);
 		return *m_proxied_value; 
 	}
 
@@ -81,10 +81,10 @@ private:
 };
 
 /// definition of integer proxy
-typedef VariableProxyImpl<int>	IntProxy;
+typedef VariableProxyImpl<int>		IntProxy;
 
 /// definition of floating point proxy
-typedef VariableProxyImpl<int>	FloatProxy;
+typedef VariableProxyImpl<float>	FloatProxy;
 
 
 #endif

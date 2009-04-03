@@ -28,7 +28,7 @@ void request_parser::reset()
 	expected_content_bytes_ = 0;
 }
 
-ParserResult request_parser::consume(request& req, char input)
+request_parser::ParserResult request_parser::consume(request& req, char input)
 {
 	switch (state_)
 	{
@@ -294,7 +294,7 @@ ParserResult request_parser::consume(request& req, char input)
 		if (input == '\n')
 		{
 			if (req.method != "POST")
-				return true;
+				return Success;
 				
 			// check to see if we need to parse for post content
 			for (size_t i = 0; i < req.headers.size(); i++)
@@ -302,9 +302,9 @@ ParserResult request_parser::consume(request& req, char input)
 				{
 					try 
 					{
-						expected_content_bytes_ = lexical_cast<size_t>(req.headers[i].value);
+						expected_content_bytes_ = boost::lexical_cast<std::size_t>(req.headers[i].value);
 					}
-					catch (bad_lexical_cast &)
+					catch (boost::bad_lexical_cast &)
 					{
 						return BadRequest;
 					}
@@ -321,7 +321,7 @@ ParserResult request_parser::consume(request& req, char input)
 		}
 	case expecting_content:
 		{
-			req.post_content.append(input);
+			req.post_content.push_back(input);
 			if (++content_received_ == expected_content_bytes_)
 				return Success;
 				

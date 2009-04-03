@@ -20,8 +20,17 @@
 #include "DataServer.h"
 #include "VariableProxy.h"
 
+#include "server/server.hpp"
+
+#include <ctime>
+
+#include <boost/tokenizer.hpp>
+
 #include <boost/foreach.hpp>
-#define BOOST_FOREACH foreach
+#define foreach BOOST_FOREACH
+
+ 
+DataServer * DataServer::m_instance = NULL;
 
 
 DataServer * DataServer::GetInstance()	
@@ -34,22 +43,49 @@ DataServer * DataServer::GetInstance()
 IntProxy DataServer::CreateIntProxy( 
 	const char * groupName, 
 	const char * name, 
-	const IntDataFlags &flags)
+	const IntProxyFlags &flags)
 {
 	IntProxyInfo * proxy = new IntProxyInfo(flags);
-	GetInstance()->InitProxy( proxy, groupName, name);
+	GetInstance()->InitProxy( proxy, groupName, name );
 	return proxy->GetProxy();
 }
 	
 FloatProxy DataServer::CreateFloatProxy( 
 	const char * groupName, 
 	const char * name, 
-	const FloatDataFlags &flags)
+	const FloatProxyFlags &flags)
 {
 	FloatProxyInfo * proxy = new FloatProxyInfo(flags);
-	GetInstance()->InitProxy( proxy, groupName, name);
+	GetInstance()->InitProxy( proxy, groupName, name );
 	return proxy->GetProxy();
 }
+
+void DataServer::SetPort(unsigned int port)
+{
+	try {
+		if (port <= 65535)
+			GetInstance()->m_port = boost::lexical_cast<std::string>(port);
+	} 
+	catch (boost::bad_lexical_cast &)
+	{
+	}
+}
+
+void DataServer::SetRootDir(const std::string &dir)
+{
+	GetInstance()->m_rootDir = dir;
+}
+
+
+DataServer::DataServer() :
+	m_port("8080"),
+	m_rootDir("www"),
+	m_html_valid(false),
+	m_creation_time(time(NULL))
+{}
+
+
+
 
 /**
 	@note This function will assume ownership of the proxy object
@@ -59,13 +95,13 @@ void DataServer::InitProxy(
 	const std::string &groupName, 
 	const std::string &name)
 {
-	boost::lock_guard(m_mutex);
+	lock_guard lock(m_mutex);
 
 	DataProxyGroupPtr ptr;
 	
 	// small data sets, linear search is ok
 	foreach ( DataProxyGroupPtr &group, m_groups)
-		if (group.name == groupName)
+		if (group->name == groupName)
 		{
 			ptr = group;
 			break;
@@ -81,7 +117,7 @@ void DataServer::InitProxy(
 	DataProxyVariablePtr dptr;
 	
 	foreach( DataProxyVariablePtr &variable, ptr->variables)
-		if (variable.name == name)
+		if (variable->name == name)
 		{
 			dptr = variable;
 			break;
@@ -98,10 +134,9 @@ void DataServer::InitProxy(
 	{
 		assert(0 && "key/value pair already registered!");
 	}
+
+	m_html_valid = false;
 }
-
-
-
 
 
 void DataServer::DataServerThreadStart(void * param)
@@ -121,17 +156,27 @@ void DataServer::ThreadFn()
 
 void DataServer::Enable()
 {
-	m_enabled = true;
-		
-	// then start the task/thread
+	GetInstance()->EnableInternal();
 }
 
-void DataServer::regen_html()
+void DataServer::EnableInternal()
+{
+	lock_guard lock(m_mutex);
+		
+	// then start the task/thread
+	if (m_thread.get() == NULL)
+		m_thread.reset( new boost::thread(boost::bind(&DataServer::ThreadFn, this)) );
+}
+
+std::string DataServer::get_html()
 {
 	// lock globally
-	boost::lock_guard(m_mutex);
+	lock_guard lock(m_mutex);
 
-	// generate some HTML for this thing, so we're not constantly
+	if (m_html_valid)
+		return m_html;
+
+	// generate some HTML for this thing and cache it so we're not constantly
 	// regenerating data for it
 	m_html.clear();
 
@@ -140,11 +185,11 @@ void DataServer::regen_html()
 	foreach( const DataProxyGroupPtr &gptr  , m_groups )
 	{
 		// group name/header
-		m_html.append("\t<div class=\"group\">\n");
-		m_html.append("\t\t<div class=\"grouphr\">\n");
+		m_html.append("\n\t<div class=\"group\">\n");
+		m_html.append("\t\t<div class=\"grouphdr\">\n");
 		m_html.append("\t\t\t");
 		m_html.append(gptr->name);
-		m_html.append("\n\t\t</div>\n\t\t<div><table>\n\t\t\t");
+		m_html.append("\n\t\t</div>\n\t\t<div><table>\n");
 		
 		size_t v = 0;
 		
@@ -165,33 +210,92 @@ void DataServer::regen_html()
 		
 		// and add a javascript portion that allows us
 		// to store the 'current value'
-		m_html.append("<script type=\"text/javascript\"><!--\nvar current_value=");
-		m_html.append(m_current_value);
-		m_html.append(";\n//--></script>");
+		m_html.append("\n\n\t<script type=\"text/javascript\"><!--\n\tvar current_instance = ");
+		m_html.append(boost::lexical_cast<std::string>(m_creation_time));
+		m_html.append(";\n\t//--></script>");
 		
 		g += 1;
 	}
+
+	m_html_valid = true;
+	return m_html;
 }
 
-bool DataServer::ProcessData(const std::string &post_data)
+std::string DataServer::ProcessRequest(const std::string &post_data)
 {
-	// parse the POST request
+	size_t group = 0, variable = 0;
+	int found_flags = 0;
+	std::string value;
+
+	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+
+	// parse the POST request into name/value pairs
+	boost::char_separator<char> sep("&");
+	tokenizer tokens(post_data, sep);
+
+	foreach (const std::string &token, tokens)
+	{
+		size_t pos = token.find('=');
+		if (pos == std::string::npos || pos > token.size()-2)
+			return "INVALID";
+		
+		std::string key = token.substr(0, pos); 
+		std::string val = token.substr(pos+1);
+
+		try
+		{
+			if (key == "group")
+			{
+				found_flags |= 0x01;
+				group = boost::lexical_cast<size_t>(val);
+			}
+			else if (key == "var")
+			{
+				found_flags |= 0x02;
+				variable = boost::lexical_cast<size_t>(val);
+			}
+			else if (key == "value")
+			{
+				found_flags |= 0x04;
+				value = val;
+			}
+			else if (key == "instance")
+			{
+				found_flags |= 0x08;
+				time_t inst = boost::lexical_cast<time_t>(val);
+
+				if (inst != GetInstance()->m_creation_time)
+					return "RELOAD";
+			}
+		}
+		catch (boost::bad_lexical_cast &)
+		{
+			return "INVALID";
+		}
+	}
+
+	if (found_flags != 0x0F)
+		return "INVALID";
 	
 	// ok, if everything is good then modify the proxy
 	
-	return ModifyProxy(group, variable, value);
+	if (GetInstance()->ModifyProxy(group, variable, value))
+		return "OK";
+
+	return "FAIL";
 }
 
 bool DataServer::ModifyProxy(size_t group, size_t variable, const std::string &value)
 {
-	boost::lock_guard(m_mutex);
+	lock_guard lock(m_mutex);
 	
 	if (m_groups.size() < group)
 		return false;
 		
 	if (m_groups[group]->variables.size() < variable)
 		return false;
-		
+	
+	m_html_valid = false;
 	return m_groups[group]->variables[variable]->info->SetValue(value);
 }
 

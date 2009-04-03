@@ -60,6 +60,17 @@ FloatProxy DataServer::CreateFloatProxy(
 	return proxy->GetProxy();
 }
 
+BoolProxy DataServer::CreateBoolProxy( 
+	const char * groupName, 
+	const char * name, 
+	bool default_value)
+{
+	BoolProxyInfo * proxy = new BoolProxyInfo(default_value);
+	GetInstance()->InitProxy( proxy, groupName, name );
+	return proxy->GetProxy();
+}
+
+
 void DataServer::SetPort(unsigned int port)
 {
 	try {

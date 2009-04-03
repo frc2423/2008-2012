@@ -90,10 +90,10 @@ struct NumericProxyInfoImpl : public DataProxyInfo {
 		
 		idstr 	<< "g" << gid
 				<< "_v" << vid
+				<< "_" << current_value
 				<< "_" << m_flags.minval_
 				<< "_" << m_flags.maxval_
-				<< "_" << m_flags.step_
-				<< "_" << current_value;
+				<< "_" << m_flags.step_;
 		
 		std::string id = idstr.str();
 		
@@ -132,6 +132,73 @@ typedef NumericProxyInfoImpl<float> FloatProxyInfo;
 
 /// implementation for integers
 typedef NumericProxyInfoImpl<int> 	IntProxyInfo;
+
+
+
+// boolean implementation
+struct BoolProxyInfo : public DataProxyInfo {
+
+	typedef VariableProxyImpl<bool>	Proxy;
+
+	/// constructor
+	BoolProxyInfo(bool default_value) :
+		m_proxied_value(default_value)
+	{}
+
+	/// external thing sets value
+	bool SetValue( const std::string &value)
+	{
+		try {
+			boost::lock_guard<boost::mutex> lock(m_mutex);
+			m_proxied_value = boost::lexical_cast<bool>(value);
+		} 
+		catch (boost::bad_lexical_cast &)
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	/// returns html
+	std::string GetHtmlDisplay(std::size_t gid, std::size_t vid) const
+	{
+		bool current_value;
+	
+		{
+			boost::lock_guard<boost::mutex> lock(m_mutex);
+			current_value = m_proxied_value;
+		}
+	
+		std::string html;
+		
+		html = "<input class=\"booleans\" type=\"checkbox\" id=\"g"
+				+ boost::lexical_cast<std::string>(gid)
+				+ "_v"
+				+ boost::lexical_cast<std::string>(vid)
+				+ "\"";
+				
+		if (current_value)
+			html.append(" checked");
+		
+		html.append(" />");
+		
+		return html;
+	}
+	
+	Proxy GetProxy()
+	{
+		return Proxy(&m_proxied_value, &m_mutex);
+	}
+	
+private:
+	BoolProxyInfo();
+
+	bool 					m_proxied_value;
+	mutable boost::mutex 	m_mutex;
+};
+
+
 
 
 #endif

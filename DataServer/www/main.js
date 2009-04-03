@@ -10,6 +10,27 @@ $(document).ready(function()
 			return false;
 		});
 	});
+	
+	// checkboxes
+	$(".booleans").each(function(idx, thing){
+		var params = this.id.split("_");
+		
+		$(this).data('bar', params);
+		
+		$(this).click(function(e)
+		{
+			var params = $(this).data('bar');
+			
+			if (this.checked)
+				params[2] = 1;
+			else
+				params[2] = 0;
+			
+			submit_variables(this, params);
+		});
+		
+	});
+	
 
 	// make the bars highlight when moused
 	$(".selectbar").mouseover(function(){
@@ -22,20 +43,20 @@ $(document).ready(function()
 		return false;
 	});	
 	
-	// make the bars come to life
+	// make the bars come to life (integers)
 	$(".selectbar").each(function(idx, thing){
 		
 		/* 
 			bar parameters are done using the id tag:
 				0 - group
-				1 - variable name 
-				2 - min
-				3 - max
-				4 - step
-				5 - current value
+				1 - variable name
+				2 - current value
+				3 - min
+				4 - max
+				5 - step
 				
 				6 is set by the code, and is the floating point
-				precision. 
+				precision (which is inferred from the step size)
 				
 				If the numeric items have a p in them, that is
 				actually a decimal point.
@@ -55,7 +76,7 @@ $(document).ready(function()
 				params[i] = parseInt(params[i]);
 				
 		// add the inner divs, transform it into a nice bar
-		var bar = "<div style=\"position: relative\"><div>&nbsp;</div><span style=\"display: block; position: absolute; right: 0.1em; top: 0\">" + params[5] + "</span></div>";
+		var bar = "<div style=\"position: relative\"><div>&nbsp;</div><span style=\"display: block; position: absolute; right: 0.1em; top: 0\">" + params[2] + "</span></div>";
 		$(thing).html(bar);
 		
 		// select the child, and attach the parameters to it
@@ -63,7 +84,7 @@ $(document).ready(function()
 		child.data('bar', params);
 		
 		// find the inner div, set it correctly
-		child.children("div:first-child").width((params[5]/(params[3] - params[2]))*100 + "%");
+		child.children("div:first-child").width((params[2]/(params[4] - params[3]))*100 + "%");
 		
 		
 		// set the text correctly
@@ -114,55 +135,73 @@ function dragFn(that, e)
 		var params = $(that).data('bar');
 	
 		// calculate the new value
-		var diff = params[3] - params[2];
+		var diff = params[4] - params[3];
 		
 		// the -5 here is to allow the edges to be less significant
 		var x = (e.clientX - parseInt($(that).position().left)) - 5;
 		if (x < 0) x = 0;
 		
 		// determine the value by converting the mouse position into a ratio
-		params[5] = (x / ($(that).width() - 10) ) * diff;
+		params[2] = (x / ($(that).width() - 10) ) * diff;
 		
-		params[5] = Math.round(params[5] / params[4]) * params[4] + params[2];
+		// move to an even step size
+		params[2] = Math.round(params[2] / params[5]) * params[5] + params[3];
 		
 		// ensure its not too big
-		if (params[5] > params[3])
-			params[5] = params[3];
+		if (params[2] > params[4])
+			params[2] = params[4];
 		
 		// then convert it back and display it
-		$(that).children("div:first-child").width((params[5] / diff)*100 + "%");
+		$(that).children("div:first-child").width((params[2] / diff)*100 + "%");
 		if (params[6] == 0)
-			$(that).children("span").html(params[5]);
+			$(that).children("span").html(params[2]);
 		else
-			$(that).children("span").html(params[5].toFixed(params[6]));
+			$(that).children("span").html(params[2].toFixed(params[6]));
 		
-		// TODO: submit the value via ajax, but only do like 1 request per 50ms or something
-		if (that.ajaxprocess != true)
-		{
-			that.ajaxprocess = true;
-			setTimeout(
-				function(){
-					$.ajax({
-						type: "POST",
-						url: "/varcontrol",
-						data: 
-							"group=" + params[0].substr(1) + 
-							"&var=" + params[1].substr(1) + 
-							"&value=" + params[5] +
-							"&instance=" + current_instance,
-						error: function(x, status, e) {
-							// display something somewhere to indicate an error
-						},
-						success: function(msg) {
-							// display something somewhere to indicate success
+		submit_variables(that, params);
+
+	}
+}
+
+// submits the variables
+function submit_variables(that, params)
+{
+	if ($(that).data('ajaxprocess') != true)
+	{
+		$(that).data('ajaxprocess', true);
+		setTimeout(
+			function(){
+				$.ajax({
+					type: "POST",
+					url: "/varcontrol",
+					data: 
+						"group=" + params[0].substr(1) + 
+						"&var=" + params[1].substr(1) + 
+						"&value=" + params[2] +
+						"&instance=" + current_instance,
+					error: function(x, status, e) {
+						// display something somewhere to indicate an error
+					},
+					success: function(msg) {
+						// display something somewhere to indicate success?
+						switch (msg)
+						{
+							case "FAIL":
+							case "INVALID":
+								break;
+							case "SUCCESS":
+								break;
+							case "RELOAD":
+								window.location.reload();
+								break;
 						}
-					});
-					
-					that.ajaxprocess = false;
-				},
-				50
-			);
-		}
+					}
+				});
+				
+				$(that).data('ajaxprocess', false);
+			},
+			50
+		);
 	}
 }
 

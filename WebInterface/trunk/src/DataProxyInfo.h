@@ -1,5 +1,5 @@
 /*
-    NotSureWhatThisProjectNameIsYet
+    WebInterface
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$
@@ -17,8 +17,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DATAPROXYINFO_H
-#define DATAPROXYINFO_H
+#ifndef WI_DATAPROXYINFO_H
+#define WI_DATAPROXYINFO_H
 
 #include <string>
 #include <sstream>

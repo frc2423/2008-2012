@@ -180,7 +180,7 @@
 				Name="src"
 				>
 				<File
-					RelativePath=".\src\DataServer.cpp"
+					RelativePath=".\src\WebInterface.cpp"
 					>
 				</File>
 				<Filter
@@ -227,15 +227,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\DataServer.h"
-				>
-			</File>
-			<File
 				RelativePath=".\src\VariableProxy.h"
 				>
 			</File>
 			<File
 				RelativePath=".\src\VariableProxyFlags.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\WebInterface.h"
 				>
 			</File>
 			<Filter

@@ -1,5 +1,5 @@
 /*
-    NotSureWhatThisProjectNameIsYet
+    WebInterface
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$
@@ -17,10 +17,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VARIABLEPROXYFLAGS_H
-#define VARIABLEPROXYFLAGS_H
-
-#include <boost/mpl/if.hpp>
+#ifndef WI_VARIABLEPROXYFLAGS_H
+#define WI_VARIABLEPROXYFLAGS_H
 
 	
 #define FN(varname, flag, T) 					\

@@ -1,5 +1,5 @@
 /*
-    NotSureWhatThisProjectNameIsYet
+    WebInterface
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$
@@ -17,8 +17,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DATASERVER_H
-#define DATASERVER_H
+#ifndef WI_WEBINTERFACE_H
+#define WI_WEBINTERFACE_H
 
 #include <string>
 #include <vector>
@@ -35,13 +35,13 @@ namespace http {
 }
 
 /**
-	\class DataServer
+	\class WebInterface
 	\brief Singleton class used to allow users to remotely modify variables
 	via a webserver launched in a seperate task.
 	
 	@todo Make values persistent, by writing to file?
 */
-class DataServer {
+class WebInterface {
 
 	// various type definitions
 	typedef boost::lock_guard<boost::mutex>			lock_guard;
@@ -107,11 +107,11 @@ public:
 	
 private:
 
-	static DataServer * m_instance;
-	DataServer();
+	static WebInterface * m_instance;
+	WebInterface();
 	
 	// internal utility functions
-	static DataServer * GetInstance();
+	static WebInterface * GetInstance();
 
 	void InitProxy(
 		DataProxyInfo * proxy, 
@@ -120,7 +120,7 @@ private:
 		
 	// internal functions that start the webserver thread
 	void EnableInternal(const std::string &port, const std::string &rootdir);
-	static void DataServerThreadStart(void * param);
+	static void WebInterfaceThreadStart(void * param);
 	void ThreadFn();
 	
 	// functions used to process/generate html response

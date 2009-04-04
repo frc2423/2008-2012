@@ -1,5 +1,5 @@
 /*
-    NotSureWhatThisProjectNameIsYet
+    WebInterface
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$
@@ -17,8 +17,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef VARIABLEPROXY_H
-#define VARIABLEPROXY_H
+#ifndef WI_VARIABLEPROXY_H
+#define WI_VARIABLEPROXY_H
 
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/locks.hpp>

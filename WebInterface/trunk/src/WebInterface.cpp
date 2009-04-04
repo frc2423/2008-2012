@@ -1,5 +1,5 @@
 /*
-    NotSureWhatThisProjectNameIsYet
+    WebInterface
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$
@@ -17,7 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "DataServer.h"
+#include "WebInterface.h"
 #include "VariableProxy.h"
 
 #include "server/server.hpp"
@@ -30,17 +30,17 @@
 #define foreach BOOST_FOREACH
 
  
-DataServer * DataServer::m_instance = NULL;
+WebInterface * WebInterface::m_instance = NULL;
 
 
-DataServer * DataServer::GetInstance()	
+WebInterface * WebInterface::GetInstance()	
 {
 	if (m_instance == NULL)
-		m_instance = new DataServer();
+		m_instance = new WebInterface();
 	return m_instance;
 }
 
-IntProxy DataServer::CreateIntProxy( 
+IntProxy WebInterface::CreateIntProxy( 
 	const char * groupName, 
 	const char * name, 
 	const IntProxyFlags &flags)
@@ -50,7 +50,7 @@ IntProxy DataServer::CreateIntProxy(
 	return proxy->GetProxy();
 }
 	
-FloatProxy DataServer::CreateFloatProxy( 
+FloatProxy WebInterface::CreateFloatProxy( 
 	const char * groupName, 
 	const char * name, 
 	const FloatProxyFlags &flags)
@@ -60,7 +60,7 @@ FloatProxy DataServer::CreateFloatProxy(
 	return proxy->GetProxy();
 }
 
-BoolProxy DataServer::CreateBoolProxy( 
+BoolProxy WebInterface::CreateBoolProxy( 
 	const char * groupName, 
 	const char * name, 
 	bool default_value)
@@ -70,7 +70,7 @@ BoolProxy DataServer::CreateBoolProxy(
 	return proxy->GetProxy();
 }
 
-DataServer::DataServer() :
+WebInterface::WebInterface() :
 	m_port("8080"),
 	m_rootDir("www"),
 	m_html_valid(false),
@@ -83,7 +83,7 @@ DataServer::DataServer() :
 /**
 	@note This function will assume ownership of the proxy object
 */	
-void DataServer::InitProxy(
+void WebInterface::InitProxy(
 	DataProxyInfo * proxy, 
 	const std::string &groupName, 
 	const std::string &name)
@@ -132,13 +132,13 @@ void DataServer::InitProxy(
 }
 
 
-void DataServer::DataServerThreadStart(void * param)
+void WebInterface::WebInterfaceThreadStart(void * param)
 {
-	((DataServer*)param)->ThreadFn();
+	((WebInterface*)param)->ThreadFn();
 }
 
 
-void DataServer::ThreadFn()
+void WebInterface::ThreadFn()
 {
 	std::string port, rootdir;
 	
@@ -155,12 +155,12 @@ void DataServer::ThreadFn()
     s.run();
 }
 
-void DataServer::Enable(const std::string &port, const std::string &rootdir)
+void WebInterface::Enable(const std::string &port, const std::string &rootdir)
 {
 	GetInstance()->EnableInternal(port, rootdir);
 }
 
-void DataServer::EnableInternal(const std::string &port, const std::string &rootdir)
+void WebInterface::EnableInternal(const std::string &port, const std::string &rootdir)
 {
 	lock_guard lock(m_mutex);
 		
@@ -172,10 +172,10 @@ void DataServer::EnableInternal(const std::string &port, const std::string &root
 		
 	// then start the task/thread
 	if (m_thread.get() == NULL)
-		m_thread.reset( new boost::thread(boost::bind(&DataServer::ThreadFn, this)) );
+		m_thread.reset( new boost::thread(boost::bind(&WebInterface::ThreadFn, this)) );
 }
 
-std::string DataServer::get_html()
+std::string WebInterface::get_html()
 {
 	// lock globally
 	lock_guard lock(m_mutex);
@@ -228,7 +228,7 @@ std::string DataServer::get_html()
 	return m_html;
 }
 
-std::string DataServer::ProcessRequest(const std::string &post_data)
+std::string WebInterface::ProcessRequest(const std::string &post_data)
 {
 	size_t group = 0, variable = 0;
 	int found_flags = 0;
@@ -293,7 +293,7 @@ std::string DataServer::ProcessRequest(const std::string &post_data)
 	return "FAIL";
 }
 
-bool DataServer::ModifyProxy(size_t group, size_t variable, const std::string &value)
+bool WebInterface::ModifyProxy(size_t group, size_t variable, const std::string &value)
 {
 	lock_guard lock(m_mutex);
 	

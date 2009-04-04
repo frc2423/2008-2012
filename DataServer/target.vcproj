@@ -173,44 +173,48 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\DataServer.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>
 			<Filter
-				Name="server"
+				Name="src"
 				>
 				<File
-					RelativePath=".\server\connection.cpp"
+					RelativePath=".\src\DataServer.cpp"
 					>
 				</File>
-				<File
-					RelativePath=".\server\connection_manager.cpp"
+				<Filter
+					Name="server"
 					>
-				</File>
-				<File
-					RelativePath=".\server\mime_types.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\server\reply.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\server\request_handler.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\server\request_parser.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\server\server.cpp"
-					>
-				</File>
+					<File
+						RelativePath=".\src\server\connection.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\server\connection_manager.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\server\mime_types.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\server\reply.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\server\request_handler.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\server\request_parser.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\server\server.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter
@@ -219,58 +223,58 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\DataProxyInfo.h"
+				RelativePath=".\src\DataProxyInfo.h"
 				>
 			</File>
 			<File
-				RelativePath=".\DataServer.h"
+				RelativePath=".\src\DataServer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\VariableProxy.h"
+				RelativePath=".\src\VariableProxy.h"
 				>
 			</File>
 			<File
-				RelativePath=".\VariableProxyFlags.h"
+				RelativePath=".\src\VariableProxyFlags.h"
 				>
 			</File>
 			<Filter
 				Name="server"
 				>
 				<File
-					RelativePath=".\server\connection.hpp"
+					RelativePath=".\src\server\connection.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\server\connection_manager.hpp"
+					RelativePath=".\src\server\connection_manager.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\server\header.hpp"
+					RelativePath=".\src\server\header.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\server\mime_types.hpp"
+					RelativePath=".\src\server\mime_types.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\server\reply.hpp"
+					RelativePath=".\src\server\reply.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\server\request.hpp"
+					RelativePath=".\src\server\request.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\server\request_handler.hpp"
+					RelativePath=".\src\server\request_handler.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\server\request_parser.hpp"
+					RelativePath=".\src\server\request_parser.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\server\server.hpp"
+					RelativePath=".\src\server\server.hpp"
 					>
 				</File>
 			</Filter>

@@ -65,9 +65,9 @@ class DataServer {
 
 public:
 
-	/// you should call this after initializing all variables, otherwise the
-	/// data proxies will always return the default values
-	static void Enable();
+	/// you should call this to enable the web server. You may add more
+	/// proxies after this is called
+	static void Enable(const std::string &port = "", const std::string &rootdir = "");
 
 
 	/** 
@@ -102,48 +102,45 @@ public:
 	static BoolProxy CreateBoolProxy( const char * groupName, const char * name, bool default_value);
 	
 
-	/// @todo other types of variables: enums, bools, etc
-	
+	/// @todo other types of variables: enums, doubles, signed/unsigned.. 
 
-	/// Set the port that the HTTP server should listen on
-	void SetPort(unsigned int port);
-	
-	/// Set the root directory for web files
-	void SetRootDir(const std::string &dir);
 	
 private:
 
 	static DataServer * m_instance;
 	DataServer();
 	
+	// internal utility functions
 	static DataServer * GetInstance();
-
 
 	void InitProxy(
 		DataProxyInfo * proxy, 
 		const std::string &groupName, 
 		const std::string &name);
-
-
-	void EnableInternal();
-
+		
+	// internal functions that start the webserver thread
+	void EnableInternal(const std::string &port, const std::string &rootdir);
 	static void DataServerThreadStart(void * param);
 	void ThreadFn();
 	
+	// functions used to process/generate html response
 	static std::string ProcessRequest(const std::string &post_data);
-	std::string get_html();
-
+	
 	bool ModifyProxy(size_t group, size_t variable, const std::string &value);
+	std::string get_html();
 	
-	
-	
-	// server data
+	/// port that the server will listen on
 	std::string				m_port;
+	
+	/// root directory where webpages are found
 	std::string				m_rootDir;
 	
-	// generated HTML for the server
-	bool					m_html_valid;
+	/// generated HTML for the server
 	std::string				m_html;
+	
+	/// set to true if m_html is a valid string, or false if the html
+	/// needs to be regenerated
+	bool					m_html_valid;
 	
 	/// each ajax request is compared against this, and if it doesn't
 	/// match then it means the page must reload. This is updated each time

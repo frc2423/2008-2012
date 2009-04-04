@@ -70,24 +70,6 @@ BoolProxy DataServer::CreateBoolProxy(
 	return proxy->GetProxy();
 }
 
-
-void DataServer::SetPort(unsigned int port)
-{
-	try {
-		if (port <= 65535)
-			GetInstance()->m_port = boost::lexical_cast<std::string>(port);
-	} 
-	catch (boost::bad_lexical_cast &)
-	{
-	}
-}
-
-void DataServer::SetRootDir(const std::string &dir)
-{
-	GetInstance()->m_rootDir = dir;
-}
-
-
 DataServer::DataServer() :
 	m_port("8080"),
 	m_rootDir("www"),
@@ -158,21 +140,35 @@ void DataServer::DataServerThreadStart(void * param)
 
 void DataServer::ThreadFn()
 {
+	std::string port, rootdir;
+	
+	{
+		lock_guard lock(m_mutex);
+		port = m_port;
+		rootdir = m_rootDir;
+	}
+
     // Initialise server.
-    http::server::server s("0.0.0.0", m_port, m_rootDir);
+    http::server::server s("0.0.0.0", port, rootdir);
 	
 	// Run the server until stopped.
     s.run();
 }
 
-void DataServer::Enable()
+void DataServer::Enable(const std::string &port, const std::string &rootdir)
 {
-	GetInstance()->EnableInternal();
+	GetInstance()->EnableInternal(port, rootdir);
 }
 
-void DataServer::EnableInternal()
+void DataServer::EnableInternal(const std::string &port, const std::string &rootdir)
 {
 	lock_guard lock(m_mutex);
+		
+	if (!port.empty())
+		m_port = port;
+		
+	if (!rootdir.empty())
+		m_rootDir = rootdir;
 		
 	// then start the task/thread
 	if (m_thread.get() == NULL)
@@ -249,7 +245,8 @@ std::string DataServer::ProcessRequest(const std::string &post_data)
 		size_t pos = token.find('=');
 		if (pos == std::string::npos || pos > token.size()-2)
 			return "INVALID";
-		
+
+		// we have a key/value pair now.. 
 		std::string key = token.substr(0, pos); 
 		std::string val = token.substr(pos+1);
 

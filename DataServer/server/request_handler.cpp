@@ -125,7 +125,7 @@ void request_handler::handle_get_request(const std::string &request_path, reply 
 	if (request_path == "/index.html")
 	{
 		// substitute the inner html element with our custom one
-		boost::replace_first(rep.content, "<!--variables-->", DataServer::GetInstance()->get_html());
+		boost::replace_first(rep.content, "<!-- variables fill in here -->", DataServer::GetInstance()->get_html());
 	}
 }
 

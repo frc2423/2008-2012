@@ -5,6 +5,33 @@ body, input, table{
 	background: #f5f5f5;
 }
 
+
+
+/* decorative */
+
+h4 {
+	background: #000000;
+	color: #ffffff;
+	margin: 0;
+	padding: .5em;
+	width: 15em;
+}
+
+#container {
+	background: #fcfcfc;
+	border-top: 1px solid #000000;
+	border-left: 1px solid #000000;
+	border-bottom: 3px solid #aaaaaa;
+	border-right: 3px solid #aaaaaa;
+	padding: 1em;
+}
+
+.clear {
+	clear: both;
+}
+
+/* styles for the group */
+
 .group {
 	border: 1px solid #cfcfcf;
 	width: 15em;
@@ -34,6 +61,8 @@ body, input, table{
 	padding: 0.1em;
 	text-align: right;
 }
+
+/* styles for the selection bar */
 
 .selectbar, .selectbar_hl {
 	

@@ -5,6 +5,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kwarqs2009", "Kwarqs2009\Kw
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WPILibTestHarness", "WPILibTestHarness\WPILibTestHarness.vcproj", "{480A3AFE-4578-4A07-B461-691214CAF324}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebInterface", "WebInterface\WebInterface.vcproj", "{61D70AF6-226F-40D9-8833-8A99E2BD582F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -19,6 +21,10 @@ Global
 		{480A3AFE-4578-4A07-B461-691214CAF324}.Debug|Win32.Build.0 = Debug|Win32
 		{480A3AFE-4578-4A07-B461-691214CAF324}.Release|Win32.ActiveCfg = Release|Win32
 		{480A3AFE-4578-4A07-B461-691214CAF324}.Release|Win32.Build.0 = Release|Win32
+		{61D70AF6-226F-40D9-8833-8A99E2BD582F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{61D70AF6-226F-40D9-8833-8A99E2BD582F}.Debug|Win32.Build.0 = Debug|Win32
+		{61D70AF6-226F-40D9-8833-8A99E2BD582F}.Release|Win32.ActiveCfg = Release|Win32
+		{61D70AF6-226F-40D9-8833-8A99E2BD582F}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

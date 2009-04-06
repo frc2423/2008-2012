@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="WebInterface"
-	ProjectGUID="{480A3AFE-4578-4A07-B461-691214CAF324}"
+	ProjectGUID="{61D70AF6-226F-40D9-8833-8A99E2BD582F}"
 	RootNamespace="WebInterface"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"
@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)/WPILib&quot;;$(ProjectDir);&quot;$(ProjectDir)/VxWorks&quot;;C:\wxWidgets\include;C:\wxWidgets\include\msvc"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;USE_MSVC_MEMORY_TRACING"
+				AdditionalIncludeDirectories="&quot;C:\Program Files\boost\boost_1_38&quot;"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;USE_MSVC_MEMORY_TRACING;_WIN32_WINNT=0x0501"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -151,118 +151,38 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\App.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MotorDisplay.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SimulationWindow.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Slider.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\TogglePanelButton.cpp"
+				RelativePath=".\src\WebInterface.cpp"
 				>
 			</File>
 			<Filter
-				Name="WPILib"
+				Name="server"
 				>
 				<File
-					RelativePath=".\WPILib\Dashboard.cpp"
+					RelativePath=".\src\server\connection.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\DigitalSource.cpp"
+					RelativePath=".\src\server\connection_manager.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\DriverStation.cpp"
+					RelativePath=".\src\server\mime_types.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\Encoder.cpp"
+					RelativePath=".\src\server\reply.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\Error.cpp"
+					RelativePath=".\src\server\request_handler.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\ErrorBase.cpp"
+					RelativePath=".\src\server\request_parser.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\IterativeRobot.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Jaguar.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Joystick.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\PIDController.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Resource.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\RobotBase.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\RobotDrive.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\SensorBase.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\SimpleRobot.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Solenoid.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Synchronized.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Victor.cpp"
-					>
-				</File>
-				<Filter
-					Name="NetworkCommunication"
-					>
-					<File
-						RelativePath=".\WPILib\NetworkCommunication\FRCComm.cpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="Simulator"
-				>
-				<File
-					RelativePath=".\Simulator\SimulationData.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Simulator\Simulator.cpp"
+					RelativePath=".\src\server\server.cpp"
 					>
 				</File>
 			</Filter>
@@ -273,222 +193,58 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\MotorDisplay.h"
+				RelativePath=".\src\DataProxyInfo.h"
 				>
 			</File>
 			<File
-				RelativePath=".\SimulationWindow.h"
+				RelativePath=".\src\StaticDeleter.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Slider.h"
+				RelativePath=".\src\VariableProxy.h"
 				>
 			</File>
 			<File
-				RelativePath=".\TogglePanelButton.h"
+				RelativePath=".\src\VariableProxyFlags.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\WebInterface.h"
 				>
 			</File>
 			<Filter
-				Name="WPILib"
+				Name="server"
 				>
 				<File
-					RelativePath=".\WPILib\AnalogChannel.h"
+					RelativePath=".\src\server\connection.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\AnalogTriggerOutput.h"
+					RelativePath=".\src\server\connection_manager.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\Base.h"
+					RelativePath=".\src\server\mime_types.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\ChipObject.h"
+					RelativePath=".\src\server\reply.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\Counter.h"
+					RelativePath=".\src\server\request.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\CounterBase.h"
+					RelativePath=".\src\server\request_handler.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\Dashboard.h"
+					RelativePath=".\src\server\request_parser.hpp"
 					>
 				</File>
 				<File
-					RelativePath=".\WPILib\DigitalInput.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\DigitalSource.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\DriverStation.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Encoder.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Error.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\ErrorBase.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\GenericHID.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Gyro.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\IterativeRobot.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Jaguar.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Joystick.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Notifier.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\PIDOutput.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\PIDSource.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\PWM.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Resource.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\RobotBase.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\SensorBase.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\SimpleRobot.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\SpeedController.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Synchronized.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Task.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Timer.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Utility.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Victor.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\Watchdog.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\WPILib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\WPILib\WPIStatus.h"
-					>
-				</File>
-				<Filter
-					Name="ChipObject"
-					>
-					<File
-						RelativePath=".\WPILib\ChipObject\NiRio.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="NetworkCommunication"
-					>
-					<File
-						RelativePath=".\WPILib\NetworkCommunication\FRCComm.h"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="Simulator"
-				>
-				<File
-					RelativePath=".\Simulator\ControlInterface.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Simulator\SimulationData.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Simulator\Simulator.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="VxWorks"
-				>
-				<File
-					RelativePath=".\VxWorks\moduleLib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\semLib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\strLib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\taskLib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\unldLib.h"
-					>
-				</File>
-				<File
-					RelativePath=".\VxWorks\VxWorks.h"
+					RelativePath=".\src\server\server.hpp"
 					>
 				</File>
 			</Filter>

@@ -8,6 +8,8 @@
 #ifndef KWARQS_WHEEL_SERVO_H
 #define KWARQS_WHEEL_SERVO_H
 
+#include "ProxiedPIDController.h"
+
 // define this to enable auto-calibrate mode
 #define AUTOCALIBRATE_SERVO
 
@@ -26,6 +28,7 @@ public:
 	static int UncalibratedServoCount();
 	
 	KwarqsWheelServo(
+		const char * groupName,
 		UINT32 slot,
 		UINT32 pwm_port, 
 		UINT32 encoder_port1, UINT32 encoder_port2,
@@ -104,7 +107,7 @@ private:
 
 	void CalibrationComplete();
 
-	PIDController * m_pidController;
+	ProxiedPIDController * m_pidController;
 	
 	
 	Encoder 		m_encoder;
@@ -112,14 +115,14 @@ private:
 	// calibration sensor
 	DigitalInput 	m_sensor;
 	
-	double 		m_outputScale;
+	DoubleProxy m_outputScale;
 	double		m_setAngle;
 	
 	int			m_encoderResolution;
 	
 	bool		m_calibrating;
 	int			m_calibrated_offset;		// subtract from real counts
-	double		m_calibrating_offset;		// how many degrees off is the calibration point?
+	DoubleProxy	m_calibrating_offset;		// how many degrees off is the calibration point?
 	
 	float		m_invert_motor;
 	

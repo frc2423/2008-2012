@@ -43,6 +43,7 @@
 	of use you can look at KwarqsConstants.h for some macros
 	that define the appropriate parameters. 
 	
+	@param groupName			Name this shows up in the webinterface as
 	@param slot					Slot for electronics
 	@param pwm_port				PWM port for motor
 	@param encoder_port1		Encoder port
@@ -61,6 +62,7 @@
 	
 */
 KwarqsWheelServo::KwarqsWheelServo(
+	const char * groupName,
 	UINT32 slot,
 	UINT32 pwm_port, 
 	UINT32 encoder_port1, UINT32 encoder_port2,
@@ -75,11 +77,9 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_motor(slot, pwm_port),
 	m_encoder(slot, encoder_port1, slot, encoder_port2, invert_encoder),
 	m_sensor(slot, cal_port),
-	m_outputScale(outputScale),
 	m_setAngle(0),
 	m_encoderResolution(encoderResolution),
 	m_calibrating(false),
-	m_calibrating_offset(cal_offset),
 	m_invert_motor( invert_motor ? -1.0F : 1.0F )
 	
 {
@@ -90,7 +90,14 @@ KwarqsWheelServo::KwarqsWheelServo(
 	CalibrationComplete();
 		
 	// create the PID controller
-	m_pidController = new PIDController(param_p, 0.0F, 0.0F, this, this);
+	m_pidController = new ProxiedPIDController(param_p, 0.0F, 0.0F, this, this, groupName);
+	
+	// initialize the output scale parameter
+	m_outputScale = WebInterface::CreateDoubleProxy(groupName, "Scale", 
+		DoubleProxyFlags().default_value(outputScale).minval(1).maxval(360).step(1));
+		
+	m_calibrating_offset = WebInterface::CreateDoubleProxy(groupName, "Offset", 
+		DoubleProxyFlags().default_value(cal_offset).minval(-180).maxval(180).step(.1));
 	
 	// set the PID parameters
 	m_pidController->SetContinuous();
@@ -226,7 +233,7 @@ void KwarqsWheelServo::SetAngle(double angle)
 // generally you won't need to use this.. 
 void KwarqsWheelServo::TuneParameters(float p, float i, float d)
 {
-	m_pidController->SetPID(p, i, d);
+	//m_pidController->SetPID(p, i, d);
 }
 
 

@@ -19,7 +19,13 @@ CompassController::CompassController(KwarqsDriveController * driveController) :
 	m_position(PositionInformation::GetInstance()),
 	m_spinEvent(0.025),
 	m_noseDirection(0)
-{}
+{	
+	m_bigButtonAngle = WebInterface::CreateDoubleProxy("CompassController", "High Adjustment", 
+		DoubleProxyFlags().default_value(5).minval(-180).maxval(180).step(.1));
+		
+	m_smallButtonAngle = WebInterface::CreateDoubleProxy("CompassController", "Low Adjustment", 
+		DoubleProxyFlags().default_value(1).minval(-180).maxval(180).step(.1));
+}
 
 
 
@@ -35,7 +41,7 @@ void CompassController::Move()
 	double y2 = m_controller.GetRawAxis(4) * -1, x2 = m_controller.GetRawAxis(3);
 	double rotation = 0;
 	
-	// if we're meant to point in a particular direction, do it
+	// if we're asked to point in a particular direction, do it
 	if (fabs(__hypot(x2, y2)) > 0.25)
 	{
 		m_noseDirection = (atan2(y2, x2) * (180/M_PI) - 90.0 );	
@@ -48,21 +54,24 @@ void CompassController::Move()
 		// to the 'real' nose position if the person lets go of the
 		// buttons, so the bot doesn't just keep turning unexpectedly
 		
+		double big = m_bigButtonAngle;
+		double small = m_smallButtonAngle;
+		
 		// go left
 		if (m_controller.GetRawButton(7))
-			m_noseDirection += 5;
+			m_noseDirection += big;
 		
 		// go right
 		if (m_controller.GetRawButton(8))
-			m_noseDirection -= 5;
+			m_noseDirection -= big;
 
 		// go left a tiny bit
 		if (m_controller.GetRawButton(5))
-			m_noseDirection += 1;
+			m_noseDirection += small;
 		
 		// go right a tiny bit
 		if (m_controller.GetRawButton(6))
-			m_noseDirection -= 1;
+			m_noseDirection -= small;
 	}
 
 	rotation = m_nosePointer.GetRotation(m_noseDirection);

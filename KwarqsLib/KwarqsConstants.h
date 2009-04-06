@@ -201,7 +201,8 @@
 
 // aggregated parameters (just ignore these)
 
-#define SERVO_PARAMS(lr, fr)		SERVO_##lr##fr##_SLOT, \
+#define SERVO_PARAMS(lr, fr)		#lr #fr " Servo", \
+									SERVO_##lr##fr##_SLOT, \
 									SERVO_##lr##fr##_VICTOR, \
 									ENCODER_SERVO_##lr##fr##_1, \
 									ENCODER_SERVO_##lr##fr##_2, \

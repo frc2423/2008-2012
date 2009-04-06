@@ -16,6 +16,8 @@
 #include "../KwarqsLib/KwarqsJoystick.h"
 #include "../KwarqsLib/DelayEvent.h"
 
+#include <WebInterface.h>
+
 /**
 	\class CompassController
 	\brief A very simple control system to demonstrate that things work
@@ -48,6 +50,9 @@ private:
 	
 	DelayEvent m_spinEvent;
 	double m_noseDirection;
+	
+	DoubleProxy m_bigButtonAngle;
+	DoubleProxy m_smallButtonAngle;
 };
 
 #endif

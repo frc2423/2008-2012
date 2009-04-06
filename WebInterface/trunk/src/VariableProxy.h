@@ -86,6 +86,9 @@ typedef VariableProxyImpl<int>		IntProxy;
 /// definition of floating point proxy
 typedef VariableProxyImpl<float>	FloatProxy;
 
+/// definition of double floating point proxy
+typedef VariableProxyImpl<double>	DoubleProxy;
+
 /// definition of boolean proxy
 typedef VariableProxyImpl<bool>		BoolProxy;
 

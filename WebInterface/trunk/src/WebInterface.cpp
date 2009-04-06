@@ -30,8 +30,12 @@
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
- 
-WebInterface * WebInterface::m_instance = NULL;
+#include "StaticDeleter.h"
+
+static
+WebInterface * m_instance = NULL;
+
+StaticDeleter<WebInterface> m_deleter(&m_instance);
 
 
 WebInterface * WebInterface::GetInstance()	
@@ -60,6 +64,17 @@ FloatProxy WebInterface::CreateFloatProxy(
 	GetInstance()->InitProxy( proxy, groupName, name );
 	return proxy->GetProxy();
 }
+
+DoubleProxy WebInterface::CreateDoubleProxy( 
+	const char * groupName, 
+	const char * name, 
+	const DoubleProxyFlags &flags)
+{
+	DoubleProxyInfo * proxy = new DoubleProxyInfo(flags);
+	GetInstance()->InitProxy( proxy, groupName, name );
+	return proxy->GetProxy();
+}
+
 
 BoolProxy WebInterface::CreateBoolProxy( 
 	const char * groupName, 
@@ -214,16 +229,15 @@ std::string WebInterface::get_html()
 		}
 			
 		// finish it off
-		m_html.append("\t\t</table></div>\n\t</div>");
-		
-		// and add a javascript portion that allows us
-		// to store the 'current value'
-		m_html.append("\n\n\t<script type=\"text/javascript\"><!--\n\tvar current_instance = ");
-		m_html.append(boost::lexical_cast<std::string>(m_creation_time));
-		m_html.append(";\n\t//--></script>");
-		
+		m_html.append("\t\t</table></div>\n\t</div>");		
 		g += 1;
 	}
+
+	// and add a javascript portion that allows us
+	// to store the 'current value'
+	m_html.append("\n\n\t<script type=\"text/javascript\"><!--\n\tvar current_instance = ");
+	m_html.append(boost::lexical_cast<std::string>(m_creation_time));
+	m_html.append(";\n\t//--></script>");
 
 	m_html_valid = true;
 	return m_html;

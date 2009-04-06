@@ -87,9 +87,19 @@ public:
 		@param groupName	group this variable belongs to
 		@param name			name of this variable (should be unique)
 		@param flags		Use this to set min/max/default values and etc. For example,
-							FloatProxyFlags().default_value(x).minval(x).maxval(x).step(x)
+							FloatProxyFlags().default_value(x).minval(x).maxval(x).step(x).precision(2)
 	*/
 	static FloatProxy CreateFloatProxy( const char * groupName, const char * name, const FloatProxyFlags &flags);
+	
+	/** 
+		Use this to initialize a 'double' floating point proxy
+		
+		@param groupName	group this variable belongs to
+		@param name			name of this variable (should be unique)
+		@param flags		Use this to set min/max/default values and etc. For example,
+							DoubleProxyFlags().default_value(x).minval(x).maxval(x).step(x).precision(2)
+	*/
+	static DoubleProxy CreateDoubleProxy( const char * groupName, const char * name, const DoubleProxyFlags &flags);
 	
 	
 	/**
@@ -107,7 +117,7 @@ public:
 	
 private:
 
-	static WebInterface * m_instance;
+	
 	WebInterface();
 	
 	// internal utility functions

@@ -79,12 +79,23 @@ NumericProxyFlagsImpl<float>::NumericProxyFlagsImpl() :
 	fields_initialized(0)
 {}
 
+// double specialization
+template <>
+inline
+NumericProxyFlagsImpl<double>::NumericProxyFlagsImpl() :
+	precision_(2),
+	fields_initialized(0)
+{}
+
 
 /// definition for integers
 typedef NumericProxyFlagsImpl<int>		IntProxyFlags;
 
 /// definition for floats
 typedef NumericProxyFlagsImpl<float>	FloatProxyFlags;
+
+/// definition for floats
+typedef NumericProxyFlagsImpl<double>	DoubleProxyFlags;
 
 
 #undef FN

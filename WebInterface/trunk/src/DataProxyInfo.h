@@ -130,6 +130,9 @@ private:
 /// implementation for floats
 typedef NumericProxyInfoImpl<float> FloatProxyInfo;
 
+/// implementation for doubles
+typedef NumericProxyInfoImpl<double> DoubleProxyInfo;
+
 /// implementation for integers
 typedef NumericProxyInfoImpl<int> 	IntProxyInfo;
 

@@ -84,7 +84,7 @@ $(document).ready(function()
 		child.data('bar', params);
 		
 		// find the inner div, set it correctly
-		child.children("div:first-child").width((params[2]/(params[4] - params[3]))*100 + "%");
+		child.children("div:first-child").width(((params[2] - params[3])/(params[4] - params[3]))*100 + "%");
 		
 		
 		// set the text correctly
@@ -152,7 +152,7 @@ function dragFn(that, e)
 			params[2] = params[4];
 		
 		// then convert it back and display it
-		$(that).children("div:first-child").width((params[2] / diff)*100 + "%");
+		$(that).children("div:first-child").width(((params[2] - params[3]) / diff)*100 + "%");
 		if (params[6] == 0)
 			$(that).children("span").html(params[2]);
 		else

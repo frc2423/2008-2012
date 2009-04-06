@@ -67,16 +67,16 @@ private:
 template <>
 inline
 NumericProxyFlagsImpl<int>::NumericProxyFlagsImpl() :
-	fields_initialized(0),
-	precision_(0)
+	precision_(0),
+	fields_initialized(0)
 {}
 
 // float specialization
 template <>
 inline
 NumericProxyFlagsImpl<float>::NumericProxyFlagsImpl() :
-	fields_initialized(0),
-	precision_(2)
+	precision_(2),
+	fields_initialized(0)
 {}
 
 

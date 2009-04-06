@@ -17,6 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 #include "WebInterface.h"
 #include "VariableProxy.h"
 
@@ -234,7 +235,7 @@ std::string WebInterface::ProcessRequest(const std::string &post_data)
 	int found_flags = 0;
 	std::string value;
 
-	typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+	typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
 	// parse the POST request into name/value pairs
 	boost::char_separator<char> sep("&");

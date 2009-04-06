@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wrxml>
     <properties platform="VxWorks" platform_name="vxworks-6.3" root="1" type="DownloadableKernelModuleProject"/>
+    <subprojects>
+        <subproject project="/WebInterface"/>
+    </subprojects>
     <attributes>
         <mapAttribute>
             <listAttribute key="BLD::Info|GlobalMacros">
@@ -28,6 +31,8 @@
                 <stringAttribute value="-I$(WIND_BASE)/target/h"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/WPILib"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
+                <stringAttribute value="-I%Proj-WebInterface%"/>
+                <stringAttribute value="-IC:/Program Files/boost/boost_1_38_vxworks"/>
             </listAttribute>
             <listAttribute key="BLD::Info|Libs|PPC32diab">
                 <stringAttribute value="$(WIND_BASE)/target/lib/WPILib.a"/>

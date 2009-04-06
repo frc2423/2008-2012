@@ -37,6 +37,7 @@
 //#include "KwarqsLib/KwarqsTelemetry.h"
 //#include "TelemetryData.h"
 
+#include <WebInterface.h>
 
 
 class KwarqsRobotMain : public SimpleRobot
@@ -128,6 +129,10 @@ public:
 		driveController.AddDrive(&swerveDrive, DriveEnabled);
 		
 		lcd = DriverStationLCD::GetInstance();
+		
+		// by now, everything depending on the web interface
+		// should have initialized, so go ahead and enable it
+		WebInterface::Enable();
 	}
 
 	/**

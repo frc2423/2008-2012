@@ -3,6 +3,7 @@
 	<name>Kwarqs2009</name>
 	<comment></comment>
 	<projects>
+		<project>WebInterface</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

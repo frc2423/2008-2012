@@ -102,8 +102,9 @@ void request_handler::handle_get_request(const std::string &request_path, reply 
 
 	// Open the file to send back.
 	std::string full_path = doc_root_ + request_path;
-	std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
-	if (!is)
+
+	FILE * file = fopen(full_path.c_str(), "rb");
+	if (!file)
 	{
 		rep = reply::stock_reply(reply::not_found, true);
 		return;
@@ -116,8 +117,17 @@ void request_handler::handle_get_request(const std::string &request_path, reply 
 	
 	
 	char buf[1024];
-	while (is.read(buf, sizeof(buf)).gcount() > 0)
-		rep.content.append(buf, is.gcount());
+
+	do
+	{
+		size_t sz = fread(buf, 1, sizeof(buf), file);
+
+		if (sz == 0)
+			break;
+
+		rep.content.append(buf, sz);
+	} while (!feof(file));
+
 	rep.headers.resize(1);
 	rep.headers[0].name = "Content-Type";
 	rep.headers[0].value = mime_types::extension_to_type(extension);

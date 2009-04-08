@@ -32,6 +32,13 @@
 
 #include "StaticDeleter.h"
 
+
+#if defined(__VXWORKS__)
+#	include <WPILib/WPILib.h>
+#endif
+
+
+
 static
 WebInterface * m_instance = NULL;
 
@@ -187,8 +194,13 @@ void WebInterface::EnableInternal(const std::string &port, const std::string &ro
 		m_rootDir = rootdir;
 		
 	// then start the task/thread
+#if defined(__VXWORKS__)
+	Task * task = new Task("WebInterface", (FUNCPTR)WebInterface::WebInterfaceThreadStart, Task::kDefaultPriority, 64000);
+	task->Start((INT32)this);
+#else
 	if (m_thread.get() == NULL)
 		m_thread.reset( new boost::thread(boost::bind(&WebInterface::ThreadFn, this)) );
+#endif
 }
 
 std::string WebInterface::get_html()

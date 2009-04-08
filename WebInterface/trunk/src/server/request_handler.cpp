@@ -117,10 +117,11 @@ void request_handler::handle_get_request(const std::string &request_path, reply 
 	
 	
 	char buf[1024];
+	size_t sz;
 
 	do
 	{
-		size_t sz = fread(buf, 1, sizeof(buf), file);
+		sz = fread(buf, 1, sizeof(buf), file);
 
 		if (sz == 0)
 			break;

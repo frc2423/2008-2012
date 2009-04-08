@@ -161,7 +161,9 @@ private:
 	boost::mutex			m_mutex;
 	
 	/// thread
+#if !defined(__VXWORKS__)
 	boost::shared_ptr< boost::thread > m_thread;
+#endif
 	
 	/// storage of the proxied data
 	DataProxyGroups 		m_groups;

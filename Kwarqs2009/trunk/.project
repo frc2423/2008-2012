@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>WebInterface</project>
+		<project>boost</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

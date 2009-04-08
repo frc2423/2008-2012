@@ -295,7 +295,8 @@ public:
 			if (m_stick.GetRawButton(5) && m_stick.GetRawButton(6))
 				PositionInformation::GetInstance()->ResetHeading();
 			
-			UpdateLCD();			
+			UpdateLCD();
+			Wait(0.01);
 		}
 		
 		GetTeleoperatedMovementControl(user_selection)->OnDisable();

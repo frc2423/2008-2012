@@ -24,6 +24,7 @@
 #include "server/server.hpp"
 
 #include <ctime>
+#include <iostream>
 
 #include <boost/tokenizer.hpp>
 
@@ -171,11 +172,18 @@ void WebInterface::ThreadFn()
 		rootdir = m_rootDir;
 	}
 
-    // Initialise server.
-    http::server::server s("0.0.0.0", port, rootdir);
+	try
+	{
+		// Initialise server.
+		http::server::server s("0.0.0.0", port, rootdir);
 	
-	// Run the server until stopped.
-    s.run();
+		// Run the server until stopped.
+		s.run();
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << "WebInterface Server exception: " << e.what() << std::endl;
+	}
 }
 
 void WebInterface::Enable(const std::string &port, const std::string &rootdir)

@@ -40,8 +40,8 @@
             </listAttribute>
             <listAttribute key="BLD::Info|Libs|PPC603gnu">
                 <stringAttribute value="$(WIND_BASE)/target/lib/WPILib.a"/>
-                <stringAttribute value="C:/WindRiver/workspace/WebInterface/PPC603gnu/WebInterface/Debug/WebInterface.a"/>
-                <stringAttribute value="C:/WindRiver/workspace/boost/PPC603gnu/boost/Debug/boost.a"/>
+                <stringAttribute value="$(WS_ROOT_DIR)/WebInterface/PPC603gnu/WebInterface/Debug/WebInterface.a"/>
+                <stringAttribute value="$(WS_ROOT_DIR)/boost/PPC603gnu/boost/Debug/boost.a"/>
             </listAttribute>
             <listAttribute key="BLD::Info|Macros">
                 <stringAttribute value="VX_CPU_FAMILY"/>

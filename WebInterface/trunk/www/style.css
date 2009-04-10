@@ -64,9 +64,99 @@ h4 {
 
 /* styles for the selection bar */
 
-.selectbar, .selectbar_hl {
-	
+.selectbar {
 	float: right;
+	
+}
+
+.selectbar .bar {
+	position: relative;
+	margin-left: 1em;
+	margin-right: 1em;
+	width: 10em;
+	height: 1.5em;
+	cursor: pointer;
+	border: 1px solid #dfdfdf;
+}
+
+.selectbar .bar div {
+	height: 1.5em;
+	background: #dddddd;
+}
+
+.selectbar .bar span {
+	display: block; 
+	position: absolute; 
+	right: 0.1em; 
+	top: 0
+}
+
+
+
+.selectbar .lt, .selectbar .gt {
+	border-top: 1px solid #dfdfdf;
+	border-bottom: 1px solid #dfdfdf;
+	height: 1.5em;
+	width: 1em;
+	cursor: pointer;
+	background: #f2f2f2;
+	color: #bfbfbf;
+	text-align: center;
+}
+
+.selectbar .lt {
+	float: left;
+	border-left: 1px solid #dfdfdf;
+	-moz-border-radius-topleft: 0.5em;
+	-moz-border-radius-bottomleft: 0.5em;
+}
+
+.selectbar .gt {
+	float: right;
+	border-right: 1px solid #dfdfdf;
+	-moz-border-radius-topright: 0.5em;
+	-moz-border-radius-bottomright: 0.5em;
+}
+
+/* hovers */
+
+.selectbar_hovered .bar {
+	border: 1px solid #bfbfbf;
+}
+
+.selectbar_hovered .lt {
+	border-top: 1px solid #bfbfbf;
+	border-bottom: 1px solid #bfbfbf;
+	border-left: 1px solid #bfbfbf;
+}
+
+.selectbar_hovered .gt {
+	border-top: 1px solid #bfbfbf;
+	border-bottom: 1px solid #bfbfbf;
+	border-right: 1px solid #bfbfbf;
+}
+
+
+.selectbar_hovered .bar div {
+	background: #bbbbbb;
+}
+
+.selectbar .ltgt_hovered {
+	background: #dddddd;
+	color: #8f8f8f;
+}
+
+
+
+
+
+
+
+
+
+/*
+.selectbar, .selectbar_hl {
+	position: relative;
 }
 
 .selectbar div, .selectbar_hl div {
@@ -91,4 +181,12 @@ h4 {
 {
 	background: #bbbbbb;
 }
+
+.selectbar_edit {
+	float: right; 
+	margin-left: 1px; 
+	width: 1em; 
+	text-align: center
+}
+*/
 

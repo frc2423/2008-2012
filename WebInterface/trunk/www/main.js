@@ -31,17 +31,15 @@ $(document).ready(function()
 		
 	});
 	
+	$(".selectbar").hover(
+		function(){
+			$(this).addClass("selectbar_hovered");
+		},
+		function(){
+			$(this).removeClass("selectbar_hovered");
+		}
+	);
 
-	// make the bars highlight when moused
-	$(".selectbar").mouseover(function(){
-		this.className = this.className + '_hl';
-		return false;
-	});
-	
-	$(".selectbar").mouseout(function(){
-		this.className = this.className.replace(/_hl/,'');
-		return false;
-	});	
 	
 	// make the bars come to life (integers)
 	$(".selectbar").each(function(idx, thing){
@@ -76,26 +74,31 @@ $(document).ready(function()
 				params[i] = parseInt(params[i]);
 				
 		// add the inner divs, transform it into a nice bar
-		var bar = "<div style=\"position: relative\"><div>&nbsp;</div><span style=\"display: block; position: absolute; right: 0.1em; top: 0\">" + params[2] + "</span></div>";
-		$(thing).html(bar);
+		var barhtml = "";
+		
+		barhtml += "<div class=\"lt\">-</div>";
+		barhtml += "<div class=\"gt\">+</div>";
+		
+		barhtml += "<div class=\"bar\"><div>&nbsp;</div><span>" + params[2] + "</span></div>";
+		
+		
+		
+		$(thing).html(barhtml);
 		
 		// select the child, and attach the parameters to it
-		var child = $(thing).children("div:first-child");
-		child.data('bar', params);
+		var bar = $(thing).children(".bar");
+		bar.data('bar', params);
 		
-		// find the inner div, set it correctly
-		child.children("div:first-child").width(((params[2] - params[3])/(params[4] - params[3]))*100 + "%");
+		modify_bar(bar, false);
+		
+		// find the inner div, set it's width correctly
 		
 		
-		// set the text correctly
+		bar.children("div:first-child").width(((params[2] - params[3])/(params[4] - params[3]))*100 + "%");
 		
-		// add a mousemove handler to ensure that we 
-		// can move the variable around
+		bar.data('down', false);
 		
-		child.data('down', false);
-		
-		child
-		.hover(
+		bar.hover(
 			function() { 
 				return true;
 			},
@@ -116,15 +119,48 @@ $(document).ready(function()
 		.mousemove(function(e){
 			dragFn(this, e);
 			return false;
-		})
-		.children()
-		.keydown(function(e){
-			alert("keydown");
-		})
-		.focus(function(e){
-			alert("focus");
 		});
-	
+		
+		// setup the adjustment tabs on each end
+		$(thing).children(".lt,.gt")
+		.hover(
+			function() {
+				$(this).addClass("ltgt_hovered");
+			},
+			function() {
+				// cancels the step timer, just in case
+				$(this).data('mv-enabled', false);
+				$(this).removeClass("ltgt_hovered");
+			}
+		)
+		.mousedown(function(e){
+			
+			// pin these variables down so the timeout function can use them
+			var data = this;
+			var that = $(this).siblings('.bar');
+			var stepsz = $(this).hasClass('gt') ? 1 : -1;
+			$(this).data('mv-enabled', true);
+			
+			step_bar(that, stepsz);
+				
+			// setup a timer that allows us to repeat the step until the 
+			// mouse is released
+			var fn = function(){ 
+				if ($(data).data('mv-enabled'))
+				{
+					step_bar(that, stepsz);
+					setTimeout(fn, 100);
+				}
+			}
+			
+			setTimeout(fn, 600);
+			return false;
+		})
+		.mouseup(function(e){
+			// cancel the timer
+			$(this).data('mv-enabled', false);
+			return false;
+		});
 	});
 });
 
@@ -133,8 +169,6 @@ function dragFn(that, e)
 	if ($(that).data('down') == true)
 	{
 		var params = $(that).data('bar');
-	
-		// calculate the new value
 		var diff = params[4] - params[3];
 		
 		// the -5 here is to allow the edges to be less significant
@@ -146,22 +180,41 @@ function dragFn(that, e)
 		
 		// move to an even step size
 		params[2] = Math.round(params[2] / params[5]) * params[5] + params[3];
-		
-		// ensure its not too big
-		if (params[2] > params[4])
-			params[2] = params[4];
-		
-		// then convert it back and display it
-		$(that).children("div:first-child").width(((params[2] - params[3]) / diff)*100 + "%");
-		if (params[6] == 0)
-			$(that).children("span").html(params[2]);
-		else
-			$(that).children("span").html(params[2].toFixed(params[6]));
-		
-		submit_variables(that, params);
-
+					
+		modify_bar(that, true);
 	}
 }
+
+function step_bar(that, val)
+{
+	var params = $(that).data('bar');
+	params[2] += params[5] * val;
+			
+	modify_bar(that, true);
+}
+
+function modify_bar(that, dosubmit)
+{
+	var params = $(that).data('bar');
+	var diff = params[4] - params[3];
+	
+	// ensure its not too big
+	if (params[2] > params[4])
+		params[2] = params[4];
+	else if (params[2] < params[3])
+		params[2] = params[3];
+	
+	// then convert it back and display it
+	$(that).children("div:first-child").width(((params[2] - params[3]) / diff)*100 + "%");
+	if (params[6] == 0)
+		$(that).children("span").html(params[2]);
+	else
+		$(that).children("span").html(params[2].toFixed(params[6]));
+
+	if (dosubmit)
+		submit_variables(that, params);
+}
+
 
 // submits the variables
 function submit_variables(that, params)

@@ -64,15 +64,15 @@ h4 {
 
 /* styles for the selection bar */
 
-.selectbar {
-	float: right;
-	
+.selectbar {	
+	position: relative;
+	width: 12em;
 }
 
 .selectbar .bar {
 	position: relative;
-	float: right;
 	width: 10em;
+	margin: 0 1em;
 	height: 1.5em;
 	cursor: pointer;
 	border: 1px solid #dfdfdf;
@@ -104,14 +104,18 @@ h4 {
 }
 
 .selectbar .lt {
-	float: right;
+	position: absolute;
+	left: 0;
+	top: 0;
 	border-left: 1px solid #dfdfdf;
 	-moz-border-radius-topleft: 0.5em;
 	-moz-border-radius-bottomleft: 0.5em;
 }
 
 .selectbar .gt {
-	float: right;
+	position: absolute;
+	right: 0;
+	top: 0;
 	border-right: 1px solid #dfdfdf;
 	-moz-border-radius-topright: 0.5em;
 	-moz-border-radius-bottomright: 0.5em;

@@ -100,9 +100,9 @@ $(document).ready(function()
 		// add the inner divs, transform it into a nice bar
 		var barhtml = "";
 		
-		barhtml += "<div class=\"gt\">+</div>";
-		barhtml += "<div class=\"bar\"><div>&nbsp;</div><span>" + params[2] + "</span></div>";
 		barhtml += "<div class=\"lt\">-</div>";
+		barhtml += "<div class=\"bar\"><div>&nbsp;</div><span>" + params[2] + "</span></div>";
+		barhtml += "<div class=\"gt\">+</div>";
 		
 		$(thing).html(barhtml);
 		
@@ -188,11 +188,11 @@ function dragFn(that, e)
 		var diff = params[4] - params[3];
 		
 		var x = e.clientX 
-				- parseInt($(that).position().left) 
-				- parseInt('0' + $(that).css('margin-left'))
-				- parseInt('0' + $(that).css('padding-left'))
+				- parseInt($(that).offset().left) 
 				- parseInt('0' + $(that).css('borderLeftWidth'));
 		var w = $(that).innerWidth();
+		
+	
 		
 		// determine the value by converting the mouse position into a ratio
 		params[2] = (x / w) * diff;

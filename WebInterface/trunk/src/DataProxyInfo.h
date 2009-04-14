@@ -179,6 +179,7 @@ struct BoolProxyInfo : public DataProxyInfo {
 				+ boost::lexical_cast<std::string>(gid)
 				+ "_v"
 				+ boost::lexical_cast<std::string>(vid)
+				+ (current_value ? "_checked" : "_notchecked")
 				+ "\"";
 				
 		if (current_value)

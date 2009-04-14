@@ -1,3 +1,21 @@
+/*
+    WebInterface
+    Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
+	
+	$Id$
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License v3 as published by
+    the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 $(document).ready(function() 
 {
@@ -16,6 +34,12 @@ $(document).ready(function()
 		var params = this.id.split("_");
 		
 		$(this).data('bar', params);
+		
+		// various browsers keep the checkbox values over refreshes
+		if (params[2] == 'checked')
+			this.checked = true;
+		else
+			this.checked = false;
 		
 		$(this).click(function(e)
 		{
@@ -76,12 +100,9 @@ $(document).ready(function()
 		// add the inner divs, transform it into a nice bar
 		var barhtml = "";
 		
-		barhtml += "<div class=\"lt\">-</div>";
 		barhtml += "<div class=\"gt\">+</div>";
-		
 		barhtml += "<div class=\"bar\"><div>&nbsp;</div><span>" + params[2] + "</span></div>";
-		
-		
+		barhtml += "<div class=\"lt\">-</div>";
 		
 		$(thing).html(barhtml);
 		
@@ -89,28 +110,23 @@ $(document).ready(function()
 		var bar = $(thing).children(".bar");
 		bar.data('bar', params);
 		
-		modify_bar(bar, false);
-		
-		// find the inner div, set it's width correctly
-		
-		
+		// setup the parameters
+		update_parameters(bar, false);
+
 		bar.children("div:first-child").width(((params[2] - params[3])/(params[4] - params[3]))*100 + "%");
 		
 		bar.data('down', false);
 		
 		bar.hover(
-			function() { 
-				return true;
-			},
+			function() {},
 			function() {
 				$(this).data('down', false);
-				return true;
 			}
 		)
 		.mousedown(function(e){
 			$(this).data('down', true);
 			dragFn(this, e);
-			return true;
+			return false;
 		})
 		.mouseup(function(){
 			$(this).data('down', false);
@@ -171,17 +187,20 @@ function dragFn(that, e)
 		var params = $(that).data('bar');
 		var diff = params[4] - params[3];
 		
-		// the -5 here is to allow the edges to be less significant
-		var x = (e.clientX - parseInt($(that).position().left)) - 5;
-		if (x < 0) x = 0;
+		var x = e.clientX 
+				- parseInt($(that).position().left) 
+				- parseInt('0' + $(that).css('margin-left'))
+				- parseInt('0' + $(that).css('padding-left'))
+				- parseInt('0' + $(that).css('borderLeftWidth'));
+		var w = $(that).innerWidth();
 		
 		// determine the value by converting the mouse position into a ratio
-		params[2] = (x / ($(that).width() - 10) ) * diff;
+		params[2] = (x / w) * diff;
 		
-		// move to an even step size
+		// adjust it to be on a step size boundary
 		params[2] = Math.round(params[2] / params[5]) * params[5] + params[3];
 					
-		modify_bar(that, true);
+		update_parameters(that);
 	}
 }
 
@@ -190,10 +209,10 @@ function step_bar(that, val)
 	var params = $(that).data('bar');
 	params[2] += params[5] * val;
 			
-	modify_bar(that, true);
+	update_parameters(that);
 }
 
-function modify_bar(that, dosubmit)
+function update_parameters(that, dosubmit)
 {
 	var params = $(that).data('bar');
 	var diff = params[4] - params[3];
@@ -210,18 +229,23 @@ function modify_bar(that, dosubmit)
 		$(that).children("span").html(params[2]);
 	else
 		$(that).children("span").html(params[2].toFixed(params[6]));
-
-	if (dosubmit)
+		
+	if (dosubmit !== false)
 		submit_variables(that, params);
 }
 
+var num_requests = 0;
 
-// submits the variables
+// submits a variable change to the server
 function submit_variables(that, params)
 {
 	if ($(that).data('ajaxprocess') != true)
 	{
+		// only do the submission every 50 ms or so
 		$(that).data('ajaxprocess', true);
+		num_requests += 1;
+		var current_request = num_requests;
+		
 		setTimeout(
 			function(){
 				$.ajax({
@@ -232,17 +256,38 @@ function submit_variables(that, params)
 						"&var=" + params[1].substr(1) + 
 						"&value=" + params[2] +
 						"&instance=" + current_instance,
+						
 					error: function(x, status, e) {
 						// display something somewhere to indicate an error
+						$('body').append(
+							"<div id=\"err" + current_request + "\" style=\"display: none\">" +
+								"<strong>ERROR</strong>: an error occurred while communicating with the server! (request " +
+								current_request + ")" +
+							"</div>"
+						);
+							
+						$('#err' + current_request).show(1000, function() {
+							setTimeout(function()
+							{
+								$('#err' + current_request).hide("slow", function() { 
+									$(this).remove(); 
+								});
+							}, 5000);
+						});
+						
+						$(that).addClass("error");
 					},
+					
 					success: function(msg) {
 						// display something somewhere to indicate success?
 						switch (msg)
 						{
 							case "FAIL":
 							case "INVALID":
+								$(that).addClass("error");
 								break;
-							case "SUCCESS":
+							case "OK":
+								$(that).removeClass("error");
 								break;
 							case "RELOAD":
 								window.location.reload();

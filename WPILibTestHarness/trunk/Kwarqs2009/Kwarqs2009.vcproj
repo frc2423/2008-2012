@@ -173,10 +173,6 @@
 			ReferencedProjectIdentifier="{480A3AFE-4578-4A07-B461-691214CAF324}"
 			RelativePathToProject=".\WPILibTestHarness\WPILibTestHarness.vcproj"
 		/>
-		<ProjectReference
-			ReferencedProjectIdentifier="{61D70AF6-226F-40D9-8833-8A99E2BD582F}"
-			RelativePathToProject=".\WebInterface\WebInterface.vcproj"
-		/>
 	</References>
 	<Files>
 		<Filter
@@ -288,6 +284,46 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="WebInterface"
+				>
+				<File
+					RelativePath=".\src\WebInterface\WebInterface.cpp"
+					>
+				</File>
+				<Filter
+					Name="server"
+					>
+					<File
+						RelativePath=".\src\WebInterface\server\connection.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\connection_manager.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\mime_types.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\reply.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\request_handler.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\request_parser.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\server.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -398,6 +434,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\KwarqsLib\ProxiedPIDController.h"
+					>
+				</File>
+				<File
 					RelativePath=".\src\KwarqsLib\Serialization.h"
 					>
 				</File>
@@ -453,6 +493,70 @@
 					RelativePath=".\src\Drives\SwerveDrive.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="WebInterface"
+				>
+				<File
+					RelativePath=".\src\WebInterface\DataProxyInfo.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WebInterface\StaticDeleter.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WebInterface\VariableProxy.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WebInterface\VariableProxyFlags.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\WebInterface\WebInterface.h"
+					>
+				</File>
+				<Filter
+					Name="server"
+					>
+					<File
+						RelativePath=".\src\WebInterface\server\connection.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\connection_manager.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\header.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\mime_types.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\reply.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\request.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\request_handler.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\request_parser.hpp"
+						>
+					</File>
+					<File
+						RelativePath=".\src\WebInterface\server\server.hpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

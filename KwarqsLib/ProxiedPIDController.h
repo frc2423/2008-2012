@@ -10,7 +10,7 @@
 #include "Base.h"
 #include "semLib.h"
 
-#include <WebInterface.h>
+#include "../WebInterface/WebInterface.h"
 
 class PIDOutput;
 class PIDSource;

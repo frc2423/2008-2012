@@ -16,7 +16,7 @@
 #include "../KwarqsLib/KwarqsJoystick.h"
 #include "../KwarqsLib/DelayEvent.h"
 
-#include <WebInterface.h>
+#include "../WebInterface/WebInterface.h"
 
 /**
 	\class CompassController

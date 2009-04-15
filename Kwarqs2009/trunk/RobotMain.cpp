@@ -37,7 +37,7 @@
 //#include "KwarqsLib/KwarqsTelemetry.h"
 //#include "TelemetryData.h"
 
-#include <WebInterface.h>
+#include "WebInterface/WebInterface.h"
 
 
 class KwarqsRobotMain : public SimpleRobot

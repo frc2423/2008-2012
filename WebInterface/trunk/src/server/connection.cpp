@@ -93,6 +93,7 @@ void connection::handle_read(const boost::system::error_code& e,
 
 void connection::parse_input_data()
 {
+	boost::shared_ptr<reply> the_reply;
 	request_parser::ParserResult result;
 	input_buffer::iterator next;
 	boost::tie(result, next) = request_parser_.parse(request_, 
@@ -105,25 +106,28 @@ void connection::parse_input_data()
 	switch (result)
 	{
 		case request_parser::Success:
-			// successful 
-			request_handler_.handle_request(request_, reply_);
-			boost::asio::async_write(socket_, reply_.to_buffers(),
+			// successful
+			the_reply.reset(new reply);
+			request_handler_.handle_request(request_, *the_reply);
+			boost::asio::async_write(socket_, the_reply->to_buffers(),
 					boost::bind(&connection::handle_write, shared_from_this(),
-						boost::asio::placeholders::error));
+						boost::asio::placeholders::error, the_reply));
 			break;
 		
 		case request_parser::LengthRequired:
-			reply_ = reply::stock_reply(reply::length_required, false);
-			boost::asio::async_write(socket_, reply_.to_buffers(),
+			the_reply.reset(new reply);
+			*the_reply = reply::stock_reply(reply::length_required, false);
+			boost::asio::async_write(socket_, the_reply->to_buffers(),
 					boost::bind(&connection::handle_write, shared_from_this(),
-						boost::asio::placeholders::error));
+						boost::asio::placeholders::error, the_reply));
 			break;
 			
 		case request_parser::BadRequest:
-			reply_ = reply::stock_reply(reply::bad_request, false);				
-			boost::asio::async_write(socket_, reply_.to_buffers(),
+			the_reply.reset(new reply);
+			*the_reply = reply::stock_reply(reply::bad_request, false);				
+			boost::asio::async_write(socket_, the_reply->to_buffers(),
 					boost::bind(&connection::handle_write, shared_from_this(),
-						boost::asio::placeholders::error));
+						boost::asio::placeholders::error, the_reply));
 			break;
 		
 		case request_parser::NeedMoreData:
@@ -141,14 +145,14 @@ void connection::parse_input_data()
 }
 
 
-void connection::handle_write(const boost::system::error_code& e)
+void connection::handle_write(const boost::system::error_code& e, const boost::shared_ptr<reply> &the_reply)
 {
 	bool do_abort = true;
 	io_timeout_.cancel();
 
 	if (!e)
 	{
-		if (!reply_.persistent)
+		if (!the_reply->persistent)
 		{
 			// Initiate graceful connection closure if not persistent
 			boost::system::error_code ignored_ec;

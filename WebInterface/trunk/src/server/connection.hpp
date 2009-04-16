@@ -58,7 +58,8 @@ private:
 			std::size_t bytes_transferred);
 
 	/// Handle completion of a write operation.
-	void handle_write(const boost::system::error_code& e);
+	void handle_write(const boost::system::error_code& e,
+			const boost::shared_ptr<reply> &the_reply);
 	
 	/// Handle an I/O timeout
 	void handle_io_timeout(const boost::system::error_code& e);
@@ -90,9 +91,6 @@ private:
 
 	/// The parser for the incoming request.
 	request_parser request_parser_;
-
-	/// The reply to be sent back to the client.
-	reply reply_;
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;

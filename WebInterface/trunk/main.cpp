@@ -3,7 +3,11 @@
 
 #include "src/WebInterface.h"
 
-#include <windows.h>
+#ifdef _MSC_VER
+	#include <windows.h>
+#else
+	#include <unistd.h>
+#endif
 
 int main()
 {
@@ -29,7 +33,12 @@ int main()
 	{
 		printf("%5d %5d %5.1f %5.1f %5.1f\r", (int)i1, (int)i2, (float)f1, (float)f2, (double)d1);
 	
+		
+#ifdef _MSC_VER
 		Sleep(100);
+#else
+		usleep(10000);
+#endif
 	}
 
 	return true;

@@ -34,15 +34,10 @@
 #include "StaticDeleter.h"
 
 
-#if defined(__VXWORKS__)
-#	include <WPILib/WPILib.h>
-#endif
-
-
-
 static
 WebInterface * m_instance = NULL;
 
+// this ensures that the WebInterface gets deleted at exit
 StaticDeleter<WebInterface> m_deleter(&m_instance);
 
 
@@ -94,13 +89,41 @@ BoolProxy WebInterface::CreateBoolProxy(
 	return proxy->GetProxy();
 }
 
+
+// default constructor
 WebInterface::WebInterface() :
 	m_port("8080"),
 	m_rootDir("www"),
 	m_html_valid(false),
-	m_creation_time(time(NULL))
+	m_creation_time(time(NULL)),
+	m_server(NULL),
+	m_thread_created(false)
 {}
 
+WebInterface::~WebInterface()
+{
+	bool thread_created = false;
+
+	{
+		lock_guard lock(m_mutex);
+		thread_created = m_thread_created;
+	}
+	
+	// if the thread is created, then join it. Be sure that
+	// we don't hold the lock while it is joined, otherwise
+	// the server will deadlock. the lock must be held when
+	// signaling the server however. 
+	if (thread_created)
+	{
+		{
+			lock_guard lock(m_mutex);
+			if (m_server)
+				m_server->stop();
+		}
+
+		m_thread->join();
+	}
+}
 
 
 
@@ -161,28 +184,31 @@ void WebInterface::WebInterfaceThreadStart(void * param)
 	((WebInterface*)param)->ThreadFn();
 }
 
-
+/// this is the thread that the HTTP server runs on. When the WebInterface is
+/// destroyed, the server should be signaled to exit and the thread will be
+/// joined
 void WebInterface::ThreadFn()
 {
-	std::string port, rootdir;
-	
-	{
-		lock_guard lock(m_mutex);
-		port = m_port;
-		rootdir = m_rootDir;
-	}
-
 	try
 	{
 		// Initialise server.
-		http::server::server s("0.0.0.0", port, rootdir);
+		{
+			lock_guard lock(m_mutex);
+			m_server = new http::server::server("0.0.0.0", m_port, m_rootDir);
+		}
 	
 		// Run the server until stopped.
-		s.run();
+		m_server->run();
 	}
 	catch (std::exception &e)
 	{
 		std::cerr << "WebInterface Server exception: " << e.what() << std::endl;
+	}
+	
+	{
+		lock_guard lock(m_mutex);
+		delete m_server;
+		m_server = NULL;
 	}
 }
 
@@ -201,16 +227,15 @@ void WebInterface::EnableInternal(const std::string &port, const std::string &ro
 	if (!rootdir.empty())
 		m_rootDir = rootdir;
 		
-	// then start the task/thread
-#if defined(__VXWORKS__)
-	Task * task = new Task("WebInterface", (FUNCPTR)WebInterface::WebInterfaceThreadStart, Task::kDefaultPriority, 64000);
-	task->Start((INT32)this);
-#else
-	if (m_thread.get() == NULL)
+	// then start the thread
+	if (!m_thread_created)
+	{
 		m_thread.reset( new boost::thread(boost::bind(&WebInterface::ThreadFn, this)) );
-#endif
+		m_thread_created = true;
+	}
 }
 
+/// this function returns the html to be inserted into the index.html page
 std::string WebInterface::get_html()
 {
 	// lock globally

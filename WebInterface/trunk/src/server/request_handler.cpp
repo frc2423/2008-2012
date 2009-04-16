@@ -102,9 +102,8 @@ void request_handler::handle_get_request(const std::string &request_path, reply 
 
 	// Open the file to send back.
 	std::string full_path = doc_root_ + request_path;
-
-	FILE * file = fopen(full_path.c_str(), "rb");
-	if (!file)
+	std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
+	if (!is)
 	{
 		rep = reply::stock_reply(reply::not_found, true);
 		return;
@@ -112,22 +111,9 @@ void request_handler::handle_get_request(const std::string &request_path, reply 
 
 	// Fill out the reply to be sent to the client.
 	rep.status = reply::ok;
-	rep.content.clear();
-	rep.headers.clear();
-	
-	
-	char buf[1024];
-	size_t sz;
-
-	do
-	{
-		sz = fread(buf, 1, sizeof(buf), file);
-
-		if (sz == 0)
-			break;
-
-		rep.content.append(buf, sz);
-	} while (!feof(file));
+	char buf[512];
+	while (is.read(buf, sizeof(buf)).gcount() > 0)
+		rep.content.append(buf, is.gcount());
 
 	rep.headers.resize(1);
 	rep.headers[0].name = "Content-Type";

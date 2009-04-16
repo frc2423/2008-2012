@@ -61,7 +61,10 @@ public:
 	~StaticDeleter()
 	{
 		if (*m_ptr2ptr)
+		{
 			delete *m_ptr2ptr;
+			*m_ptr2ptr = NULL;
+		}
 	}
 
 private:

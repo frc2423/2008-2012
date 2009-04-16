@@ -31,6 +31,7 @@
 namespace http {
 	namespace server {
 		class request_handler;
+		class server;
 	}
 }
 
@@ -114,6 +115,7 @@ public:
 
 	/// @todo other types of variables: enums, doubles, signed/unsigned.. 
 
+	~WebInterface();
 	
 private:
 
@@ -161,12 +163,15 @@ private:
 	boost::mutex			m_mutex;
 	
 	/// thread
-#if !defined(__VXWORKS__)
 	boost::shared_ptr< boost::thread > m_thread;
-#endif
+	
+	http::server::server *	m_server;
+	
+	bool 					m_thread_created;
 	
 	/// storage of the proxied data
 	DataProxyGroups 		m_groups;
+	
 	
 };
 

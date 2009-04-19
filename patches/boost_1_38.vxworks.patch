@@ -1,26 +1,55 @@
-diff -r -u boost_1_38_0/boost/asio/detail/descriptor_ops.hpp boost_1_38_vxworks/boost/asio/detail/descriptor_ops.hpp
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/asio/detail/descriptor_ops.hpp boost_1_38_vxworks/boost/asio/detail/descriptor_ops.hpp
 --- boost_1_38_0/boost/asio/detail/descriptor_ops.hpp	2008-10-09 01:41:50.000000000 -0400
-+++ boost_1_38_vxworks/boost/asio/detail/descriptor_ops.hpp	2009-04-08 00:00:20.997375000 -0400
-@@ -50,7 +50,11 @@
++++ boost_1_38_vxworks/boost/asio/detail/descriptor_ops.hpp	2009-04-18 17:52:40.555375000 -0400
+@@ -50,13 +50,23 @@
  inline int open(const char* path, int flags, boost::system::error_code& ec)
  {
    clear_error(ec);
+-  return error_wrapper(::open(path, flags), ec);
 +#if defined(__VXWORKS__) && defined(_WRS_KERNEL)
 +  return error_wrapper(::open(path, flags, 0), ec);
 +#else
-   return error_wrapper(::open(path, flags), ec);
++  int result = error_wrapper(::open(path, flags), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
 +#endif
  }
  
  inline int close(int d, boost::system::error_code& ec)
-@@ -95,14 +99,22 @@
+ {
+   clear_error(ec);
+-  return error_wrapper(::close(d), ec);
++  int result = error_wrapper(::close(d), ec);
++  if (result == 0)
++    clear_error(ec);
++  return result;
+ }
+ 
+ inline void init_buf_iov_base(void*& base, void* addr)
+@@ -88,33 +98,56 @@
      boost::system::error_code& ec)
  {
    clear_error(ec);
+-  return error_wrapper(::readv(d, bufs, static_cast<int>(count)), ec);
++  int result = error_wrapper(::readv(d, bufs, static_cast<int>(count)), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
+ }
+ 
+ inline int gather_write(int d, const buf* bufs, size_t count,
+     boost::system::error_code& ec)
+ {
+   clear_error(ec);
+-  return error_wrapper(::writev(d, bufs, static_cast<int>(count)), ec);
 +#if defined(__VXWORKS__)
 +  return error_wrapper(::writev(d, const_cast<buf*>(bufs), static_cast<int>(count)), ec);
 +#else
-   return error_wrapper(::writev(d, bufs, static_cast<int>(count)), ec);
++  int result = error_wrapper(::writev(d, bufs, static_cast<int>(count)), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
 +#endif
  }
  
@@ -28,17 +57,65 @@ diff -r -u boost_1_38_0/boost/asio/detail/descriptor_ops.hpp boost_1_38_vxworks/
      boost::system::error_code& ec)
  {
    clear_error(ec);
+-  return error_wrapper(::ioctl(d, cmd, arg), ec);
 +#if defined(__VXWORKS__) && defined(_WRS_KERNEL)
 +  return error_wrapper(::ioctl(d, cmd, (int)arg), ec);
 +#else
-   return error_wrapper(::ioctl(d, cmd, arg), ec);
++  int result = error_wrapper(::ioctl(d, cmd, arg), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
 +#endif
  }
  
  inline int fcntl(int d, long cmd, boost::system::error_code& ec)
-diff -r -u boost_1_38_0/boost/asio/detail/pipe_select_interrupter.hpp boost_1_38_vxworks/boost/asio/detail/pipe_select_interrupter.hpp
+ {
+   clear_error(ec);
+-  return error_wrapper(::fcntl(d, cmd), ec);
++  int result = error_wrapper(::fcntl(d, cmd), ec);
++  if (result != -1)
++    clear_error(ec);
++  return result;
+ }
+ 
+ inline int fcntl(int d, long cmd, long arg, boost::system::error_code& ec)
+ {
+   clear_error(ec);
+-  return error_wrapper(::fcntl(d, cmd, arg), ec);
++  int result = error_wrapper(::fcntl(d, cmd, arg), ec);
++  if (result != -1)
++    clear_error(ec);
++  return result;
+ }
+ 
+ inline int poll_read(int d, boost::system::error_code& ec)
+@@ -125,7 +158,10 @@
+   fds.events = POLLIN;
+   fds.revents = 0;
+   clear_error(ec);
+-  return error_wrapper(::poll(&fds, 1, -1), ec);
++  int result = error_wrapper(::poll(&fds, 1, -1), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
+ }
+ 
+ inline int poll_write(int d, boost::system::error_code& ec)
+@@ -136,7 +172,10 @@
+   fds.events = POLLOUT;
+   fds.revents = 0;
+   clear_error(ec);
+-  return error_wrapper(::poll(&fds, 1, -1), ec);
++  int result = error_wrapper(::poll(&fds, 1, -1), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
+ }
+ 
+ } // namespace descriptor_ops
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/asio/detail/pipe_select_interrupter.hpp boost_1_38_vxworks/boost/asio/detail/pipe_select_interrupter.hpp
 --- boost_1_38_0/boost/asio/detail/pipe_select_interrupter.hpp	2009-02-04 00:22:44.000000000 -0500
-+++ boost_1_38_vxworks/boost/asio/detail/pipe_select_interrupter.hpp	2009-04-05 17:02:21.046875000 -0400
++++ boost_1_38_vxworks/boost/asio/detail/pipe_select_interrupter.hpp	2009-04-18 17:48:22.946000000 -0400
 @@ -23,7 +23,7 @@
  #include <boost/system/system_error.hpp>
  #include <boost/asio/detail/pop_options.hpp>
@@ -48,9 +125,9 @@ diff -r -u boost_1_38_0/boost/asio/detail/pipe_select_interrupter.hpp boost_1_38
  
  #include <boost/asio/detail/push_options.hpp>
  #include <fcntl.h>
-diff -r -u boost_1_38_0/boost/asio/detail/select_interrupter.hpp boost_1_38_vxworks/boost/asio/detail/select_interrupter.hpp
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/asio/detail/select_interrupter.hpp boost_1_38_vxworks/boost/asio/detail/select_interrupter.hpp
 --- boost_1_38_0/boost/asio/detail/select_interrupter.hpp	2008-10-09 01:41:50.000000000 -0400
-+++ boost_1_38_vxworks/boost/asio/detail/select_interrupter.hpp	2009-04-05 17:02:55.156250000 -0400
++++ boost_1_38_vxworks/boost/asio/detail/select_interrupter.hpp	2009-04-18 17:48:22.946000000 -0400
 @@ -29,7 +29,7 @@
  namespace asio {
  namespace detail {
@@ -60,46 +137,110 @@ diff -r -u boost_1_38_0/boost/asio/detail/select_interrupter.hpp boost_1_38_vxwo
  typedef socket_select_interrupter select_interrupter;
  #elif defined(BOOST_ASIO_HAS_EVENTFD)
  typedef eventfd_select_interrupter select_interrupter;
-diff -r -u boost_1_38_0/boost/asio/detail/socket_ops.hpp boost_1_38_vxworks/boost/asio/detail/socket_ops.hpp
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/asio/detail/socket_ops.hpp boost_1_38_vxworks/boost/asio/detail/socket_ops.hpp
 --- boost_1_38_0/boost/asio/detail/socket_ops.hpp	2009-02-04 00:22:44.000000000 -0500
-+++ boost_1_38_vxworks/boost/asio/detail/socket_ops.hpp	2009-04-05 22:44:24.075759900 -0400
-@@ -75,7 +75,11 @@
++++ boost_1_38_vxworks/boost/asio/detail/socket_ops.hpp	2009-04-18 17:54:19.821000000 -0400
+@@ -40,6 +40,14 @@
+ struct msghdr { int msg_namelen; };
+ #endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+ 
++#if defined(__VXWORKS__)
++  // vxworks has strange function definitions, uses int instead of socklen_t (which is unsigned)
++# define SockLenTypeImpl int
++#else
++# define SockLenTypeImpl SockLenType
++#endif
++
++
+ #if defined(__hpux)
+ // HP-UX doesn't declare these functions extern "C", so they are declared again
+ // here to avoid linker errors about undefined symbols.
+@@ -75,7 +83,7 @@
  inline socket_type call_accept(SockLenType msghdr::*,
      socket_type s, socket_addr_type* addr, std::size_t* addrlen)
  {
-+#if defined(__VXWORKS__)
-+  int tmp_addrlen = addrlen ? (int)*addrlen : 0;
-+#else
-   SockLenType tmp_addrlen = addrlen ? (SockLenType)*addrlen : 0;
-+#endif
+-  SockLenType tmp_addrlen = addrlen ? (SockLenType)*addrlen : 0;
++  SockLenTypeImpl tmp_addrlen = addrlen ? (SockLenTypeImpl)*addrlen : 0;
    socket_type result = ::accept(s, addr, addrlen ? &tmp_addrlen : 0);
    if (addrlen)
      *addrlen = (std::size_t)tmp_addrlen;
-@@ -114,7 +118,11 @@
+@@ -103,10 +111,7 @@
+   }
+ #endif
+ 
+-#if defined(BOOST_WINDOWS)
+   clear_error(ec);
+-#endif
+-
+   return new_s;
+ }
+ 
+@@ -114,7 +119,7 @@
  inline int call_bind(SockLenType msghdr::*,
      socket_type s, const socket_addr_type* addr, std::size_t addrlen)
  {
-+#if defined(__VXWORKS__)
-+  return ::bind(s, const_cast<socket_addr_type*>(addr), (SockLenType)addrlen);
-+#else
-   return ::bind(s, addr, (SockLenType)addrlen);
-+#endif
+-  return ::bind(s, addr, (SockLenType)addrlen);
++  return ::bind(s, const_cast<socket_addr_type*>(addr), (SockLenTypeImpl)addrlen);
  }
  
  inline int bind(socket_type s, const socket_addr_type* addr,
-@@ -158,7 +166,11 @@
+@@ -123,10 +128,8 @@
+   clear_error(ec);
+   int result = error_wrapper(call_bind(
+         &msghdr::msg_namelen, s, addr, addrlen), ec);
+-#if defined(BOOST_WINDOWS)
+   if (result == 0)
+     clear_error(ec);
+-#endif
+   return result;
+ }
+ 
+@@ -135,22 +138,20 @@
+   clear_error(ec);
+ #if defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+   int result = error_wrapper(::closesocket(s), ec);
++#else // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
++  int result = error_wrapper(::close(s), ec);
++#endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+   if (result == 0)
+     clear_error(ec);
+   return result;
+-#else // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+-  return error_wrapper(::close(s), ec);
+-#endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+ }
+ 
+ inline int shutdown(socket_type s, int what, boost::system::error_code& ec)
+ {
+   clear_error(ec);
+   int result = error_wrapper(::shutdown(s, what), ec);
+-#if defined(BOOST_WINDOWS)
+   if (result == 0)
+     clear_error(ec);
+-#endif
+   return result;
+ }
+ 
+@@ -158,7 +159,7 @@
  inline int call_connect(SockLenType msghdr::*,
      socket_type s, const socket_addr_type* addr, std::size_t addrlen)
  {
-+#if defined(__VXWORKS__)
-+  return ::connect(s, const_cast<socket_addr_type*>(addr), (SockLenType)addrlen);
-+#else
-   return ::connect(s, addr, (SockLenType)addrlen);
-+#endif
+-  return ::connect(s, addr, (SockLenType)addrlen);
++  return ::connect(s, const_cast<socket_addr_type*>(addr), (SockLenTypeImpl)addrlen);
  }
  
  inline int connect(socket_type s, const socket_addr_type* addr,
-@@ -177,7 +189,7 @@
+@@ -167,17 +168,15 @@
+   clear_error(ec);
+   int result = error_wrapper(call_connect(
+         &msghdr::msg_namelen, s, addr, addrlen), ec);
+-#if defined(BOOST_WINDOWS)
+   if (result == 0)
+     clear_error(ec);
+-#endif
+   return result;
+ }
+ 
  inline int socketpair(int af, int type, int protocol,
      socket_type sv[2], boost::system::error_code& ec)
  {
@@ -108,67 +249,239 @@ diff -r -u boost_1_38_0/boost/asio/detail/socket_ops.hpp boost_1_38_vxworks/boos
    (void)(af);
    (void)(type);
    (void)(protocol);
-@@ -418,8 +430,12 @@
+@@ -186,7 +185,10 @@
+   return -1;
+ #else
+   clear_error(ec);
+-  return error_wrapper(::socketpair(af, type, protocol, sv), ec);
++  int result = error_wrapper(::socketpair(af, type, protocol, sv), ec);
++  if (result == 0)
++    clear_error(ec);
++  return result;
+ #endif
+ }
+ 
+@@ -194,10 +196,8 @@
+ {
+   clear_error(ec);
+   int result = error_wrapper(::listen(s, backlog), ec);
+-#if defined(BOOST_WINDOWS)
+   if (result == 0)
+     clear_error(ec);
+-#endif
+   return result;
+ }
+ 
+@@ -281,7 +281,10 @@
+   msghdr msg = msghdr();
+   msg.msg_iov = bufs;
+   msg.msg_iovlen = count;
+-  return error_wrapper(::recvmsg(s, &msg, flags), ec);
++  int result = error_wrapper(::recvmsg(s, &msg, flags), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
+ #endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+ }
+ 
+@@ -311,6 +314,8 @@
+   msg.msg_iovlen = count;
+   int result = error_wrapper(::recvmsg(s, &msg, flags), ec);
+   *addrlen = msg.msg_namelen;
++  if (result >= 0)
++    clear_error(ec);
+   return result;
+ #endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+ }
+@@ -337,7 +342,10 @@
+ #if defined(__linux__)
+   flags |= MSG_NOSIGNAL;
+ #endif // defined(__linux__)
+-  return error_wrapper(::sendmsg(s, &msg, flags), ec);
++  int result = error_wrapper(::sendmsg(s, &msg, flags), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
+ #endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+ }
+ 
+@@ -366,7 +374,10 @@
+ #if defined(__linux__)
+   flags |= MSG_NOSIGNAL;
+ #endif // defined(__linux__)
+-  return error_wrapper(::sendmsg(s, &msg, flags), ec);
++  int result = error_wrapper(::sendmsg(s, &msg, flags), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
+ #endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+ }
+ 
+@@ -409,7 +420,10 @@
+ 
+   return s;
+ #else
+-  return error_wrapper(::socket(af, type, protocol), ec);
++  int s = error_wrapper(::socket(af, type, protocol), ec);
++  if (s >= 0)
++    clear_error(ec);
++  return s;
+ #endif
+ }
+ 
+@@ -418,8 +432,13 @@
      socket_type s, int level, int optname,
      const void* optval, std::size_t optlen)
  {
 +#if defined(__VXWORKS__)
-+  return ::setsockopt(s, level, optname, (char*)const_cast<void*>(optval), optlen);
-+#else
    return ::setsockopt(s, level, optname,
-       (const char*)optval, (SockLenType)optlen);
-+#endif
+-      (const char*)optval, (SockLenType)optlen);
++      (char*)optval, (SockLenTypeImpl)optlen);
++#else
++  return ::setsockopt(s, level, optname,
++      (const char*)optval, (SockLenTypeImpl)optlen);
++#endif // defined(__VXWORKS__)
  }
  
  inline int setsockopt(socket_type s, int level, int optname,
-@@ -465,7 +481,11 @@
+@@ -452,10 +471,8 @@
+   clear_error(ec);
+   int result = error_wrapper(call_setsockopt(&msghdr::msg_namelen,
+         s, level, optname, optval, optlen), ec);
+-# if defined(BOOST_WINDOWS)
+   if (result == 0)
+     clear_error(ec);
+-# endif
+   return result;
+ #endif // defined(__BORLANDC__)
+ }
+@@ -465,7 +482,7 @@
      socket_type s, int level, int optname,
      void* optval, std::size_t* optlen)
  {
-+#if defined(__VXWORKS__)
-+  int tmp_optlen = (int)*optlen;
-+#else
-   SockLenType tmp_optlen = (SockLenType)*optlen;
-+#endif
+-  SockLenType tmp_optlen = (SockLenType)*optlen;
++  SockLenTypeImpl tmp_optlen = (SockLenTypeImpl)*optlen;
    int result = ::getsockopt(s, level, optname, (char*)optval, &tmp_optlen);
    *optlen = (std::size_t)tmp_optlen;
    return result;
-@@ -552,7 +572,11 @@
+@@ -544,6 +561,8 @@
+     *static_cast<int*>(optval) /= 2;
+   }
+ #endif // defined(__linux__)
++  if (result == 0)
++    clear_error(ec);
+   return result;
+ #endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+ }
+@@ -552,7 +571,7 @@
  inline int call_getpeername(SockLenType msghdr::*,
      socket_type s, socket_addr_type* addr, std::size_t* addrlen)
  {
-+#if defined(__VXWORKS__)
-+  int tmp_addrlen = (int)*addrlen;
-+#else
-   SockLenType tmp_addrlen = (SockLenType)*addrlen;
-+#endif
+-  SockLenType tmp_addrlen = (SockLenType)*addrlen;
++  SockLenTypeImpl tmp_addrlen = (SockLenTypeImpl)*addrlen;
    int result = ::getpeername(s, addr, &tmp_addrlen);
    *addrlen = (std::size_t)tmp_addrlen;
    return result;
-@@ -575,7 +599,11 @@
+@@ -564,10 +583,8 @@
+   clear_error(ec);
+   int result = error_wrapper(call_getpeername(
+         &msghdr::msg_namelen, s, addr, addrlen), ec);
+-#if defined(BOOST_WINDOWS)
+   if (result == 0)
+     clear_error(ec);
+-#endif
+   return result;
+ }
+ 
+@@ -575,7 +592,7 @@
  inline int call_getsockname(SockLenType msghdr::*,
      socket_type s, socket_addr_type* addr, std::size_t* addrlen)
  {
-+#if defined(__VXWORKS__)
-+  int tmp_addrlen = (int)*addrlen;
-+#else
-   SockLenType tmp_addrlen = (SockLenType)*addrlen;
-+#endif
+-  SockLenType tmp_addrlen = (SockLenType)*addrlen;
++  SockLenTypeImpl tmp_addrlen = (SockLenTypeImpl)*addrlen;
    int result = ::getsockname(s, addr, &tmp_addrlen);
    *addrlen = (std::size_t)tmp_addrlen;
    return result;
-@@ -603,6 +631,8 @@
+@@ -587,10 +604,8 @@
+   clear_error(ec);
+   int result = error_wrapper(call_getsockname(
+         &msghdr::msg_namelen, s, addr, addrlen), ec);
+-#if defined(BOOST_WINDOWS)
+   if (result == 0)
+     clear_error(ec);
+-#endif
+   return result;
+ }
+ 
+@@ -600,12 +615,15 @@
+   clear_error(ec);
+ #if defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+   int result = error_wrapper(::ioctlsocket(s, cmd, arg), ec);
++#elif defined(__VXWORKS__) && defined(_WRS_KERNEL)
++  int result = error_wrapper(::ioctl(s, cmd, (int)arg), ec);
++#else // defined(__VXWORKS__)
++  int result = error_wrapper(::ioctl(s, cmd, arg), ec);
++#endif
    if (result == 0)
      clear_error(ec);
    return result;
-+#elif defined(__VXWORKS__)
-+  return error_wrapper(::ioctl(s, cmd, (int)arg), ec);
- #else // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
-   return error_wrapper(::ioctl(s, cmd, arg), ec);
+-#else // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+-  return error_wrapper(::ioctl(s, cmd, arg), ec);
+-#endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
++
+ }
+ 
+ inline int select(int nfds, fd_set* readfds, fd_set* writefds,
+@@ -643,10 +661,8 @@
+ #else
+   int result = error_wrapper(::select(nfds, readfds,
+         writefds, exceptfds, timeout), ec);
+-# if defined(BOOST_WINDOWS)
+   if (result >= 0)
+     clear_error(ec);
+-# endif
+   return result;
+ #endif
+ }
+@@ -668,7 +684,10 @@
+   fds.events = POLLIN;
+   fds.revents = 0;
+   clear_error(ec);
+-  return error_wrapper(::poll(&fds, 1, -1), ec);
++  int result = error_wrapper(::poll(&fds, 1, -1), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
  #endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
-diff -r -u boost_1_38_0/boost/asio/detail/socket_types.hpp boost_1_38_vxworks/boost/asio/detail/socket_types.hpp
+ }
+ 
+@@ -689,7 +708,10 @@
+   fds.events = POLLOUT;
+   fds.revents = 0;
+   clear_error(ec);
+-  return error_wrapper(::poll(&fds, 1, -1), ec);
++  int result = error_wrapper(::poll(&fds, 1, -1), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
+ #endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+ }
+ 
+@@ -713,7 +735,10 @@
+   fds.events = POLLOUT;
+   fds.revents = 0;
+   clear_error(ec);
+-  return error_wrapper(::poll(&fds, 1, -1), ec);
++  int result = error_wrapper(::poll(&fds, 1, -1), ec);
++  if (result >= 0)
++    clear_error(ec);
++  return result;
+ #endif // defined(BOOST_WINDOWS) || defined(__CYGWIN__)
+ }
+ 
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/asio/detail/socket_types.hpp boost_1_38_vxworks/boost/asio/detail/socket_types.hpp
 --- boost_1_38_0/boost/asio/detail/socket_types.hpp	2009-02-04 00:22:44.000000000 -0500
-+++ boost_1_38_vxworks/boost/asio/detail/socket_types.hpp	2009-04-05 23:01:03.341384900 -0400
++++ boost_1_38_vxworks/boost/asio/detail/socket_types.hpp	2009-04-18 17:48:22.946000000 -0400
 @@ -92,6 +92,31 @@
  #  endif // defined(_MSC_VER) || defined(__BORLANDC__)
  # endif // !defined(BOOST_ASIO_NO_DEFAULT_LINKED_LIBS)
@@ -190,7 +503,7 @@ diff -r -u boost_1_38_0/boost/asio/detail/socket_types.hpp boost_1_38_vxworks/bo
 +# include <netdb.h>
 +# include <net/if.h>
 +# include <limits.h>
-+// vxworks has some really stupid definitions
++// vxworks has some really braindead macros defined
 +#ifdef m_flags
 +#	undef m_flags
 +#endif
@@ -201,9 +514,9 @@ diff -r -u boost_1_38_0/boost/asio/detail/socket_types.hpp boost_1_38_vxworks/bo
  #else
  # include <sys/ioctl.h>
  # include <sys/poll.h>
-diff -r -u boost_1_38_0/boost/asio/serial_port_base.hpp boost_1_38_vxworks/boost/asio/serial_port_base.hpp
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/asio/serial_port_base.hpp boost_1_38_vxworks/boost/asio/serial_port_base.hpp
 --- boost_1_38_0/boost/asio/serial_port_base.hpp	2008-06-19 18:20:52.000000000 -0400
-+++ boost_1_38_vxworks/boost/asio/serial_port_base.hpp	2009-04-05 17:31:19.328125000 -0400
++++ boost_1_38_vxworks/boost/asio/serial_port_base.hpp	2009-04-18 17:48:54.430375000 -0400
 @@ -22,6 +22,9 @@
  #include <stdexcept>
  #include <boost/config.hpp>
@@ -221,9 +534,9 @@ diff -r -u boost_1_38_0/boost/asio/serial_port_base.hpp boost_1_38_vxworks/boost
 +#endif // !BOOST_ASIO_DISABLE_SERIAL_PORT
 +
  #endif // BOOST_ASIO_SERIAL_PORT_BASE_HPP
-diff -r -u boost_1_38_0/boost/asio/serial_port_service.hpp boost_1_38_vxworks/boost/asio/serial_port_service.hpp
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/asio/serial_port_service.hpp boost_1_38_vxworks/boost/asio/serial_port_service.hpp
 --- boost_1_38_0/boost/asio/serial_port_service.hpp	2008-06-19 18:20:52.000000000 -0400
-+++ boost_1_38_vxworks/boost/asio/serial_port_service.hpp	2009-04-05 17:33:30.218750000 -0400
++++ boost_1_38_vxworks/boost/asio/serial_port_service.hpp	2009-04-18 17:48:54.430375000 -0400
 @@ -23,6 +23,8 @@
  #include <string>
  #include <boost/asio/detail/pop_options.hpp>
@@ -242,72 +555,87 @@ diff -r -u boost_1_38_0/boost/asio/serial_port_service.hpp boost_1_38_vxworks/bo
  #include <boost/asio/detail/pop_options.hpp>
  
  #endif // BOOST_ASIO_SERIAL_PORT_SERVICE_HPP
-diff -r -u boost_1_38_0/boost/config/posix_features.hpp boost_1_38_vxworks/boost/config/posix_features.hpp
---- boost_1_38_0/boost/config/posix_features.hpp	2005-10-14 10:16:26.000000000 -0400
-+++ boost_1_38_vxworks/boost/config/posix_features.hpp	2009-04-05 01:51:31.859375000 -0400
-@@ -44,6 +44,11 @@
-       // occur very rarely if at all.
- #     if defined(_POSIX_THREADS) && (_POSIX_THREADS+0 >= 0) && !defined(BOOST_HAS_WINTHREADS) && !defined(BOOST_HAS_MPTASKS)
- #        define BOOST_HAS_PTHREADS
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/config/platform/vxworks.hpp boost_1_38_vxworks/boost/config/platform/vxworks.hpp
+--- boost_1_38_0/boost/config/platform/vxworks.hpp	1969-12-31 19:00:00.000000000 -0500
++++ boost_1_38_vxworks/boost/config/platform/vxworks.hpp	2009-04-18 17:49:02.867875000 -0400
+@@ -0,0 +1,33 @@
++//  (C) Copyright Dustin Spicuzza 2009. 
++//  Use, modification and distribution are subject to the 
++//  Boost Software License, Version 1.0. (See accompanying file 
++//  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 +
-+         // vxWorks has pthreads, but does not have pthread_mutexattr_settype
-+#        if !defined(__VXWORKS__)
-+#           define BOOST_HAS_PTHREAD_MUTEXATTR_SETTYPE
-+#        endif
- #     endif
- 
-       // BOOST_HAS_NANOSLEEP:
-diff -r -u boost_1_38_0/boost/config/user.hpp boost_1_38_vxworks/boost/config/user.hpp
---- boost_1_38_0/boost/config/user.hpp	2004-01-10 06:10:00.000000000 -0500
-+++ boost_1_38_vxworks/boost/config/user.hpp	2009-04-07 23:59:08.997375000 -0400
-@@ -13,6 +13,26 @@
- //  configuration policy:
- //
- 
-+// vxworks platform config
-+#define BOOST_HAS_THREADS
-+#define BOOST_HAS_PTHREADS
++//  See http://www.boost.org for most recent version.
++
++//  vxWorks specific config options:
++
++#define BOOST_PLATFORM "vxWorks"
 +
 +#define BOOST_NO_CWCHAR
 +#define BOOST_NO_INTRINSIC_WCHAR_T
 +
-+#define BOOST_HASH_USE_OVERLOAD_FLOAT_FUNCS
-+
-+#define BOOST_ASIO_DISABLE_SERIAL_PORT
-+
-+#define BOOST_HAS_CLOCK_GETTIME
-+
-+#ifndef LONG_LONG_MAX
-+	#define LONG_LONG_MAX 9223372036854775807LL
-+	#define LONG_LONG_MIN (-LONG_LONG_MAX-1)
-+	#define ULONG_LONG_MAX (LONG_LONG_MAX * 2ULL + 1)
++#if defined(__GNUC__) && defined(__STRICT_ANSI__)
++#define BOOST_NO_INT64_T
 +#endif
 +
++#define BOOST_HAS_UNISTD_H
 +
- // define this to locate a compiler config file:
- // #define BOOST_COMPILER_CONFIG <myheader>
++// these allow posix_features to work, since vxWorks doesn't
++// define them itself
++#define _POSIX_TIMERS 1
++#define _POSIX_THREADS 1
++
++// vxworks doesn't work with asio serial ports
++#define BOOST_ASIO_DISABLE_SERIAL_PORT
++
++// boilerplate code:
++#include <boost/config/posix_features.hpp>
++ 
++
++
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/config/select_platform_config.hpp boost_1_38_vxworks/boost/config/select_platform_config.hpp
+--- boost_1_38_0/boost/config/select_platform_config.hpp	2005-11-04 08:57:44.000000000 -0400
++++ boost_1_38_vxworks/boost/config/select_platform_config.hpp	2009-04-18 17:49:02.867875000 -0400
+@@ -61,6 +61,10 @@
+ // QNX:
+ #  define BOOST_PLATFORM_CONFIG "boost/config/platform/qnxnto.hpp"
  
-@@ -32,7 +52,7 @@
++#elif defined(__VXWORKS__)
++// vxWorks:
++#  define BOOST_PLATFORM_CONFIG "boost/config/platform/vxworks.hpp"
++
+ #else
  
- // define this to disable platform config,
- // use if your platform config has nothing to set:
--// #define BOOST_NO_PLATFORM_CONFIG
-+#define BOOST_NO_PLATFORM_CONFIG
- 
- // define this to disable all config options,
- // excluding the user config.  Use if your
-@@ -54,7 +74,7 @@
- // with an #error if it encounters anything unknown --
- // either an unknown compiler version or an unknown
- // compiler/platform/library:
--// #define BOOST_ASSERT_CONFIG
-+#define BOOST_ASSERT_CONFIG
- 
- 
- // define if you want to disable threading support, even
-diff -r -u boost_1_38_0/boost/date_time/compiler_config.hpp boost_1_38_vxworks/boost/date_time/compiler_config.hpp
+ #  if defined(unix) \
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/date_time/c_time.hpp boost_1_38_vxworks/boost/date_time/c_time.hpp
+--- boost_1_38_0/boost/date_time/c_time.hpp	2008-11-12 13:37:54.000000000 -0500
++++ boost_1_38_vxworks/boost/date_time/c_time.hpp	2009-04-18 17:48:29.836625000 -0400
+@@ -55,7 +55,10 @@
+       static std::tm* localtime(const std::time_t* t, std::tm* result)
+       {
+         // localtime_r() not in namespace std???
+-        result = localtime_r(t, result);
++#if !defined(BOOST_DATE_TIME_HAS_REENTRANT_STD_FUNCTIONS_NO_RETVAL)
++        result =
++#endif
++		localtime_r(t, result);
+         if (!result)
+           boost::throw_exception(std::runtime_error("could not convert calendar time to local time"));
+         return result;
+@@ -65,7 +68,10 @@
+       static std::tm* gmtime(const std::time_t* t, std::tm* result)
+       {
+         // gmtime_r() not in namespace std???
+-        result = gmtime_r(t, result);
++#if !defined(BOOST_DATE_TIME_HAS_REENTRANT_STD_FUNCTIONS_NO_RETVAL)
++        result =
++#endif
++        gmtime_r(t, result);
+         if (!result)
+           boost::throw_exception(std::runtime_error("could not convert calendar time to UTC time"));
+         return result;
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/date_time/compiler_config.hpp boost_1_38_vxworks/boost/date_time/compiler_config.hpp
 --- boost_1_38_0/boost/date_time/compiler_config.hpp	2008-11-12 13:37:54.000000000 -0500
-+++ boost_1_38_vxworks/boost/date_time/compiler_config.hpp	2009-04-05 01:25:49.656250000 -0400
++++ boost_1_38_vxworks/boost/date_time/compiler_config.hpp	2009-04-18 17:48:29.836625000 -0400
 @@ -32,7 +32,7 @@
  
  //Set up a configuration parameter for platforms that have 
@@ -317,33 +645,49 @@ diff -r -u boost_1_38_0/boost/date_time/compiler_config.hpp boost_1_38_vxworks/b
  #define BOOST_DATE_TIME_HAS_HIGH_PRECISION_CLOCK
  #endif
  
-@@ -160,7 +160,7 @@
- #endif  // auto-linking disabled
- 
- #if defined(BOOST_HAS_THREADS) 
--#  if defined(_MSC_VER) || defined(__MWERKS__) || defined(__MINGW32__) ||  defined(__BORLANDC__)
-+#  if defined(_MSC_VER) || defined(__MWERKS__) || defined(__MINGW32__) ||  defined(__BORLANDC__) || defined(__VXWORKS__)
+@@ -164,6 +164,10 @@
       //no reentrant posix functions (eg: localtime_r)
  #  elif (!defined(__hpux) || (defined(__hpux) && defined(_REENTRANT)))
  #   define BOOST_DATE_TIME_HAS_REENTRANT_STD_FUNCTIONS
-diff -r -u boost_1_38_0/boost/date_time/microsec_time_clock.hpp boost_1_38_vxworks/boost/date_time/microsec_time_clock.hpp
++#   if defined(__VXWORKS__)
++      // vxworks has strange versions of localtime_r and gmtime_r
++#     define BOOST_DATE_TIME_HAS_REENTRANT_STD_FUNCTIONS_NO_RETVAL
++#   endif
+ #  endif
+ #endif
+ 
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/date_time/microsec_time_clock.hpp boost_1_38_vxworks/boost/date_time/microsec_time_clock.hpp
 --- boost_1_38_0/boost/date_time/microsec_time_clock.hpp	2008-11-23 05:13:36.000000000 -0500
-+++ boost_1_38_vxworks/boost/date_time/microsec_time_clock.hpp	2009-04-05 01:26:23.031250000 -0400
++++ boost_1_38_vxworks/boost/date_time/microsec_time_clock.hpp	2009-04-18 17:48:29.836625000 -0400
 @@ -84,6 +84,11 @@
        gettimeofday(&tv, 0); //gettimeofday does not support TZ adjust on Linux.
        std::time_t t = tv.tv_sec;
        boost::uint32_t sub_sec = tv.tv_usec;
 +#elif defined(BOOST_HAS_CLOCK_GETTIME)
 +      timespec ts;
-+	  clock_gettime(CLOCK_REALTIME, &ts);
-+	  std::time_t t = ts.tv_sec;
-+	  boost::uint32_t sub_sec = ts.tv_nsec/1000;
++      clock_gettime(CLOCK_REALTIME, &ts);
++      std::time_t t = ts.tv_sec;
++      boost::uint32_t sub_sec = ts.tv_nsec/1000;
  #elif defined(BOOST_HAS_FTIME)
        winapi::file_time ft;
        winapi::get_system_time_as_file_time(ft);
-diff -r -u boost_1_38_0/boost/thread/pthread/recursive_mutex.hpp boost_1_38_vxworks/boost/thread/pthread/recursive_mutex.hpp
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/functional/hash/detail/float_functions.hpp boost_1_38_vxworks/boost/functional/hash/detail/float_functions.hpp
+--- boost_1_38_0/boost/functional/hash/detail/float_functions.hpp	2008-11-20 16:53:20.000000000 -0500
++++ boost_1_38_vxworks/boost/functional/hash/detail/float_functions.hpp	2009-04-18 17:48:35.149125000 -0400
+@@ -59,6 +59,10 @@
+ #    define BOOST_HASH_USE_OVERLOAD_FLOAT_FUNCS
+ #  endif
+ 
++// vxWorks. It has its own math library, but uses Dinkumware STL
++#elif defined(__VXWORKS__)
++#  define BOOST_HASH_USE_OVERLOAD_FLOAT_FUNCS
++
+ // Dinkumware.
+ #elif (defined(_YVALS) && !defined(__IBMCPP__)) || defined(_CPPLIB_VER)
+ // Some versions of Visual C++ don't seem to have the C++ overloads but they
+diff -r --unidirectional-new-file -u boost_1_38_0/boost/thread/pthread/recursive_mutex.hpp boost_1_38_vxworks/boost/thread/pthread/recursive_mutex.hpp
 --- boost_1_38_0/boost/thread/pthread/recursive_mutex.hpp	2008-10-13 16:30:14.000000000 -0400
-+++ boost_1_38_vxworks/boost/thread/pthread/recursive_mutex.hpp	2009-04-05 01:49:02.875000000 -0400
++++ boost_1_38_vxworks/boost/thread/pthread/recursive_mutex.hpp	2009-04-18 17:48:42.336625000 -0400
 @@ -5,6 +5,8 @@
  // accompanying file LICENSE_1_0.txt or copy at
  // http://www.boost.org/LICENSE_1_0.txt)
@@ -360,5 +704,3 @@ diff -r -u boost_1_38_0/boost/thread/pthread/recursive_mutex.hpp boost_1_38_vxwo
 +#endif		// BOOST_HAS_PTHREAD_MUTEXATTR_SETTYPE
 +
  #endif
-Files boost_1_38_0/libs/program_options/test/ucs2.txt and boost_1_38_vxworks/libs/program_options/test/ucs2.txt differ
-Files boost_1_38_0/libs/program_options/test/utf8.txt and boost_1_38_vxworks/libs/program_options/test/utf8.txt differ

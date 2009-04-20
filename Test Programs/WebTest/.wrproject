@@ -26,6 +26,7 @@
             </listAttribute>
             <listAttribute key="BLD::Info|Incl|PPC603gnu">
                 <stringAttribute value="-I$(WIND_BASE)/target/h"/>
+                <stringAttribute value="-IC:/Program Files/boost/boost_1_38_vxworks"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/WPILib"/>
                 <stringAttribute value="-I$(WIND_BASE)/target/h/wrn/coreip"/>
             </listAttribute>

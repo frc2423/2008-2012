@@ -75,8 +75,8 @@ template <>
 inline
 NumericProxyFlagsImpl<int>::NumericProxyFlagsImpl() :
 	precision_(0),
-	fields_initialized(0),
-	readonly_(false)
+	readonly_(false),
+	fields_initialized(0)
 {}
 
 // float specialization
@@ -84,8 +84,8 @@ template <>
 inline
 NumericProxyFlagsImpl<float>::NumericProxyFlagsImpl() :
 	precision_(2),
-	fields_initialized(0),
-	readonly_(false)
+	readonly_(false),
+	fields_initialized(0)
 {}
 
 // double specialization
@@ -93,8 +93,8 @@ template <>
 inline
 NumericProxyFlagsImpl<double>::NumericProxyFlagsImpl() :
 	precision_(2),
-	fields_initialized(0),
-	readonly_(false)
+	readonly_(false),
+	fields_initialized(0)
 {}
 
 

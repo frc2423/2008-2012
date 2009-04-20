@@ -1,5 +1,7 @@
 #include "WPILib.h"
 
+#include "WebInterface/WebInterface.h"
+
 /**
  * This is a demo program showing the use of the RobotBase class.
  * The SimpleRobot class is the base of a robot application that will automatically call your
@@ -17,6 +19,11 @@ public:
 		stick(1)		// as they are declared above.
 	{
 		GetWatchdog().SetExpiration(0.1);
+		
+		DoubleProxy d1 = WebInterface::CreateDoubleProxy("group1", "var1", 
+				DoubleProxyFlags().default_value(5).minval(0).maxval(10).precision(2).step(0.1));
+		
+		WebInterface::Enable();
 	}
 
 	/**

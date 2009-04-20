@@ -1,5 +1,5 @@
 /*
-    WebInterface
+    WebDMA
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$
@@ -50,33 +50,53 @@
 template <typename T>
 struct VariableProxyImpl {
 
+	typedef boost::shared_mutex mutex_type;
+	typedef boost::shared_lock< mutex_type > read_lock;
+	typedef boost::unique_lock< mutex_type > write_lock;
+
 	/// default/null constructor
 	VariableProxyImpl() :
 		m_proxied_value(NULL), m_mutex(NULL)
 	{}
 	
 	/// initialization constructor
-	VariableProxyImpl(T * proxied_value, boost::mutex * mutex) :
+	VariableProxyImpl(T * proxied_value, mutex_type * mutex) :
 		m_proxied_value(proxied_value), m_mutex(mutex)
 	{}
 
 	/// converts to the given type automatically
-	operator T() 
+	operator T() const
 	{
-		return GetValue();
+		read_lock lock(*m_mutex);
+		return *m_proxied_value; 
 	}
 	
 	/// a more explicit way of obtaining the value
-	T GetValue()
+	T Get() const
 	{
-		boost::lock_guard<boost::mutex> lock(*m_mutex);
+		read_lock lock(*m_mutex);
 		return *m_proxied_value; 
 	}
+	
+	
+	/// changes the variable
+	VariableProxyImpl<T>& operator=(const T& value)
+	{
+		write_lock lock(*m_mutex);
+		*m_proxied_value = value;
+		return *this;
+	}
 
+	/// a more explicit way of setting the value
+	void Set(const T& value)
+	{
+		write_lock lock(*m_mutex);
+		*m_proxied_value = value;
+	}
 
 private:
-	T * 			m_proxied_value;
-	boost::mutex *	m_mutex;
+	T * 					m_proxied_value;
+	mutable mutex_type *	m_mutex;
 
 };
 

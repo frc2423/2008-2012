@@ -1,5 +1,5 @@
 /*
-    WebInterface
+    WebDMA
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$
@@ -39,24 +39,31 @@ struct NumericProxyFlagsImpl {
 
 	typedef NumericProxyFlagsImpl<T> this_type;
 
-	T 	default_value_;
-	T	minval_;
-	T	maxval_;
-	T	step_;
-	int	precision_;
+	T 		default_value_;
+	T		minval_;
+	T		maxval_;
+	T		step_;
+	int		precision_;
+	bool	readonly_;
 
 	// various setters for the flags
-	this_type& FN(default_value, 1, T)
-	this_type& FN(minval, 2, T)
-	this_type& FN(maxval, 4, T)
-	this_type& FN(step, 8, T)
+	this_type& FN(default_value, 0x01, T)
+	this_type& FN(minval, 0x02, T)
+	this_type& FN(maxval, 0x04, T)
+	this_type& FN(step, 0x08, T)
 	this_type& FN(precision, 0, int)
+	
+	this_type& readonly()
+	{
+		readonly_ = true;
+		return *this;
+	}
 	
 	NumericProxyFlagsImpl();
 	
 	bool is_initialized() const 
 	{
-		return fields_initialized == 0x0F;
+		return readonly || fields_initialized == 0x0F;
 	}
 		
 private:
@@ -68,7 +75,8 @@ template <>
 inline
 NumericProxyFlagsImpl<int>::NumericProxyFlagsImpl() :
 	precision_(0),
-	fields_initialized(0)
+	fields_initialized(0),
+	readonly_(false)
 {}
 
 // float specialization
@@ -76,7 +84,8 @@ template <>
 inline
 NumericProxyFlagsImpl<float>::NumericProxyFlagsImpl() :
 	precision_(2),
-	fields_initialized(0)
+	fields_initialized(0),
+	readonly_(false)
 {}
 
 // double specialization
@@ -84,7 +93,8 @@ template <>
 inline
 NumericProxyFlagsImpl<double>::NumericProxyFlagsImpl() :
 	precision_(2),
-	fields_initialized(0)
+	fields_initialized(0),
+	readonly_(false)
 {}
 
 

@@ -1,5 +1,5 @@
 /*
-    WebInterface
+    WebDMA
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$

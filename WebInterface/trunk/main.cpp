@@ -22,6 +22,9 @@ int main()
 	FloatProxy f2 = WebInterface::CreateFloatProxy("group", "f2",
 					FloatProxyFlags().default_value(.3F).minval(0).maxval(1).step(.01F));
 
+	IntProxy count = WebInterface::CreateIntProxy("group", "counter", 
+					IntProxyFlags().default_value(0).readonly() );
+
 	DoubleProxy d1 = WebInterface::CreateDoubleProxy("group", "d1",
 					DoubleProxyFlags().default_value(10).minval(-180).maxval(180).step(1));
 					
@@ -39,6 +42,9 @@ int main()
 #else
 		usleep(10000);
 #endif
+		int c = count;
+		count = c + 1;
+
 	}
 
 	return true;

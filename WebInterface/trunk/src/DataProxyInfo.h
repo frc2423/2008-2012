@@ -1,5 +1,5 @@
 /*
-    WebInterface
+    WebDMA
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$
@@ -35,6 +35,7 @@ struct DataProxyInfo {
 
 	virtual bool SetValue( const std::string & ) = 0;
 	virtual std::string GetHtmlDisplay(std::size_t, std::size_t) const = 0;
+	virtual std::string GetJson(std::size_t, std::size_t) const = 0;
 	virtual ~DataProxyInfo(){}
 
 };
@@ -47,7 +48,11 @@ template <typename T>
 struct NumericProxyInfoImpl : public DataProxyInfo {
 
 	typedef NumericProxyFlagsImpl<T>	Flags;
-	typedef VariableProxyImpl<T>	Proxy;
+	typedef VariableProxyImpl<T>		Proxy;
+
+	typedef typename Proxy::mutex_type	mutex_type;
+	typedef typename Proxy::read_lock	read_lock;
+	typedef typename Proxy::write_lock	write_lock;
 
 	/// constructor
 	NumericProxyInfoImpl(const Flags& flags) :
@@ -59,7 +64,7 @@ struct NumericProxyInfoImpl : public DataProxyInfo {
 	bool SetValue( const std::string &value)
 	{
 		try {
-			boost::lock_guard<boost::mutex> lock(m_mutex);
+			write_lock lock(m_mutex);
 			m_proxied_value = boost::lexical_cast<T>(value);
 		} 
 		catch (boost::bad_lexical_cast &)
@@ -76,43 +81,83 @@ struct NumericProxyInfoImpl : public DataProxyInfo {
 		T current_value;
 	
 		{
-			boost::lock_guard<boost::mutex> lock(m_mutex);
+			read_lock lock(m_mutex);
 			current_value = m_proxied_value;
 		}
 	
 		std::string html;
 		
-		html.append("<div class=\"selectbar\" id=\"");
-		
 		// generate an id based on the flags	
 		std::stringstream idstr;
 		idstr.precision(m_flags.precision_);
+		idstr.setf( std::ios::fixed, std::ios::floatfield );
 		
-		idstr 	<< "g" << gid
-				<< "_v" << vid
-				<< "_" << current_value
-				<< "_" << m_flags.minval_
-				<< "_" << m_flags.maxval_
-				<< "_" << m_flags.step_;
+		if (m_flags.readonly_)
+		{
+			html.append("<span class=\"readonlyvar\" id=\"g" +
+				boost::lexical_cast<std::string>(gid) +
+				"_v" +
+				boost::lexical_cast<std::string>(vid) +
+				"\">");
+		}
+		else
+		{
+			html.append("<div class=\"selectbar\" id=\"");
 		
-		std::string id = idstr.str();
 		
-		for (std::size_t i = 0; i < id.size(); i++)
-			if (id[i] == '.')
-				id[i] = 'p';
+			idstr 	<< "g" << gid
+					<< "_v" << vid
+					<< "_" << current_value
+					<< "_" << m_flags.minval_
+					<< "_" << m_flags.maxval_
+					<< "_" << m_flags.step_;
 		
-		html.append(id);
-		html.append("\">");
+			std::string id = idstr.str();
+			
+			for (std::size_t i = 0; i < id.size(); i++)
+				if (id[i] == '.')
+					id[i] = 'p';
 		
+			html.append(id);
+			html.append("\">");
+		}
+			
 		// makes sure the value is formatted correctly
 		idstr.str("");
 		idstr	<< current_value;
-		
+			
 		html.append(idstr.str());
-		html.append("</div>");
+		
+		if (m_flags.readonly_)
+			html.append("</span>");
+		else
+			html.append("</div>");
+		
 		
 		return html;
 	}
+	
+	std::string GetJson(std::size_t gid, std::size_t vid) const 
+	{
+		T current_value;
+		
+		{
+			read_lock lock(m_mutex);
+			current_value = m_proxied_value;
+		}
+
+		// generate an id based on the flags	
+		std::stringstream json;
+		json.precision(m_flags.precision_);
+		json.setf( std::ios::fixed, std::ios::floatfield );
+		
+		json 	<< "\"g" << gid
+				<< "_v" << vid
+				<< "\": " << current_value;
+				
+		return json.str();
+	}
+	
 	
 	Proxy GetProxy()
 	{
@@ -122,9 +167,9 @@ struct NumericProxyInfoImpl : public DataProxyInfo {
 private:
 	NumericProxyInfoImpl();
 
-	T 						m_proxied_value;
-	mutable boost::mutex 	m_mutex;
-	const Flags				m_flags;
+	T 					m_proxied_value;
+	mutable mutex_type 	m_mutex;
+	const Flags			m_flags;
 };
 
 /// implementation for floats
@@ -141,7 +186,11 @@ typedef NumericProxyInfoImpl<int> 	IntProxyInfo;
 // boolean implementation
 struct BoolProxyInfo : public DataProxyInfo {
 
-	typedef VariableProxyImpl<bool>	Proxy;
+	typedef VariableProxyImpl<bool>		Proxy;
+
+	typedef Proxy::mutex_type			mutex_type;
+	typedef Proxy::read_lock			read_lock;
+	typedef Proxy::write_lock			write_lock;
 
 	/// constructor
 	BoolProxyInfo(bool default_value) :
@@ -152,7 +201,7 @@ struct BoolProxyInfo : public DataProxyInfo {
 	bool SetValue( const std::string &value)
 	{
 		try {
-			boost::lock_guard<boost::mutex> lock(m_mutex);
+			write_lock lock(m_mutex);
 			m_proxied_value = boost::lexical_cast<bool>(value);
 		} 
 		catch (boost::bad_lexical_cast &)
@@ -169,7 +218,7 @@ struct BoolProxyInfo : public DataProxyInfo {
 		bool current_value;
 	
 		{
-			boost::lock_guard<boost::mutex> lock(m_mutex);
+			read_lock lock(m_mutex);
 			current_value = m_proxied_value;
 		}
 	
@@ -190,6 +239,22 @@ struct BoolProxyInfo : public DataProxyInfo {
 		return html;
 	}
 	
+	std::string GetJson(std::size_t gid, std::size_t vid) const
+	{
+		bool current_value;
+	
+		{
+			read_lock lock(m_mutex);
+			current_value = m_proxied_value;
+		}
+
+		return "\"g"
+			+ boost::lexical_cast<std::string>(gid)
+			+ "_v"
+			+ boost::lexical_cast<std::string>(vid)
+			+ (current_value ? "\": true" : "\": false");
+	}
+	
 	Proxy GetProxy()
 	{
 		return Proxy(&m_proxied_value, &m_mutex);
@@ -198,8 +263,8 @@ struct BoolProxyInfo : public DataProxyInfo {
 private:
 	BoolProxyInfo();
 
-	bool 					m_proxied_value;
-	mutable boost::mutex 	m_mutex;
+	bool 				m_proxied_value;
+	mutable mutex_type 	m_mutex;
 };
 
 

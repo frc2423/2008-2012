@@ -1,5 +1,5 @@
 /*
-    WebInterface
+    WebDMA
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$
@@ -137,9 +137,12 @@ private:
 	
 	// functions used to process/generate html response
 	static std::string ProcessRequest(const std::string &post_data);
+	std::string ProcessRequestInternal(const std::string &post_data);
 	
 	bool ModifyProxy(size_t group, size_t variable, const std::string &value);
+	
 	std::string get_html();
+	std::string get_json();
 	
 	/// port that the server will listen on
 	std::string				m_port;
@@ -147,17 +150,10 @@ private:
 	/// root directory where webpages are found
 	std::string				m_rootDir;
 	
-	/// generated HTML for the server
-	std::string				m_html;
-	
-	/// set to true if m_html is a valid string, or false if the html
-	/// needs to be regenerated
-	bool					m_html_valid;
-	
 	/// each ajax request is compared against this, and if it doesn't
 	/// match then it means the page must reload. This is updated each time
 	/// a new proxy is added or deleted
-	time_t 					m_creation_time;
+	std::string 			m_current_instance;
 	
 	/// global access lock
 	boost::mutex			m_mutex;

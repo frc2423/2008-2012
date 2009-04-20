@@ -1,5 +1,5 @@
 /*
-    WebInterface
+    WebDMA
     Copyright (C) 2009 Dustin Spicuzza <dustin@virtualroadside.com>
 	
 	$Id$
@@ -32,6 +32,8 @@
 #define foreach BOOST_FOREACH
 
 #include "StaticDeleter.h"
+
+#define JSON_STATUS(x) "{ \"status\": \"" x "\" }"
 
 
 static
@@ -94,8 +96,7 @@ BoolProxy WebInterface::CreateBoolProxy(
 WebInterface::WebInterface() :
 	m_port("8080"),
 	m_rootDir("www"),
-	m_html_valid(false),
-	m_creation_time(time(NULL)),
+	m_current_instance(boost::lexical_cast<std::string>(time(NULL))),
 	m_server(NULL),
 	m_thread_created(false)
 {}
@@ -174,8 +175,9 @@ void WebInterface::InitProxy(
 	{
 		assert(0 && "key/value pair already registered!");
 	}
-
-	m_html_valid = false;
+	
+	// tell the client theres something new its missing
+	m_current_instance = boost::lexical_cast<std::string>(time(NULL));
 }
 
 
@@ -241,55 +243,86 @@ std::string WebInterface::get_html()
 	// lock globally
 	lock_guard lock(m_mutex);
 
-	if (m_html_valid)
-		return m_html;
-
-	// generate some HTML for this thing and cache it so we're not constantly
-	// regenerating data for it
-	m_html.clear();
+	// generate some HTML for this thing
+	std::string html;
 
 	size_t g = 0;
 	
 	foreach( const DataProxyGroupPtr &gptr  , m_groups )
 	{
 		// group name/header
-		m_html.append("\n\t<div class=\"group\">\n");
-		m_html.append("\t\t<div class=\"grouphdr\">\n");
-		m_html.append("\t\t\t");
-		m_html.append(gptr->name);
-		m_html.append("\n\t\t</div>\n\t\t<div><table>\n");
+		html.append("\n\t<div class=\"group\">\n");
+		html.append("\t\t<div class=\"grouphdr\">\n");
+		html.append("\t\t\t");
+		html.append(gptr->name);
+		html.append("\n\t\t</div>\n\t\t<div><table>\n");
 		
 		size_t v = 0;
 		
 		// for each variable, create a table row for it
 		foreach( const DataProxyVariablePtr &dptr, gptr->variables )
 		{
-			m_html.append("\t\t\t<tr><td>");
-			m_html.append(dptr->name);
-			m_html.append("</td><td>");
-			m_html.append(dptr->info->GetHtmlDisplay(g, v));
-			m_html.append("</td></tr>\n");
+			html.append("\t\t\t<tr><td>");
+			html.append(dptr->name);
+			html.append("</td><td>");
+			html.append(dptr->info->GetHtmlDisplay(g, v));
+			html.append("</td></tr>\n");
 			
 			v += 1;
 		}
 			
 		// finish it off
-		m_html.append("\t\t</table></div>\n\t</div>");		
+		html.append("\t\t</table></div>\n\t</div>");		
 		g += 1;
 	}
 
 	// and add a javascript portion that allows us
 	// to store the 'current value'
-	m_html.append("\n\n\t<script type=\"text/javascript\"><!--\n\tvar current_instance = ");
-	m_html.append(boost::lexical_cast<std::string>(m_creation_time));
-	m_html.append(";\n\t//--></script>");
+	html.append("\n\n\t<script type=\"text/javascript\"><!--\n\tvar current_instance = ");
+	html.append(m_current_instance);
+	html.append(";\n\t//--></script>");
 
-	m_html_valid = true;
-	return m_html;
+	return html;
 }
+
+// should only be called by a locked function
+std::string WebInterface::get_json()
+{
+	// generate the values for this thing
+	std::string json = "{ \"instance\": \"" + m_current_instance + "\"";
+
+	size_t g = 0;
+	
+	foreach( const DataProxyGroupPtr &gptr  , m_groups )
+	{	
+		size_t v = 0;
+		
+		foreach( const DataProxyVariablePtr &dptr, gptr->variables )
+		{
+			json.append(", ");
+			json.append(dptr->info->GetJson(g, v));
+			v += 1;
+		}
+
+		g += 1;
+	}
+
+	json.append(" }");
+	
+	return json;
+}
+
 
 std::string WebInterface::ProcessRequest(const std::string &post_data)
 {
+	return GetInstance()->ProcessRequestInternal(post_data);
+}
+
+std::string WebInterface::ProcessRequestInternal(const std::string &post_data)
+{
+	if (post_data == "getupdate=true")
+		return get_json();
+
 	size_t group = 0, variable = 0;
 	int found_flags = 0;
 	std::string value;
@@ -304,7 +337,7 @@ std::string WebInterface::ProcessRequest(const std::string &post_data)
 	{
 		size_t pos = token.find('=');
 		if (pos == std::string::npos || pos > token.size()-2)
-			return "INVALID";
+			return JSON_STATUS("INVALID");
 
 		// we have a key/value pair now.. 
 		std::string key = token.substr(0, pos); 
@@ -330,27 +363,26 @@ std::string WebInterface::ProcessRequest(const std::string &post_data)
 			else if (key == "instance")
 			{
 				found_flags |= 0x08;
-				time_t inst = boost::lexical_cast<time_t>(val);
 
-				if (inst != GetInstance()->m_creation_time)
-					return "RELOAD";
+				if (val != m_current_instance)
+					return JSON_STATUS( "RELOAD" );
 			}
 		}
 		catch (boost::bad_lexical_cast &)
 		{
-			return "INVALID";
+			return JSON_STATUS( "INVALID" );
 		}
 	}
 
 	if (found_flags != 0x0F)
-		return "INVALID";
+		return JSON_STATUS( "INVALID" );
 	
 	// ok, if everything is good then modify the proxy
 	
-	if (GetInstance()->ModifyProxy(group, variable, value))
-		return "OK";
+	if (ModifyProxy(group, variable, value))
+		return JSON_STATUS( "OK" );
 
-	return "FAIL";
+	return JSON_STATUS( "FAIL" );
 }
 
 bool WebInterface::ModifyProxy(size_t group, size_t variable, const std::string &value)
@@ -362,8 +394,7 @@ bool WebInterface::ModifyProxy(size_t group, size_t variable, const std::string 
 		
 	if (m_groups[group]->variables.size() < variable)
 		return false;
-	
-	m_html_valid = false;
+
 	return m_groups[group]->variables[variable]->info->SetValue(value);
 }
 

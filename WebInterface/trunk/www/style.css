@@ -30,6 +30,15 @@ h4 {
 	clear: both;
 }
 
+.copyright {
+	font-size: 0.7em;
+}
+
+.readonlyvar {
+	float: right;
+	padding-right: 2em;
+}
+
 /* styles for the group */
 
 .group {

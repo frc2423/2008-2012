@@ -12,6 +12,10 @@
 #include "../KwarqsLib/KwarqsJoystick.h"
 #include "../RobotChassis.h"
 
+#include "../WebInterface/WebInterface.h"
+
+#include "../KwarqsLib/DelayEvent.h"
+
 /**
 	\class SwerveDrive
 	\brief A class that controls a chassis with 4 independently steerable wheels
@@ -54,7 +58,13 @@ private:
 	SwerveDrive();
 	
 	void Stop();
-	void ShortestPath(double &speed, double &angle, double current_angle );
+	void ShortestPath(
+		double &speed, 
+		double &angle, 
+		double current_angle,
+		bool &m_pick_alt,
+		DelayEvent &m_pickEvent
+	);
 	
 	RobotChassis * m_chassis;
 	
@@ -63,6 +73,21 @@ private:
 	double m_time;
 	
 	KwarqsJoystick m_stick;
+	
+	DoubleProxy m_servo_lf;
+	DoubleProxy m_servo_lr;
+	DoubleProxy m_servo_rf;
+	DoubleProxy m_servo_rr;
+	
+	bool m_pick_alt_lf;
+	bool m_pick_alt_lr;
+	bool m_pick_alt_rf;
+	bool m_pick_alt_rr;
+	
+	DelayEvent m_pickEvent_lf;
+	DelayEvent m_pickEvent_lr;
+	DelayEvent m_pickEvent_rf;
+	DelayEvent m_pickEvent_rr;
 };
 
 

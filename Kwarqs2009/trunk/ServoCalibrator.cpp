@@ -52,7 +52,16 @@ ServoCalibrator::ServoCalibrator(RobotChassis * chassis) :
 	pot4offset(0),
 	m_begin_manual_calibrate(true),
 	last_trig(false)
-{}
+{
+	proxy_lf = WebInterface::CreateDoubleProxy("Manual", "LF Wheel", 
+			DoubleProxyFlags().default_value(0).minval(0).maxval(360).step(0.1));
+	proxy_lr = WebInterface::CreateDoubleProxy("Manual", "LR Wheel", 
+			DoubleProxyFlags().default_value(0).minval(0).maxval(360).step(0.1));
+	proxy_rf = WebInterface::CreateDoubleProxy("Manual", "RF Wheel", 
+			DoubleProxyFlags().default_value(0).minval(0).maxval(360).step(0.1));
+	proxy_rr = WebInterface::CreateDoubleProxy("Manual", "RR Wheel", 
+			DoubleProxyFlags().default_value(0).minval(0).maxval(360).step(0.1));
+}
 
 
 
@@ -78,6 +87,7 @@ void ServoCalibrator::DoAutoCalibrate()
 void ServoCalibrator::DoManualCalibrate()
 {	
 	// filter out the pots
+	/*
 	const double c = 500.0 / 1000.0;
 
 	double pot1 = ceil( m_ds->GetAnalogIn(1) * c);
@@ -126,10 +136,14 @@ void ServoCalibrator::DoManualCalibrate()
 	pot4 = m_potfilter4.GetAverage() - pot4offset;
 	
 	// finally tell the servo to go to that angle
-	m_chassis->servo_lf.SetAngle(pot1);
-	m_chassis->servo_lr.SetAngle(pot3);
-	m_chassis->servo_rf.SetAngle(pot2);
-	m_chassis->servo_rr.SetAngle(pot4);
+	*/
+	
+	
+	m_chassis->servo_lf.SetAngle(proxy_lf);
+	m_chassis->servo_lr.SetAngle(proxy_lr);
+	m_chassis->servo_rf.SetAngle(proxy_rf);
+	m_chassis->servo_rr.SetAngle(proxy_rr);
+	
 	
 	ShowLCDOutput();
 }

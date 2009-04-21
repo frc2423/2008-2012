@@ -38,7 +38,7 @@ private:
 	float m_prevError;	// the prior sensor input (used to compute velocity)
 	double m_totalError; //the sum of the errors for use in the integral calc
 	float m_tolerance;	//the percetage error that is considered on target
-	float m_setpoint;
+	FloatProxy m_setpoint;
 	float m_error;
 	float m_result;
 	float m_period;

@@ -48,7 +48,19 @@ SwerveDrive::SwerveDrive(RobotChassis * chassis) :
 	m_chassis(chassis),
 	m_time(GetTime()),
 	m_stick(FIRST_JOYSTICK_PORT)
-{}
+{
+	m_servo_lf = WebInterface::CreateDoubleProxy("SwerveDrive", "LF Servo", 
+		DoubleProxyFlags().default_value(0).readonly());
+	
+	m_servo_lr = WebInterface::CreateDoubleProxy("SwerveDrive", "LR Servo", 
+		DoubleProxyFlags().default_value(0).readonly());
+	
+	m_servo_rf = WebInterface::CreateDoubleProxy("SwerveDrive", "RF Servo", 
+		DoubleProxyFlags().default_value(0).readonly());
+	
+	m_servo_rr = WebInterface::CreateDoubleProxy("SwerveDrive", "RR Servo", 
+		DoubleProxyFlags().default_value(0).readonly());
+}
 
 /*
 	Calculates the parameters for an individual wheel
@@ -67,6 +79,9 @@ void CalculateWheel(
 	// return as polar coordinates
 	magnitude = __hypot(Vx, Vy); 
 	angle = (atan2(Vy, Vx)*180)/M_PI - 90.0;
+	
+	angle = fmod(angle, 360);
+	if (angle < 0) angle = angle + 360;
 }
 
 
@@ -156,11 +171,17 @@ void SwerveDrive::Move(
 			speeds[i] /= highest_speed;
 	}
 	
+	m_servo_lf = lf_angle;
+	m_servo_lr = lr_angle;
+	m_servo_rf = rf_angle;
+	m_servo_rr = rr_angle;
+	
+	
 	// calculate the shortest path to the setpoint
-	ShortestPath(speeds[0], lf_angle, m_chassis->servo_lf.GetCurrentAngle());
-	ShortestPath(speeds[1], lr_angle, m_chassis->servo_lr.GetCurrentAngle());
-	ShortestPath(speeds[2], rf_angle, m_chassis->servo_rf.GetCurrentAngle());
-	ShortestPath(speeds[3], rr_angle, m_chassis->servo_rr.GetCurrentAngle());
+	ShortestPath(speeds[0], lf_angle, m_chassis->servo_lf.GetCurrentAngle(), m_pick_alt_lf, m_pickEvent_lf);
+	ShortestPath(speeds[1], lr_angle, m_chassis->servo_lr.GetCurrentAngle(), m_pick_alt_lr, m_pickEvent_lr);
+	ShortestPath(speeds[2], rf_angle, m_chassis->servo_rf.GetCurrentAngle(), m_pick_alt_rf, m_pickEvent_rf);
+	ShortestPath(speeds[3], rr_angle, m_chassis->servo_rr.GetCurrentAngle(), m_pick_alt_rr, m_pickEvent_rr);
 	
     
     // set the motors
@@ -201,11 +222,10 @@ void SwerveDrive::Stop()
 	}
 	
 	// find the shortest path to that spot, and do it
-	ShortestPath(speed, lf_angle, m_chassis->servo_lf.GetCurrentAngle());
-	ShortestPath(speed, lr_angle, m_chassis->servo_lr.GetCurrentAngle());
-	ShortestPath(speed, rf_angle, m_chassis->servo_rf.GetCurrentAngle());
-	ShortestPath(speed, rr_angle, m_chassis->servo_rr.GetCurrentAngle());
-
+	ShortestPath(speed, lf_angle, m_chassis->servo_lf.GetCurrentAngle(), m_pick_alt_lf, m_pickEvent_lf);
+	ShortestPath(speed, lr_angle, m_chassis->servo_lr.GetCurrentAngle(), m_pick_alt_lr, m_pickEvent_lr);
+	ShortestPath(speed, rf_angle, m_chassis->servo_rf.GetCurrentAngle(), m_pick_alt_rf, m_pickEvent_rf);
+	ShortestPath(speed, rr_angle, m_chassis->servo_rr.GetCurrentAngle(), m_pick_alt_rr, m_pickEvent_rr);
 	
 	m_chassis->servo_lf.SetAngle(lf_angle);
 	m_chassis->servo_lr.SetAngle(lr_angle);
@@ -219,8 +239,14 @@ void SwerveDrive::Stop()
 }
 
 // returns the shortest path to an angle, adjusts speed also
-void SwerveDrive::ShortestPath(double &speed, double &angle, double current_angle )
-{
+void SwerveDrive::ShortestPath(
+		double &speed, 
+		double &angle, 
+		double current_angle,
+		bool &m_pick_alt,
+		DelayEvent &m_pickEvent
+)
+{	
 	double alternate_angle = angle + 180 > 360 ? angle - 180 : angle + 180;
 
 	double error1 = angle - current_angle;
@@ -236,8 +262,7 @@ void SwerveDrive::ShortestPath(double &speed, double &angle, double current_angl
 	
 	error1 = fabs(error1);
 	error2 = fabs(error2);
-
-	// if the other way is quicker, then use that instead
+	
 	if (error1 > error2)
 	{
 		angle = alternate_angle;

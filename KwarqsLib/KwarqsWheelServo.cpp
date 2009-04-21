@@ -93,11 +93,18 @@ KwarqsWheelServo::KwarqsWheelServo(
 	m_pidController = new ProxiedPIDController(param_p, 0.0F, 0.0F, this, this, groupName);
 	
 	// initialize the output scale parameter
+	m_stopRange = WebInterface::CreateDoubleProxy(groupName, "StopRange", 
+		DoubleProxyFlags().default_value(3).minval(1).maxval(360).step(1));
+	
 	m_outputScale = WebInterface::CreateDoubleProxy(groupName, "Scale", 
 		DoubleProxyFlags().default_value(outputScale).minval(1).maxval(360).step(1));
 		
 	m_calibrating_offset = WebInterface::CreateDoubleProxy(groupName, "Offset", 
 		DoubleProxyFlags().default_value(cal_offset).minval(-180).maxval(180).step(.1));
+	
+	m_current_angle = WebInterface::CreateDoubleProxy(groupName, "Current Angle", 
+		DoubleProxyFlags().default_value(0).readonly());
+	
 	
 	// set the PID parameters
 	m_pidController->SetContinuous();
@@ -191,7 +198,8 @@ double KwarqsWheelServo::GetCurrentAngle()
 			
 	if (angle < 0)
 		angle += 360;
-		
+	
+	m_current_angle = angle;
 	return angle;
 }
 
@@ -276,10 +284,7 @@ double KwarqsWheelServo::PIDGet()
 
 bool KwarqsWheelServo::OnTarget()
 {
-	bool temp;
-	temp = (fabs(m_setAngle - GetCurrentAngle())< 0.0025 / 100 * 720);
-
-	return temp;
+	return fabs(m_setAngle - GetCurrentAngle()) < m_stopRange;
 }
 
 

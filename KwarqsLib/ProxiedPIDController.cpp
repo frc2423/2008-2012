@@ -43,7 +43,7 @@ ProxiedPIDController::ProxiedPIDController(float Kp, float Ki, float Kd,
 	
 	m_continuous = false;
 	m_enabled = false;
-	m_setpoint = 0;
+	m_setpoint = WebInterface::CreateFloatProxy(groupName, "Setpoint", FloatProxyFlags().default_value(0).readonly());;
 
 	m_prevError = 0;
 	m_totalError = 0;

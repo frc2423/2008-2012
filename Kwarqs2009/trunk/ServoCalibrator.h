@@ -16,6 +16,8 @@
 
 #include "KwarqsLib/filters.h"
 
+#include "WebInterface/WebInterface.h"
+
 class ServoCalibrator {
 public:
 
@@ -54,6 +56,11 @@ private:
 	double pot2offset;
 	double pot3offset;
 	double pot4offset;
+	
+	DoubleProxy proxy_lf;
+	DoubleProxy proxy_lr;
+	DoubleProxy proxy_rf;
+	DoubleProxy proxy_rr;
 	
 	bool m_begin_manual_calibrate;
 	

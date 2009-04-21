@@ -124,6 +124,9 @@ private:
 	int			m_calibrated_offset;		// subtract from real counts
 	DoubleProxy	m_calibrating_offset;		// how many degrees off is the calibration point?
 	
+	DoubleProxy m_current_angle;
+	DoubleProxy m_stopRange;
+	
 	float		m_invert_motor;
 	
 	bool 		m_in_manual_mode;

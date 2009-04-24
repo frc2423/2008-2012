@@ -113,7 +113,7 @@ void MaintenanceMode::DoMaintenance(int user_selection)
 		case 2:
 		
 			if (print_to_lcd)
-				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "2. 4-pot Calibrate");
+				m_lcd->PrintfLine(DriverStationLCD::kMain_Line, "2. Web Controlled");
 		
 			// do the manual servo calibration
 			servoCalibrator.DoManualCalibrate();

@@ -12,6 +12,8 @@
 #include "KwarqsConstants.h"
 #include "Deleter.h"
 
+#include "../WebInterface/WebInterface.h"
+
 // defined parameters
 #define PINFO_CALCULATION_PERIOD 	0.05		// period calculation is run
 
@@ -123,6 +125,9 @@ private:
 	SEM_ID			m_mutex;
 	
 	int m_field_position;
+	
+	// data aquisition information
+	DoubleProxy		m_gyro_angle;
 };
 
 #endif

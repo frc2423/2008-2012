@@ -13,6 +13,11 @@
 #include "math.h"
 #include "DelayEvent.h"
 
+#include "../WebInterface/WebInterface.h"
+
+#define NP_SQRT_RANGE 225.0
+#define NP_ERROR_ANGLE 1.0
+
 /**
 	\class KwarqsNosePointer
 	\brief This calculates a rotation to get your nose pointing in a 
@@ -21,11 +26,25 @@
 class KwarqsNosePointer {
 public:
 
-	KwarqsNosePointer() : 
+	KwarqsNosePointer(const char * groupname = NULL) : 
 		m_sampleEvent(0.05),
 		m_result(0),
-		m_position(PositionInformation::GetInstance())
-	{}
+		m_position(PositionInformation::GetInstance()),
+		m_has_proxy(groupname ? true : false)
+	{
+		if (m_has_proxy)
+		{
+			m_sqrt_range = WebInterface::CreateDoubleProxy(groupname, "SQRT Range", 
+					DoubleProxyFlags().minval(0).maxval(360).default_value(NP_SQRT_RANGE).step(1));
+			m_error_angle = WebInterface::CreateDoubleProxy(groupname, "Error Angle", 
+					DoubleProxyFlags().minval(0).maxval(360).default_value(NP_ERROR_ANGLE).step(1));
+			
+			m_setpoint = WebInterface::CreateDoubleProxy(groupname, "Point angle", 
+					DoubleProxyFlags().readonly().default_value(0));
+			m_error = WebInterface::CreateDoubleProxy(groupname, "Current Error", 
+					DoubleProxyFlags().readonly().default_value(0));
+		}
+	}
 	
 	/**
 		Pass this an angle, and this will calculate a rotation parameter
@@ -50,6 +69,9 @@ public:
 			// get the difference between the angles
 			double error = setpoint - angle;
 			
+			if (m_has_proxy)
+				m_error = error;
+			
 			// find the shortest rotation distance
 			if (fabs(error) > 180)
 			{
@@ -59,8 +81,10 @@ public:
 					error += 360;
 			}
 			
-			// any error under 1 degree is ok by me, stop rotating
-			if (fabs(error) < 1.0)
+			double error_angle = m_has_proxy ? m_error_angle : NP_ERROR_ANGLE;
+			
+			// stop rotating depending on the error
+			if (fabs(error) < error_angle)
 				m_result = 0;
 			else
 			{
@@ -69,16 +93,21 @@ public:
 				// linear:
 				//m_result = (error * .5) / 180;
 				
+				double sqrt_range = m_has_proxy ? m_sqrt_range : NP_SQRT_RANGE;
+				
 				// sqrt:
 				if (error < 0)
-					m_result = ((sqrt(fabs(error))) / sqrt(190.0))*-1.0;
+					m_result = ((sqrt(fabs(error))) / sqrt(sqrt_range))*-1.0;
 				else
-					m_result = (sqrt(error)) / sqrt(190.0);
+					m_result = (sqrt(error)) / sqrt(sqrt_range);
 			}
 		
 			// print something useful out
 			DriverStationLCD::GetInstance()->PrintfLine(DriverStationLCD::kUser_Line6, "@: %5.1f To: %5.1f", angle, setpoint);
 		}
+		
+		if (m_has_proxy)
+			m_setpoint = setpoint;
 			
 		// return the calculation
 		return m_result;
@@ -90,6 +119,13 @@ private:
 	double m_result;
 	
 	PositionInformation * m_position;
+	
+	DoubleProxy m_sqrt_range;
+	DoubleProxy m_setpoint;
+	DoubleProxy m_error;
+	DoubleProxy m_error_angle;
+	
+	bool m_has_proxy;
 };
 
 #endif

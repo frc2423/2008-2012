@@ -53,6 +53,11 @@ private:
 	
 	DoubleProxy m_bigButtonAngle;
 	DoubleProxy m_smallButtonAngle;
+	
+	BoolProxy m_override;
+	DoubleProxy m_angle;
+	DoubleProxy m_heading;
+	DoubleProxy m_speed;
 };
 
 #endif

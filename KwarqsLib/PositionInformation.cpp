@@ -32,7 +32,10 @@ PositionInformation::PositionInformation() :
 	m_field_offset(0.0),
 
 	xBias(0.0), yBias(0.0),
-	m_field_position(0)
+	m_field_position(0),
+	
+	m_gyro_angle(WebInterface::CreateDoubleProxy("Position Information", "Gyro Angle",
+			DoubleProxyFlags().default_value(0).readonly()))
 {
 	m_gyro.SetSensitivity(0.007F);
 	
@@ -76,8 +79,8 @@ PositionInformation::PositionInformation() :
 	UpdateFieldPosition();
 
 	// start the calculations
-	//m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
-	//m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);
+	m_notifier = new Notifier(PositionInformation::PeriodicFunction, this);
+	m_notifier->StartPeriodic(PINFO_CALCULATION_PERIOD);
 }
 
 // destructor
@@ -92,6 +95,7 @@ PositionInformation::~PositionInformation()
 /// called every 50ms
 void PositionInformation::CalculatePositionInformation()
 {
+	/*
 	Synchronized sync(m_mutex);
 	
 	double x, y;
@@ -101,7 +105,15 @@ void PositionInformation::CalculatePositionInformation()
 	avgAy.AddPoint(y - yBias);
 	
 	// do the field offset here
-
+	*/
+	
+	// update any data aquisition needs here
+	double angle = fmod(GetFieldAngle()*-1, 360.0);
+	if (angle < 0)
+		angle += 360;
+	
+	m_gyro_angle = angle;
+	
 }
 
 void PositionInformation::UpdateFieldPosition()

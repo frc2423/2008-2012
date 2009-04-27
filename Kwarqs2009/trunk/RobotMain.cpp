@@ -132,7 +132,7 @@ public:
 		
 		// by now, everything depending on the web interface
 		// should have initialized, so go ahead and enable it
-		WebInterface::Enable();
+		WebInterface::Enable("80");
 	}
 
 	/**

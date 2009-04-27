@@ -9,6 +9,8 @@
 #ifndef PSEUDOGEARBOX_H
 #define PSEUDOGEARBOX_H
 
+#include "../WebInterface/WebInterface.h"
+
 /**
 	\class PsuedoGearbox
 	\brief This is a trivially simple filter drive class that limits the 
@@ -22,7 +24,11 @@ public:
 	PsuedoGearbox() :
 		m_stick(FIRST_JOYSTICK_PORT),
 		m_controller(CONTROLLER_JOYSTICK_PORT),
-		m_enabled(true)
+		m_enabled(true),
+		m_speed_pct(WebInterface::CreateDoubleProxy("Limiter", "Speed %",
+				DoubleProxyFlags().minval(0).maxval(1).default_value(.5).step(.1))),
+		m_rotation_pct(WebInterface::CreateDoubleProxy("Limiter", "Rotation %",
+				DoubleProxyFlags().minval(0).maxval(1).default_value(.5).step(.1)))
 	{}
 
 	void Disable(){
@@ -43,8 +49,8 @@ public:
 			return;
 	
 		// low speed action (boring, but makes robot easier to drive)
-		speed *= .5;
-		rotation *= .5;
+		speed *= m_speed_pct;
+		rotation *= m_rotation_pct;
 	}
 
 	/// Return the name of the class
@@ -56,6 +62,9 @@ private:
 	KwarqsJoystick m_controller;
 
 	bool m_enabled;
+	
+	DoubleProxy m_speed_pct;
+	DoubleProxy m_rotation_pct;
 };
 
 #endif

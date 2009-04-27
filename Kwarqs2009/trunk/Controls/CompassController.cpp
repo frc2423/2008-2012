@@ -17,14 +17,26 @@ CompassController::CompassController(KwarqsDriveController * driveController) :
 	KwarqsMovementControl(driveController),
 	m_controller(CONTROLLER_JOYSTICK_PORT),
 	m_position(PositionInformation::GetInstance()),
+	m_nosePointer("CompassController"),
 	m_spinEvent(0.025),
 	m_noseDirection(0)
 {	
 	m_bigButtonAngle = WebInterface::CreateDoubleProxy("CompassController", "High Adjustment", 
-		DoubleProxyFlags().default_value(5).minval(-180).maxval(180).step(.1));
+		DoubleProxyFlags().default_value(35).minval(-180).maxval(180).step(.1));
 		
 	m_smallButtonAngle = WebInterface::CreateDoubleProxy("CompassController", "Low Adjustment", 
-		DoubleProxyFlags().default_value(1).minval(-180).maxval(180).step(.1));
+		DoubleProxyFlags().default_value(15).minval(-180).maxval(180).step(.1));
+	
+	m_override = WebInterface::CreateBoolProxy("CompassController", "Override", false);
+	
+	m_speed = WebInterface::CreateDoubleProxy("CompassController", "Speed", 
+		DoubleProxyFlags().default_value(0).minval(-1).maxval(1).step(.1));
+	
+	m_heading = WebInterface::CreateDoubleProxy("CompassController", "Heading", 
+		DoubleProxyFlags().default_value(0).minval(0).maxval(360).step(1));
+	
+	m_angle = WebInterface::CreateDoubleProxy("CompassController", "Angle", 
+		DoubleProxyFlags().default_value(0).minval(0).maxval(360).step(1));
 }
 
 
@@ -57,21 +69,30 @@ void CompassController::Move()
 		double big = m_bigButtonAngle;
 		double small = m_smallButtonAngle;
 		
+		double current_angle = m_position->GetNormalizedFieldAngle()*-1;
+		
 		// go left
 		if (m_controller.GetRawButton(7))
-			m_noseDirection += big;
+			m_noseDirection = current_angle + big;
 		
 		// go right
 		if (m_controller.GetRawButton(8))
-			m_noseDirection -= big;
+			m_noseDirection = current_angle - big;
 
 		// go left a tiny bit
 		if (m_controller.GetRawButton(5))
-			m_noseDirection += small;
+			m_noseDirection = current_angle + small;
 		
 		// go right a tiny bit
 		if (m_controller.GetRawButton(6))
-			m_noseDirection -= small;
+			m_noseDirection = current_angle - small;
+	}
+	
+	if (m_override)
+	{
+		speed = m_speed;
+		m_noseDirection = m_angle;
+		wheel_Direction = m_heading;
 	}
 
 	rotation = m_nosePointer.GetRotation(m_noseDirection);

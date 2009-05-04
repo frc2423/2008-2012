@@ -31,7 +31,7 @@ void CompassDrive::Move()
 	
 	// every period of time, add a bit to the angle depending on the twist
 	if (m_twistEvent.DoEvent())
-		m_noseAngle += m_stick.GetTwist() * -5;
+		m_noseAngle = (m_position->GetNormalizedFieldAngle()*-1) + (m_stick.GetTwist() * -25);
 	
 	// continuously adjust the nose so we're always pointing the same
 	// direction relative to the field

@@ -23,8 +23,9 @@
 #include "Controls/NullMovementControl.h"
 #include "Controls/CompassDriveII.h"
 #include "Controls/CompassController.h"
+#include "Controls/WebController.h"
 
-
+#include "Controls/NormalController.h"
 
 #include "DriveFilters/PsuedoGearbox.h"
 
@@ -55,7 +56,10 @@ class KwarqsRobotMain : public SimpleRobot
 	CompassDrive			compassDrive;
 	CompassDriveII			compassDriveII;
 	CompassController		compassController;
+	NormalController		normalController;
+	WebController			webController;
 	NullMovementControl		nullMovementControl;
+	
 	
 	AutonomousDemo			autonomousDemo;
 	
@@ -99,6 +103,8 @@ public:
 		compassDrive(&driveController),
 		compassDriveII(&driveController),
 		compassController(&driveController),
+		normalController(&driveController),
+		webController(&driveController),
 		
 		nullMovementControl(&driveController),
 		
@@ -163,9 +169,9 @@ public:
 		
 		switch (user_selection)
 		{
-			//case 5:
-			//	control = &annControl;
-			//	break;
+			case 5:
+				control = &normalController;
+				break;
 			
 			case 6:
 				control = &compassController;
@@ -186,6 +192,9 @@ public:
 			default:
 				control = &nullMovementControl;
 		}
+		
+		if (webController.IsEnabled())
+			control = &webController;
 		
 		// enable or disable it depending on whether it was previously
 		// selected

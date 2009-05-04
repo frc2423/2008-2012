@@ -26,17 +26,6 @@ CompassController::CompassController(KwarqsDriveController * driveController) :
 		
 	m_smallButtonAngle = WebInterface::CreateDoubleProxy("CompassController", "Low Adjustment", 
 		DoubleProxyFlags().default_value(15).minval(-180).maxval(180).step(.1));
-	
-	m_override = WebInterface::CreateBoolProxy("CompassController", "Override", false);
-	
-	m_speed = WebInterface::CreateDoubleProxy("CompassController", "Speed", 
-		DoubleProxyFlags().default_value(0).minval(-1).maxval(1).step(.1));
-	
-	m_heading = WebInterface::CreateDoubleProxy("CompassController", "Heading", 
-		DoubleProxyFlags().default_value(0).minval(0).maxval(360).step(1));
-	
-	m_angle = WebInterface::CreateDoubleProxy("CompassController", "Angle", 
-		DoubleProxyFlags().default_value(0).minval(0).maxval(360).step(1));
 }
 
 
@@ -67,7 +56,7 @@ void CompassController::Move()
 		// buttons, so the bot doesn't just keep turning unexpectedly
 		
 		double big = m_bigButtonAngle;
-		double small = m_smallButtonAngle;
+		//double small = m_smallButtonAngle;
 		
 		double current_angle = m_position->GetNormalizedFieldAngle()*-1;
 		
@@ -80,23 +69,21 @@ void CompassController::Move()
 			m_noseDirection = current_angle - big;
 
 		// go left a tiny bit
-		if (m_controller.GetRawButton(5))
+		/*if (m_controller.GetRawButton(5))
 			m_noseDirection = current_angle + small;
 		
 		// go right a tiny bit
 		if (m_controller.GetRawButton(6))
 			m_noseDirection = current_angle - small;
+		*/
+		
+		if (m_controller.GetRawButton(5))
+			m_noseDirection = wheel_Direction;
+		
 	}
 	
-	if (m_override)
-	{
-		speed = m_speed;
-		m_noseDirection = m_angle;
-		wheel_Direction = m_heading;
-	}
-
 	rotation = m_nosePointer.GetRotation(m_noseDirection);
-
+	
 	m_driveController->Move(speed, wheel_Direction, rotation, m_controller.GetRawButton(1));
 }
 

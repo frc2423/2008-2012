@@ -49,6 +49,15 @@ SwerveDrive::SwerveDrive(RobotChassis * chassis) :
 	m_time(GetTime()),
 	m_stick(FIRST_JOYSTICK_PORT)
 {
+	m_speed = WebInterface::CreateDoubleProxy("SwerveDrive", "Speed", 
+		DoubleProxyFlags().default_value(0).readonly());
+	
+	m_angle = WebInterface::CreateDoubleProxy("SwerveDrive", "Angle", 
+		DoubleProxyFlags().default_value(0).readonly());
+	
+	m_rotation = WebInterface::CreateDoubleProxy("SwerveDrive", "Rotation", 
+		DoubleProxyFlags().default_value(0).readonly());
+	
 	m_servo_lf = WebInterface::CreateDoubleProxy("SwerveDrive", "LF Servo", 
 		DoubleProxyFlags().default_value(0).readonly());
 	
@@ -95,6 +104,10 @@ void SwerveDrive::Move(
 	bool &stop
 )
 {
+	m_speed = speed;
+	m_angle = angle;
+	m_rotation = rotation;
+	
 	if (stop)
 	{
 		Stop();
@@ -117,7 +130,7 @@ void SwerveDrive::Move(
 	*/
 	
 	// special case: doing nothing
-	if (fabs(speed) < 0.0001 && fabs(angle) < 0.0001 && fabs(rotation) < 0.0001)
+	if (fabs(speed) < 0.0001 && fabs(rotation) < 0.0001)
 	{
 		// this forces motors to stop and keeps the wheels pointed in the
 		// same direction, much less annoying

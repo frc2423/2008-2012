@@ -74,6 +74,10 @@ private:
 	
 	KwarqsJoystick m_stick;
 	
+	DoubleProxy m_speed;
+	DoubleProxy m_angle;
+	DoubleProxy m_rotation;
+	
 	DoubleProxy m_servo_lf;
 	DoubleProxy m_servo_lr;
 	DoubleProxy m_servo_rf;

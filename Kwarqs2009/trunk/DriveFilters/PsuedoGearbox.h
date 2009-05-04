@@ -45,7 +45,8 @@ public:
 	virtual void Move(double &speed, double &angle, double &rotation, bool &stop)
 	{
 		// don't touch this (turbo mode)
-		if (!m_enabled || m_stick.GetTrigger() || m_controller.GetRawButton(2))
+		if (!m_enabled || m_stick.GetTrigger() || 
+			m_controller.GetRawButton(2) || m_controller.GetRawButton(6))
 			return;
 	
 		// low speed action (boring, but makes robot easier to drive)

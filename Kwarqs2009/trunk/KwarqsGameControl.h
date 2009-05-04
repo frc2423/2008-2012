@@ -9,6 +9,8 @@
 #ifndef KWARQSGAMECONTROL_H
 #define KWARQSGAMECONTROL_H
 
+#include "WebInterface/WebInterface.h"
+
 /**
 	\class KwarqsGameControl
 	\brief This encapsulates all of the game piece control
@@ -31,6 +33,7 @@ private:
 	Victor m_upper_arm_motor;
 	Joystick * m_stick;
 
+	FloatProxy m_shooter_speed;
 };
 
 #endif

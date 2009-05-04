@@ -14,6 +14,9 @@ KwarqsGameControl::KwarqsGameControl() :
 	m_low_arm_motor(DIGITAL_SLOT_2, 6),
 	m_upper_arm_motor(DIGITAL_SLOT_2, 5)
 {
+	m_shooter_speed = WebInterface::CreateFloatProxy("Game Controls", "Shooter", 
+		FloatProxyFlags().default_value(0).readonly());
+	
 	// we intentionally do not use a KwarqsJoystick here
 	m_stick = Joystick::GetStickForPort(SECOND_JOYSTICK_PORT);
 	TurnoffMotors();
@@ -35,9 +38,12 @@ void KwarqsGameControl::PerformMovement()
 		m_low_arm_motor.Set(0);
 	
 	float val = ((m_stick->GetZ()*-1.0F) + 1.0F)/ 2.0F;
+	val = val * .35;
 	
 	// scale this value so it can only go the correct direction
 	m_upper_arm_motor.Set(val*-1.0F);
+	
+	m_shooter_speed = (val*-1.0F);
 	
 	//DriverStationLCD::GetInstance()->Printf(DriverStationLCD::kUser_Line6, 1, "%f", val);
 }

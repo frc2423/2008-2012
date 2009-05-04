@@ -62,6 +62,11 @@ private:
 	DoubleProxy proxy_rf;
 	DoubleProxy proxy_rr;
 	
+	DoubleProxy proxy_mlf;
+	DoubleProxy proxy_mlr;
+	DoubleProxy proxy_mrf;
+	DoubleProxy proxy_mrr;
+	
 	bool m_begin_manual_calibrate;
 	
 	bool last_trig;

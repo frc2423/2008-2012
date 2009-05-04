@@ -61,6 +61,15 @@ ServoCalibrator::ServoCalibrator(RobotChassis * chassis) :
 			DoubleProxyFlags().default_value(0).minval(0).maxval(360).step(0.1));
 	proxy_rr = WebInterface::CreateDoubleProxy("Manual", "RR Wheel", 
 			DoubleProxyFlags().default_value(0).minval(0).maxval(360).step(0.1));
+	
+	proxy_mlf = WebInterface::CreateDoubleProxy("Manual", "LF Motor", 
+			DoubleProxyFlags().default_value(0).minval(-1).maxval(1).step(0.1));
+	proxy_mlr = WebInterface::CreateDoubleProxy("Manual", "LR Motor", 
+			DoubleProxyFlags().default_value(0).minval(-1).maxval(1).step(0.1));
+	proxy_mrf = WebInterface::CreateDoubleProxy("Manual", "RF Motor", 
+			DoubleProxyFlags().default_value(0).minval(-1).maxval(1).step(0.1));
+	proxy_mrr = WebInterface::CreateDoubleProxy("Manual", "RR Motor", 
+			DoubleProxyFlags().default_value(0).minval(-1).maxval(1).step(0.1));
 }
 
 
@@ -143,6 +152,11 @@ void ServoCalibrator::DoManualCalibrate()
 	m_chassis->servo_lr.SetAngle(proxy_lr);
 	m_chassis->servo_rf.SetAngle(proxy_rf);
 	m_chassis->servo_rr.SetAngle(proxy_rr);
+	
+	m_chassis->motor_lf.SetSpeed(proxy_mlf);
+	m_chassis->motor_lr.SetSpeed(proxy_mlr);
+	m_chassis->motor_rf.SetSpeed(proxy_mrf);
+	m_chassis->motor_rr.SetSpeed(proxy_mrr);
 	
 	
 	ShowLCDOutput();

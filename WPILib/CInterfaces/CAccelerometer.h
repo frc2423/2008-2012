@@ -16,5 +16,14 @@ void SetAccelerometerZero(UINT32 slot, UINT32 channel, float zero);
 void DeleteAccelerometer(UINT32 slot, UINT32 channel);
 void DeleteAccelerometer(UINT32 channe);
 
+typedef void *AccelerometerObject;
+
+AccelerometerObject CreateAccelerometer(UINT32 channel);
+AccelerometerObject CreateAccelerometer(UINT32 slot, UINT32 channel);
+float GetAcceleration(AccelerometerObject o);
+void SetAccelerometerSensitivity(AccelerometerObject o, float sensitivity);
+void SetAccelerometerZero(AccelerometerObject o, float zero);
+void DeleteAccelerometer(AccelerometerObject o);
+
 #endif
 

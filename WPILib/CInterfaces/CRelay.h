@@ -13,5 +13,12 @@ void DeleteRelay(UINT32 slot, UINT32 channel);
 void SetRelay(UINT32 channel, RelayValue value);
 void SetRelay(UINT32 slot, UINT32 channel, RelayValue value);
 
+typedef void *RelayObject;
+
+RelayObject CreateRelay(UINT32 slot, UINT32 channel, RelayDirection direction = kBothDirections);
+RelayObject CreateRelay(UINT32 channel, RelayDirection direction = kBothDirections);
+void SetRelay(RelayObject o, RelayValue value);
+void DeleteRelay(RelayObject o);
+
 #endif
 

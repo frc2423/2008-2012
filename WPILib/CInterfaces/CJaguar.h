@@ -16,5 +16,14 @@ UINT8 GetJaguarRaw(UINT32 module, UINT32 channel);
 void DeleteJaguar(UINT32 module, UINT32 channel);
 void DeleteJaguar(UINT32 channel);
 
+typedef void *JaguarObject;
+
+JaguarObject CreateJaguar(UINT32 module, UINT32 channel);
+JaguarObject CreateJaguar(UINT32 channel);
+void SetJaguarRaw(JaguarObject o, UINT8 value);
+void SetJaguarSpeed(JaguarObject o, float speed);
+UINT8 GetJaguarRaw(JaguarObject o);
+void DeleteJaguar(JaguarObject o);
+
 #endif
 

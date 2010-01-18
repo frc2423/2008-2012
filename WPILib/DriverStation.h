@@ -8,10 +8,11 @@
 #define __DRIVER_STATION_H__
 
 #include "Dashboard.h"
+#include "DriverStationEnhancedIO.h"
 #include "SensorBase.h"
 #include "Task.h"
 
-struct FRCControlData;
+struct FRCCommonControlData;
 class AnalogChannel;
 
 /**
@@ -38,9 +39,12 @@ public:
 	void SetDigitalOut(UINT32 channel, bool value);
 	bool GetDigitalOut(UINT32 channel);
 
+	bool IsEnabled();
 	bool IsDisabled();
 	bool IsAutonomous();
 	bool IsOperatorControl();
+	bool IsNewControlData();
+	bool IsFMSAttached();
 
 	UINT32 GetPacketNumber();
 	Alliance GetAlliance();
@@ -48,7 +52,9 @@ public:
 
 	float GetBatteryVoltage();
 
-	Dashboard& GetDashboardPacker(void) {return m_dashboard;}
+	Dashboard& GetHighPriorityDashboardPacker(void) {return m_dashboardHigh;}
+	Dashboard& GetLowPriorityDashboardPacker(void) {return m_dashboardLow;}
+	DriverStationEnhancedIO& GetEnhancedIO(void) {return m_enhancedIO;}
 
 protected:
 	DriverStation();
@@ -64,13 +70,16 @@ private:
 
 	void Run();
 
-	struct FRCControlData *m_controlData;
-	char *m_userControl;
-	char *m_userStatus;
+	struct FRCCommonControlData *m_controlData;
 	UINT8 m_digitalOut;
 	AnalogChannel *m_batteryChannel;
+	SEM_ID m_statusDataSemaphore;
 	Task m_task;
-	Dashboard m_dashboard;
+	Dashboard m_dashboardHigh;
+	Dashboard m_dashboardLow;
+	bool m_newControlData;
+	SEM_ID m_packetDataAvailableSem;
+	DriverStationEnhancedIO m_enhancedIO;
 };
 
 #endif

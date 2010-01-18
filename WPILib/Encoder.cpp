@@ -180,7 +180,7 @@ void Encoder::Start()
 		m_counter->Start();
 	else
 	{
-		m_encoder->writeEnable(1, &status);
+		m_encoder->writeConfig_Enable(1, &status);
 		wpi_assertCleanStatus(status);
 	}
 }
@@ -194,7 +194,7 @@ void Encoder::Stop()
 		m_counter->Stop();
 	else
 	{
-		m_encoder->writeEnable(0, &status);
+		m_encoder->writeConfig_Enable(0, &status);
 		wpi_assertCleanStatus(status);
 	}
 }
@@ -275,9 +275,7 @@ double Encoder::GetPeriod()
 			value = (double)output.Period / (double)output.Count;
 		}
 		wpi_assertCleanStatus(status);
-		// Workaround artf4249: treat the 4x decoder as a 2x decoder for for the timer only.
-		// Should be multiplied by 0.25 for 4x decoding... using 0.5 as 2x
-		return value * 1.0e-6  / (DecodingScaleFactor() * 2.0);
+		return value * 1.0e-6  / (DecodingScaleFactor() * 4.0);
 	}
 }
 
@@ -301,9 +299,7 @@ void Encoder::SetMaxPeriod(double maxPeriod)
 	}
 	else
 	{
-		// Workaround artf4249: treat the 4x decoder as a 2x decoder for for the timer only.
-		// Should be multiplied by 0.25 for 4x decoding... using 0.5 as 2x
-		m_encoder->writeTimerConfig_StallPeriod((UINT32)(maxPeriod * 1.0e6 * DecodingScaleFactor() * 2.0), &status);
+		m_encoder->writeTimerConfig_StallPeriod((UINT32)(maxPeriod * 1.0e6 * DecodingScaleFactor()), &status);
 		wpi_assertCleanStatus(status);
 	}
 }

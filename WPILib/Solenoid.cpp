@@ -21,7 +21,7 @@ UINT32 Solenoid::m_refCount = 0;
  */
 void Solenoid::InitSolenoid()
 {
-	Resource::CreateResourceObject(&allocated, tSolenoid::kNumSystems * kSolenoidChannels);
+	Resource::CreateResourceObject(&allocated, tSolenoid::kNumDO7_0Elements * kSolenoidChannels);
 	CheckSolenoidModule(m_chassisSlot);
 	CheckSolenoidChannel(m_channel);
 
@@ -86,7 +86,7 @@ Solenoid::~Solenoid()
  */
 UINT32 Solenoid::SlotToIndex(UINT32 slot)
 {
-	return 0;
+	return 8 - slot;
 }
 
 /**
@@ -98,7 +98,7 @@ void Solenoid::Set(bool on)
 {
 	{
 		Synchronized sync(m_semaphore);
-		UINT8 value = m_fpgaSolenoidModule->readDO7_0(&status);
+		UINT8 value = m_fpgaSolenoidModule->readDO7_0(SlotToIndex(m_chassisSlot), &status);
 		if (on)
 		{
 			value |= 1 << (m_channel - 1);
@@ -107,7 +107,7 @@ void Solenoid::Set(bool on)
 		{
 			value &= ~(1 << (m_channel - 1));
 		}
-		m_fpgaSolenoidModule->writeDO7_0(value, &status);
+		m_fpgaSolenoidModule->writeDO7_0(SlotToIndex(m_chassisSlot), value, &status);
 	}
 
 	wpi_assertCleanStatus(status);
@@ -120,7 +120,17 @@ void Solenoid::Set(bool on)
  */
 bool Solenoid::Get()
 {
-	UINT32 value = m_fpgaSolenoidModule->readDO7_0(&status) & ( 1 << (m_channel - 1));
+	UINT32 value = m_fpgaSolenoidModule->readDO7_0(SlotToIndex(m_chassisSlot), &status) & ( 1 << (m_channel - 1));
 	wpi_assertCleanStatus(status);
 	return (value != 0);
+}
+
+/**
+ * Read all 8 solenoids as a single byte
+ * 
+ * @return The current value of all 8 solenoids.
+ */
+char Solenoid::GetAll()
+{
+	return m_fpgaSolenoidModule->readDO7_0(SlotToIndex(m_chassisSlot), &status);
 }

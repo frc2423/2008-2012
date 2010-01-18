@@ -4,7 +4,7 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
-#include "../WPILib.h"
+#include "../Jaguar.h"
 #include "CJaguar.h"
 #include "CWrappers.h"
 #include "CPWM.h"
@@ -17,7 +17,7 @@
  * @param slot The slot the digital module is plugged into
  * @param channel The PWM channel connected to this speed controller
  */
-static SensorBase *CreateJaguar(UINT32 slot, UINT32 channel)
+static SensorBase *CreateJaguarStatic(UINT32 slot, UINT32 channel)
 {
 	return new Jaguar(slot, channel);
 }
@@ -34,7 +34,7 @@ static SensorBase *CreateJaguar(UINT32 slot, UINT32 channel)
  */
 void SetJaguarSpeed(UINT32 slot, UINT32 channel, float speed)
 {
-	Jaguar *jaguar = (Jaguar *) AllocatePWM(slot, channel, CreateJaguar);
+	Jaguar *jaguar = (Jaguar *) AllocatePWM(slot, channel, CreateJaguarStatic);
 	if (jaguar)	jaguar->Set(speed);
 }
 
@@ -49,7 +49,7 @@ void SetJaguarSpeed(UINT32 slot, UINT32 channel, float speed)
  */
 void SetJaguarSpeed(UINT32 channel, float speed)
 {
-	Jaguar *jaguar = (Jaguar *) AllocatePWM(SensorBase::GetDefaultDigitalModule(), channel, CreateJaguar);
+	Jaguar *jaguar = (Jaguar *) AllocatePWM(SensorBase::GetDefaultDigitalModule(), channel, CreateJaguarStatic);
 	if (jaguar) jaguar->Set(speed);
 }
 
@@ -63,7 +63,7 @@ void SetJaguarSpeed(UINT32 channel, float speed)
  */
 void SetJaguarRaw(UINT32 channel, UINT8 value)
 {
-	Jaguar *jaguar = (Jaguar *) AllocatePWM(SensorBase::GetDefaultDigitalModule(), channel, CreateJaguar);
+	Jaguar *jaguar = (Jaguar *) AllocatePWM(SensorBase::GetDefaultDigitalModule(), channel, CreateJaguarStatic);
 	if (jaguar) jaguar->SetRaw(value);
 }
 
@@ -77,7 +77,7 @@ void SetJaguarRaw(UINT32 channel, UINT8 value)
  */
 UINT8 GetJaguarRaw(UINT32 channel)
 {
-	Jaguar *jaguar = (Jaguar *) AllocatePWM(SensorBase::GetDefaultDigitalModule(), channel, CreateJaguar);
+	Jaguar *jaguar = (Jaguar *) AllocatePWM(SensorBase::GetDefaultDigitalModule(), channel, CreateJaguarStatic);
 	if (jaguar)
 		return jaguar->GetRaw();
 	else
@@ -95,7 +95,7 @@ UINT8 GetJaguarRaw(UINT32 channel)
  */
 void SetJaguarRaw(UINT32 slot, UINT32 channel, UINT8 value)
 {
-	Jaguar *jaguar = (Jaguar *) AllocatePWM(slot, channel, CreateJaguar);
+	Jaguar *jaguar = (Jaguar *) AllocatePWM(slot, channel, CreateJaguarStatic);
 	if (jaguar) jaguar->SetRaw(value);
 }
 
@@ -110,7 +110,7 @@ void SetJaguarRaw(UINT32 slot, UINT32 channel, UINT8 value)
  */
 UINT8 GetJaguarRaw(UINT32 slot, UINT32 channel)
 {
-	Jaguar *jaguar = (Jaguar *) AllocatePWM(slot, channel, CreateJaguar);
+	Jaguar *jaguar = (Jaguar *) AllocatePWM(slot, channel, CreateJaguarStatic);
 	if (jaguar)
 		return jaguar->GetRaw();
 	else
@@ -126,7 +126,7 @@ UINT8 GetJaguarRaw(UINT32 slot, UINT32 channel)
  */
 void DeleteJaguar(UINT32 slot, UINT32 channel)
 {
-	Jaguar *jaguar = (Jaguar *) AllocatePWM(slot, channel, CreateJaguar);
+	Jaguar *jaguar = (Jaguar *) AllocatePWM(slot, channel, CreateJaguarStatic);
 	DeletePWM(slot, channel);
 	delete jaguar;
 }
@@ -140,5 +140,40 @@ void DeleteJaguar(UINT32 slot, UINT32 channel)
 void DeleteJaguar(UINT32 channel)
 {
 	DeleteJaguar(SensorBase::GetDefaultDigitalModule(), channel);
+}
+
+
+/*
+ * Alternate interface to Jaguar
+ */
+
+JaguarObject CreateJaguar(UINT32 module, UINT32 channel)
+{
+	return (JaguarObject) new Jaguar(module, channel); 
+}
+
+JaguarObject CreateJaguar(UINT32 channel)
+{
+	return (JaguarObject) new Jaguar(channel);
+}
+
+void SetJaguarRaw(JaguarObject o, UINT8 value)
+{
+	((Jaguar *) o)->SetRaw(value);
+}
+
+void SetJaguarSpeed(JaguarObject o, float speed)
+{
+	((Jaguar *) o)->Set(speed);
+}
+
+UINT8 GetJaguarRaw(JaguarObject o)
+{
+	return ((Jaguar *)o)->GetRaw();
+}
+
+void DeleteJaguar(JaguarObject o)
+{
+	delete (Jaguar *) o;
 }
 

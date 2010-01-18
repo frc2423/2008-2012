@@ -14,4 +14,16 @@ double GetCounterPeriod(UINT32 slot, UINT32 channel);
 void DeleteCounter(UINT32 slot, UINT32 channel);
 void DeleteCounter(UINT32 channel);
 
+typedef void *CounterObject;
+
+CounterObject CreateCounter(UINT32 channel);
+CounterObject CreateCounter(UINT32 slot, UINT32 channel);
+void StartCounter(CounterObject o);
+INT32 GetCounter(CounterObject o);
+void ResetCounter(CounterObject o);
+void StopCounter(CounterObject o);
+double GetCounterPeriod(CounterObject o);
+void DeleteCounter(CounterObject o);
+
+
 #endif

@@ -322,10 +322,10 @@ UINT16 DigitalModule::GetDIODirection(void)
  * Generate a single pulse.
  * Write a pulse to the specified digital output channel. There can only be a single pulse going at any time.
  */
-void DigitalModule::Pulse(UINT32 channel, UINT8 pulseLength)
+void DigitalModule::Pulse(UINT32 channel, float pulseLength)
 {
 	UINT32 mask = 1 << RemapDigitalChannel(channel - 1);
-	m_fpgaDIO->writePulseLength(pulseLength, &status);
+	m_fpgaDIO->writePulseLength((UINT8)(1e9 * pulseLength / (m_fpgaDIO->readLoopTiming(&status) * 25)), &status);
 	m_fpgaDIO->writePulse(mask, &status);
 	wpi_assertCleanStatus(status);
 }

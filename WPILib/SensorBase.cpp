@@ -16,7 +16,7 @@ UINT32 SensorBase::m_defaultSolenoidModule = 8;
 SensorBase *SensorBase::m_singletonList = NULL;
 
 // Slots are one based index, so ignore element 0.
-static const UINT32 modulePopulation[] = {0,  9201, 9201, 0, 9403, 0, 9403, 0, 9472};
+static const UINT32 modulePopulation[] = {0,  9201, 9201, 0, 9403, 0, 9403, 9472, 9472};
 
 /**
  * Creates an instance of the sensor base and gets an FPGA handle
@@ -141,7 +141,7 @@ bool SensorBase::CheckAnalogModule(UINT32 slot)
 
 /**
  * Verify that the solenoid module is correct.
- * Verify that the solenoid module is slot 8 (for now).
+ * Verify that the solenoid module is slot 8 or 7.
  */
 bool SensorBase::CheckSolenoidModule(UINT32 slot)
 {

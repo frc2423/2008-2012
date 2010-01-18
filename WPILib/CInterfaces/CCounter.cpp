@@ -219,3 +219,46 @@ void DeleteCounter(UINT32 channel)
 	DeleteCounter(SensorBase::GetDefaultDigitalModule(), channel);
 }
 
+/*******************************************************************************
+ * Alternative interface to counter
+*******************************************************************************/
+
+CounterObject CreateCounter(UINT32 channel) 
+{
+	return (CounterObject) new Counter(channel);
+}
+
+CounterObject CreateCounter(UINT32 slot, UINT32 channel) 
+{
+	return (CounterObject) new Counter(slot,channel);	
+}
+
+void StartCounter(CounterObject o)
+{
+	((Counter *) o)->Start();
+}
+
+INT32 GetCounter(CounterObject o)
+{
+	return 	((Counter *) o)->Get();
+}
+
+void ResetCounter(CounterObject o)
+{
+	((Counter *) o)->Reset();	
+}
+
+void StopCounter(CounterObject o)
+{
+	((Counter *) o)->Stop();
+}
+
+double GetCounterPeriod(CounterObject o)
+{
+	return 	((Counter *) o)->GetPeriod();	
+}
+
+void DeleteCounter(CounterObject o)
+{
+	delete (Counter *) o;
+}

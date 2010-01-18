@@ -96,3 +96,28 @@ void DeleteDigitalOutput(UINT32 channel)
 {
 	DeleteDigitalOutput(SensorBase::GetDefaultDigitalModule(), channel);
 }
+
+/*******************************************************************************
+ * Alternative interface to digital output
+*******************************************************************************/
+DigitalOutputObject CreateDigitalOutput(UINT32 module, UINT32 channel)
+{
+	return (DigitalOutputObject) new DigitalOutput(module, channel); 
+}
+
+DigitalOutputObject CreateDigitalOutput(UINT32 channel)
+{
+	return (DigitalOutputObject) new DigitalOutput(channel); 
+}
+
+void SetDigitalOutput(DigitalOutputObject o, bool val)
+{
+	((DigitalOutput *) o)->Set(val);
+}
+
+void DeleteDigitalOutput(DigitalOutputObject o)
+{
+	delete (DigitalOutput *) o;
+}
+
+

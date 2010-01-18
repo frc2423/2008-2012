@@ -46,6 +46,7 @@ public:
 	static const UINT32 kAnalogModules = 2;
 	static const UINT32 kDigitalModules = 2;
 	static const UINT32 kSolenoidChannels = 8;
+    static const UINT32 kSolenoidModules = 2;
 	static const UINT32 kPwmChannels = 10;
 	static const UINT32 kRelayChannels = 8;
 	static const UINT32 kChassisSlots = 8;

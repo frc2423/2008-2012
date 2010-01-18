@@ -1,46 +1,55 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __Alarm_h__
-#define __Alarm_h__
+#ifndef __nAD9A5591CC64E4DF756D77D1B57A549E_Alarm_h__
+#define __nAD9A5591CC64E4DF756D77D1B57A549E_Alarm_h__
 
-#include "tSystem.h"
+#include "tScopedSystem.h"
 
 namespace nFPGA
 {
-namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D
+namespace nAD9A5591CC64E4DF756D77D1B57A549E
 {
 
-class tAlarm : public tSystem
+class tAlarm : public tScopedSystem
 {
 public:
    tAlarm(tRioStatusCode *status);
    ~tAlarm();
 
-   static const unsigned char kNumSystems;
+   typedef enum
+   {
+      kNumSystems = 1,
+   } tConstants;
 
 
 
 
-   static void writeTriggerTime(unsigned int value, tRioStatusCode *status);
-   static unsigned int readTriggerTime(tRioStatusCode *status);
+   typedef enum
+   {
+      kAlarm_TriggerTimeAddress = 0x8124,
+   } tTriggerTime_Constants;
 
-   static void writeEnable(bool value, tRioStatusCode *status);
-   static bool readEnable(tRioStatusCode *status);
+   void writeTriggerTime(unsigned int value, tRioStatusCode *status);
+   unsigned int readTriggerTime(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kAlarm_EnableAddress = 0x8120,
+   } tEnable_Constants;
+
+   void writeEnable(bool value, tRioStatusCode *status);
+   bool readEnable(tRioStatusCode *status);
 
 
 
 
 private:
-   unsigned char _SystemIndex;
-
-   #define Alarm_TriggerTime_ADDRESS 0x8124
-   #define Alarm_Enable_ADDRESS 0x8120
-
 
 };
 
 }
 }
 
-#endif // __Alarm_h__
+#endif // __nAD9A5591CC64E4DF756D77D1B57A549E_Alarm_h__

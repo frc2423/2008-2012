@@ -185,3 +185,29 @@ void DeleteUltrasonic(UINT32 pingChannel, UINT32 echoChannel)
 {
 	DeleteUltrasonic(SensorBase::GetDefaultDigitalModule(), pingChannel, SensorBase::GetDefaultDigitalModule(), echoChannel);
 }
+
+UltrasonicObject CreateUltrasonic(UINT32 pingChannel, UINT32 echoChannel)
+{
+	return (UltrasonicObject) new Ultrasonic(pingChannel, echoChannel);
+}
+
+UltrasonicObject CreateUltrasonic(UINT32 pingSlot, UINT32 pingChannel, UINT32 echoSlot, UINT32 echoChannel)
+{
+	return (UltrasonicObject) new Ultrasonic(pingSlot, pingChannel, echoSlot, echoChannel);
+}
+
+double GetUltrasonicInches(UltrasonicObject o)
+{
+	return ((Ultrasonic *)o)->GetRangeInches();
+}
+
+double GetUltrasonicMM(UltrasonicObject o)
+{
+	return ((Ultrasonic *)o)->GetRangeMM();
+}
+
+void DeleteUltrasonic(UltrasonicObject o)
+{
+	delete (Ultrasonic *) o;
+}
+

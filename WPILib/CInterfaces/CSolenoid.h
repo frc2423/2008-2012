@@ -10,5 +10,12 @@
 void SetSolenoid(UINT32 channel, bool on);
 bool GetSolenoid(UINT32 channel);
 
+typedef void *SolenoidObject;
+
+SolenoidObject CreateSolenoid(UINT32 channel);
+void DeleteSolenoid(SolenoidObject o);
+void SetSolenoid(SolenoidObject o, bool on);
+bool GetSolenoid(SolenoidObject o);
+
 #endif
 

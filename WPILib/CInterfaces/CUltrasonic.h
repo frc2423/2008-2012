@@ -17,4 +17,12 @@ double GetUltrasonicMM(UINT32 pingSlot, UINT32 pingChannel, UINT32 echoSlot, UIN
 void DeleteUltrasonic(UINT32 pingChannel, UINT32 echoChannel);
 void DeleteUltrasonic(UINT32 pingSlot, UINT32 pingChannel, UINT32 echoSlot, UINT32 echoChannel);
 
+typedef void *UltrasonicObject;
+
+UltrasonicObject CreateUltrasonic(UINT32 pingChannel, UINT32 echoChannel);
+UltrasonicObject CreateUltrasonic(UINT32 pingSlot, UINT32 pingChannel, UINT32 echoSlot, UINT32 echoChannel);
+double GetUltrasonicInches(UltrasonicObject o);
+double GetUltrasonicMM(UltrasonicObject o);
+void DeleteUltrasonic(UltrasonicObject o);
+
 #endif

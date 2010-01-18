@@ -9,9 +9,27 @@
 
 #include <taskLib.h>
 
-#define wpi_assert(condition) wpi_assert_impl(condition, #condition, __FILE__, __LINE__, __FUNCTION__)
+#define wpi_assert(condition) wpi_assert_impl(condition, #condition, NULL, __FILE__, __LINE__, __FUNCTION__)
+#define wpi_assertWithMessage(condition, message) wpi_assert_impl(condition, #condition, message, __FILE__, __LINE__, __FUNCTION__)
+
+#define wpi_assertEqual(a, b) wpi_assertEqual_impl(a, b, NULL, __FILE__, __LINE__, __FUNCTION__)
+#define wpi_assertEqualWithMessage(a, b, message) wpi_assertEqual_impl(a, b, message, __FILE__, __LINE__, __FUNCTION__)
+
+#define wpi_assertNotEqual(a, b) wpi_assertNotEqual_impl(a, b, NULL, __FILE__, __LINE__, __FUNCTION__)
+#define wpi_assertNotEqualWithMessage(a, b, message) wpi_assertNotEqual_impl(a, b, message, __FILE__, __LINE__, __FUNCTION__)
+
+#define wpi_imaqAssert(status, message) wpi_imaqAssert_impl(status, message, __FILE__, __LINE__, __FUNCTION__)
+
 #define wpi_assertCleanStatus(status) wpi_assertCleanStatus_impl(status, __FILE__, __LINE__, __FUNCTION__)
-void wpi_assert_impl(bool conditionValue, const char *conditionText, const char *fileName, UINT32 lineNumber, const char *funcName);
+
+bool wpi_assert_impl(bool conditionValue, const char *conditionText, const char *message, const char *fileName, UINT32 lineNumber, const char *funcName);
+bool wpi_assertEqual_impl(int valueA, int valueB, const char *message, const char *fileName,UINT32 lineNumber, const char *funcName);
+bool wpi_assertNotEqual_impl(int valueA, int valueB, const char *message, const char *fileName,UINT32 lineNumber, const char *funcName);
+
+void wpi_imaqAssert_impl(int imaqStatus, const char *message,
+							const char *fileName,
+							UINT32 lineNumber,
+							const char *funcName);
 void wpi_assertCleanStatus_impl(INT32 status, const char *fileName, UINT32 lineNumber, const char *funcName);
 
 #define wpi_fatal(error) wpi_fatal_impl(wpi_v_##error, wpi_s_##error, __FILE__, __LINE__, __FUNCTION__)

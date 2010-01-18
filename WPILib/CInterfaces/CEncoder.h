@@ -36,4 +36,22 @@ void SetEncoderReverseDirection(UINT32 aslot, UINT32 aChannel, UINT32 bslot, UIN
 void DeleteEncoder(UINT32 aChannel, UINT32 bChannel);
 void DeleteEncoder(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel);
 
+typedef void *EncoderObject;
+
+EncoderObject CreateEncoder(UINT32 aChannel, UINT32 bChannel);
+EncoderObject CreateEncoder(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel);
+void StartEncoder(EncoderObject o);
+INT32 GetEncoder(EncoderObject o);
+void ResetEncoder(EncoderObject o);
+void StopEncoder(EncoderObject o);
+double GetEncoderPeriod(EncoderObject o);
+void SetMaxEncoderPeriod(EncoderObject o, double maxPeriod);
+bool GetEncoderStopped(EncoderObject o);
+bool GetEncoderDirection(EncoderObject o);
+double GetEncoderDistance(EncoderObject o);
+double GetEncoderRate(EncoderObject o);
+void SetMinEncoderRate(EncoderObject o, double minRate);
+void SetEncoderDistancePerPulse(EncoderObject o, double distancePerPulse);
+void SetEncoderReverseDirection(EncoderObject o, bool reversedDirection);
+void DeleteEncoder(EncoderObject o);
 #endif

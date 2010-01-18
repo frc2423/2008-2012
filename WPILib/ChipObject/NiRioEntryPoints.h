@@ -8,7 +8,7 @@
    Intended to be called from a C client, or the LabVIEW
    interface.
 
-   © Copyright 2004. National Instruments. All rights reserved.
+   Copyright (c) 2004. National Instruments. All rights reserved.
 */
 
 #ifndef  ___NiRioSrv_NiRioEntryPoints_H___
@@ -20,9 +20,11 @@
 // typedefs...
 typedef tNIRIO_u32 tRioDeviceHandle;
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
+
 
 // ---------------------------
 // Utilities:
@@ -47,16 +49,16 @@ typedef void
 // Enumerate RIO resources that match the supplied search pattern on
 // the specified host.
 //
-// host: 
+// host:
 //     NULL, ""              : Local host
 //     "rio://<host_name>/"  : Remote host
 //     "visa://<host_name>/" : Remote host (deprecated)
-//     
+//
 // pattern:
 //     NULL, ""              : All devices
-//     
+//
 // index       : 0-based index of string to return (0 refreshes list).
-// resource    : on success, set to a new character buffer with the 
+// resource    : on success, set to a new character buffer with the
 //             :     requested string
 //
 // returns     : resource string, or NULL on error
@@ -71,7 +73,7 @@ kNIRIOSRVExportPre char*
 kNIRIOSRVCCall NiRioSrv_host_getResourceString(const char*     host,
                                                const char*     pattern,
                                                tNIRIO_u32      index,
-                                               tRioStatusCode* status) 
+                                               tRioStatusCode* status)
 kNIRIOSRVExportPost;
 
 typedef char*
@@ -85,7 +87,7 @@ typedef char*
 // Device Handles:
 
 // open(): Get a device handle for the specified RIO resource. The
-// handle should be released when no longer needed.
+// handle must be released before unloading this
 //
 // returns: tNIRIO_u32 device handle (0 if error)
 //
@@ -93,7 +95,7 @@ kNIRIOSRVExportPre tRioDeviceHandle
 kNIRIOSRVCCall NiRioSrv_device_open(const char*     resource,
                                     tRioStatusCode* status)
 kNIRIOSRVExportPost;
-   
+
 typedef tRioDeviceHandle
 (kNIRIOSRVCCall *NiRioSrv_device_openFn)(const char*     resource,
                                          tRioStatusCode* status);
@@ -114,7 +116,7 @@ typedef void
 // RIO Device Interface:
 //
 // This set of functions allow RIO device access using a logical
-// handle (obtained using NiRioSrv_getDeviceByRsrcString()).
+// handle (obtained using NiRioSrv_getDeviceByResourceString()).
 //
 // Each device function accepts a handle and provides optional status
 // chaining via the status parameter (status may be NULL).
@@ -129,63 +131,78 @@ typedef void
 
 kNIRIOSRVExportPre tNIRIO_u32
 kNIRIOSRVCCall NiRioSrv_device_get32(      tRioDeviceHandle hClient,
-                                           tRioDeviceAttr32 attribute,
+                                           tRioDeviceAttribute32 attribute,
                                            tRioStatusCode*  status)
 kNIRIOSRVExportPost;
-   
+
 typedef tNIRIO_u32
 (kNIRIOSRVCCall *NiRioSrv_device_get32Fn)( tRioDeviceHandle hClient,
-                                           tRioDeviceAttr32 attribute,
+                                           tRioDeviceAttribute32 attribute,
                                            tRioStatusCode*  status);
 
 // Added in 230
-// 
+//
 // Client must freeString() any non-NULL return value.
 //
 kNIRIOSRVExportPre char*
 kNIRIOSRVCCall NiRioSrv_device_getString(  tRioDeviceHandle  hClient,
-                                           tRioDeviceAttrStr attribute,
+                                           tRioDeviceAttributeStr attribute,
                                            tRioStatusCode*   status)
 kNIRIOSRVExportPost;
-   
+
 typedef char*
 (kNIRIOSRVCCall *NiRioSrv_device_getStringFn)(
                                            tRioDeviceHandle  hClient,
-                                           tRioDeviceAttrStr attribute,
+                                           tRioDeviceAttributeStr attribute,
                                            tRioStatusCode*   status);
 
 kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_device_set32(      tRioDeviceHandle hClient,
-                                           tRioDeviceAttr32 attribute,
+                                           tRioDeviceAttribute32 attribute,
                                            tNIRIO_u32       value,
                                            tRioStatusCode*  status)
 kNIRIOSRVExportPost;
 
 typedef void
 (kNIRIOSRVCCall *NiRioSrv_device_set32Fn)( tRioDeviceHandle hClient,
-                                           tRioDeviceAttr32 attribute,
+                                           tRioDeviceAttribute32 attribute,
                                            tNIRIO_u32       value,
                                            tRioStatusCode*  status);
 
 // Added in 230
-// 
+//
 //
 kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_device_setString(  tRioDeviceHandle  hClient,
-                                           tRioDeviceAttrStr attribute,
+                                           tRioDeviceAttributeStr attribute,
                                            const char*       value,
                                            tRioStatusCode*   status)
 kNIRIOSRVExportPost;
-   
+
 typedef void
 (kNIRIOSRVCCall *NiRioSrv_device_setStringFn)(
                                            tRioDeviceHandle  hClient,
-                                           tRioDeviceAttrStr attribute,
+                                           tRioDeviceAttributeStr attribute,
                                            const char*       value,
                                            tRioStatusCode*   status);
 
 // ---------------------------
 // Device Download Control:
+
+kNIRIOSRVExportPre void
+kNIRIOSRVCCall NiRioSrv_device_download(     tRioDeviceHandle handle,
+                                             const tNIRIO_u8* bitstream,
+                                             tNIRIO_u32       size,
+                                             tNIRIO_u32       attribute,
+                                             tRioStatusCode*  status)
+kNIRIOSRVExportPost;
+
+typedef void
+(kNIRIOSRVCCall *NiRioSrv_device_downloadFn)(tRioDeviceHandle handle,
+                                             const tNIRIO_u8* bitstream,
+                                             tNIRIO_u32       size,
+                                             tNIRIO_u32       attribute,
+                                             tRioStatusCode*  status);
 
 kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_device_downloadBegin(     tRioDeviceHandle hClient,
@@ -220,7 +237,7 @@ typedef void
 // configSet(): All resources "added" since the device handle was
 // obtained, or since the last configSet() call, are enabled for use.
 //
-// attr: must be 0
+// attribute: must be 0
 //
 kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_device_configSet(     tRioDeviceHandle hClient,
@@ -236,6 +253,7 @@ typedef void
 // configAddFifoInput(): Add an input fifo device resource.
 //
 // channel: logical channel for fifo (DMA channel)
+//
 //
 kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_device_configAddFifoInputEx(
@@ -256,9 +274,11 @@ typedef void
    tNIRIO_u32       version,
    tRioStatusCode*  status);
 
+
 // configAddFifoOutput(): Add an output fifo device resource.
 //
 // channel: logical channel for fifo (DMA channel)
+//
 //
 kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_device_configAddFifoOutputEx(
@@ -318,7 +338,7 @@ kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_device_fifoRead(        tRioDeviceHandle hClient,
                                                 tNIRIO_u32       channel,
                                                 tNIRIO_u32*      buf,
-                                                tNIRIO_u32       num,
+                                                tNIRIO_u32       number,
                                                 tNIRIO_u32       timeout,
                                                 tNIRIO_u32*      read,
                                                 tNIRIO_u32*      remaining,
@@ -328,17 +348,18 @@ typedef void
 (kNIRIOSRVCCall *NiRioSrv_device_fifoReadFn)(   tRioDeviceHandle hClient,
                                                 tNIRIO_u32       channel,
                                                 tNIRIO_u32*      buf,
-                                                tNIRIO_u32       num,
+                                                tNIRIO_u32       number,
                                                 tNIRIO_u32       timeout,
                                                 tNIRIO_u32*      read,
                                                 tNIRIO_u32*      remaining,
                                                 tRioStatusCode*  status);
 
+
 kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_device_fifoWrite(       tRioDeviceHandle  hClient,
                                                 tNIRIO_u32        channel,
                                                 const tNIRIO_u32* buf,
-                                                tNIRIO_u32        num,
+                                                tNIRIO_u32        number,
                                                 tNIRIO_u32        timeout,
                                                 tNIRIO_u32*       remaining,
                                                 tRioStatusCode*   status)
@@ -347,7 +368,7 @@ typedef void
 (kNIRIOSRVCCall *NiRioSrv_device_fifoWriteFn)(  tRioDeviceHandle hClient,
                                                 tNIRIO_u32       channel,
                                                 tNIRIO_u32*      buf,
-                                                tNIRIO_u32       num,
+                                                tNIRIO_u32       number,
                                                 tNIRIO_u32       timeout,
                                                 tNIRIO_u32*      remaining,
                                                 tRioStatusCode*  status);
@@ -539,11 +560,11 @@ typedef void
 // ---------------------------
 // IRQs:
 
-kNIRIOSRVExportPre 
+kNIRIOSRVExportPre
 void kNIRIOSRVCCall
 NiRioSrv_device_irqReserve(tRioDeviceHandle hClient,
                            void**           context,
-                           tNIRIO_i32*      status) 
+                           tNIRIO_i32*      status)
    kNIRIOSRVExportPost;
 
 typedef void
@@ -555,7 +576,7 @@ kNIRIOSRVExportPre
 void kNIRIOSRVCCall
 NiRioSrv_device_irqUnreserve(tRioDeviceHandle hClient,
                              void**           context,
-                             tNIRIO_i32*      status) 
+                             tNIRIO_i32*      status)
    kNIRIOSRVExportPost;
 
 typedef void
@@ -570,7 +591,7 @@ NiRioSrv_device_irqWait(tRioDeviceHandle hClient,
                         void**           context,
                         tNIRIO_u32       irqs,
                         tNIRIO_i32       timeout,
-                        tNIRIO_i32*      status) 
+                        tNIRIO_i32*      status)
    kNIRIOSRVExportPost;
 
 typedef tNIRIO_u32
@@ -596,7 +617,7 @@ kNIRIOSRVCCall NiRioSrv_host_get32(     const char*         host,
                                         tRioHostAttribute32 attribute,
                                         tRioStatusCode*     status)
 kNIRIOSRVExportPost;
-   
+
 typedef tNIRIO_u32
 (kNIRIOSRVCCall *NiRioSrv_host_get32Fn)(const char*         host,
                                         tRioHostAttribute32 attribute,
@@ -611,18 +632,38 @@ typedef tNIRIO_u32
 // attribute: attribute to set
 // value:     value to set
 //
-kNIRIOSRVExportPre void     
+kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_host_set32(     const char* const   host,
                                         tRioHostAttribute32 attribute,
                                         tNIRIO_u32          value,
                                         tRioStatusCode*     status)
 kNIRIOSRVExportPost;
 
-typedef void     
+typedef void
 (kNIRIOSRVCCall *NiRioSrv_host_set32Fn)(const char* const   host,
                                         tRioHostAttribute32 attribute,
                                         tNIRIO_u32          value,
                                         tRioStatusCode*     status);
+
+//
+// NiRioSrv_host_getString
+//
+// Gets a string attribute from a host.
+//
+// host:      host to query, NULL or empty string for local
+// attribute: attribute to query
+//
+kNIRIOSRVExportPre char*
+kNIRIOSRVCCall NiRioSrv_host_getString( const char*             host,
+                                        tRioHostAttributeString attribute,
+                                        tRioStatusCode*         status)
+kNIRIOSRVExportPost;
+
+typedef char*
+(kNIRIOSRVCCall *NiRioSrv_host_getStringFn)(const char*             host,
+                                            tRioHostAttributeString attribute,
+                                            tRioStatusCode*         status);
+
 
 //
 // NiRioSrv_host_setAliases
@@ -798,7 +839,7 @@ typedef char*
 
 kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_setRecentDevices(const char* host,
-                                         const char* list, 
+                                         const char* list,
                                          tNIRIO_i32* status)
 kNIRIOSRVExportPost;
 
@@ -843,7 +884,7 @@ kNIRIOSRVCCall NiRioSrv_device_configAddFifoInput(
    tNIRIO_u32       depthInSamples,
    tRioStatusCode*  status)
 kNIRIOSRVExportPost;
-   
+
 kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_device_configAddFifoOutput(
    tRioDeviceHandle hClient,
@@ -857,7 +898,7 @@ kNIRIOSRVExportPre tRioDeviceHandle
 kNIRIOSRVCCall NiRioSrv_getDeviceByRsrcString(     const char*     resource,
                                                    tRioStatusCode* status)
 kNIRIOSRVExportPost;
-   
+
 kNIRIOSRVExportPre void
 kNIRIOSRVCCall NiRioSrv_releaseDevice(     tRioDeviceHandle hClient,
                                            tRioStatusCode*  status)

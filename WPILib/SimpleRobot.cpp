@@ -9,28 +9,38 @@
 #include "Timer.h"
 
 SimpleRobot::SimpleRobot()
+	: m_robotMainOverridden (true)
 {
-	m_robotMainOverridden = true;
+}
+
+/**
+ * Disabled should go here.
+ * Users should overload this method to run code that should run while the field is
+ * disabled.
+ */
+void SimpleRobot::Disabled()
+{
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
  * Autonomous should go here.
- * Users should add autonomous code to this method that should run while the field is
+ * Users should overload this method to run code that should run while the field is
  * in the autonomous period.
  */
 void SimpleRobot::Autonomous()
 {
-	printf("Information: Provided Autonomous() method running\n");
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
  * Operator control (tele-operated) code should go here.
- * Users should add Operator Control code to this method that should run while the field is
+ * Users should overload this method to run code that should run while the field is
  * in the Operator Control (tele-operated) period.
  */
 void SimpleRobot::OperatorControl()
 {
-	printf("Information: Provided OperatorControl() method running\n");
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -46,7 +56,6 @@ void SimpleRobot::OperatorControl()
  */
 void SimpleRobot::RobotMain()
 {
-	printf("Information: No user-supplied RobotMain()\n");
 	m_robotMainOverridden = false;
 }
 
@@ -61,21 +70,24 @@ void SimpleRobot::RobotMain()
 void SimpleRobot::StartCompetition()
 {
 	RobotMain();
-	if ( !m_robotMainOverridden)
+	if (!m_robotMainOverridden)
 	{
 		while (1)
 		{
-			while (IsDisabled()) Wait(.01);		// wait for robot to be enabled
-
-			if (IsAutonomous())
+			if (IsDisabled())
 			{
-				Autonomous();					// run the autonomous method
-				while (IsAutonomous() && !IsDisabled()) Wait(.01);
+				Disabled();
+				while (IsDisabled()) Wait(.01);
+			}
+			else if (IsAutonomous())
+			{
+				Autonomous();
+				while (IsAutonomous() && IsEnabled()) Wait(.01);
 			}
 			else
 			{
-				OperatorControl();				// run the operator control method
-				while (IsOperatorControl() && !IsDisabled()) Wait(.01);
+				OperatorControl();
+				while (IsOperatorControl() && IsEnabled()) Wait(.01);
 			}
 		}
 	}

@@ -362,3 +362,61 @@ void DeleteAnalogChannel(UINT32 channel)
 	DeleteAnalogChannel(SensorBase::GetDefaultAnalogModule(), channel);
 }
 
+/**
+ * Alternative C Interface
+ */
+
+AnalogChannelObject CreateAnalogChannel(UINT32 module, UINT32 channel)
+{
+	return (AnalogChannelObject) new AnalogChannel(module, channel);
+}
+
+AnalogChannelObject CreateAnalogChannel(UINT32 channel)
+{
+	return (AnalogChannelObject) new AnalogChannel(channel);
+}
+
+INT16 GetAnalogValue(AnalogChannelObject o)
+{
+	return ((AnalogChannel *)o )->GetValue();
+}
+
+INT32 GetAnalogAverageValue(AnalogChannelObject o)
+{
+	return ((AnalogChannel *)o )->GetAverageValue();
+}
+
+float GetAnalogVoltage(AnalogChannelObject o)
+{
+	return ((AnalogChannel *)o )->GetVoltage();
+}
+
+float GetAnalogAverageVoltage(AnalogChannelObject o)
+{
+	return ((AnalogChannel *)o )->GetAverageVoltage();
+}
+
+void SetAnalogAverageBits(AnalogChannelObject o, UINT32 bits)
+{
+	((AnalogChannel *)o )->SetAverageBits(bits);
+}
+
+UINT32 GetAnalogAverageBits(AnalogChannelObject o)
+{
+	return ((AnalogChannel *)o )->GetAverageBits();
+}
+
+void SetAnalogOversampleBits(AnalogChannelObject o, UINT32 bits)
+{
+	((AnalogChannel *)o )->SetOversampleBits(bits);
+}
+
+UINT32 GetAnalogOversampleBits(AnalogChannelObject o)
+{
+	return ((AnalogChannel *)o )->GetOversampleBits();
+}
+
+void DeleteAnalogChannel(AnalogChannelObject o)
+{
+	delete (AnalogChannel *)o;
+}

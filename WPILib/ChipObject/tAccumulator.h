@@ -1,33 +1,36 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __Accumulator_h__
-#define __Accumulator_h__
+#ifndef __nAD9A5591CC64E4DF756D77D1B57A549E_Accumulator_h__
+#define __nAD9A5591CC64E4DF756D77D1B57A549E_Accumulator_h__
 
-#include "tSystem.h"
+#include "tScopedSystem.h"
 
 namespace nFPGA
 {
-namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D
+namespace nAD9A5591CC64E4DF756D77D1B57A549E
 {
 
-class tAccumulator : public tSystem
+class tAccumulator : public tScopedSystem
 {
 public:
    tAccumulator(unsigned char sys_index, tRioStatusCode *status);
    ~tAccumulator();
 
-   static const unsigned char kNumSystems;
+   inline unsigned char getSystemIndex()
+   {
+      return _SystemIndex;
+   }
 
-   static const unsigned int kOutputAddresses [];
-   static const unsigned int kCenterAddresses [];
-   static const unsigned int kResetAddresses [];
-   static const unsigned int kDeadbandAddresses [];
+   typedef enum
+   {
+      kNumSystems = 2,
+   } tConstants;
 
    typedef
    union{
       struct{
-         unsigned long long Value;
+         signed long long Value;
          unsigned Count : 32;
       };
       struct{
@@ -37,14 +40,46 @@ public:
       };
    } tOutput;
 
+
+   typedef enum
+   {
+      kAccumulator0_OutputAddress = 0x83D0,
+      kAccumulator1_OutputAddress = 0x83C0,
+   } tOutput_Constants;
+   static const unsigned int kOutputAddresses [];
+
    tOutput readOutput(tRioStatusCode *status);
    signed long long readOutput_Value(tRioStatusCode *status);
    unsigned int readOutput_Count(tRioStatusCode *status);
 
+
+   typedef enum
+   {
+      kAccumulator0_CenterAddress = 0x83D8,
+      kAccumulator1_CenterAddress = 0x83C8,
+   } tCenter_Constants;
+   static const unsigned int kCenterAddresses [];
+
    void writeCenter(signed int value, tRioStatusCode *status);
    signed int readCenter(tRioStatusCode *status);
 
+
+   typedef enum
+   {
+      kAccumulator0_ResetAddress = 0x83D4,
+      kAccumulator1_ResetAddress = 0x83C4,
+   } tReset_Constants;
+   static const unsigned int kResetAddresses [];
+
    void strobeReset(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kAccumulator0_DeadbandAddress = 0x83CC,
+      kAccumulator1_DeadbandAddress = 0x83BC,
+   } tDeadband_Constants;
+   static const unsigned int kDeadbandAddresses [];
 
    void writeDeadband(signed int value, tRioStatusCode *status);
    signed int readDeadband(tRioStatusCode *status);
@@ -56,21 +91,9 @@ public:
 private:
    unsigned char _SystemIndex;
 
-
-   #define Accumulator0_Output_ADDRESS 0x83FC
-   #define Accumulator0_Center_ADDRESS 0x8404
-   #define Accumulator0_Reset_ADDRESS 0x8400
-   #define Accumulator0_Deadband_ADDRESS 0x83F8
-
-   #define Accumulator1_Output_ADDRESS 0x83EC
-   #define Accumulator1_Center_ADDRESS 0x83F4
-   #define Accumulator1_Reset_ADDRESS 0x83F0
-   #define Accumulator1_Deadband_ADDRESS 0x83E8
-
-
 };
 
 }
 }
 
-#endif // __Accumulator_h__
+#endif // __nAD9A5591CC64E4DF756D77D1B57A549E_Accumulator_h__

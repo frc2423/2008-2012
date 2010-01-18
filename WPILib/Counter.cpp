@@ -227,14 +227,14 @@ void Counter::ClearUpSource()
 		m_upSource = NULL;
 		m_allocatedUpSource = false;
 	}
-	bool state = m_counter->readEnable(&status);
-	m_counter->writeEnable(false, &status);
+	bool state = m_counter->readConfig_Enable(&status);
+	m_counter->writeConfig_Enable(false, &status);
 	m_counter->writeConfig_UpFallingEdge(false, &status);
 	m_counter->writeConfig_UpRisingEdge(false, &status);
 	// Index 0 of digital is always 0.
 	m_counter->writeConfig_UpSource_Channel(0, &status);
 	m_counter->writeConfig_UpSource_AnalogTrigger(false, &status);
-	m_counter->writeEnable(state, &status);
+	m_counter->writeConfig_Enable(state, &status);
 	wpi_assertCleanStatus(status);
 }
 
@@ -328,14 +328,14 @@ void Counter::ClearDownSource()
 		m_downSource = NULL;
 		m_allocatedDownSource = false;
 	}
-	bool state = m_counter->readEnable(&status);
-	m_counter->writeEnable(false, &status);
+	bool state = m_counter->readConfig_Enable(&status);
+	m_counter->writeConfig_Enable(false, &status);
 	m_counter->writeConfig_DownFallingEdge(false, &status);
 	m_counter->writeConfig_DownRisingEdge(false, &status);
 	// Index 0 of digital is always 0.
 	m_counter->writeConfig_DownSource_Channel(0, &status);
 	m_counter->writeConfig_DownSource_AnalogTrigger(false, &status);
-	m_counter->writeEnable(state, &status);
+	m_counter->writeConfig_Enable(state, &status);
 	wpi_assertCleanStatus(status);
 }
 
@@ -391,7 +391,7 @@ void Counter::SetPulseLengthMode(float threshold)
  */
 void Counter::Start()
 {
-	m_counter->writeEnable(1, &status);
+	m_counter->writeConfig_Enable(1, &status);
 	wpi_assertCleanStatus(status);
 }
 
@@ -424,7 +424,7 @@ void Counter::Reset()
  */
 void Counter::Stop()
 {
-	m_counter->writeEnable(0, &status);
+	m_counter->writeConfig_Enable(0, &status);
 	wpi_assertCleanStatus(status);
 }
 

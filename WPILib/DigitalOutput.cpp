@@ -57,8 +57,7 @@ void DigitalOutput::Set(UINT32 value)
  */
 void DigitalOutput::Pulse(float length)
 {
-	tRioStatusCode localStatus = 0;
-	m_module->Pulse(m_channel, (UINT8)(1e9 * length / (tDIO::readLoopTiming(&localStatus) * 25)));
+	m_module->Pulse(m_channel, length);
 }
 
 /**

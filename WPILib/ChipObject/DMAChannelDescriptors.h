@@ -1,18 +1,19 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __DMAChannelDescriptors_h__
-#define __DMAChannelDescriptors_h__
+#ifndef __nAD9A5591CC64E4DF756D77D1B57A549E_DMAChannelDescriptors_h__
+#define __nAD9A5591CC64E4DF756D77D1B57A549E_DMAChannelDescriptors_h__
 
 #include "tDMAChannelDescriptor.h"
 
-#define DMA_VERSION 1
-#define NUM_DMA_CHANNELS 1
-
 namespace nFPGA
 {
+namespace nAD9A5591CC64E4DF756D77D1B57A549E
+{
 
-static const tDMAChannelDescriptor g_DMAChannelDescriptors[] = 
+   static const int g_DmaVersion = 1;
+   static const int g_NumDmaChannels = 1;
+   static const tDMAChannelDescriptor g_DMAChannelDescriptors[] =
    {
       // "DMA"
       {
@@ -24,5 +25,6 @@ static const tDMAChannelDescriptor g_DMAChannelDescriptors[] =
    };
 
 }
+}
 
-#endif // __DMAChannelDescriptors_h__
+#endif // __nAD9A5591CC64E4DF756D77D1B57A549E_DMAChannelDescriptors_h__

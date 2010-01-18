@@ -7,6 +7,8 @@
 #include "RobotBase.h"
 
 #include "DriverStation.h"
+#include "NetworkCommunication/FRCComm.h"
+#include "NetworkCommunication/symModuleLink.h"
 #include "Utility.h"
 #include <moduleLib.h>
 #include <taskLib.h>
@@ -74,6 +76,15 @@ Watchdog &RobotBase::GetWatchdog()
 }
 
 /**
+ * Determine if the Robot is currently enabled.
+ * @return True if the Robot is currently enabled by the field controls.
+ */
+bool RobotBase::IsEnabled()
+{
+	return m_ds->IsEnabled();
+}
+
+/**
  * Determine if the Robot is currently disabled.
  * @return True if the Robot is currently disabled by the field controls.
  */
@@ -102,20 +113,11 @@ bool RobotBase::IsOperatorControl()
 
 /**
  * Indicates if new data is available from the driver station.
- * @todo The current implementation is silly.  We already know this explicitly without trying to figure it out.
  * @return Has new data arrived over the network since the last time this function was called?
  */
 bool RobotBase::IsNewDataAvailable()
 {
-	static UINT32 previousPacketNumber = 0;
-
-	if (m_ds->GetPacketNumber() == previousPacketNumber)
-	{
-		return false;
-	}
-
-	previousPacketNumber = m_ds->GetPacketNumber();
-	return true;
+	return m_ds->IsNewControlData();
 }
 
 /**
@@ -152,17 +154,23 @@ void RobotBase::startRobotTask(FUNCPTR factory)
 	if (oldId != ERROR)
 	{
 		// Find the startup code module.
-		MODULE_ID startupModId = moduleFindByName("FRC_UserProgram.out");
+		char moduleName[256];
+		moduleNameFindBySymbolName("FRC_UserProgram_StartupLibraryInit", moduleName);
+		MODULE_ID startupModId = moduleFindByName(moduleName);
 		if (startupModId != NULL)
 		{
 			// Remove the startup code.
 			unldByModuleId(startupModId, 0);
-			printf("!!!   Error: Default code was still running... Please try again.\n");
+			printf("!!!   Error: Default code was still running... It was unloaded for you... Please try again.\n");
 			return;
 		}
+		// This case should no longer get hit.
 		printf("!!!   Error: Other robot code is still running... Unload it and then try again.\n");
 		return;
 	}
+
+	// Let the framework know that we are starting a new user program so the Driver Station can disable.
+	FRC_NetworkCommunication_observeUserProgramStarting();
 
 	// Start robot task
 	// This is done to ensure that the C++ robot task is spawned with the floating point

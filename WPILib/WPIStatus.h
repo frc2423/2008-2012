@@ -40,6 +40,10 @@ S(CompressorUndefined, -21, "Using compressor functions without defining compres
 S(InconsistentArrayValueAdded, -22, "When packing data into an array to the dashboard, not all values added were of the same type.");
 S(MismatchedComplexTypeClose, -23, "When packing data to the dashboard, a Close for a complex type was called without a matching Open.");
 S(DashboardDataOverflow, -24, "When packing data to the dashboard, too much data was packed and the buffer overflowed.");
+S(DashboardDataCollision, -25, "The same buffer was used for packing data and for printing.");
+S(EnhancedIOMissing, -26, "IO is not attached or Enhanced IO is not enabled.");
+S(LineNotOutput, -27, "Cannot SetDigitalOutput for a line not configured for output.");
+S(ParameterOutOfRange, -28, "A parameter is out of range.");
 /*
  * Warnings
  */
@@ -53,5 +57,6 @@ S(BadJoystickIndex, 7, "Joystick index is out of range, should be 1-4");
 S(BadJoystickAxis, 8, "Joystick axis is out of range");
 S(InvalidMotorIndex, 9, "Motor index is out of range, should be 0-3");
 S(DriverStationTaskError, 10, "Driver Station task won't start");
+S(EnhancedIOPWMPeriodOutOfRange, 10, "Driver Station Enhanced IO PWM Output period out of range.");
 
 #endif

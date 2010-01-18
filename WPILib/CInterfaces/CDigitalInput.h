@@ -12,5 +12,12 @@ UINT32 GetDigitalInput(UINT32 channel);
 void DeleteDigitalInput(UINT32 slot, UINT32 channel);
 void DeleteDigitalInput(UINT32 channel);
 
+typedef void *DigitalInputObject;
+
+DigitalInputObject CreateDigitalInput(UINT32 slot, UINT32 channel);
+DigitalInputObject CreateDigitalInput(UINT32 channel);
+bool GetDigitalInput(DigitalInputObject o);
+void DeleteDigitalInput(DigitalInputObject o);
+
 #endif
 

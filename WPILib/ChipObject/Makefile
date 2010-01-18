@@ -10,7 +10,10 @@ WIND_HOME := $(subst \,/,$(WIND_HOME))
 WIND_BASE := $(subst \,/,$(WIND_BASE))
 WIND_USR := $(subst \,/,$(WIND_USR))
 
-all : pre_recursion subdirs_all post_recursion pre_build main_all post_build
+all : pre_build main_all post_build
+
+_clean ::
+	@echo "make: removing targets and objects of `pwd`"
 
 TRACE=0
 TRACEON=$(TRACE:0=@)
@@ -22,8 +25,8 @@ BUILD_SPEC = PPC603gnu
 DEBUG_MODE = 1
 SRC_DIR := .
 BUILD_ROOT_DIR := 
-PRJ_ROOT_DIR := C:/WindRiver/workspace/WPILib
-WS_ROOT_DIR := C:/WindRiver/workspace
+PRJ_ROOT_DIR := C:/windriver/workspace/WPILib
+WS_ROOT_DIR := C:/windriver/workspace
 
 ALL_BUILD_SPECS := PPC32diab PPC32gnu PPC32sfdiab PPC32sfgnu \
 	 PPC403diab PPC403gnu PPC405diab PPC405gnu \
@@ -756,7 +759,7 @@ CC_ARCH_SPEC = -mcpu=603 -mstrict-align -mno-implicit-fp -mlongcall
 LIBPATH = 
 LIBS = 
 
-IDE_INCLUDES = -I$(WIND_BASE)/target/h -I$(WIND_BASE)/target/h/wrn/coreip 
+IDE_INCLUDES = -I.. -I$(WIND_BASE)/target/h -I$(WIND_BASE)/target/h/wrn/coreip 
 
 IDE_LIBRARIES = 
 endif
@@ -1564,16 +1567,16 @@ else
 DEBUGFLAGS_C++-Compiler = -O2 -fstrength-reduce -fno-builtin
 endif
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cpp
-	$(TRACE_FLAG) $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL -D'SVN_REV="$(shell svnversion -n .)"' $(DEFINES) -o "$@" -c "$<"
+	$(TRACE_FLAG) $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL -D'SVN_REV="$(shell svnversion -n ..)"' $(DEFINES) -o "$@" -c "$<"
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.C
-	$(TRACE_FLAG) $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL -D'SVN_REV="$(shell svnversion -n .)"' $(DEFINES) -o "$@" -c "$<"
+	$(TRACE_FLAG) $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL -D'SVN_REV="$(shell svnversion -n ..)"' $(DEFINES) -o "$@" -c "$<"
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cxx
-	$(TRACE_FLAG) $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL -D'SVN_REV="$(shell svnversion -n .)"' $(DEFINES) -o "$@" -c "$<"
+	$(TRACE_FLAG) $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL -D'SVN_REV="$(shell svnversion -n ..)"' $(DEFINES) -o "$@" -c "$<"
 
 $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cc
-	$(TRACE_FLAG) $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL -D'SVN_REV="$(shell svnversion -n .)"' $(DEFINES) -o "$@" -c "$<"
+	$(TRACE_FLAG) $(TOOL_PATH)ccppc $(DEBUGFLAGS_C++-Compiler) $(CC_ARCH_SPEC) -ansi -Wall  -MD -MP $(ADDED_C++FLAGS) $(IDE_INCLUDES) $(ADDED_INCLUDES) -DCPU=$(CPU) -DTOOL_FAMILY=$(TOOL_FAMILY) -DTOOL=$(TOOL) -D_WRS_KERNEL -D'SVN_REV="$(shell svnversion -n ..)"' $(DEFINES) -o "$@" -c "$<"
 
 endif
 ifeq ($(BUILD_SPEC),PPC604diab)
@@ -2147,26 +2150,15 @@ endif
 
 
 
+-include $(PRJ_ROOT_DIR)/*.makefile
+
 -include *.makefile
 
-main_all : check_objectdir external_build $(PROJECT_TARGETS)
+main_all : external_build $(PROJECT_TARGETS)
 	@echo "make: built targets of `pwd`"
-
-check_objectdir :
-	@if [ ! -d "$(OBJ_DIR)" ]; then\
-		mkdir -p $(OBJ_DIR);\
-	fi
 
 # entry point for extending the build
 external_build ::
-	@echo ""
-
-# main entry point for pre processing prior to the recursion
-pre_recursion ::
-	@echo ""
-
-# main entry point for post processing after the recursion
-post_recursion ::
 	@echo ""
 
 # main entry point for pre processing prior to the build
@@ -2185,89 +2177,8 @@ post_build :: $(POST_BUILD_STEP) deploy_output
 deploy_output ::
 	@echo ""
 
-# recursive make in SUBDIRS
-subdirs_all :
-	@_PWD=`pwd`;\
-	for dir in _dummy_ $(SUBDIRS); do\
-		if [ "$$dir" = "_dummy_" ]; then\
-			continue ;\
-		fi;\
-		if [ ! -d "$$dir" ]; then\
-			continue ;\
-		fi;\
-		echo "Recursive make: Changing to Directory '$$dir'";\
-		cd "$$dir";\
-		"$(MAKE)" -f "$(MAKEFILE)" $(MFLAGS) all || exit;\
-		echo "Recursive make: Changing back to Directory '$$_PWD'";\
-		cd "$$_PWD";\
-	done
-
-clean ::
-	@_PWD=`pwd`;\
-	for dir in _dummy_ $(SUBDIRS); do\
-		if [ "$$dir" = "_dummy_" ]; then\
-			continue ;\
-		fi;\
-		if [ ! -d "$$dir" ]; then\
-			continue ;\
-		fi;\
-		echo "Recursive make: Changing to Directory '$$dir'";\
-		cd "$$dir";\
-		"$(MAKE)" -f "$(MAKEFILE)" $(MFLAGS) $@ || exit;\
-		echo "Recursive make: Changing back to Directory '$$_PWD'";\
-		cd "$$_PWD";\
-	done
-
 clean :: external_clean $(CLEAN_STEP) _clean
 
 # entry point for extending the build clean
 external_clean ::
 	@echo ""
-
-_clean :
-	@echo "make: removing targets and objects of `pwd`";\
-	rm -f $(OBJECTS) $(PROJECT_TARGETS) $(DEP_FILES) $(wildcard $(OBJ_DIR)/*.unstripped) $(wildcard $(OBJ_DIR)/ctdt.*)
-
-build_all_specs :
-	@echo "building target default for ALL build-specs";\
-	for spec in _dummy_ $(ALL_BUILD_SPECS); do\
-		if [ "$$spec" = "_dummy_" ]; then\
-			continue ;\
-		fi;\
-		echo " ";\
-		echo "building all for build-spec '$$spec'";\
-		"$(MAKE)" -f "$(MAKEFILE)" $(MFLAGS) BUILD_SPEC=$$spec DEBUG_MODE=$(DEBUG_MODE) TRACE=$(TRACE) || exit;\
-	done
-
-clean_all_specs :
-	@echo "building target clean for ALL build-specs";\
-	for spec in _dummy_ $(ALL_BUILD_SPECS); do\
-		if [ "$$spec" = "_dummy_" ]; then\
-			continue ;\
-		fi;\
-		echo " ";\
-		echo "building clean for build-spec '$$spec'";\
-		"$(MAKE)" -f "$(MAKEFILE)" $(MFLAGS) BUILD_SPEC=$$spec DEBUG_MODE=$(DEBUG_MODE) TRACE=$(TRACE) clean || exit;\
-	done
-
-build_enabled_specs :
-	@echo "building target default for ENABLED build-specs";\
-	for spec in _dummy_ $(ENABLED_BUILD_SPECS); do\
-		if [ "$$spec" = "_dummy_" ]; then\
-			continue ;\
-		fi;\
-		echo " ";\
-		echo "building all for build-spec '$$spec'";\
-		"$(MAKE)" -f "$(MAKEFILE)" $(MFLAGS) BUILD_SPEC=$$spec DEBUG_MODE=$(DEBUG_MODE) TRACE=$(TRACE) || exit;\
-	done
-
-clean_enabled_specs :
-	@echo "building target clean for ENABLED build-specs";\
-	for spec in _dummy_ $(ENABLED_BUILD_SPECS); do\
-		if [ "$$spec" = "_dummy_" ]; then\
-			continue ;\
-		fi;\
-		echo " ";\
-		echo "building clean for build-spec '$$spec'";\
-		"$(MAKE)" -f "$(MAKEFILE)" $(MFLAGS) BUILD_SPEC=$$spec DEBUG_MODE=$(DEBUG_MODE) TRACE=$(TRACE) clean || exit;\
-	done

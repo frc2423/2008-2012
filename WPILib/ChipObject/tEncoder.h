@@ -1,30 +1,31 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __Encoder_h__
-#define __Encoder_h__
+#ifndef __nAD9A5591CC64E4DF756D77D1B57A549E_Encoder_h__
+#define __nAD9A5591CC64E4DF756D77D1B57A549E_Encoder_h__
 
-#include "tSystem.h"
+#include "tScopedSystem.h"
 
 namespace nFPGA
 {
-namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D
+namespace nAD9A5591CC64E4DF756D77D1B57A549E
 {
 
-class tEncoder : public tSystem
+class tEncoder : public tScopedSystem
 {
 public:
    tEncoder(unsigned char sys_index, tRioStatusCode *status);
    ~tEncoder();
 
-   static const unsigned char kNumSystems;
+   inline unsigned char getSystemIndex()
+   {
+      return _SystemIndex;
+   }
 
-   static const unsigned int kOutputAddresses [];
-   static const unsigned int kConfigAddresses [];
-   static const unsigned int kResetAddresses [];
-   static const unsigned int kTimerOutputAddresses [];
-   static const unsigned int kEnableAddresses [];
-   static const unsigned int kTimerConfigAddresses [];
+   typedef enum
+   {
+      kNumSystems = 4,
+   } tConstants;
 
    typedef
    union{
@@ -50,9 +51,10 @@ public:
          unsigned IndexSource_AnalogTrigger : 1;
          unsigned IndexActiveHigh : 1;
          unsigned Reverse : 1;
+         unsigned Enable : 1;
       };
       struct{
-         unsigned value : 20;
+         unsigned value : 21;
       };
    } tConfig;
    typedef
@@ -78,9 +80,29 @@ public:
       };
    } tTimerConfig;
 
+
+   typedef enum
+   {
+      kEncoder0_OutputAddress = 0x81DC,
+      kEncoder1_OutputAddress = 0x81C8,
+      kEncoder2_OutputAddress = 0x81B4,
+      kEncoder3_OutputAddress = 0x81A0,
+   } tOutput_Constants;
+   static const unsigned int kOutputAddresses [];
+
    tOutput readOutput(tRioStatusCode *status);
    bool readOutput_Direction(tRioStatusCode *status);
    signed int readOutput_Value(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kEncoder0_ConfigAddress = 0x81E4,
+      kEncoder1_ConfigAddress = 0x81D0,
+      kEncoder2_ConfigAddress = 0x81BC,
+      kEncoder3_ConfigAddress = 0x81A8,
+   } tConfig_Constants;
+   static const unsigned int kConfigAddresses [];
 
    void writeConfig(tConfig value, tRioStatusCode *status);
    void writeConfig_ASource_Channel(unsigned char value, tRioStatusCode *status);
@@ -94,6 +116,7 @@ public:
    void writeConfig_IndexSource_AnalogTrigger(bool value, tRioStatusCode *status);
    void writeConfig_IndexActiveHigh(bool value, tRioStatusCode *status);
    void writeConfig_Reverse(bool value, tRioStatusCode *status);
+   void writeConfig_Enable(bool value, tRioStatusCode *status);
    tConfig readConfig(tRioStatusCode *status);
    unsigned char readConfig_ASource_Channel(tRioStatusCode *status);
    unsigned char readConfig_ASource_Module(tRioStatusCode *status);
@@ -106,16 +129,46 @@ public:
    bool readConfig_IndexSource_AnalogTrigger(tRioStatusCode *status);
    bool readConfig_IndexActiveHigh(tRioStatusCode *status);
    bool readConfig_Reverse(tRioStatusCode *status);
+   bool readConfig_Enable(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kEncoder0_ResetAddress = 0x81E0,
+      kEncoder1_ResetAddress = 0x81CC,
+      kEncoder2_ResetAddress = 0x81B8,
+      kEncoder3_ResetAddress = 0x81A4,
+   } tReset_Constants;
+   static const unsigned int kResetAddresses [];
 
    void strobeReset(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kTimerOutput_Period_FixedPointIntegerShift = 1,
+      kEncoder0_TimerOutputAddress = 0x81D4,
+      kEncoder1_TimerOutputAddress = 0x81C0,
+      kEncoder2_TimerOutputAddress = 0x81AC,
+      kEncoder3_TimerOutputAddress = 0x8198,
+   } tTimerOutput_Constants;
+   static const unsigned int kTimerOutputAddresses [];
 
    tTimerOutput readTimerOutput(tRioStatusCode *status);
    unsigned int readTimerOutput_Period(tRioStatusCode *status);
    unsigned char readTimerOutput_Count(tRioStatusCode *status);
    bool readTimerOutput_Stalled(tRioStatusCode *status);
 
-   void writeEnable(bool value, tRioStatusCode *status);
-   bool readEnable(tRioStatusCode *status);
+
+   typedef enum
+   {
+      kTimerConfig_StallPeriod_FixedPointIntegerShift = 1,
+      kEncoder0_TimerConfigAddress = 0x81D8,
+      kEncoder1_TimerConfigAddress = 0x81C4,
+      kEncoder2_TimerConfigAddress = 0x81B0,
+      kEncoder3_TimerConfigAddress = 0x819C,
+   } tTimerConfig_Constants;
+   static const unsigned int kTimerConfigAddresses [];
 
    void writeTimerConfig(tTimerConfig value, tRioStatusCode *status);
    void writeTimerConfig_StallPeriod(unsigned int value, tRioStatusCode *status);
@@ -133,39 +186,9 @@ public:
 private:
    unsigned char _SystemIndex;
 
-
-   #define Encoder0_Output_ADDRESS 0x81EC
-   #define Encoder0_Config_ADDRESS 0x81F8
-   #define Encoder0_Reset_ADDRESS 0x81F0
-   #define Encoder0_TimerOutput_ADDRESS 0x81E4
-   #define Encoder0_Enable_ADDRESS 0x81F4
-   #define Encoder0_TimerConfig_ADDRESS 0x81E8
-
-   #define Encoder1_Output_ADDRESS 0x81D4
-   #define Encoder1_Config_ADDRESS 0x81E0
-   #define Encoder1_Reset_ADDRESS 0x81D8
-   #define Encoder1_TimerOutput_ADDRESS 0x81CC
-   #define Encoder1_Enable_ADDRESS 0x81DC
-   #define Encoder1_TimerConfig_ADDRESS 0x81D0
-
-   #define Encoder2_Output_ADDRESS 0x81BC
-   #define Encoder2_Config_ADDRESS 0x81C8
-   #define Encoder2_Reset_ADDRESS 0x81C0
-   #define Encoder2_TimerOutput_ADDRESS 0x81B4
-   #define Encoder2_Enable_ADDRESS 0x81C4
-   #define Encoder2_TimerConfig_ADDRESS 0x81B8
-
-   #define Encoder3_Output_ADDRESS 0x81A4
-   #define Encoder3_Config_ADDRESS 0x81B0
-   #define Encoder3_Reset_ADDRESS 0x81A8
-   #define Encoder3_TimerOutput_ADDRESS 0x819C
-   #define Encoder3_Enable_ADDRESS 0x81AC
-   #define Encoder3_TimerConfig_ADDRESS 0x81A0
-
-
 };
 
 }
 }
 
-#endif // __Encoder_h__
+#endif // __nAD9A5591CC64E4DF756D77D1B57A549E_Encoder_h__

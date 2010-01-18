@@ -8,13 +8,13 @@
 
 #define WPI_STATUS_DEFINE_STRINGS
 #include "WPIStatus.h"
-
+#include "NetworkCommunication/FRCComm.h"
 #include "ChipObject.h"
 #include "Task.h"
 #include <dbgLib.h>
 #include <stdio.h>
 #include <sysSymTbl.h>
-
+#include <VisionAPI.h>
 
 #define DBG_DEMANGLE_PRINT_LEN 256  /* Num chars of demangled names to print */
 
@@ -192,20 +192,129 @@ static void wpi_handleTracing()
 /**
  * Assert implementation.
  * This allows breakpoints to be set on an assert.
- * The users don't call this, but instead use the wpi_assert macro in Utility.h.
+ * The users don't call this, but instead use the wpi_assert macros in Utility.h.
  */
-void wpi_assert_impl(bool conditionValue, const char *conditionText, const char *fileName,
-		UINT32 lineNumber, const char *funcName)
+bool wpi_assert_impl(bool conditionValue, 
+					 const char *conditionText,
+					 const char *message,
+					 const char *fileName,
+					 UINT32 lineNumber, 
+					 const char *funcName)
 {
 	if (!conditionValue)
-	{
-		printf("\n\n>>>>Assert \"%s\" failed in %s() in %s at line %d\n",
-				conditionText, funcName, fileName, lineNumber);
+	{   
+		// Error string buffer
+		char error[256];
+				
+		// If an error message was specified, include it
+		// Build error string
+		if(message != NULL) {
+			sprintf(error, "Assertion failed: \"%s\", \"%s\" failed in %s() in %s at line %d\n", 
+							 message, conditionText, funcName, fileName, lineNumber);
+		} else {
+			sprintf(error, "Assertion failed: \"%s\" in %s() in %s at line %d\n", 
+							 conditionText, funcName, fileName, lineNumber);
+		}
+		
+		// Print to console and send to remote dashboard
+		printf("\n\n>>>>%s", error);
+		setErrorData(error, strlen(error), 100);
+		
 		wpi_handleTracing();
 		if (suspendOnAssertEnabled) taskSuspend(0);
 	}
+	return conditionValue;
 }
 
+/**
+ * Common error routines for wpi_assertEqual_impl and wpi_assertNotEqual_impl
+ * This should not be called directly; it should only be used by wpi_assertEqual_impl
+ * and wpi_assertNotEqual_impl.
+ */
+void wpi_assertEqual_common_impl(int valueA,
+					 	         int valueB,
+					 	         const char *equalityType,
+						         const char *message,
+						         const char *fileName,
+						         UINT32 lineNumber, 
+						         const char *funcName)
+{
+	// Error string buffer
+	char error[256];
+			
+	// If an error message was specified, include it
+	// Build error string
+	if(message != NULL) {
+		sprintf(error, "Assertion failed: \"%s\", \"%d\" %s \"%d\" in %s() in %s at line %d\n", 
+						 message, valueA, equalityType, valueB, funcName, fileName, lineNumber);
+	} else {
+		sprintf(error, "Assertion failed: \"%d\" %s \"%d\" in %s() in %s at line %d\n", 
+						 valueA, equalityType, valueB, funcName, fileName, lineNumber);
+	}
+	
+	// Print to console and send to remote dashboard
+	printf("\n\n>>>>%s", error);
+	setErrorData(error, strlen(error), 100);
+	
+	wpi_handleTracing();
+	if (suspendOnAssertEnabled) taskSuspend(0);
+}
+
+/**
+ * Assert equal implementation.
+ * This determines whether the two given integers are equal. If not,
+ * the value of each is printed along with an optional message string.
+ * The users don't call this, but instead use the wpi_assertEqual macros in Utility.h.
+ */
+bool wpi_assertEqual_impl(int valueA,
+					 	  int valueB,
+						  const char *message,
+						  const char *fileName,
+						  UINT32 lineNumber, 
+						  const char *funcName)
+{
+	if(!(valueA == valueB))
+	{
+		wpi_assertEqual_common_impl(valueA, valueB, "!=", message, fileName, lineNumber, funcName);
+	}
+	return valueA == valueB;
+}
+
+/**
+ * Assert not equal implementation.
+ * This determines whether the two given integers are equal. If so,
+ * the value of each is printed along with an optional message string.
+ * The users don't call this, but instead use the wpi_assertNotEqual macros in Utility.h.
+ */
+bool wpi_assertNotEqual_impl(int valueA,
+					 	     int valueB,
+						     const char *message,
+						     const char *fileName,
+						     UINT32 lineNumber, 
+						     const char *funcName)
+{
+	if(!(valueA != valueB))
+	{
+		wpi_assertEqual_common_impl(valueA, valueB, "==", message, fileName, lineNumber, funcName);
+	}
+	return valueA != valueB;
+}
+
+/**
+ * imaq assert implementation.
+ */
+void wpi_imaqAssert_impl(int imaqStatus, const char *message,
+							const char *fileName,
+							UINT32 lineNumber,
+							const char *funcName)
+{
+	if (imaqStatus <= 0)
+	{
+		char err[64];
+		sprintf(err, "%s: %d", message, imaqGetLastError());
+		wpi_assertWithMessage(imaqStatus > 0, err);
+	}
+}
 
 /**
  * Assert status clean implementation.
@@ -217,8 +326,19 @@ void wpi_assertCleanStatus_impl(INT32 status, const char *fileName, UINT32 lineN
 {
 	if (status != 0)
 	{
-		printf("\n\n>>>>%s: status == %d (0x%08X) in %s() in %s at line %d\n",
+		// Error string buffers
+		char error[256];
+		char error_with_code[256];
+		
+		// Build error strings
+		sprintf(error, "%s: status == %d (0x%08X) in %s() in %s at line %d\n",
 				status < 0 ? "ERROR" : "WARNING", status, (UINT32)status, funcName, fileName, lineNumber);
+		sprintf(error_with_code,"<Code>%d %s", status, error);
+		
+		// Print to console and send to remote dashboard
+		printf("\n\n>>>>%s", error);
+		setErrorData(error_with_code, strlen(error_with_code), 100);
+		
 		wpi_handleTracing();
 		if (suspendOnAssertEnabled) taskSuspend(0);
 	}
@@ -227,8 +347,17 @@ void wpi_assertCleanStatus_impl(INT32 status, const char *fileName, UINT32 lineN
 void wpi_fatal_impl(const INT32 statusCode, const char *statusString,
 					const char *fileName, UINT32 lineNumber, const char *funcName)
 {
-	printf("\n\n>>>>Fatal error \"%s\" in %s() in %s at line %d\n",
+	// Error string buffer
+	char error[256];
+
+	// Build error strings
+	sprintf(error, "Fatal error \"%s\" in %s() in %s at line %d\n",
 			statusString, funcName, fileName, lineNumber);
+
+	// Print to console and send to remote dashboard
+	printf("\n\n>>>>%s", error);
+	setErrorData(error, strlen(error), 100);
+
 	wpi_handleTracing();
 }
 
@@ -241,7 +370,8 @@ void wpi_fatal_impl(const INT32 statusCode, const char *statusString,
 UINT16 GetFPGAVersion()
 {
 	tRioStatusCode status = 0;
-	UINT16 version = tGlobal::readVersion(&status); 
+	tGlobal global(&status);
+	UINT16 version = global.readVersion(&status); 
 	wpi_assertCleanStatus(status);
 	return version;
 }
@@ -257,7 +387,8 @@ UINT16 GetFPGAVersion()
 UINT32 GetFPGARevision()
 {
 	tRioStatusCode status = 0;
-	UINT32 revision = tGlobal::readRevision(&status);
+	tGlobal global(&status);
+	UINT32 revision = global.readRevision(&status);
 	wpi_assertCleanStatus(status);
 	return revision;
 }
@@ -265,12 +396,13 @@ UINT32 GetFPGARevision()
 /**
  * Read the microsecond-resolution timer on the FPGA.
  * 
- * @return The current time in seconds according to the FPGA (since FPGA reset).
+ * @return The current time in microseconds according to the FPGA (since FPGA reset).
  */
 UINT32 GetFPGATime()
 {
 	tRioStatusCode status = 0;
-	UINT32 time = tGlobal::readLocalTime(&status);
+	tGlobal global(&status);
+	UINT32 time = global.readLocalTime(&status);
 	wpi_assertCleanStatus(status);
 	return time;
 }
@@ -327,7 +459,8 @@ INT32 ToggleRIOUserLED()
 void SetRIO_FPGA_LED(UINT32 state)
 {
 	tRioStatusCode status = 0;
-	tGlobal::writeFPGA_LED(state, &status);
+	tGlobal global(&status);
+	global.writeFPGA_LED(state, &status);
 }
 
 /**
@@ -337,7 +470,8 @@ void SetRIO_FPGA_LED(UINT32 state)
 INT32 GetRIO_FPGA_LED()
 {
 	tRioStatusCode status = 0;
-	return tGlobal::readFPGA_LED(&status);
+	tGlobal global(&status);
+	return global.readFPGA_LED(&status);
 }
 
 /**

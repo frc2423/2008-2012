@@ -39,7 +39,7 @@ public:
 	UINT16 GetDIO(void);
 	bool GetDIODirection(UINT32 channel);
 	UINT16 GetDIODirection(void);
-	void Pulse(UINT32 channel, UINT8 pulseLength);
+	void Pulse(UINT32 channel, float pulseLength);
 	bool IsPulsing(UINT32 channel);
 	bool IsPulsing();
 

@@ -6,6 +6,7 @@
 
 #include "DriverStation.h"
 #include "AnalogChannel.h"
+#include "Synchronized.h"
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIStatus.h"
@@ -21,17 +22,24 @@ DriverStation* DriverStation::m_instance = NULL;
  */
 DriverStation::DriverStation()
 	: m_controlData (NULL)
-	, m_userControl (NULL)
-	, m_userStatus (NULL)
 	, m_digitalOut (0)
 	, m_batteryChannel (NULL)
+	, m_statusDataSemaphore (semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE))
 	, m_task ("DriverStation", (FUNCPTR)DriverStation::InitTask)
-	, m_dashboard(&m_userStatus)
+	, m_dashboardHigh(m_statusDataSemaphore)
+	, m_dashboardLow(m_statusDataSemaphore)
+	, m_newControlData (false)
+	, m_packetDataAvailableSem (0)
+	, m_enhancedIO()
 {
-	m_controlData = new FRCControlData;
-	m_userControl = new char[USER_CONTROL_DATA_SIZE];
-	m_userStatus = new char[USER_STATUS_DATA_SIZE];
-	bzero(m_userStatus, USER_STATUS_DATA_SIZE);
+	// Create a new semaphore
+	m_packetDataAvailableSem = semBCreate (SEM_Q_PRIORITY, SEM_EMPTY);
+
+	// Register that semaphore with the network communications task.
+	// It will signal when new packet data is available. 
+	setNewDataSem(m_packetDataAvailableSem);
+
+	m_controlData = new FRCCommonControlData;
 
 	// initialize packet number and control words to zero;
 	m_controlData->packetIndex = 0;
@@ -70,11 +78,14 @@ DriverStation::DriverStation()
 
 DriverStation::~DriverStation()
 {
+	m_task.Stop();
+	semDelete(m_statusDataSemaphore);
 	delete m_batteryChannel;
 	delete m_controlData;
-	delete[] m_userControl;
-	delete[] m_userStatus;
 	m_instance = NULL;
+	// Unregister our semaphore.
+	setNewDataSem(0);
+	semDelete(m_packetDataAvailableSem);
 }
 
 void DriverStation::InitTask(DriverStation *ds)
@@ -86,8 +97,10 @@ void DriverStation::Run()
 {
 	while (true)
 	{
+		semTake(m_packetDataAvailableSem, WAIT_FOREVER);
 		SetData();
-		Wait(kUpdatePeriod);
+		m_enhancedIO.UpdateData();
+		GetData();
 	}
 }
 
@@ -110,7 +123,8 @@ DriverStation* DriverStation::GetInstance()
  */
 void DriverStation::GetData()
 {
-	getControlData(m_controlData, m_userControl, WAIT_FOREVER);
+	getCommonControlData(m_controlData, WAIT_FOREVER);
+	m_newControlData = true;
 }
 
 /**
@@ -119,8 +133,19 @@ void DriverStation::GetData()
  */
 void DriverStation::SetData()
 {
-	setStatusData(GetBatteryVoltage(), m_digitalOut, m_userStatus,
-			USER_STATUS_DATA_SIZE, WAIT_FOREVER);
+	UINT8 userStatusUpdateNumber;
+	char *userStatusDataHigh;
+	INT32 userStatusDataHighSize;
+	char *userStatusDataLow;
+	INT32 userStatusDataLowSize;
+
+	Synchronized sync(m_statusDataSemaphore);
+
+	m_dashboardHigh.GetStatusBuffer(&userStatusDataHigh, &userStatusDataHighSize);
+	m_dashboardLow.GetStatusBuffer(&userStatusDataLow, &userStatusDataLowSize);
+	userStatusUpdateNumber = Dashboard::GetUpdateNumber();
+	setStatusData(GetBatteryVoltage(), m_digitalOut, userStatusUpdateNumber,
+		userStatusDataHigh, userStatusDataHighSize, userStatusDataLow, userStatusDataLowSize, WAIT_FOREVER);
 }
 
 /**
@@ -158,7 +183,6 @@ float DriverStation::GetStickAxis(UINT32 stick, UINT32 axis)
 	}
 
 	INT8 value;
-	GetData();
 	switch (stick)
 	{
 		case 1:
@@ -201,7 +225,6 @@ float DriverStation::GetStickAxis(UINT32 stick, UINT32 axis)
 short DriverStation::GetStickButtons(UINT32 stick)
 {
 	wpi_assert ((stick >= 1) && (stick <= 4));
-	GetData();
 	switch (stick)
 	{
 	case 1:
@@ -216,6 +239,9 @@ short DriverStation::GetStickButtons(UINT32 stick)
 	return 0;
 }
 
+// 5V divided by 10 bits
+#define kDSAnalogInScaling ((float)(5.0 / 1023.0))
+
 /**
  * Get an analog voltage from the Driver Station.
  * The analog values are returned as UINT32 values for the Driver Station analog inputs.
@@ -228,19 +254,18 @@ short DriverStation::GetStickButtons(UINT32 stick)
 float DriverStation::GetAnalogIn(UINT32 channel)
 {
 	wpi_assert ((channel >= 1) && (channel <= 4));
-	GetData();
 	switch (channel)
 	{
 	case 1:
-		return m_controlData->analog1;
+		return kDSAnalogInScaling * m_controlData->analog1;
 	case 2:
-		return m_controlData->analog2;
+		return kDSAnalogInScaling * m_controlData->analog2;
 	case 3:
-		return m_controlData->analog3;
+		return kDSAnalogInScaling * m_controlData->analog3;
 	case 4:
-		return m_controlData->analog4;
+		return kDSAnalogInScaling * m_controlData->analog4;
 	}
-	return 0;
+	return 0.0;
 }
 
 /**
@@ -252,7 +277,6 @@ float DriverStation::GetAnalogIn(UINT32 channel)
 bool DriverStation::GetDigitalIn(UINT32 channel)
 {
 	wpi_assert ((channel >= 1) && (channel <= 8));
-	GetData();
 	return ((m_controlData->dsDigitalIn >> (channel-1)) & 0x1) ? true : false;
 }
 
@@ -283,22 +307,45 @@ bool DriverStation::GetDigitalOut(UINT32 channel)
 	return ((m_digitalOut >> (channel-1)) & 0x1) ? true : false;;
 }
 
+bool DriverStation::IsEnabled()
+{
+	return m_controlData->enabled;
+}
+
 bool DriverStation::IsDisabled()
 {
-	GetData();
 	return !m_controlData->enabled;
 }
 
 bool DriverStation::IsAutonomous()
 {
-	GetData();
 	return m_controlData->autonomous;
 }
 
 bool DriverStation::IsOperatorControl()
 {
-	GetData();
 	return !m_controlData->autonomous;
+}
+
+/**
+ * Has a new control packet from the driver station arrived since the last time this function was called?
+ * @return True if the control data has been updated since the last call.
+ */
+bool DriverStation::IsNewControlData()
+{
+	bool newData = m_newControlData;
+	m_newControlData = false;
+	return newData;
+}
+
+/**
+ * Is the driver station attached to a Field Management System?
+ * Note: This does not work with the Blue DS.
+ * @return True if the robot is competing on a field being controlled by a Field Management System
+ */
+bool DriverStation::IsFMSAttached()
+{
+	return m_controlData->fmsAttached;
 }
 
 /**
@@ -308,7 +355,6 @@ bool DriverStation::IsOperatorControl()
  */
 UINT32 DriverStation::GetPacketNumber()
 {
-	GetData();
 	return m_controlData->packetIndex;
 }
 

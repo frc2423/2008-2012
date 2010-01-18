@@ -72,3 +72,22 @@ void DeleteSolenoid(UINT32 channel)
 	}
 }
 
+SolenoidObject CreateSolenoid(UINT32 channel)
+{
+	return (SolenoidObject) new Solenoid(channel);
+}
+
+void DeleteSolenoid(SolenoidObject o)
+{
+	delete (Solenoid *) o;
+}
+
+void SetSolenoid(SolenoidObject o, bool on)
+{
+	((Solenoid *)o)->Set(on);
+}
+
+bool GetSolenoid(SolenoidObject o)
+{
+	return ((Solenoid *)o)->Get();
+}

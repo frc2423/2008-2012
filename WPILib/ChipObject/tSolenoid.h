@@ -1,42 +1,49 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __Solenoid_h__
-#define __Solenoid_h__
+#ifndef __nAD9A5591CC64E4DF756D77D1B57A549E_Solenoid_h__
+#define __nAD9A5591CC64E4DF756D77D1B57A549E_Solenoid_h__
 
-#include "tSystem.h"
+#include "tScopedSystem.h"
 
 namespace nFPGA
 {
-namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D
+namespace nAD9A5591CC64E4DF756D77D1B57A549E
 {
 
-class tSolenoid : public tSystem
+class tSolenoid : public tScopedSystem
 {
 public:
    tSolenoid(tRioStatusCode *status);
    ~tSolenoid();
 
-   static const unsigned char kNumSystems;
+   typedef enum
+   {
+      kNumSystems = 1,
+   } tConstants;
 
 
 
 
-   static void writeDO7_0(unsigned char value, tRioStatusCode *status);
-   static unsigned char readDO7_0(tRioStatusCode *status);
+   typedef enum
+   {
+      kNumDO7_0Elements = 2,
+      kDO7_0_ElementSize = 8,
+      kDO7_0_ElementMask = 0xFF,
+      kSolenoid_DO7_0Address = 0x8410,
+   } tDO7_0_Constants;
+
+   void writeDO7_0(unsigned char bitfield_index, unsigned char value, tRioStatusCode *status);
+   unsigned char readDO7_0(unsigned char bitfield_index, tRioStatusCode *status);
 
 
 
 
 private:
-   unsigned char _SystemIndex;
-
-   #define Solenoid_DO7_0_ADDRESS 0x84C0
-
 
 };
 
 }
 }
 
-#endif // __Solenoid_h__
+#endif // __nAD9A5591CC64E4DF756D77D1B57A549E_Solenoid_h__

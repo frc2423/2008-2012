@@ -22,5 +22,17 @@ float GetServoMinAngle(UINT32 channel);
 void DeleteServo(UINT32 slot, UINT32 channel);
 void DeleteServo(UINT32 channel);
 
+typedef void *ServoObject;
+
+ServoObject CreateServo(UINT32 slot, UINT32 channel);
+ServoObject CreateServo(UINT32 channel);
+void SetServo(ServoObject o, float value);
+float GetGetServo(ServoObject o);
+void SetServoAngle(ServoObject o, float angle);
+float GetServoAngle(ServoObject o);
+float GetServoMaxAngle(ServoObject o);
+float GetServoMinAngle(ServoObject o);
+void DeleteServo(ServoObject o);
+
 #endif
 

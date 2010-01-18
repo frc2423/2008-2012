@@ -23,4 +23,14 @@ void ResetGearTooth(UINT32 slot, UINT32 channel);
 void DeleteGearTooth(UINT32 channel);
 void DeleteGearTooth(UINT32 slot, UINT32 channel);
 
+typedef void *GearToothObject;
+
+GearToothObject CreateGearTooth(UINT32 channel, bool directionSensitive = true);
+GearToothObject CreateGearTooth(UINT32 slot, UINT32 channel, bool directionSensitive = true);
+void StartGearTooth(GearToothObject o);
+void StopGearTooth(GearToothObject o);
+INT32 GetGearTooth(GearToothObject o);
+void ResetGearTooth(GearToothObject o);
+void DeleteGearTooth(GearToothObject o);
+
 #endif

@@ -28,8 +28,8 @@
  * 
  * Periodic() functions -- each of these functions is called iteratively at the
  *                         appropriate periodic rate (aka the "slow loop").  The default period of
- *                         the iterative robot is 0.005 seconds, giving a periodic frequency
- *                         of 200Hz (200 times per second).
+ *                         the iterative robot is synced to the driver station control packets,
+ *                         giving a periodic frequency of about 50Hz (50 times per second).
  *   - DisabledPeriodic()
  *   - AutonomousPeriodic()
  *   - TeleopPeriodic()
@@ -44,7 +44,13 @@
 
 class IterativeRobot : public RobotBase {
 public:
-	static const double kDefaultPeriod = 2e-2;	/** default period for periodic functions **/
+	/*
+	 * The default period for the periodic function calls (seconds)
+	 * Setting the period to 0.0 will cause the periodic functions to follow
+	 * the Driver Station packet rate of about 50Hz.
+	 */
+	static const double kDefaultPeriod = 0.0;
+
 	virtual void StartCompetition();
 
 	virtual void RobotInit();
@@ -61,6 +67,7 @@ public:
 	virtual void TeleopContinuous();
 
 	void SetPeriod(double period);
+	double GetPeriod();
 	double GetLoopsPerSec();
 
 protected:
@@ -73,12 +80,8 @@ private:
 	bool m_disabledInitialized;
 	bool m_autonomousInitialized;
 	bool m_teleopInitialized;
-	UINT32 m_disabledLoops;
-	UINT32 m_autonomousLoops;
-	UINT32 m_teleopLoops;
 	double m_period;
-	
-	SEM_ID m_packetDataAvailableSem;
+	Timer m_mainLoopTimer;
 };
 
 #endif

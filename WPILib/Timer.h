@@ -13,7 +13,7 @@
 typedef void (*TimerInterruptHandler)(void *param);
 
 void Wait(double seconds);
-double GetClock();
+double GetClock(void);
 double GetTime(void);
 
 
@@ -33,6 +33,7 @@ public:
 	void Reset();
 	void Start();
 	void Stop();
+	bool HasPeriodPassed(double period);
 
 private:
 	double m_startTime;

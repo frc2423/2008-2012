@@ -41,6 +41,8 @@ public:
 	UINT32 Read(char *buffer, INT32 count);
 	UINT32 Write(const char *buffer, INT32 count);
 	void SetTimeout(float timeout);
+	void SetReadBufferSize(UINT32 size);
+	void SetWriteBufferSize(UINT32 size);
 	void SetWriteBufferMode(WriteBufferMode mode);
 	void Flush();
 	void Reset();
@@ -52,6 +54,7 @@ public:
 private:
 	UINT32 m_resourceManagerHandle;
 	UINT32 m_portHandle;
+	bool m_consoleModeEnabled;
 	DISALLOW_COPY_AND_ASSIGN(SerialPort);
 };
 

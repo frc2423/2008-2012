@@ -46,10 +46,12 @@ public:
 
 	void Printf(const char *writeFmt, ...);
 
-	INT32 Finalize(void);	
+	INT32 Finalize(void);
 private:
-	Dashboard(char **userStatus);
+	Dashboard(SEM_ID statusDataSemaphore);
 	virtual ~Dashboard();
+	static UINT8 GetUpdateNumber(void) {return m_updateNumber;}
+	void GetStatusBuffer(char **userStatusData, INT32* userStatusDataSize);
 
 	static const INT32 kMaxDashboardDataSize = USER_STATUS_DATA_SIZE - sizeof(UINT32) * 3 - sizeof(UINT8); // 13 bytes needed for 3 size parameters and the sequence number
 
@@ -60,7 +62,8 @@ private:
 	void AddedElement(Type type);
 	bool IsArrayRoot(void);
 
-	char **m_userStatus;
+	char *m_userStatusData;
+	INT32 m_userStatusDataSize;
 	char *m_localBuffer;
 	char *m_localPrintBuffer;
 	char *m_packPtr;
@@ -69,7 +72,8 @@ private:
 	std::vector<INT32*> m_arraySizePtr;
 	std::stack<ComplexType> m_complexTypeStack;
 	SEM_ID m_printSemaphore;
-	UINT8 m_sequence;
+	SEM_ID m_statusDataSemaphore;
+	static UINT8 m_updateNumber;
 };
 
 #endif

@@ -23,6 +23,8 @@
 #include "DigitalOutput.h"
 #include "DigitalSource.h"
 #include "DriverStation.h"
+#include "DriverStationEnhancedIO.h"
+#include "DriverStationLCD.h"
 #include "Encoder.h"
 #include "ErrorBase.h"
 #include "GearTooth.h"

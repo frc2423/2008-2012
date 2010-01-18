@@ -151,3 +151,52 @@ void SetRelay(UINT32 channel, RelayValue value)
 {
 	SetRelay(SensorBase::GetDefaultDigitalModule(), channel, value);
 }
+
+
+/**
+ * Alternate C Interface
+ */
+
+RelayObject CreateRelay(UINT32 slot, UINT32 channel, RelayDirection direction)
+{
+	switch (direction)
+	{
+	case kForwardOnly:
+		return new Relay(slot, channel, Relay::kForwardOnly);
+	case kReverseOnly:
+		return new Relay(slot, channel, Relay::kReverseOnly);
+	case kBothDirections:
+	default:
+		return new Relay(slot, channel, Relay::kBothDirections);
+	}
+}
+
+RelayObject CreateRelay(UINT32 channel, RelayDirection direction)
+{
+	switch (direction)
+	{
+	case kForwardOnly:
+		return new Relay(channel, Relay::kForwardOnly);
+	case kReverseOnly:
+		return new Relay(channel, Relay::kReverseOnly);
+	case kBothDirections:
+	default:
+		return new Relay(channel, Relay::kBothDirections);
+	}
+}
+
+void SetRelay(RelayObject o, RelayValue value)
+{
+	switch (value)
+	{
+		case kOff: ((Relay *)o )->Set(Relay::kOff); break;
+		case kOn: ((Relay *)o )->Set(Relay::kOn); break;
+		case kForward: ((Relay *)o )->Set(Relay::kForward); break;
+		case kReverse: ((Relay *)o )->Set(Relay::kReverse); break;
+	}
+}
+
+void DeleteRelay(RelayObject o)
+{
+	delete (Relay *) o;
+}

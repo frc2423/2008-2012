@@ -4,8 +4,8 @@
 /* must be accompanied by the FIRST BSD license file in $(WIND_BASE)/WPILib.  */
 /*----------------------------------------------------------------------------*/
 
+#include "DriverStation.h"
 #include "IterativeRobot.h"
-#include "NetworkCommunication/FRCComm.h"
 #include "Utility.h"
 
 /**
@@ -15,31 +15,11 @@
  * the status of initialization for disabled, autonomous, and teleop code.
  */
 IterativeRobot::IterativeRobot()
-	: m_packetDataAvailableSem (0)
+	: m_disabledInitialized (false)
+	, m_autonomousInitialized (false)
+	, m_teleopInitialized (false)
+	, m_period (kDefaultPeriod)
 {
-	printf("RobotIterativeBase Constructor Start\n");
-	// set status for initialization of disabled, autonomous, and teleop code.
-	m_disabledInitialized = false;
-	m_autonomousInitialized = false;
-	m_teleopInitialized = false;
-
-	// keep track of the number of continuous loops performed per period
-	m_disabledLoops = 0;
-	m_autonomousLoops = 0;
-	m_teleopLoops = 0;
-
-	// Create a new semaphore
-	m_packetDataAvailableSem = semBCreate (SEM_Q_PRIORITY, SEM_EMPTY);
-
-	// Register that semaphore with the network communications task.
-	// It will signal when new packet data is available. 
-	setNewDataSem(m_packetDataAvailableSem);
-
-	m_period = kDefaultPeriod;
-
-	// Start the timer for the main loop
-
-	printf("RobotIterativeBase Constructor Finish\n");
 }
 
 /**
@@ -47,25 +27,42 @@ IterativeRobot::IterativeRobot()
  */
 IterativeRobot::~IterativeRobot()
 {
-	// Unregister our semaphore.
-	setNewDataSem(0);
 }
 
 /**
  * Set the period for the periodic functions.
  * 
- * @deprecated The periodic functions are now synchronized with the receipt of packets from the Driver Station.
+ * @param period The period of the periodic function calls.  0.0 means sync to driver station control data.
  */
 void IterativeRobot::SetPeriod(double period)
 {
-	wpi_assert(false);
+	if (period != 0.0)
+	{
+		// Not syncing with the DS, so start the timer for the main loop
+		m_mainLoopTimer.Reset();
+		m_mainLoopTimer.Start();
+	}
+	else
+	{
+		// Syncing with the DS, don't need the timer
+		m_mainLoopTimer.Stop();
+	}
+	m_period = period;
+}
+
+/**
+ * Get the period for the periodic functions.
+ * Returns 0.0 if configured to syncronize with DS control data packets.
+ * @return Period of the periodic function calls
+ */
+double IterativeRobot::GetPeriod()
+{
+	return m_period;
 }
 
 /**
  * Get the number of loops per second for the IterativeRobot
- * 
- * Get the number of loops per second for the IterativeRobot.  The default period of
- * 0.005 seconds results in 200 loops per second.  (200Hz iteration loop).
+ * @return Frequency of the periodic function calls
  */
 double IterativeRobot::GetLoopsPerSec()
 {
@@ -82,8 +79,6 @@ double IterativeRobot::GetLoopsPerSec()
  */
 void IterativeRobot::StartCompetition()
 {
-	printf("RobotIterativeBase StartCompetition() Commenced\n");
-	
 	// first and one-time initialization
 	RobotInit();
 	
@@ -102,7 +97,6 @@ void IterativeRobot::StartCompetition()
 				// reset the initialization flags for the other modes
 				m_autonomousInitialized = false;
 				m_teleopInitialized = false;
-				printf("Disabled_Init() completed\n");
 			}
 			if (NextPeriodReady())
 			{
@@ -116,15 +110,11 @@ void IterativeRobot::StartCompetition()
 			// either a different mode or from power-on
 			if(!m_autonomousInitialized)
 			{
-				// KBS NOTE:  old code reset all PWMs and relays to "safe values"
-				// whenever entering autonomous mode, before calling
-				// "Autonomous_Init()"
 				AutonomousInit();
 				m_autonomousInitialized = true;
 				// reset the initialization flags for the other modes
 				m_disabledInitialized = false;
 				m_teleopInitialized = false;
-				printf("Autonomous_Init() completed\n");
 			}
 			if (NextPeriodReady())
 			{
@@ -143,7 +133,6 @@ void IterativeRobot::StartCompetition()
 				// reset the initialization flags for the other modes
 				m_disabledInitialized = false;
 				m_autonomousInitialized = false;
-				printf("Teleop_Init() completed\n");
 			}
 			if (NextPeriodReady())
 			{
@@ -152,26 +141,28 @@ void IterativeRobot::StartCompetition()
 			TeleopContinuous();
 		}
 	}	
-	printf("RobotIterativeBase StartCompetition() Ended\n");
 }
 
 /**
- * Determine if the appropriate next periodic function should be called.
- * 
- * This function makes adjust for lateness in the cycle by keeping track of how late
- * it was and crediting the next period with that amount.
+ * Determine if the periodic functions should be called.
+ *
+ * If m_period > 0.0, call the periodic function every m_period as compared
+ * to Timer.Get().  If m_period == 0.0, call the periodic functions whenever
+ * a packet is received from the Driver Station, or about every 20ms.
+ *
+ * @todo Decide what this should do if it slips more than one cycle.
  */
-//TODO: decide what this should do if it slips more than one cycle.
 
 bool IterativeRobot::NextPeriodReady()
 {
-	int success = semTake(m_packetDataAvailableSem, 0);
-
-	if(success == OK)
+	if (m_period > 0.0)
 	{
-		return true;
+		return m_mainLoopTimer.HasPeriodPassed(m_period);
 	}
-	return false;
+	else
+	{
+		return m_ds->IsNewControlData();
+	}
 }
 
 /**
@@ -182,7 +173,7 @@ bool IterativeRobot::NextPeriodReady()
  */
 void IterativeRobot::RobotInit()
 {
-	printf("Default RobotIterativeBase::RobotInit() method running\n");
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -193,7 +184,7 @@ void IterativeRobot::RobotInit()
  */
 void IterativeRobot::DisabledInit()
 {
-	printf("Default RobotIterativeBase::DisabledInit() method running\n");
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -204,7 +195,7 @@ void IterativeRobot::DisabledInit()
  */
 void IterativeRobot::AutonomousInit()
 {
-	printf("Default RobotIterativeBase::AutonomousInit() method running\n");
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -215,7 +206,7 @@ void IterativeRobot::AutonomousInit()
  */
 void IterativeRobot::TeleopInit()
 {
-	printf("Default RobotIterativeBase::TeleopInit() method running\n");
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -226,8 +217,7 @@ void IterativeRobot::TeleopInit()
  */
 void IterativeRobot::DisabledPeriodic()
 {
-	printf("D - %d\n", m_disabledLoops);
-	m_disabledLoops = 0;
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -238,8 +228,7 @@ void IterativeRobot::DisabledPeriodic()
  */
 void IterativeRobot::AutonomousPeriodic()
 {
-	printf("A - %d\n", m_autonomousLoops);
-	m_autonomousLoops = 0;
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -250,11 +239,8 @@ void IterativeRobot::AutonomousPeriodic()
  */
 void IterativeRobot::TeleopPeriodic()
 {
-	printf("T - %d", m_teleopLoops);
-	m_teleopLoops = 0;
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
-
-	
 
 /**
  * Continuous code for disabled mode should go here.
@@ -264,7 +250,7 @@ void IterativeRobot::TeleopPeriodic()
  */
 void IterativeRobot::DisabledContinuous()
 {
-  m_disabledLoops++;
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -275,7 +261,7 @@ void IterativeRobot::DisabledContinuous()
  */
 void IterativeRobot::AutonomousContinuous()
 {
-  m_autonomousLoops++;
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 
 /**
@@ -286,6 +272,6 @@ void IterativeRobot::AutonomousContinuous()
  */
 void IterativeRobot::TeleopContinuous()
 {
-  m_teleopLoops++;
+	printf("Default %s() method... Overload me!\n", __FUNCTION__);
 }
 

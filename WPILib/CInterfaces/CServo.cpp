@@ -8,7 +8,7 @@
 #include "CServo.h"
 #include "CPWM.h"
 
-static SensorBase *CreateServo(UINT32 slot, UINT32 channel)
+static SensorBase *CreateServoStatic(UINT32 slot, UINT32 channel)
 {
 	return new Servo(slot, channel);
 }
@@ -24,7 +24,7 @@ static SensorBase *CreateServo(UINT32 slot, UINT32 channel)
  */
 void SetServo(UINT32 slot, UINT32 channel, float value)
 {
-	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServoStatic);
 	servo->Set(value);
 }
 
@@ -39,7 +39,7 @@ void SetServo(UINT32 slot, UINT32 channel, float value)
  */
 float GetGetServo(UINT32 slot, UINT32 channel)
 {
-	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServoStatic);
 	return servo->Get();
 }
 
@@ -58,7 +58,7 @@ float GetGetServo(UINT32 slot, UINT32 channel)
  */
 void SetServoAngle(UINT32 slot, UINT32 channel, float angle)
 {
-	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServoStatic);
 	servo->SetAngle(angle);
 }
 
@@ -73,7 +73,7 @@ void SetServoAngle(UINT32 slot, UINT32 channel, float angle)
  */
 float GetServoAngle(UINT32 slot, UINT32 channel)
 {
-	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServoStatic);
 	return servo->GetAngle();
 }
 
@@ -85,7 +85,7 @@ float GetServoAngle(UINT32 slot, UINT32 channel)
  */
 float GetServoMaxAngle(UINT32 slot, UINT32 channel)
 {
-	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServoStatic);
 	return servo->GetMaxAngle();
 }
 
@@ -97,7 +97,7 @@ float GetServoMaxAngle(UINT32 slot, UINT32 channel)
  */
 float GetServoMinAngle(UINT32 slot, UINT32 channel)
 {
-	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServoStatic);
 	return servo->GetMinAngle();
 }
 
@@ -111,7 +111,7 @@ float GetServoMinAngle(UINT32 slot, UINT32 channel)
  */
 void SetServo(UINT32 channel, float value)
 {
-	Servo *servo = (Servo *) AllocatePWM(channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(channel, CreateServoStatic);
 	servo->Set(value);
 }
 
@@ -125,7 +125,7 @@ void SetServo(UINT32 channel, float value)
  */
 float GetServo(UINT32 channel)
 {
-	Servo *servo = (Servo *) AllocatePWM(channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(channel, CreateServoStatic);
 	return servo->Get();
 }
 
@@ -143,7 +143,7 @@ float GetServo(UINT32 channel)
  */
 void SetServoAngle(UINT32 channel, float angle)
 {
-	Servo *servo = (Servo *) AllocatePWM(channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(channel, CreateServoStatic);
 	servo->SetAngle(angle);
 }
 
@@ -157,7 +157,7 @@ void SetServoAngle(UINT32 channel, float angle)
  */
 float GetServoAngle(UINT32 channel)
 {
-	Servo *servo = (Servo *) AllocatePWM(channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(channel, CreateServoStatic);
 	return servo->GetAngle();
 }
 
@@ -168,7 +168,7 @@ float GetServoAngle(UINT32 channel)
  */
 float GetServoMaxAngle(UINT32 channel)
 {
-	Servo *servo = (Servo *) AllocatePWM(channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(channel, CreateServoStatic);
 	return servo->GetMaxAngle();
 }
 
@@ -179,7 +179,7 @@ float GetServoMaxAngle(UINT32 channel)
  */
 float GetServoMinAngle(UINT32 channel)
 {
-	Servo *servo = (Servo *) AllocatePWM(channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(channel, CreateServoStatic);
 	return servo->GetMinAngle();
 }
 
@@ -192,7 +192,7 @@ float GetServoMinAngle(UINT32 channel)
  */
 void DeleteServo(UINT32 slot, UINT32 channel)
 {
-	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServo);
+	Servo *servo = (Servo *) AllocatePWM(slot, channel, CreateServoStatic);
 	DeletePWM(slot, channel);
 	delete servo;
 }
@@ -207,3 +207,50 @@ void DeleteServo(UINT32 channel)
 {
 	DeleteServo(SensorBase::GetDefaultDigitalModule(), channel);
 }
+
+ServoObject CreateServo(UINT32 slot, UINT32 channel)
+{
+	return (ServoObject) new Servo(slot, channel);
+}
+
+ServoObject CreateServo(UINT32 channel)
+{
+	return (ServoObject) new Servo(channel);
+}
+
+void SetServo(ServoObject o, float value)
+{
+	((Servo *)o)->Set(value);
+}
+
+float GetGetServo(ServoObject o)
+{
+	return ((Servo *)o)->Get();
+}
+
+void SetServoAngle(ServoObject o, float angle)
+{
+	((Servo *)o)->SetAngle(angle);
+}
+
+float GetServoAngle(ServoObject o)
+{
+	return ((Servo *)o)->GetAngle();
+}
+
+float GetServoMaxAngle(ServoObject o)
+{
+	return ((Servo *)o)->GetMaxAngle();
+}
+
+float GetServoMinAngle(ServoObject o)
+{
+	return ((Servo *)o)->GetMinAngle();
+}
+
+void DeleteServo(ServoObject o)
+{
+	delete (Servo *)o;
+}
+
+

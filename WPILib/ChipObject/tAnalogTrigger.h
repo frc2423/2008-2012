@@ -1,27 +1,31 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __AnalogTrigger_h__
-#define __AnalogTrigger_h__
+#ifndef __nAD9A5591CC64E4DF756D77D1B57A549E_AnalogTrigger_h__
+#define __nAD9A5591CC64E4DF756D77D1B57A549E_AnalogTrigger_h__
 
-#include "tSystem.h"
+#include "tScopedSystem.h"
 
 namespace nFPGA
 {
-namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D
+namespace nAD9A5591CC64E4DF756D77D1B57A549E
 {
 
-class tAnalogTrigger : public tSystem
+class tAnalogTrigger : public tScopedSystem
 {
 public:
    tAnalogTrigger(unsigned char sys_index, tRioStatusCode *status);
    ~tAnalogTrigger();
 
-   static const unsigned char kNumSystems;
+   inline unsigned char getSystemIndex()
+   {
+      return _SystemIndex;
+   }
 
-   static const unsigned int kSourceSelectAddresses [];
-   static const unsigned int kUpperLimitAddresses [];
-   static const unsigned int kLowerLimitAddresses [];
+   typedef enum
+   {
+      kNumSystems = 8,
+   } tConstants;
 
    typedef
    union{
@@ -50,6 +54,21 @@ public:
       };
    } tSourceSelect;
 
+
+   typedef enum
+   {
+      kSourceSelect_RolloverLimit_FixedPointIntegerShift = 4,
+      kAnalogTrigger0_SourceSelectAddress = 0x83B4,
+      kAnalogTrigger1_SourceSelectAddress = 0x83A8,
+      kAnalogTrigger2_SourceSelectAddress = 0x839C,
+      kAnalogTrigger3_SourceSelectAddress = 0x8390,
+      kAnalogTrigger4_SourceSelectAddress = 0x8384,
+      kAnalogTrigger5_SourceSelectAddress = 0x8378,
+      kAnalogTrigger6_SourceSelectAddress = 0x836C,
+      kAnalogTrigger7_SourceSelectAddress = 0x8360,
+   } tSourceSelect_Constants;
+   static const unsigned int kSourceSelectAddresses [];
+
    void writeSourceSelect(tSourceSelect value, tRioStatusCode *status);
    void writeSourceSelect_Channel(unsigned char value, tRioStatusCode *status);
    void writeSourceSelect_Module(unsigned char value, tRioStatusCode *status);
@@ -65,19 +84,55 @@ public:
    bool readSourceSelect_FloatingRollover(tRioStatusCode *status);
    signed short readSourceSelect_RolloverLimit(tRioStatusCode *status);
 
+
+   typedef enum
+   {
+      kAnalogTrigger0_UpperLimitAddress = 0x83B0,
+      kAnalogTrigger1_UpperLimitAddress = 0x83A4,
+      kAnalogTrigger2_UpperLimitAddress = 0x8398,
+      kAnalogTrigger3_UpperLimitAddress = 0x838C,
+      kAnalogTrigger4_UpperLimitAddress = 0x8380,
+      kAnalogTrigger5_UpperLimitAddress = 0x8368,
+      kAnalogTrigger6_UpperLimitAddress = 0x8374,
+      kAnalogTrigger7_UpperLimitAddress = 0x835C,
+   } tUpperLimit_Constants;
+   static const unsigned int kUpperLimitAddresses [];
+
    void writeUpperLimit(signed int value, tRioStatusCode *status);
    signed int readUpperLimit(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kAnalogTrigger0_LowerLimitAddress = 0x83AC,
+      kAnalogTrigger1_LowerLimitAddress = 0x83A0,
+      kAnalogTrigger2_LowerLimitAddress = 0x8394,
+      kAnalogTrigger3_LowerLimitAddress = 0x8388,
+      kAnalogTrigger4_LowerLimitAddress = 0x837C,
+      kAnalogTrigger5_LowerLimitAddress = 0x8364,
+      kAnalogTrigger6_LowerLimitAddress = 0x8370,
+      kAnalogTrigger7_LowerLimitAddress = 0x8358,
+   } tLowerLimit_Constants;
+   static const unsigned int kLowerLimitAddresses [];
 
    void writeLowerLimit(signed int value, tRioStatusCode *status);
    signed int readLowerLimit(tRioStatusCode *status);
 
 
-   static const unsigned char kNumOutputElements;
-   static tOutput readOutput(unsigned char bitfield_index, tRioStatusCode *status);
-   static bool readOutput_InHysteresis(unsigned char bitfield_index, tRioStatusCode *status);
-   static bool readOutput_OverLimit(unsigned char bitfield_index, tRioStatusCode *status);
-   static bool readOutput_Rising(unsigned char bitfield_index, tRioStatusCode *status);
-   static bool readOutput_Falling(unsigned char bitfield_index, tRioStatusCode *status);
+
+   typedef enum
+   {
+      kNumOutputElements = 8,
+      kOutput_ElementSize = 4,
+      kOutput_ElementMask = 0xF,
+      kAnalogTrigger_OutputAddress = 0x83B8,
+   } tOutput_Constants;
+
+   tOutput readOutput(unsigned char bitfield_index, tRioStatusCode *status);
+   bool readOutput_InHysteresis(unsigned char bitfield_index, tRioStatusCode *status);
+   bool readOutput_OverLimit(unsigned char bitfield_index, tRioStatusCode *status);
+   bool readOutput_Rising(unsigned char bitfield_index, tRioStatusCode *status);
+   bool readOutput_Falling(unsigned char bitfield_index, tRioStatusCode *status);
 
 
 
@@ -85,44 +140,9 @@ public:
 private:
    unsigned char _SystemIndex;
 
-   #define AnalogTrigger_Output_ADDRESS 0x83E4
-
-   #define AnalogTrigger0_SourceSelect_ADDRESS 0x83E0
-   #define AnalogTrigger0_UpperLimit_ADDRESS 0x83DC
-   #define AnalogTrigger0_LowerLimit_ADDRESS 0x83D8
-
-   #define AnalogTrigger1_SourceSelect_ADDRESS 0x83D4
-   #define AnalogTrigger1_UpperLimit_ADDRESS 0x83D0
-   #define AnalogTrigger1_LowerLimit_ADDRESS 0x83CC
-
-   #define AnalogTrigger2_SourceSelect_ADDRESS 0x83C8
-   #define AnalogTrigger2_UpperLimit_ADDRESS 0x83C4
-   #define AnalogTrigger2_LowerLimit_ADDRESS 0x83C0
-
-   #define AnalogTrigger3_SourceSelect_ADDRESS 0x83BC
-   #define AnalogTrigger3_UpperLimit_ADDRESS 0x83B8
-   #define AnalogTrigger3_LowerLimit_ADDRESS 0x83B4
-
-   #define AnalogTrigger4_SourceSelect_ADDRESS 0x83B0
-   #define AnalogTrigger4_UpperLimit_ADDRESS 0x83AC
-   #define AnalogTrigger4_LowerLimit_ADDRESS 0x83A8
-
-   #define AnalogTrigger5_SourceSelect_ADDRESS 0x83A4
-   #define AnalogTrigger5_UpperLimit_ADDRESS 0x8394
-   #define AnalogTrigger5_LowerLimit_ADDRESS 0x8390
-
-   #define AnalogTrigger6_SourceSelect_ADDRESS 0x8398
-   #define AnalogTrigger6_UpperLimit_ADDRESS 0x83A0
-   #define AnalogTrigger6_LowerLimit_ADDRESS 0x839C
-
-   #define AnalogTrigger7_SourceSelect_ADDRESS 0x838C
-   #define AnalogTrigger7_UpperLimit_ADDRESS 0x8388
-   #define AnalogTrigger7_LowerLimit_ADDRESS 0x8384
-
-
 };
 
 }
 }
 
-#endif // __AnalogTrigger_h__
+#endif // __nAD9A5591CC64E4DF756D77D1B57A549E_AnalogTrigger_h__

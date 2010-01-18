@@ -10,24 +10,28 @@
 #include "WPIStatus.h"
 #include <strLib.h>
 
+UINT8 Dashboard::m_updateNumber = 0;
+
 /**
  * Dashboard contructor.
  * 
  * This is only called once when the DriverStation constructor is called.
  */
-Dashboard::Dashboard(char **userStatus)
-	: m_userStatus (userStatus)
+Dashboard::Dashboard(SEM_ID statusDataSem)
+	: m_userStatusData (NULL)
+	, m_userStatusDataSize (0)
 	, m_localBuffer (NULL)
 	, m_localPrintBuffer (NULL)
 	, m_packPtr (NULL)
 	, m_printSemaphore (0)
-	, m_sequence (0)
+	, m_statusDataSemaphore (statusDataSem)
 {
+	m_userStatusData = new char[kMaxDashboardDataSize];
 	m_localBuffer = new char[kMaxDashboardDataSize];
 	m_localPrintBuffer = new char[kMaxDashboardDataSize * 2];
 	m_localPrintBuffer[0] = 0;
 	m_packPtr = m_localBuffer;
-	m_printSemaphore = semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE); // synchronize access to multi-value registers
+	m_printSemaphore = semMCreate(SEM_Q_PRIORITY | SEM_DELETE_SAFE | SEM_INVERSION_SAFE);
 }
 
 /**
@@ -37,12 +41,14 @@ Dashboard::Dashboard(char **userStatus)
  */
 Dashboard::~Dashboard()
 {
+	semDelete(m_printSemaphore);
 	m_packPtr = NULL;
-	m_userStatus = NULL;
 	delete [] m_localPrintBuffer;
 	m_localPrintBuffer = NULL;
 	delete [] m_localBuffer;
 	m_localBuffer = NULL;
+	delete [] m_userStatusData;
+	m_userStatusData = NULL;
 }
 
 /**
@@ -259,6 +265,12 @@ void Dashboard::Printf(const char *writeFmt, ...)
 	va_list args;
 	INT32 size;
 
+	// Check if the buffer has already been used for packing.
+	if (m_packPtr != m_localBuffer)
+	{
+		wpi_fatal(DashboardDataCollision);
+		return;
+	}
 	va_start (args, writeFmt);
 	{
 		Synchronized sync(m_printSemaphore);
@@ -280,67 +292,52 @@ void Dashboard::Printf(const char *writeFmt, ...)
  * If you are not using the packed dashboard data, you can call Finalize() to commit the Printf() buffer and the error string buffer.
  * In effect, you are packing an empty structure.
  * Prepares a packet to go to the dashboard...
- * Pack the sequence number, Printf() buffer, the errors messages (not implemented yet), and packed dashboard data buffer.
  * @return The total size of the data packed into the userData field of the status packet.
  */
 INT32 Dashboard::Finalize(void)
 {
-	if (*m_userStatus == NULL)
-	{
-		wpi_fatal(NullParameter);
-		return 0;
-	}
 	if (!m_complexTypeStack.empty())
 	{
 		wpi_fatal(MismatchedComplexTypeClose);
 		return 0;
 	}
 
-	INT32 size = 0;
+	Synchronized sync(m_statusDataSemaphore);
 
 	// Sequence number
-	memcpy(*m_userStatus + size, &m_sequence, sizeof(m_sequence));
-	size += sizeof(m_sequence);
-	m_sequence++;
+	m_updateNumber++;
 
+	// Packed Dashboard Data
+	m_userStatusDataSize = m_packPtr - m_localBuffer;
+	memcpy(m_userStatusData, m_localBuffer, m_userStatusDataSize);
+	m_packPtr = m_localBuffer;
+
+	return m_userStatusDataSize;
+}
+
+/**
+ * Called by the DriverStation class to retrieve buffers, sizes, etc. for writing
+ *   to the NetworkCommunication task.
+ * This function is called while holding the m_statusDataSemaphore.
+ */
+void Dashboard::GetStatusBuffer(char **userStatusData, INT32* userStatusDataSize)
+{
 	// User printed strings
-	INT32 printSize;
+	if (m_localPrintBuffer[0] != 0)
 	{
-		Synchronized sync(m_printSemaphore);
+		// Sequence number
+		m_updateNumber++;
+
+		INT32 printSize;
+		Synchronized syncPrint(m_printSemaphore);
 		printSize = strlen(m_localPrintBuffer);
-		memcpy(*m_userStatus + size, &printSize, sizeof(printSize));
-		size += sizeof(printSize);
-		memcpy(*m_userStatus + size, m_localPrintBuffer, printSize);
-		size += printSize;
+		m_userStatusDataSize = printSize;
+		memcpy(m_userStatusData, m_localPrintBuffer, m_userStatusDataSize);
 		m_localPrintBuffer[0] = 0;
 	}
 
-	// Error Strings
-	INT32 errorSize = 0;
-	if (printSize + errorSize > kMaxDashboardDataSize)
-	{
-		wpi_fatal(DashboardDataOverflow);
-		return 0;
-	}
-	memcpy(*m_userStatus + size, &errorSize, sizeof(errorSize));
-	size += sizeof(errorSize);
-	///< TODO: add error reporting strings.
-	size += errorSize;
-
-	// Dashboard Data
-	INT32 dataSize = m_packPtr - m_localBuffer;
-	if (printSize + errorSize + dataSize > kMaxDashboardDataSize)
-	{
-		wpi_fatal(DashboardDataOverflow);
-		return 0;
-	}
-	memcpy(*m_userStatus + size, &dataSize, sizeof(dataSize));
-	size += sizeof(dataSize);
-	memcpy(*m_userStatus + size, m_localBuffer, dataSize);
-	size += dataSize;
-	m_packPtr = m_localBuffer;
-
-	return size;
+	*userStatusData = m_userStatusData;
+	*userStatusDataSize = m_userStatusDataSize;
 }
 
 /**
@@ -351,6 +348,12 @@ bool Dashboard::ValidateAdd(INT32 size)
 	if ((m_packPtr - m_localBuffer) + size > kMaxDashboardDataSize)
 	{
 		wpi_fatal(DashboardDataOverflow);
+		return false;
+	}
+	// Make sure printf is not being used at the same time.
+	if (m_localPrintBuffer[0] != 0)
+	{
+		wpi_fatal(DashboardDataCollision);
 		return false;
 	}
 	return true;

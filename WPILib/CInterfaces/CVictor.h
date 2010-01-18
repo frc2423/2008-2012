@@ -18,4 +18,14 @@ UINT8 GetVictorRaw(UINT32 module, UINT32 channel);
 void DeleteVictor(UINT32 module, UINT32 channel);
 void DeleteVictor(UINT32 channel);
 
+typedef void *VictorObject;
+
+VictorObject CreateVictor(UINT32 slot, UINT32 channel);
+VictorObject CreateVictor(UINT32 channel);
+void DeleteVictor(VictorObject o);
+void SetVictorSpeed(VictorObject o, float speed);
+void SetVictorRaw(VictorObject o, UINT8 value);
+UINT8 GetVictorRaw(VictorObject o);
+
+void LoadVictor();
 #endif

@@ -96,3 +96,26 @@ void DeleteDigitalInput(UINT32 channel)
 {
 	DeleteDigitalInput(SensorBase::GetDefaultDigitalModule(), channel);
 }
+
+/*******************************************************************************
+ * Alternative interface to digital input
+*******************************************************************************/
+DigitalInputObject CreateDigitalInput(UINT32 module, UINT32 channel)
+{
+	return (DigitalInputObject) new DigitalInput(module, channel); 
+}
+
+DigitalInputObject CreateDigitalInput(UINT32 channel)
+{
+	return (DigitalInputObject) new DigitalInput(channel); 
+}
+
+bool GetDigitalInput(DigitalInputObject o)
+{
+	return ((DigitalInput *) o)->Get();
+}
+
+void DeleteDigitalInput(DigitalInputObject o)
+{
+	delete (DigitalInput *) o;
+}

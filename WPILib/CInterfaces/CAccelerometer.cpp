@@ -149,3 +149,38 @@ void DeleteAccelerometer(UINT32 channel)
 	DeleteAccelerometer(SensorBase::GetDefaultAnalogModule(), channel);
 }
 
+
+/**
+ * Alternate C Interface
+ */
+
+AccelerometerObject CreateAccelerometer(UINT32 channel)
+{
+	return (AccelerometerObject) new Accelerometer(channel);
+}
+
+AccelerometerObject CreateAccelerometer(UINT32 slot, UINT32 channel)
+{
+	return (AccelerometerObject) new Accelerometer(slot, channel);
+}
+
+float GetAcceleration(AccelerometerObject o)
+{
+	return ((Accelerometer *) o)->GetAcceleration();
+}
+
+void SetAccelerometerSensitivity(AccelerometerObject o, float sensitivity)
+{
+	((Accelerometer *) o)->SetSensitivity(sensitivity);
+}
+
+void SetAccelerometerZero(AccelerometerObject o, float zero)
+{
+	((Accelerometer *)o )->SetZero(zero);
+}
+
+void DeleteAccelerometer(AccelerometerObject o)
+{
+	delete (Accelerometer *) o;
+}
+

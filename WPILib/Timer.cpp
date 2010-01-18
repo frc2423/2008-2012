@@ -158,3 +158,22 @@ void Timer::Stop()
 	}
 	END_REGION;
 }
+
+/**
+ * Check if the period specified has passed and advance advance by that period if it has.
+ * @param period The period to check for (in seconds).
+ * @return If the period has passed.
+ */
+bool Timer::HasPeriodPassed(double period)
+{
+	if (Get() > period)
+	{
+		CRITICAL_REGION(m_semaphore)
+		// Advance the start time by the period.
+		// Don't set it to the current time... we want to avoid drift.
+		m_startTime += period;
+		END_REGION;
+		return true;
+	}
+	return false;
+}

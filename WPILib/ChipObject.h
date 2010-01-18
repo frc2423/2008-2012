@@ -23,6 +23,6 @@
 #include "ChipObject/tWatchdog.h"
 
 using namespace nFPGA;
-using namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D;
+using namespace nAD9A5591CC64E4DF756D77D1B57A549E;
 
 #endif

@@ -9,6 +9,7 @@
 #include "Timer.h"
 #include "Utility.h"
 #include "WPIStatus.h"
+#include "NetworkCommunication/AICalibration.h"
 
 SEM_ID AnalogModule::m_registerWindowSemaphore = NULL;
 
@@ -71,9 +72,6 @@ AnalogModule::AnalogModule(UINT32 slot)
 		SetAverageBits(i + 1, kDefaultAverageBits);
 		SetOversampleBits(i + 1, kDefaultOversampleBits);
 	}
-
-	while ( ! m_module->readCalOK(&status) )
-		Wait(.001);
 
 	if (m_registerWindowSemaphore == NULL)
 	{
@@ -340,9 +338,9 @@ INT32 AnalogModule::VoltsToValue(INT32 channel, float voltage)
 		voltage = -10.0;
 		wpi_fatal(VoltageOutOfRange);
 	}
-	UINT32 LSBWeight = m_module->readLSBWeight(channel - 1, &status);
-	INT32 offset = m_module->readOffset(channel - 1, &status);
-	INT32 value = (INT32) ((voltage + offset * 1.0e-9) / LSBWeight * 1.0e-9);
+	UINT32 LSBWeight = GetLSBWeight(channel);
+	INT32 offset = GetOffset(channel);
+	INT32 value = (INT32) ((voltage + offset * 1.0e-9) / (LSBWeight * 1.0e-9));
 	wpi_assertCleanStatus(status);
 	return value;
 }
@@ -358,8 +356,8 @@ INT32 AnalogModule::VoltsToValue(INT32 channel, float voltage)
 float AnalogModule::GetVoltage(UINT32 channel)
 {
 	INT16 value = GetValue(channel);
-	UINT32 LSBWeight = m_module->readLSBWeight(channel - 1, &status);
-	INT32 offset = m_module->readOffset(channel - 1, &status);
+	UINT32 LSBWeight = GetLSBWeight(channel);
+	INT32 offset = GetOffset(channel);
 	float voltage = LSBWeight * 1.0e-9 * value - offset * 1.0e-9;
 	wpi_assertCleanStatus(status);
 	return voltage;
@@ -378,8 +376,8 @@ float AnalogModule::GetVoltage(UINT32 channel)
 float AnalogModule::GetAverageVoltage(UINT32 channel)
 {
 	INT32 value = GetAverageValue(channel);
-	UINT32 LSBWeight = m_module->readLSBWeight(channel - 1, &status);
-	INT32 offset = m_module->readOffset(channel - 1, &status);
+	UINT32 LSBWeight = GetLSBWeight(channel);
+	INT32 offset = GetOffset(channel);
 	UINT32 oversampleBits = GetOversampleBits(channel);
 	float voltage = ((LSBWeight * 1.0e-9 * value) / (float)(1 << oversampleBits)) - offset * 1.0e-9;
 	wpi_assertCleanStatus(status);
@@ -400,7 +398,7 @@ UINT32 AnalogModule::GetLSBWeight(UINT32 channel)
 {
 	// TODO: add scaling to make this worth while.
 	// TODO: actually use this function.
-	INT32 lsbWeight = m_module->readLSBWeight(channel - 1, &status);
+	UINT32 lsbWeight = FRC_NetworkCommunication_nAICalibration_getLSBWeight(m_module->getSystemIndex(), channel - 1, &status);
 	wpi_assertCleanStatus(status);
 	return lsbWeight;
 }
@@ -419,7 +417,7 @@ INT32 AnalogModule::GetOffset(UINT32 channel)
 {
 	// TODO: add scaling to make this worth while.
 	// TODO: actually use this function.
-	INT32 offset = m_module->readOffset(channel - 1, &status); 
+	INT32 offset = FRC_NetworkCommunication_nAICalibration_getOffset(m_module->getSystemIndex(), channel - 1, &status);
 	wpi_assertCleanStatus(status);
 	return offset;
 }

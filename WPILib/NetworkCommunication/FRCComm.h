@@ -16,11 +16,12 @@
 
 #include <vxWorks.h>
 
-#define USER_CONTROL_DATA_SIZE 936
-#define USER_STATUS_DATA_SIZE 984
+// Commandeer some bytes at the end for advanced I/O feedback.
+#define IO_CONFIG_DATA_SIZE 32
+#define USER_STATUS_DATA_SIZE (984 - IO_CONFIG_DATA_SIZE)
 #define USER_DS_LCD_DATA_SIZE 128
 
-struct FRCControlData{
+struct FRCCommonControlData{
 	UINT16 packetIndex;
 	union {
 		UINT8 control;
@@ -29,7 +30,7 @@ struct FRCControlData{
 			UINT8 notEStop : 1;
 			UINT8 enabled : 1;
 			UINT8 autonomous : 1;
-			UINT8 :1;
+			UINT8 fmsAttached:1;
 			UINT8 resync : 1;
 			UINT8 cRIOChkSum :1;
 			UINT8 fpgaChkSum :1;
@@ -108,20 +109,19 @@ struct FRCControlData{
 	char versionData[8];
 };
 
-/**
- * Structure for DS to robot control packets
- */
-typedef struct {
-	FRCControlData commonData;
-	char userDefined[USER_CONTROL_DATA_SIZE];
-	INT32 crcPad;
-	INT32 crcChecksum;
-} ControlData;
-
 extern "C" {
-	int getControlData(FRCControlData *data, char *userData, int wait_ms);
-	int setStatusData(float battery, UINT8 dsDigitalOut, const char *userData, int userDataLength, int wait_ms);
+	void getFPGAHardwareVersion(UINT16 *fpgaVersion, UINT32 *fpgaRevision);
+	int getCommonControlData(FRCCommonControlData *data, int wait_ms);
+	int getDynamicControlData(UINT8 type, char *dynamicData, INT32 maxLength, int wait_ms);
+	int setStatusData(float battery, UINT8 dsDigitalOut, UINT8 updateNumber,
+			const char *userDataHigh, int userDataHighLength,
+			const char *userDataLow, int userDataLowLength, int wait_ms);
+	int setStatusDataFloatAsInt(int battery, UINT8 dsDigitalOut, UINT8 updateNumber,
+			const char *userDataHigh, int userDataHighLength,
+			const char *userDataLow, int userDataLowLength, int wait_ms);
+	int setErrorData(const char *errors, int errorsLength, int wait_ms);
 	int setUserDsLcdData(const char *userDsLcdData, int userDsLcdDataLength, int wait_ms);
+	int overrideIOConfig(const char *ioConfig, int wait_ms);
 
 	void setNewDataSem(SEM_ID);
 	void setResyncSem(SEM_ID);
@@ -132,6 +132,7 @@ extern "C" {
 	void setResyncOccurRef(UINT32 refnum);
 
 	void FRC_NetworkCommunication_getVersionString(char *version);
+	void FRC_NetworkCommunication_observeUserProgramStarting(void);
 };
 
 #endif

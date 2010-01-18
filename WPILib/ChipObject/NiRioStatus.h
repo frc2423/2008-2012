@@ -3,7 +3,7 @@
    \author     Dave Madden <david.madden@ni.com>
    \date       02/21/2006
 
-   © Copyright 2006-2007. National Instruments. All rights reserved.
+   Copyright (c) 2006-2007. National Instruments. All rights reserved.
 */
 
 #ifndef  ___NiRioSrv_NiRioStatus_H___
@@ -57,14 +57,14 @@ const tRioStatusCode kRIOStatusAccessDenied                 = kRioStatusOffset -
 
 
 // -------------------------------------------------------------------------
-// RPC/Network Errors
+// Rpc/Network Errors
 // -------------------------------------------------------------------------
 
-/// An RPC connection could not be made to the remote device. The device may be offline, disconnected, or NI-RIO software may be missing or configured incorrectly
-const tRioStatusCode kRIOStatusRPCConnectionError           = kRioStatusOffset - 40;
+/// An Rpc connection could not be made to the remote device. The device may be offline, disconnected, or NI-RIO software may be missing or configured incorrectly
+const tRioStatusCode kRIOStatusRpcConnectionError           = kRioStatusOffset - 40;
 
-/// The RPC server had an error. Close any open sessions and reconnect. The current operation cannot complete.
-const tRioStatusCode kRIOStatusRPCServerError               = kRioStatusOffset - 41;
+/// The Rpc server had an error. Close any open sessions and reconnect. The current operation cannot complete.
+const tRioStatusCode kRIOStatusRpcServerError               = kRioStatusOffset - 41;
 
 /// A fault on the network caused the operation to fail.
 const tRioStatusCode kRIOStatusNetworkFault                 = kRioStatusOffset - 42;
@@ -72,6 +72,10 @@ const tRioStatusCode kRIOStatusNetworkFault                 = kRioStatusOffset -
 /// The current session is invalid. The target may have reset or been
 /// rebooted. The current operation cannot complete. Try again.
 const tRioStatusCode kRIOStatusRioRpcSessionError           = kRioStatusOffset - 43;
+
+/// The RIO server is not installed or operating on the target. The
+/// current operation cannot complete. Try again.
+const tRioStatusCode kRIOStatusRioRpcServerMissing          = kRioStatusOffset - 44;
 
 // -------------------------------------------------------------------------
 // Session Errors
@@ -135,7 +139,7 @@ const tRioStatusCode kRIOStatusResourceNotFound             = kRioStatusOffset -
 // Configuration
 // -------------------------------------------------------------------------
 
-/// An invalid alias was specified. RIO aliases may only contain alphanumerics, '-', and '_'.
+/// A reserved word or an invalid alias was specified. RIO aliases may only contain alphanumerics, '-', and '_'.
 const tRioStatusCode kRIOStatusInvalidAliasName             = kRioStatusOffset - 180;
 
 /// The supplied alias was not found.
@@ -151,7 +155,13 @@ const tRioStatusCode kRIOStatusInvalidPort                  = kRioStatusOffset -
 // Misc.
 // -------------------------------------------------------------------------
 
-/// This platform does not support connections to remote targets. 
+/// The first table segment has overflowed, so this session is on
+/// another segment. Only returned as a warning. Client should check
+/// for leaked sessions or increase the table segment size in their
+/// INI file.
+const tRioStatusCode kRIOStatusTableSegmentOverflow         = kRioStatusOffset - 186;
+
+/// This platform does not support connections to remote targets.
 const tRioStatusCode kRIOStatusRemoteTarget                 = kRioStatusOffset - 187;
 
 /// The operation is no longer supported
@@ -184,7 +194,7 @@ const tRioStatusCode kRIOStatusInvalidAttributeValue        = kRioStatusOffset -
 /// The system has run out of resource handles. Try closing some sessions.
 const tRioStatusCode kRIOStatusOutOfHandles                 = kRioStatusOffset - 198;
 
-/// <internal>The server does not recognize the command
+/// <internal>The server does not recognize the command</internal>
 const tRioStatusCode kRIOStatusInvalidFunction              = kRioStatusOffset - 199;
 
 // -------------------------------------------------------------------------
@@ -256,6 +266,18 @@ const tRioStatusCode kRIOStatusComponentNotFound            = -50251;
 /// The specified device is not present or is deactivated. The operation could not be completed as specified.
 const tRioStatusCode kRIOStatusDeviceNotFound               = -50300;
 
+/// The operation was aborted.
+const tRioStatusCode kRIOStatusOperationAborted             = -50405;
+
+// -------------------------------------------------------------------------
+// LabVIEW FPGA errors
+// -------------------------------------------------------------------------
+
+// Error during download
+const tRioStatusCode kFpgaStatusDownloadError               = -61018;
+
+// Device type incorrect
+const tRioStatusCode kFpgaStatusDeviceTypeIncorrect         = -61024;
 
 // -------------------------------------------------------------------------
 // LabVIEW errors

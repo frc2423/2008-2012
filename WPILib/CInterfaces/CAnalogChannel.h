@@ -40,5 +40,21 @@ INT32 GetAnalogOffset();
 void DeleteAnalogChannel(UINT32 slot, UINT32 channel);
 void DeleteAnalogChannel(UINT32 channel);
 
+typedef void *AnalogChannelObject;
+
+AnalogChannelObject CreateAnalogChannel(UINT32 module, UINT32 channel);
+AnalogChannelObject CreateAnalogChannel(UINT32 channel);
+INT16 GetAnalogValue(AnalogChannelObject o);
+INT32 GetAnalogAverageValue(AnalogChannelObject o);
+
+float GetAnalogVoltage(AnalogChannelObject o);
+float GetAnalogAverageVoltage(AnalogChannelObject o);
+
+void SetAnalogAverageBits(AnalogChannelObject o, UINT32 bits);
+UINT32 GetAnalogAverageBits(AnalogChannelObject o);
+void SetAnalogOversampleBits(AnalogChannelObject o, UINT32 bits);
+UINT32 GetAnalogOversampleBits(AnalogChannelObject o);
+void DeleteAnalogChannel(AnalogChannelObject o);
+
 #endif
 

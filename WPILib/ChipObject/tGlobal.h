@@ -1,51 +1,70 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __Global_h__
-#define __Global_h__
+#ifndef __nAD9A5591CC64E4DF756D77D1B57A549E_Global_h__
+#define __nAD9A5591CC64E4DF756D77D1B57A549E_Global_h__
 
-#include "tSystem.h"
+#include "tScopedSystem.h"
 
 namespace nFPGA
 {
-namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D
+namespace nAD9A5591CC64E4DF756D77D1B57A549E
 {
 
-class tGlobal : public tSystem
+class tGlobal : public tScopedSystem
 {
 public:
    tGlobal(tRioStatusCode *status);
    ~tGlobal();
 
-   static const unsigned char kNumSystems;
+   typedef enum
+   {
+      kNumSystems = 1,
+   } tConstants;
 
 
 
 
-   static unsigned short readVersion(tRioStatusCode *status);
+   typedef enum
+   {
+      kGlobal_VersionAddress = 0x8118,
+   } tVersion_Constants;
 
-   static void writeFPGA_LED(bool value, tRioStatusCode *status);
-   static bool readFPGA_LED(tRioStatusCode *status);
+   unsigned short readVersion(tRioStatusCode *status);
 
-   static unsigned int readLocalTime(tRioStatusCode *status);
 
-   static unsigned int readRevision(tRioStatusCode *status);
+   typedef enum
+   {
+      kGlobal_FPGA_LEDAddress = 0x811C,
+   } tFPGA_LED_Constants;
+
+   void writeFPGA_LED(bool value, tRioStatusCode *status);
+   bool readFPGA_LED(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kGlobal_LocalTimeAddress = 0x8110,
+   } tLocalTime_Constants;
+
+   unsigned int readLocalTime(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kGlobal_RevisionAddress = 0x8114,
+   } tRevision_Constants;
+
+   unsigned int readRevision(tRioStatusCode *status);
 
 
 
 
 private:
-   unsigned char _SystemIndex;
-
-   #define Global_Version_ADDRESS 0x8118
-   #define Global_FPGA_LED_ADDRESS 0x811C
-   #define Global_LocalTime_ADDRESS 0x8110
-   #define Global_Revision_ADDRESS 0x8114
-
 
 };
 
 }
 }
 
-#endif // __Global_h__
+#endif // __nAD9A5591CC64E4DF756D77D1B57A549E_Global_h__

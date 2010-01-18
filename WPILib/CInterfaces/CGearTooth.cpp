@@ -193,3 +193,44 @@ void DeleteGearTooth(UINT32 channel)
 {
 	DeleteGearTooth(SensorBase::GetDefaultDigitalModule(), channel);
 }
+
+
+/**
+ * Alternate C Interface
+ */
+
+GearToothObject CreateGearTooth(UINT32 channel, bool directionSensitive)
+{
+	return (GearToothObject) new GearTooth(channel, directionSensitive);
+}
+
+GearToothObject CreateGearTooth(UINT32 slot, UINT32 channel, bool directionSensitive)
+{
+	return (GearToothObject) new GearTooth(slot, channel, directionSensitive);
+}
+
+void StartGearTooth(GearToothObject o)
+{
+	((GearTooth *)o )->Start();
+}
+
+void StopGearTooth(GearToothObject o)
+{
+	((GearTooth *)o )->Stop();
+}
+
+INT32 GetGearTooth(GearToothObject o)
+{
+	return ((GearTooth *)o )->Get();
+}
+
+void ResetGearTooth(GearToothObject o)
+{
+	((GearTooth *)o )->Reset();
+}
+
+void DeleteGearTooth(GearToothObject o)
+{
+	delete (GearTooth *)o;
+}
+

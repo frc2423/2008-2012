@@ -49,9 +49,9 @@ void I2C::Write(UINT8 registerAddress, UINT8 data)
 {
 	Synchronized sync(m_semaphore);
 	m_module->m_fpgaDIO->writeI2CConfig_Address(m_deviceAddress, &status);
-	m_module->m_fpgaDIO->writeI2CConfig_Register(registerAddress, &status);
-	m_module->m_fpgaDIO->writeI2CConfig_DataToSend(data, &status);
-	m_module->m_fpgaDIO->writeI2CConfig_Read(false, &status);
+	m_module->m_fpgaDIO->writeI2CConfig_BytesToWrite(sizeof(registerAddress) + sizeof(data), &status);
+	m_module->m_fpgaDIO->writeI2CConfig_BytesToRead(0, &status);
+	m_module->m_fpgaDIO->writeI2CDataToSend((data << 8) || registerAddress, &status);
 	UINT8 transaction = m_module->m_fpgaDIO->readI2CStatus_Transaction(&status);
 	m_module->m_fpgaDIO->strobeI2CStart(&status);
 	while(transaction == m_module->m_fpgaDIO->readI2CStatus_Transaction(&status)) taskDelay(1);
@@ -87,9 +87,9 @@ void I2C::Read(UINT8 registerAddress, UINT8 count, UINT8 *buffer)
 	{
 		Synchronized sync(m_semaphore);
 		m_module->m_fpgaDIO->writeI2CConfig_Address(m_deviceAddress, &status);
-		m_module->m_fpgaDIO->writeI2CConfig_Register(registerAddress, &status);
+		m_module->m_fpgaDIO->writeI2CConfig_BytesToWrite(sizeof(registerAddress), &status);
 		m_module->m_fpgaDIO->writeI2CConfig_BytesToRead(count, &status);
-		m_module->m_fpgaDIO->writeI2CConfig_Read(true, &status);
+		m_module->m_fpgaDIO->writeI2CDataToSend(registerAddress, &status);
 		UINT8 transaction = m_module->m_fpgaDIO->readI2CStatus_Transaction(&status);
 		m_module->m_fpgaDIO->strobeI2CStart(&status);
 		while(transaction == m_module->m_fpgaDIO->readI2CStatus_Transaction(&status)) taskDelay(1);

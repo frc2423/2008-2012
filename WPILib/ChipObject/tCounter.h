@@ -1,30 +1,31 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __Counter_h__
-#define __Counter_h__
+#ifndef __nAD9A5591CC64E4DF756D77D1B57A549E_Counter_h__
+#define __nAD9A5591CC64E4DF756D77D1B57A549E_Counter_h__
 
-#include "tSystem.h"
+#include "tScopedSystem.h"
 
 namespace nFPGA
 {
-namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D
+namespace nAD9A5591CC64E4DF756D77D1B57A549E
 {
 
-class tCounter : public tSystem
+class tCounter : public tScopedSystem
 {
 public:
    tCounter(unsigned char sys_index, tRioStatusCode *status);
    ~tCounter();
 
-   static const unsigned char kNumSystems;
+   inline unsigned char getSystemIndex()
+   {
+      return _SystemIndex;
+   }
 
-   static const unsigned int kOutputAddresses [];
-   static const unsigned int kConfigAddresses [];
-   static const unsigned int kResetAddresses [];
-   static const unsigned int kTimerOutputAddresses [];
-   static const unsigned int kEnableAddresses [];
-   static const unsigned int kTimerConfigAddresses [];
+   typedef enum
+   {
+      kNumSystems = 8,
+   } tConstants;
 
    typedef
    union{
@@ -55,9 +56,10 @@ public:
          unsigned DownFallingEdge : 1;
          unsigned Mode : 2;
          unsigned PulseLengthThreshold : 6;
+         unsigned Enable : 1;
       };
       struct{
-         unsigned value : 31;
+         unsigned value : 32;
       };
    } tConfig;
    typedef
@@ -83,9 +85,38 @@ public:
       };
    } tTimerConfig;
 
+
+   typedef enum
+   {
+      kCounter0_OutputAddress = 0x827C,
+      kCounter1_OutputAddress = 0x8268,
+      kCounter2_OutputAddress = 0x8254,
+      kCounter3_OutputAddress = 0x8240,
+      kCounter4_OutputAddress = 0x822C,
+      kCounter5_OutputAddress = 0x8218,
+      kCounter6_OutputAddress = 0x8204,
+      kCounter7_OutputAddress = 0x81F0,
+   } tOutput_Constants;
+   static const unsigned int kOutputAddresses [];
+
    tOutput readOutput(tRioStatusCode *status);
    bool readOutput_Direction(tRioStatusCode *status);
    signed int readOutput_Value(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kConfig_PulseLengthThreshold_FixedPointIntegerShift = 8,
+      kCounter0_ConfigAddress = 0x8284,
+      kCounter1_ConfigAddress = 0x8270,
+      kCounter2_ConfigAddress = 0x825C,
+      kCounter3_ConfigAddress = 0x8248,
+      kCounter4_ConfigAddress = 0x8234,
+      kCounter5_ConfigAddress = 0x8220,
+      kCounter6_ConfigAddress = 0x820C,
+      kCounter7_ConfigAddress = 0x81F8,
+   } tConfig_Constants;
+   static const unsigned int kConfigAddresses [];
 
    void writeConfig(tConfig value, tRioStatusCode *status);
    void writeConfig_UpSource_Channel(unsigned char value, tRioStatusCode *status);
@@ -104,6 +135,7 @@ public:
    void writeConfig_DownFallingEdge(bool value, tRioStatusCode *status);
    void writeConfig_Mode(unsigned char value, tRioStatusCode *status);
    void writeConfig_PulseLengthThreshold(unsigned short value, tRioStatusCode *status);
+   void writeConfig_Enable(bool value, tRioStatusCode *status);
    tConfig readConfig(tRioStatusCode *status);
    unsigned char readConfig_UpSource_Channel(tRioStatusCode *status);
    unsigned char readConfig_UpSource_Module(tRioStatusCode *status);
@@ -121,16 +153,58 @@ public:
    bool readConfig_DownFallingEdge(tRioStatusCode *status);
    unsigned char readConfig_Mode(tRioStatusCode *status);
    unsigned short readConfig_PulseLengthThreshold(tRioStatusCode *status);
+   bool readConfig_Enable(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kCounter0_ResetAddress = 0x8280,
+      kCounter1_ResetAddress = 0x826C,
+      kCounter2_ResetAddress = 0x8258,
+      kCounter3_ResetAddress = 0x8244,
+      kCounter4_ResetAddress = 0x8230,
+      kCounter5_ResetAddress = 0x821C,
+      kCounter6_ResetAddress = 0x8208,
+      kCounter7_ResetAddress = 0x81F4,
+   } tReset_Constants;
+   static const unsigned int kResetAddresses [];
 
    void strobeReset(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kTimerOutput_Period_FixedPointIntegerShift = 1,
+      kCounter0_TimerOutputAddress = 0x8274,
+      kCounter1_TimerOutputAddress = 0x8260,
+      kCounter2_TimerOutputAddress = 0x824C,
+      kCounter3_TimerOutputAddress = 0x8238,
+      kCounter4_TimerOutputAddress = 0x8224,
+      kCounter5_TimerOutputAddress = 0x8210,
+      kCounter6_TimerOutputAddress = 0x81FC,
+      kCounter7_TimerOutputAddress = 0x81E8,
+   } tTimerOutput_Constants;
+   static const unsigned int kTimerOutputAddresses [];
 
    tTimerOutput readTimerOutput(tRioStatusCode *status);
    unsigned int readTimerOutput_Period(tRioStatusCode *status);
    unsigned char readTimerOutput_Count(tRioStatusCode *status);
    bool readTimerOutput_Stalled(tRioStatusCode *status);
 
-   void writeEnable(bool value, tRioStatusCode *status);
-   bool readEnable(tRioStatusCode *status);
+
+   typedef enum
+   {
+      kTimerConfig_StallPeriod_FixedPointIntegerShift = 1,
+      kCounter0_TimerConfigAddress = 0x8278,
+      kCounter1_TimerConfigAddress = 0x8264,
+      kCounter2_TimerConfigAddress = 0x8250,
+      kCounter3_TimerConfigAddress = 0x823C,
+      kCounter4_TimerConfigAddress = 0x8228,
+      kCounter5_TimerConfigAddress = 0x8214,
+      kCounter6_TimerConfigAddress = 0x8200,
+      kCounter7_TimerConfigAddress = 0x81EC,
+   } tTimerConfig_Constants;
+   static const unsigned int kTimerConfigAddresses [];
 
    void writeTimerConfig(tTimerConfig value, tRioStatusCode *status);
    void writeTimerConfig_StallPeriod(unsigned int value, tRioStatusCode *status);
@@ -148,67 +222,9 @@ public:
 private:
    unsigned char _SystemIndex;
 
-
-   #define Counter0_Output_ADDRESS 0x82AC
-   #define Counter0_Config_ADDRESS 0x82B8
-   #define Counter0_Reset_ADDRESS 0x82B0
-   #define Counter0_TimerOutput_ADDRESS 0x82A4
-   #define Counter0_Enable_ADDRESS 0x82B4
-   #define Counter0_TimerConfig_ADDRESS 0x82A8
-
-   #define Counter1_Output_ADDRESS 0x8294
-   #define Counter1_Config_ADDRESS 0x82A0
-   #define Counter1_Reset_ADDRESS 0x8298
-   #define Counter1_TimerOutput_ADDRESS 0x828C
-   #define Counter1_Enable_ADDRESS 0x829C
-   #define Counter1_TimerConfig_ADDRESS 0x8290
-
-   #define Counter2_Output_ADDRESS 0x827C
-   #define Counter2_Config_ADDRESS 0x8288
-   #define Counter2_Reset_ADDRESS 0x8280
-   #define Counter2_TimerOutput_ADDRESS 0x8274
-   #define Counter2_Enable_ADDRESS 0x8284
-   #define Counter2_TimerConfig_ADDRESS 0x8278
-
-   #define Counter3_Output_ADDRESS 0x8264
-   #define Counter3_Config_ADDRESS 0x8270
-   #define Counter3_Reset_ADDRESS 0x8268
-   #define Counter3_TimerOutput_ADDRESS 0x825C
-   #define Counter3_Enable_ADDRESS 0x826C
-   #define Counter3_TimerConfig_ADDRESS 0x8260
-
-   #define Counter4_Output_ADDRESS 0x824C
-   #define Counter4_Config_ADDRESS 0x8258
-   #define Counter4_Reset_ADDRESS 0x8250
-   #define Counter4_TimerOutput_ADDRESS 0x8244
-   #define Counter4_Enable_ADDRESS 0x8254
-   #define Counter4_TimerConfig_ADDRESS 0x8248
-
-   #define Counter5_Output_ADDRESS 0x8234
-   #define Counter5_Config_ADDRESS 0x8240
-   #define Counter5_Reset_ADDRESS 0x8238
-   #define Counter5_TimerOutput_ADDRESS 0x822C
-   #define Counter5_Enable_ADDRESS 0x823C
-   #define Counter5_TimerConfig_ADDRESS 0x8230
-
-   #define Counter6_Output_ADDRESS 0x821C
-   #define Counter6_Config_ADDRESS 0x8228
-   #define Counter6_Reset_ADDRESS 0x8220
-   #define Counter6_TimerOutput_ADDRESS 0x8214
-   #define Counter6_Enable_ADDRESS 0x8224
-   #define Counter6_TimerConfig_ADDRESS 0x8218
-
-   #define Counter7_Output_ADDRESS 0x8204
-   #define Counter7_Config_ADDRESS 0x8210
-   #define Counter7_Reset_ADDRESS 0x8208
-   #define Counter7_TimerOutput_ADDRESS 0x81FC
-   #define Counter7_Enable_ADDRESS 0x820C
-   #define Counter7_TimerConfig_ADDRESS 0x8200
-
-
 };
 
 }
 }
 
-#endif // __Counter_h__
+#endif // __nAD9A5591CC64E4DF756D77D1B57A549E_Counter_h__

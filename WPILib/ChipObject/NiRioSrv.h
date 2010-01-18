@@ -5,7 +5,7 @@
 
    Main include for clients.
 
-   © Copyright 2004, 2005. National Instruments. All rights reserved.
+   Copyright (c) 2004, 2005. National Instruments. All rights reserved.
 */
 
 
@@ -32,7 +32,7 @@
 // tNIRIO_u8      : Unsigned  8-bit integer
 //
 // An example for PAL:
-// 
+//
 // #define kNIRIOSRVExportPre  nNISS100_kImportPre
 // #define kNIRIOSRVExportPost nNISS100_kImportPost
 // #define kNIRIOSRVCCall nNISS100_kCCall
@@ -48,7 +48,7 @@
 #if !defined(kNIRIOSRVNoDefaultTypeDefinitions)
 //
 // An example for atomicPAL:
-// 
+//
 #if defined(___niapal_quarks_platform_h___)
 #if !defined(kNIRIOSRVExportPre)
 #define kNIRIOSRVExportPre  nNIAPALS100_kImportPre
@@ -102,6 +102,16 @@
 
 #ifndef  ___NiRioSrv_NiRioStatus_H___
 #include "NiRioStatus.h"
+#endif
+
+// Provided for backwards compatability.
+#ifndef  ___NiRioSrv_NiRioConstantsDeprecated_H___
+#include "NiRioConstantsDeprecated.h"
+#endif
+
+// Provided for backwards compatability.
+#ifndef  ___NiRioSrv_NiRioStatusDeprecated_H___
+#include "NiRioStatusDeprecated.h"
 #endif
 
 //  defines...

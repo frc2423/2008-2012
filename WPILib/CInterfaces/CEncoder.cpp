@@ -587,3 +587,86 @@ void DeleteEncoder(UINT32 aChannel, UINT32 bChannel)
 	DeleteEncoder(SensorBase::GetDefaultDigitalModule(), aChannel, SensorBase::GetDefaultDigitalModule(), bChannel);
 }
 
+/**
+ * Alternate C Interface
+ */
+
+EncoderObject CreateEncoder(UINT32 aChannel, UINT32 bChannel)
+{
+	return (EncoderObject) new Encoder(aChannel, bChannel);
+}
+
+EncoderObject CreateEncoder(UINT32 aSlot, UINT32 aChannel, UINT32 bSlot, UINT32 bChannel)
+{
+	return (EncoderObject) new Encoder(aSlot, aChannel, bSlot, bChannel);
+}
+
+void StartEncoder(EncoderObject o)
+{
+	((Encoder *)o )->Start();
+}
+
+INT32 GetEncoder(EncoderObject o)
+{
+	return ((Encoder *)o )->Get();
+}
+
+void ResetEncoder(EncoderObject o)
+{
+	((Encoder *)o )->Reset();
+}
+
+void StopEncoder(EncoderObject o)
+{
+	((Encoder *)o )->Stop();
+}
+
+double GetEncoderPeriod(EncoderObject o)
+{
+	return ((Encoder *)o )->GetPeriod();
+}
+
+void SetMaxEncoderPeriod(EncoderObject o, double maxPeriod)
+{
+	((Encoder *)o )->SetMaxPeriod(maxPeriod);
+}
+
+bool GetEncoderStopped(EncoderObject o)
+{
+	return ((Encoder *)o )->GetStopped();
+}
+
+bool GetEncoderDirection(EncoderObject o)
+{
+	return ((Encoder *)o )->GetDirection();
+}
+
+double GetEncoderDistance(EncoderObject o)
+{
+	return ((Encoder *)o )->GetDistance();
+}
+
+double GetEncoderRate(EncoderObject o)
+{
+	return ((Encoder *)o )->GetRate();
+}
+
+void SetMinEncoderRate(EncoderObject o, double minRate)
+{
+	((Encoder *)o )->SetMinRate(minRate);
+}
+
+void SetEncoderDistancePerPulse(EncoderObject o, double distancePerPulse)
+{
+	((Encoder *)o )->SetDistancePerPulse(distancePerPulse);
+}
+
+void SetEncoderReverseDirection(EncoderObject o, bool reversedDirection)
+{
+	((Encoder *)o )->SetReverseDirection(reversedDirection);
+}
+
+void DeleteEncoder(EncoderObject o)
+{
+	delete (Encoder *)o;
+}

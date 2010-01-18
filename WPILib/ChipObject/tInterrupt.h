@@ -1,26 +1,31 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __Interrupt_h__
-#define __Interrupt_h__
+#ifndef __nAD9A5591CC64E4DF756D77D1B57A549E_Interrupt_h__
+#define __nAD9A5591CC64E4DF756D77D1B57A549E_Interrupt_h__
 
-#include "tSystem.h"
+#include "tScopedSystem.h"
 
 namespace nFPGA
 {
-namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D
+namespace nAD9A5591CC64E4DF756D77D1B57A549E
 {
 
-class tInterrupt : public tSystem
+class tInterrupt : public tScopedSystem
 {
 public:
    tInterrupt(unsigned char sys_index, tRioStatusCode *status);
    ~tInterrupt();
 
-   static const unsigned char kNumSystems;
+   inline unsigned char getSystemIndex()
+   {
+      return _SystemIndex;
+   }
 
-   static const unsigned int kTimeStampAddresses [];
-   static const unsigned int kConfigAddresses [];
+   typedef enum
+   {
+      kNumSystems = 8,
+   } tConstants;
 
    typedef
    union{
@@ -37,7 +42,35 @@ public:
       };
    } tConfig;
 
+
+   typedef enum
+   {
+      kInterrupt0_TimeStampAddress = 0x8194,
+      kInterrupt1_TimeStampAddress = 0x818C,
+      kInterrupt2_TimeStampAddress = 0x8184,
+      kInterrupt3_TimeStampAddress = 0x817C,
+      kInterrupt4_TimeStampAddress = 0x8174,
+      kInterrupt5_TimeStampAddress = 0x816C,
+      kInterrupt6_TimeStampAddress = 0x8164,
+      kInterrupt7_TimeStampAddress = 0x815C,
+   } tTimeStamp_Constants;
+   static const unsigned int kTimeStampAddresses [];
+
    unsigned int readTimeStamp(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kInterrupt0_ConfigAddress = 0x810C,
+      kInterrupt1_ConfigAddress = 0x8190,
+      kInterrupt2_ConfigAddress = 0x8188,
+      kInterrupt3_ConfigAddress = 0x8180,
+      kInterrupt4_ConfigAddress = 0x8178,
+      kInterrupt5_ConfigAddress = 0x8170,
+      kInterrupt6_ConfigAddress = 0x8168,
+      kInterrupt7_ConfigAddress = 0x8160,
+   } tConfig_Constants;
+   static const unsigned int kConfigAddresses [];
 
    void writeConfig(tConfig value, tRioStatusCode *status);
    void writeConfig_Source_Channel(unsigned char value, tRioStatusCode *status);
@@ -61,35 +94,9 @@ public:
 private:
    unsigned char _SystemIndex;
 
-
-   #define Interrupt0_TimeStamp_ADDRESS 0x8194
-   #define Interrupt0_Config_ADDRESS 0x8198
-
-   #define Interrupt1_TimeStamp_ADDRESS 0x818C
-   #define Interrupt1_Config_ADDRESS 0x8190
-
-   #define Interrupt2_TimeStamp_ADDRESS 0x8184
-   #define Interrupt2_Config_ADDRESS 0x8188
-
-   #define Interrupt3_TimeStamp_ADDRESS 0x817C
-   #define Interrupt3_Config_ADDRESS 0x8180
-
-   #define Interrupt4_TimeStamp_ADDRESS 0x8174
-   #define Interrupt4_Config_ADDRESS 0x8178
-
-   #define Interrupt5_TimeStamp_ADDRESS 0x816C
-   #define Interrupt5_Config_ADDRESS 0x8170
-
-   #define Interrupt6_TimeStamp_ADDRESS 0x8164
-   #define Interrupt6_Config_ADDRESS 0x8168
-
-   #define Interrupt7_TimeStamp_ADDRESS 0x815C
-   #define Interrupt7_Config_ADDRESS 0x8160
-
-
 };
 
 }
 }
 
-#endif // __Interrupt_h__
+#endif // __nAD9A5591CC64E4DF756D77D1B57A549E_Interrupt_h__

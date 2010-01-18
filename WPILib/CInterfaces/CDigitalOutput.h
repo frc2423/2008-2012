@@ -11,5 +11,13 @@ void SetDigitalOutput(UINT32 slot, UINT32 channel, UINT32 value);
 void SetDigitalOutput(UINT32 channel, UINT32 value);
 void DeleteDigitalOutput(UINT32 slot, UINT32 channel);
 void DeleteDigitalOutput(UINT32 channel);
+
+typedef void *DigitalOutputObject;
+
+DigitalOutputObject CreateDigitalOutput(UINT32 slot, UINT32 channel);
+DigitalOutputObject CreateDigitalOutput(UINT32 channel);
+void SetDigitalOutput(DigitalOutputObject o, bool val);
+void DeleteDigitalOutput(DigitalOutputObject o);
+
 #endif
 

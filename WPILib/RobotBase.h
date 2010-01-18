@@ -40,6 +40,7 @@ public:
 	static RobotBase &getInstance();
 	static void setInstance(RobotBase* robot);
 
+	bool IsEnabled();
 	bool IsDisabled();
 	bool IsAutonomous();
 	bool IsOperatorControl();

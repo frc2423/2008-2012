@@ -1,39 +1,31 @@
 // Copyright (c) National Instruments 2008.  All Rights Reserved.
 // Do Not Edit... this file is generated!
 
-#ifndef __DIO_h__
-#define __DIO_h__
+#ifndef __nAD9A5591CC64E4DF756D77D1B57A549E_DIO_h__
+#define __nAD9A5591CC64E4DF756D77D1B57A549E_DIO_h__
 
-#include "tSystem.h"
+#include "tScopedSystem.h"
 
 namespace nFPGA
 {
-namespace n6F0EA7B88ADB8E3FD4127A39E3502C6D
+namespace nAD9A5591CC64E4DF756D77D1B57A549E
 {
 
-class tDIO : public tSystem
+class tDIO : public tScopedSystem
 {
 public:
    tDIO(unsigned char sys_index, tRioStatusCode *status);
    ~tDIO();
 
-   static const unsigned char kNumSystems;
+   inline unsigned char getSystemIndex()
+   {
+      return _SystemIndex;
+   }
 
-   static const unsigned int kDOAddresses [];
-   static const unsigned int kFilterSelectAddresses [];
-   static const unsigned int kFilterPeriodAddresses [];
-   static const unsigned int kOutputEnableAddresses [];
-   static const unsigned int kDIAddresses [];
-   static const unsigned int kI2CDataReceivedAddresses [];
-   static const unsigned int kI2CStatusAddresses [];
-   static const unsigned int kSlowValueAddresses [];
-   static const unsigned int kPWMPeriodScaleAddresses [];
-   static const unsigned int kPulseAddresses [];
-   static const unsigned int kI2CStartAddresses [];
-   static const unsigned int kBFLAddresses [];
-   static const unsigned int kPulseLengthAddresses [];
-   static const unsigned int kI2CConfigAddresses [];
-   static const unsigned int kPWMValueAddresses [];
+   typedef enum
+   {
+      kNumSystems = 2,
+   } tConstants;
 
    typedef
    union{
@@ -50,9 +42,11 @@ public:
       struct{
          unsigned Transaction : 1;
          unsigned Done : 1;
+         unsigned Aborted : 1;
+         unsigned DataReceivedHigh : 24;
       };
       struct{
-         unsigned value : 2;
+         unsigned value : 27;
       };
    } tI2CStatus;
    typedef
@@ -70,37 +64,117 @@ public:
    union{
       struct{
          unsigned Address : 8;
-         unsigned Register : 8;
-         unsigned DataToSend : 8;
-         unsigned Read : 1;
-         unsigned BytesToRead : 2;
+         unsigned BytesToRead : 3;
+         unsigned BytesToWrite : 3;
+         unsigned DataToSendHigh : 16;
       };
       struct{
-         unsigned value : 27;
+         unsigned value : 30;
       };
    } tI2CConfig;
+
+
+   typedef enum
+   {
+      kDIO0_DOAddress = 0x834C,
+      kDIO1_DOAddress = 0x82E8,
+   } tDO_Constants;
+   static const unsigned int kDOAddresses [];
 
    void writeDO(unsigned short value, tRioStatusCode *status);
    unsigned short readDO(tRioStatusCode *status);
 
-   static const unsigned char kNumFilterSelectElements;
+
+   typedef enum
+   {
+      kDIO0_I2CDataToSendAddress = 0x8314,
+      kDIO1_I2CDataToSendAddress = 0x82B0,
+   } tI2CDataToSend_Constants;
+   static const unsigned int kI2CDataToSendAddresses [];
+
+   void writeI2CDataToSend(unsigned int value, tRioStatusCode *status);
+   unsigned int readI2CDataToSend(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kNumFilterSelectElements = 16,
+      kFilterSelect_ElementSize = 2,
+      kFilterSelect_ElementMask = 0x3,
+      kDIO0_FilterSelectAddress = 0x82EC,
+      kDIO1_FilterSelectAddress = 0x8288,
+   } tFilterSelect_Constants;
+   static const unsigned int kFilterSelectAddresses [];
+
    void writeFilterSelect(unsigned char bitfield_index, unsigned char value, tRioStatusCode *status);
    unsigned char readFilterSelect(unsigned char bitfield_index, tRioStatusCode *status);
 
-   static const unsigned char kNumFilterPeriodElements;
+
+   typedef enum
+   {
+      kNumFilterPeriodElements = 3,
+      kFilterPeriod_ElementSize = 8,
+      kFilterPeriod_ElementMask = 0xFF,
+      kDIO0_FilterPeriodAddress = 0x82F0,
+      kDIO1_FilterPeriodAddress = 0x828C,
+   } tFilterPeriod_Constants;
+   static const unsigned int kFilterPeriodAddresses [];
+
    void writeFilterPeriod(unsigned char bitfield_index, unsigned char value, tRioStatusCode *status);
    unsigned char readFilterPeriod(unsigned char bitfield_index, tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kDIO0_OutputEnableAddress = 0x8344,
+      kDIO1_OutputEnableAddress = 0x82E0,
+   } tOutputEnable_Constants;
+   static const unsigned int kOutputEnableAddresses [];
 
    void writeOutputEnable(unsigned short value, tRioStatusCode *status);
    unsigned short readOutputEnable(tRioStatusCode *status);
 
+
+   typedef enum
+   {
+      kDIO0_DIAddress = 0x8348,
+      kDIO1_DIAddress = 0x82E4,
+   } tDI_Constants;
+   static const unsigned int kDIAddresses [];
+
    unsigned short readDI(tRioStatusCode *status);
 
+
+   typedef enum
+   {
+      kDIO0_I2CDataReceivedAddress = 0x8308,
+      kDIO1_I2CDataReceivedAddress = 0x82A4,
+   } tI2CDataReceived_Constants;
+   static const unsigned int kI2CDataReceivedAddresses [];
+
    unsigned int readI2CDataReceived(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kDIO0_I2CStatusAddress = 0x8304,
+      kDIO1_I2CStatusAddress = 0x82A0,
+   } tI2CStatus_Constants;
+   static const unsigned int kI2CStatusAddresses [];
 
    tI2CStatus readI2CStatus(tRioStatusCode *status);
    unsigned char readI2CStatus_Transaction(tRioStatusCode *status);
    bool readI2CStatus_Done(tRioStatusCode *status);
+   bool readI2CStatus_Aborted(tRioStatusCode *status);
+   unsigned int readI2CStatus_DataReceivedHigh(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kDIO0_SlowValueAddress = 0x8300,
+      kDIO1_SlowValueAddress = 0x829C,
+   } tSlowValue_Constants;
+   static const unsigned int kSlowValueAddresses [];
 
    void writeSlowValue(tSlowValue value, tRioStatusCode *status);
    void writeSlowValue_RelayFwd(unsigned char value, tRioStatusCode *status);
@@ -111,46 +185,132 @@ public:
    unsigned char readSlowValue_RelayRev(tRioStatusCode *status);
    unsigned char readSlowValue_I2CHeader(tRioStatusCode *status);
 
-   static const unsigned char kNumPWMPeriodScaleElements;
+
+   typedef enum
+   {
+      kNumPWMPeriodScaleElements = 10,
+      kPWMPeriodScale_ElementSize = 2,
+      kPWMPeriodScale_ElementMask = 0x3,
+      kDIO0_PWMPeriodScaleAddress = 0x8318,
+      kDIO1_PWMPeriodScaleAddress = 0x82B4,
+   } tPWMPeriodScale_Constants;
+   static const unsigned int kPWMPeriodScaleAddresses [];
+
    void writePWMPeriodScale(unsigned char bitfield_index, unsigned char value, tRioStatusCode *status);
    unsigned char readPWMPeriodScale(unsigned char bitfield_index, tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kDIO0_PulseAddress = 0x82F8,
+      kDIO1_PulseAddress = 0x8294,
+   } tPulse_Constants;
+   static const unsigned int kPulseAddresses [];
 
    void writePulse(unsigned short value, tRioStatusCode *status);
    unsigned short readPulse(tRioStatusCode *status);
 
+
+   typedef enum
+   {
+      kDIO0_I2CStartAddress = 0x830C,
+      kDIO1_I2CStartAddress = 0x82A8,
+   } tI2CStart_Constants;
+   static const unsigned int kI2CStartAddresses [];
+
    void strobeI2CStart(tRioStatusCode *status);
+
+
+   typedef enum
+   {
+      kDIO0_BFLAddress = 0x82FC,
+      kDIO1_BFLAddress = 0x8298,
+   } tBFL_Constants;
+   static const unsigned int kBFLAddresses [];
 
    void writeBFL(bool value, tRioStatusCode *status);
    bool readBFL(tRioStatusCode *status);
 
+
+   typedef enum
+   {
+      kDIO0_PulseLengthAddress = 0x82F4,
+      kDIO1_PulseLengthAddress = 0x8290,
+   } tPulseLength_Constants;
+   static const unsigned int kPulseLengthAddresses [];
+
    void writePulseLength(unsigned char value, tRioStatusCode *status);
    unsigned char readPulseLength(tRioStatusCode *status);
 
+
+   typedef enum
+   {
+      kDIO0_I2CConfigAddress = 0x8310,
+      kDIO1_I2CConfigAddress = 0x82AC,
+   } tI2CConfig_Constants;
+   static const unsigned int kI2CConfigAddresses [];
+
    void writeI2CConfig(tI2CConfig value, tRioStatusCode *status);
    void writeI2CConfig_Address(unsigned char value, tRioStatusCode *status);
-   void writeI2CConfig_Register(unsigned char value, tRioStatusCode *status);
-   void writeI2CConfig_DataToSend(unsigned char value, tRioStatusCode *status);
-   void writeI2CConfig_Read(bool value, tRioStatusCode *status);
    void writeI2CConfig_BytesToRead(unsigned char value, tRioStatusCode *status);
+   void writeI2CConfig_BytesToWrite(unsigned char value, tRioStatusCode *status);
+   void writeI2CConfig_DataToSendHigh(unsigned short value, tRioStatusCode *status);
    tI2CConfig readI2CConfig(tRioStatusCode *status);
    unsigned char readI2CConfig_Address(tRioStatusCode *status);
-   unsigned char readI2CConfig_Register(tRioStatusCode *status);
-   unsigned char readI2CConfig_DataToSend(tRioStatusCode *status);
-   bool readI2CConfig_Read(tRioStatusCode *status);
    unsigned char readI2CConfig_BytesToRead(tRioStatusCode *status);
+   unsigned char readI2CConfig_BytesToWrite(tRioStatusCode *status);
+   unsigned short readI2CConfig_DataToSendHigh(tRioStatusCode *status);
 
 
-   static unsigned short readLoopTiming(tRioStatusCode *status);
 
-   static void writePWMConfig(tPWMConfig value, tRioStatusCode *status);
-   static void writePWMConfig_Period(unsigned short value, tRioStatusCode *status);
-   static void writePWMConfig_MinHigh(unsigned short value, tRioStatusCode *status);
-   static tPWMConfig readPWMConfig(tRioStatusCode *status);
-   static unsigned short readPWMConfig_Period(tRioStatusCode *status);
-   static unsigned short readPWMConfig_MinHigh(tRioStatusCode *status);
+   typedef enum
+   {
+      kDIO_LoopTimingAddress = 0x8354,
+   } tLoopTiming_Constants;
+
+   unsigned short readLoopTiming(tRioStatusCode *status);
 
 
-   static const unsigned char kNumPWMValueRegisters;
+   typedef enum
+   {
+      kDIO_PWMConfigAddress = 0x8350,
+   } tPWMConfig_Constants;
+
+   void writePWMConfig(tPWMConfig value, tRioStatusCode *status);
+   void writePWMConfig_Period(unsigned short value, tRioStatusCode *status);
+   void writePWMConfig_MinHigh(unsigned short value, tRioStatusCode *status);
+   tPWMConfig readPWMConfig(tRioStatusCode *status);
+   unsigned short readPWMConfig_Period(tRioStatusCode *status);
+   unsigned short readPWMConfig_MinHigh(tRioStatusCode *status);
+
+
+
+   typedef enum
+   {
+      kNumPWMValueRegisters = 10,
+      kDIO0_PWMValue0Address = 0x8340,
+      kDIO0_PWMValue1Address = 0x833C,
+      kDIO0_PWMValue2Address = 0x8338,
+      kDIO0_PWMValue3Address = 0x8334,
+      kDIO0_PWMValue4Address = 0x8330,
+      kDIO0_PWMValue5Address = 0x832C,
+      kDIO0_PWMValue6Address = 0x8328,
+      kDIO0_PWMValue7Address = 0x8324,
+      kDIO0_PWMValue8Address = 0x8320,
+      kDIO0_PWMValue9Address = 0x831C,
+      kDIO1_PWMValue0Address = 0x82DC,
+      kDIO1_PWMValue1Address = 0x82D8,
+      kDIO1_PWMValue2Address = 0x82D4,
+      kDIO1_PWMValue3Address = 0x82D0,
+      kDIO1_PWMValue4Address = 0x82CC,
+      kDIO1_PWMValue5Address = 0x82C8,
+      kDIO1_PWMValue6Address = 0x82C4,
+      kDIO1_PWMValue7Address = 0x82C0,
+      kDIO1_PWMValue8Address = 0x82BC,
+      kDIO1_PWMValue9Address = 0x82B8,
+   } tPWMValue_Constants;
+   static const unsigned int kPWMValueAddresses [];
+
    void writePWMValue(unsigned char reg_index, unsigned char value, tRioStatusCode *status);
    unsigned char readPWMValue(unsigned char reg_index, tRioStatusCode *status);
 
@@ -159,63 +319,9 @@ public:
 private:
    unsigned char _SystemIndex;
 
-   #define DIO_LoopTiming_ADDRESS 0x8380
-   #define DIO_PWMConfig_ADDRESS 0x837C
-
-   #define DIO0_DO_ADDRESS 0x8378
-   #define DIO0_FilterSelect_ADDRESS 0x831C
-   #define DIO0_FilterPeriod_ADDRESS 0x8320
-   #define DIO0_OutputEnable_ADDRESS 0x8370
-   #define DIO0_DI_ADDRESS 0x8374
-   #define DIO0_I2CDataReceived_ADDRESS 0x833C
-   #define DIO0_I2CStatus_ADDRESS 0x8334
-   #define DIO0_SlowValue_ADDRESS 0x8330
-   #define DIO0_PWMPeriodScale_ADDRESS 0x8344
-   #define DIO0_Pulse_ADDRESS 0x8328
-   #define DIO0_I2CStart_ADDRESS 0x8338
-   #define DIO0_BFL_ADDRESS 0x832C
-   #define DIO0_PulseLength_ADDRESS 0x8324
-   #define DIO0_I2CConfig_ADDRESS 0x8340
-
-   #define DIO0_PWMValue0_ADDRESS 0x836C
-   #define DIO0_PWMValue1_ADDRESS 0x8368
-   #define DIO0_PWMValue2_ADDRESS 0x8364
-   #define DIO0_PWMValue3_ADDRESS 0x8360
-   #define DIO0_PWMValue4_ADDRESS 0x835C
-   #define DIO0_PWMValue5_ADDRESS 0x8358
-   #define DIO0_PWMValue6_ADDRESS 0x8354
-   #define DIO0_PWMValue7_ADDRESS 0x8350
-   #define DIO0_PWMValue8_ADDRESS 0x834C
-   #define DIO0_PWMValue9_ADDRESS 0x8348
-   #define DIO1_DO_ADDRESS 0x8318
-   #define DIO1_FilterSelect_ADDRESS 0x82BC
-   #define DIO1_FilterPeriod_ADDRESS 0x82C0
-   #define DIO1_OutputEnable_ADDRESS 0x8310
-   #define DIO1_DI_ADDRESS 0x8314
-   #define DIO1_I2CDataReceived_ADDRESS 0x82DC
-   #define DIO1_I2CStatus_ADDRESS 0x82D4
-   #define DIO1_SlowValue_ADDRESS 0x82D0
-   #define DIO1_PWMPeriodScale_ADDRESS 0x82E4
-   #define DIO1_Pulse_ADDRESS 0x82C8
-   #define DIO1_I2CStart_ADDRESS 0x82D8
-   #define DIO1_BFL_ADDRESS 0x82CC
-   #define DIO1_PulseLength_ADDRESS 0x82C4
-   #define DIO1_I2CConfig_ADDRESS 0x82E0
-
-   #define DIO1_PWMValue0_ADDRESS 0x830C
-   #define DIO1_PWMValue1_ADDRESS 0x8308
-   #define DIO1_PWMValue2_ADDRESS 0x8304
-   #define DIO1_PWMValue3_ADDRESS 0x8300
-   #define DIO1_PWMValue4_ADDRESS 0x82FC
-   #define DIO1_PWMValue5_ADDRESS 0x82F8
-   #define DIO1_PWMValue6_ADDRESS 0x82F4
-   #define DIO1_PWMValue7_ADDRESS 0x82F0
-   #define DIO1_PWMValue8_ADDRESS 0x82EC
-   #define DIO1_PWMValue9_ADDRESS 0x82E8
-
 };
 
 }
 }
 
-#endif // __DIO_h__
+#endif // __nAD9A5591CC64E4DF756D77D1B57A549E_DIO_h__

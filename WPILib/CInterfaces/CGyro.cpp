@@ -176,3 +176,37 @@ void DeleteGyro(UINT32 channel)
 	DeleteGyro(SensorBase::GetDefaultAnalogModule(), channel);
 }
 
+/**
+ * Alternate C interface to Gyro
+ */
+
+GyroObject CreateGyro(UINT32 slot, UINT32 channel)
+{
+	return (GyroObject) new Gyro(slot, channel);
+}
+
+GyroObject CreateGyro(UINT32 channel)
+{
+	return (GyroObject) new Gyro(channel);
+}
+
+float GetGyroAngle(GyroObject o)
+{
+	return ((Gyro *) o)->GetAngle();
+}
+
+void ResetGyro(GyroObject o)
+{
+	((Gyro *) o)->Reset();
+}
+
+void SetGyroSensitivity(GyroObject o, float voltsPerDegreePerSecond)
+{
+	((Gyro *) o)->SetSensitivity(voltsPerDegreePerSecond);
+}
+
+void Delete(GyroObject o)
+{
+	delete ((Gyro *) o);
+}
+

@@ -14,7 +14,7 @@
  * @param slot The slot that the digital module is plugged into
  * @param channel The PWM channel that the motor is plugged into
  */
-static SensorBase *CreateVictor(UINT32 slot, UINT32 channel)
+static SensorBase *CreateVictorStatic(UINT32 slot, UINT32 channel)
 {
 	return new Victor(slot, channel);
 }
@@ -32,7 +32,7 @@ static SensorBase *CreateVictor(UINT32 slot, UINT32 channel)
  */
 void SetVictorSpeed(UINT32 slot, UINT32 channel, float speed)
 {
-	Victor *victor = (Victor *) AllocatePWM(slot, channel, CreateVictor);
+	Victor *victor = (Victor *) AllocatePWM(slot, channel, CreateVictorStatic);
 	if (victor)	victor->Set(speed);
 }
 
@@ -46,7 +46,7 @@ void SetVictorSpeed(UINT32 slot, UINT32 channel, float speed)
  */
 void SetVictorRaw(UINT32 channel, UINT8 value)
 {
-	Victor *victor = (Victor *) AllocatePWM(channel, CreateVictor);
+	Victor *victor = (Victor *) AllocatePWM(channel, CreateVictorStatic);
 	if (victor) victor->SetRaw(value);
 }
 
@@ -61,7 +61,7 @@ void SetVictorRaw(UINT32 channel, UINT8 value)
  */
 void SetVictorSpeed(UINT32 channel, float speed)
 {
-	Victor *victor = (Victor *) AllocatePWM(channel, CreateVictor);
+	Victor *victor = (Victor *) AllocatePWM(channel, CreateVictorStatic);
 	if (victor) victor->Set(speed);
 }
 
@@ -75,7 +75,7 @@ void SetVictorSpeed(UINT32 channel, float speed)
  */
 UINT8 GetVictorRaw(UINT32 channel)
 {
-	Victor *victor = (Victor *) AllocatePWM(channel, CreateVictor);
+	Victor *victor = (Victor *) AllocatePWM(channel, CreateVictorStatic);
 	if (victor)
 		return victor->GetRaw();
 	else
@@ -93,7 +93,7 @@ UINT8 GetVictorRaw(UINT32 channel)
  */
 void SetVictorRaw(UINT32 slot, UINT32 channel, UINT8 value)
 {
-	Victor *victor = (Victor *) AllocatePWM(slot, channel, CreateVictor);
+	Victor *victor = (Victor *) AllocatePWM(slot, channel, CreateVictorStatic);
 	if (victor) victor->SetRaw(value);
 }
 
@@ -109,7 +109,7 @@ void SetVictorRaw(UINT32 slot, UINT32 channel, UINT8 value)
  */
 UINT8 GetVictorRaw(UINT32 slot, UINT32 channel)
 {
-	Victor *victor = (Victor *) AllocatePWM(slot, channel, CreateVictor);
+	Victor *victor = (Victor *) AllocatePWM(slot, channel, CreateVictorStatic);
 	if (victor)
 		return victor->GetRaw();
 	else
@@ -125,7 +125,7 @@ UINT8 GetVictorRaw(UINT32 slot, UINT32 channel)
  */
 void DeleteVictor(UINT32 slot, UINT32 channel)
 {
-	Victor *victor = (Victor *) AllocatePWM(slot, channel, CreateVictor);
+	Victor *victor = (Victor *) AllocatePWM(slot, channel, CreateVictorStatic);
 	delete victor;
 	DeletePWM(slot, channel);
 }
@@ -140,3 +140,38 @@ void DeleteVictor(UINT32 channel)
 {
 	DeleteVictor(SensorBase::GetDefaultDigitalModule(), channel);
 }
+
+VictorObject CreateVictor(UINT32 slot, UINT32 channel)
+{
+	return (VictorObject) new Victor(slot, channel);
+}
+
+VictorObject CreateVictor(UINT32 channel)
+{
+	return (VictorObject) new Victor(channel);
+}
+
+void DeleteVictor(VictorObject o)
+{
+	delete (Victor *) o;
+}
+
+void SetVictorSpeed(VictorObject o, float speed)
+{
+	((Victor *)o)->Set(speed);
+}
+
+void SetVictorRaw(VictorObject o, UINT8 value)
+{
+	((Victor *)o)->SetRaw(value);
+}
+
+UINT8 GetVictorRaw(VictorObject o)
+{
+	return ((Victor *)o)->GetRaw();
+}
+
+void LoadVictor(void)
+{
+}
+

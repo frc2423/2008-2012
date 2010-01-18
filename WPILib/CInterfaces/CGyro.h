@@ -9,6 +9,15 @@
 
 #include <VxWorks.h>
 
+typedef void *GyroObject;
+
+GyroObject CreateGyro(UINT32 slot, UINT32 channel);
+GyroObject CreateGyro(UINT32 channel);
+float GetGyroAngle(GyroObject o);
+void ResetGyro(GyroObject o);
+void SetGyroSensitivity(GyroObject o, float voltsPerDegreePerSecond);
+void Delete(GyroObject o);
+
 void InitGyro(UINT32 slot, UINT32 channel);
 void InitGyro(UINT32 channel);
 float GetGyroAngle(UINT32 channel);

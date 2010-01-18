@@ -23,6 +23,7 @@ public:
 	~Solenoid();
 	void Set(bool on);
 	bool Get();
+	char GetAll();
 
 protected:
 	UINT32 SlotToIndex(UINT32 slot);

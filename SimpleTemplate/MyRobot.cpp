@@ -1,13 +1,15 @@
-#include "WPILib.h"
+#include <WPILib.h>
 #include <WebDMA/WebDMA.h>
-#include <limits>
 
+#include "CoordinateSystem.h"
+
+#include <cmath>
+
+#define WHEEL_RADIUS 0.1524
+#define WHEEL_BASE 0.5
 #define SLOT_1 4
 #define SLOT_2 6
-
 #define SLOT SLOT_1
-#undef min
-#undef max
 
 /**
  * This is a demo program showing the use of the RobotBase class.
@@ -22,8 +24,8 @@ class RobotDemo : public SimpleRobot
 	Encoder leftEncoder; // detects the speed that the wheels are turning at
 	Encoder rightEncoder;
 	WebDMA webdma;
-	IntProxy leftEncoderValue;
-	IntProxy rightEncoderValue;
+
+	CoordinateSystem coordinateSystem;
 	
 	
 public:
@@ -31,24 +33,11 @@ public:
 		myRobot(1, 2),	// these must be initialized in the same order
 		stick(1),		// as they are declared above.
 		leftEncoder(SLOT, 3, SLOT, 4),
-		rightEncoder(SLOT, 1, SLOT, 2)
+		rightEncoder(SLOT, 1, SLOT, 2),
+		coordinateSystem(&leftEncoder, &rightEncoder, &webdma)
 	{
-		leftEncoderValue = webdma.CreateIntProxy("encoders", "leftencoder",
-			IntProxyFlags()
-				.default_value(0)
-				.minval(std::numeric_limits<int>::min())
-				.maxval(std::numeric_limits<int>::max())
-				.step(1)
-				.readonly()
-		);
-		rightEncoderValue = webdma.CreateIntProxy("encoders", "rightencoder",
-					IntProxyFlags()
-						.default_value(0)
-						.minval(std::numeric_limits<int>::min())
-						.maxval(std::numeric_limits<int>::max())
-						.step(1)
-						.readonly()
-				);
+		coordinateSystem.SetWheelInformation(WHEEL_RADIUS, WHEEL_BASE);
+
 		
 		GetWatchdog().SetExpiration(0.1);
 		webdma.Enable("80", "/www");
@@ -107,12 +96,19 @@ public:
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
-			//myRobot.Drive( stick.GetMagnitude()* stick.GetY() / abs(stick.GetY()), stick.GetThrottle()* stick.GetX() );
-			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
-			Wait(0.005);				// wait for a motor update time
 			
-			leftEncoderValue = leftEncoder.GetRaw();
-			rightEncoderValue = rightEncoder.GetRaw();
+			if (abs(stick.GetX()) <= .1)
+			{
+				myRobot.Drive( stick.GetMagnitude()* stick.GetY() / abs(stick.GetY()), 0.0 );
+			}
+			else
+			{
+				myRobot.Drive( stick.GetMagnitude()* stick.GetY() / abs(stick.GetY()), pow( (stick.GetThrottle()+ 1) / 2, abs(stick.GetY())) * stick.GetX() );
+			}
+
+			//myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
+			
+			Wait(0.005);				// wait for a motor update time
 		}
 	}
 };

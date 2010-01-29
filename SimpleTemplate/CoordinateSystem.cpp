@@ -14,7 +14,7 @@ CoordinateSystem::CoordinateSystem(
 		Encoder* rightencoder, 
 		WebDMA* webdma
 ):
-	m_Angle(0),
+	m_angle(0),
 	m_wheelBase(0),
 	m_notifier(CoordinateSystem::TimerFn, this),
 	m_leftEncoder(leftencoder),
@@ -38,6 +38,33 @@ CoordinateSystem::CoordinateSystem(
 					.readonly()
 			);
 	
+	m_xDistance = webdma->CreateDoubleProxy("Coordinate System", "X",
+				DoubleProxyFlags()
+					.default_value(0)
+					.minval(std::numeric_limits<double>::min())
+					.maxval(std::numeric_limits<double>::max())
+					.step(1)
+					.readonly()
+			);
+	
+	m_yDistance = webdma->CreateDoubleProxy("Coordinate System", "Y",
+				DoubleProxyFlags()
+					.default_value(0)
+					.minval(std::numeric_limits<double>::min())
+					.maxval(std::numeric_limits<double>::max())
+					.step(1)
+					.readonly()
+			);
+	
+	m_display_angle = webdma->CreateDoubleProxy("Coordinate System", "Angle",
+				DoubleProxyFlags()
+					.default_value(0)
+					.minval(std::numeric_limits<double>::min())
+					.maxval(std::numeric_limits<double>::max())
+					.step(1)
+					.readonly()
+			);
+	
 	// create a mutex to allow us to synchronize access to variables
 	// since we're going to be running in multiple threads
 	m_mutex = semMCreate(0);
@@ -51,8 +78,8 @@ void CoordinateSystem::SetWheelInformation (double wheel_radius, double wheel_ba
 {
 	m_wheelBase = wheel_base;
 	
-	m_leftEncoder->SetDistancePerPulse( 1440.0 / (2 * M_PI * wheel_radius) );
-	m_rightEncoder->SetDistancePerPulse( 1440.0 / (2 * M_PI * wheel_radius) );
+	m_leftEncoder->SetDistancePerPulse( (2 * M_PI * wheel_radius) / 1440.0 );
+	m_rightEncoder->SetDistancePerPulse( (2 * M_PI * wheel_radius) / 1440.0 );
 }
 
 void CoordinateSystem::Start()
@@ -74,6 +101,23 @@ void CoordinateSystem::CalculationTimerFn ()
 	
 	
 	// Store encoder values so we can use them next time.
+	double prev_leftMeters = m_leftMeters;
+	double prev_rightMeters = m_rightMeters;
+	
 	m_leftMeters = m_leftEncoder->GetDistance();
-	m_rightMeters = m_rightEncoder->GetDistance();
+	m_rightMeters = - m_rightEncoder->GetDistance();
+	
+	double leftDistance = m_leftMeters - prev_leftMeters;
+	double rightDistance = m_rightMeters - prev_rightMeters;
+	
+	double angle = (leftDistance - rightDistance) / (m_wheelBase / 2);
+	m_angle += angle;
+	
+	m_display_angle = m_angle * (180 / M_PI);
+	
+	double x_Distance = leftDistance * cos(m_angle);
+	m_xDistance = m_xDistance + x_Distance;
+	
+	double y_Distance = leftDistance * sin(m_angle);
+	m_yDistance = m_yDistance + y_Distance;
 }

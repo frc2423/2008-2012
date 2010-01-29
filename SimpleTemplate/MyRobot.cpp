@@ -5,8 +5,8 @@
 
 #include <cmath>
 
-#define WHEEL_RADIUS 0.1524
-#define WHEEL_BASE 0.5
+#define WHEEL_RADIUS (0.1524 * (22.0 / 15.0))
+#define WHEEL_BASE 0.61
 #define SLOT_1 4
 #define SLOT_2 6
 #define SLOT SLOT_1
@@ -44,6 +44,8 @@ public:
 		
 		leftEncoder.Start();
 		rightEncoder.Start();
+		
+		coordinateSystem.Start();
 	}
 
 	/**
@@ -97,7 +99,7 @@ public:
 		{
 			GetWatchdog().Feed();
 			
-			if (abs(stick.GetX()) <= .1)
+		/*	if (abs(stick.GetX()) <= .1)
 			{
 				myRobot.Drive( stick.GetMagnitude()* stick.GetY() / abs(stick.GetY()), 0.0 );
 			}
@@ -105,8 +107,9 @@ public:
 			{
 				myRobot.Drive( stick.GetMagnitude()* stick.GetY() / abs(stick.GetY()), pow( (stick.GetThrottle()+ 1) / 2, abs(stick.GetY())) * stick.GetX() );
 			}
+		*/
 
-			//myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
+			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			
 			Wait(0.005);				// wait for a motor update time
 		}

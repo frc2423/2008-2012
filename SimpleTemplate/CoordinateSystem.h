@@ -18,12 +18,16 @@ public:
 	
 private:
 	static void TimerFn(void * param); 
-	void CalculationTimerFn ();
+	void CalculationTimerFn();
+	
+	double AngleCalc();
 	
 	CoordinateSystem();
 	
-	double m_Angle;								// Heading of the robot
+	double m_angle;								// Heading of the robot
 	DoubleProxy m_leftMeters, m_rightMeters;	// Stores distance in meters
+	DoubleProxy m_xDistance, m_yDistance;
+	DoubleProxy m_display_angle;
 	double m_wheelBase;							// Wheel base of the robot
 	
 	Notifier m_notifier;

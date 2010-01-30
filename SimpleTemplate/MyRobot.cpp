@@ -59,16 +59,66 @@ public:
 		//myRobot.Drive(0.0, 0.0); 	// stop robot
 		
 		
+		int autonomousState = 1;
+		
 		while (IsAutonomous())
 		{
-			if( leftEncoder.GetDistance() >= 500.0)
+/*			if( leftEncoder.GetDistance() >= 500.0)
 			{
 				myRobot.Drive(0.2, 0.0);
 			}
 			else
 			{
 				myRobot.Drive(0.0, 0.0);
+			}         */
+		
+			double x, y, angle;
+			coordinateSystem.getData(x, y, angle);
+			
+			switch(autonomousState)
+			{
+				case 1:
+					myRobot.Drive(-0.5, 0.0);
+					if( y >= 1.0)
+						autonomousState = 2;
+					break;
+				case 2:
+					myRobot.Drive(-0.3, 0.3);
+					if( angle >= 90.0)
+						autonomousState = 3;
+					break;
+				case 3:
+					myRobot.Drive(-0.5, 0.0);
+					if( x >= 3.0)
+						autonomousState = 4;
+					break;
+				case 4:
+					myRobot.Drive(-0.3, 0.3);
+					if( angle >= 180.0)
+						autonomousState = 5;
+					double temp_y = y;
+					break;
+				case 5:
+					myRobot.Drive(-0.5, 0.0);
+					if( y >= temp_y - 1.0)
+						autonomousState = 6;
+					break;
+				case 6:
+					myRobot.Drive(-0.3, 0.3);
+					if( angle >= 270.0)
+						autonomousState = 7;
+					break;
+				case 7:
+					myRobot.Drive(-0.5, 0.0);
+					if( x >= 0.0)
+						autonomousState = 8;
+					break;
+				case 8:
+					myRobot.Drive(0.0, 0.0);
+					break;
 			}
+		
+		
 		}
 		
 		/*bool canMove = true;

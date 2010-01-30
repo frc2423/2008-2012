@@ -14,7 +14,9 @@ public:
 			);
 	
 	void Start ();
-	void SetWheelInformation (double wheel_radius, double wheel_base);
+	void SetWheelInformation (const double wheel_radius, const double wheel_base);
+	void getData(double &x, double &y, double &angle);
+
 	
 private:
 	static void TimerFn(void * param); 
@@ -23,6 +25,8 @@ private:
 	double AngleCalc();
 	
 	CoordinateSystem();
+	
+	double d_err(double number);
 	
 	double m_angle;								// Heading of the robot
 	DoubleProxy m_leftMeters, m_rightMeters;	// Stores distance in meters
@@ -38,5 +42,6 @@ private:
 };
 
 
-
 #endif
+
+

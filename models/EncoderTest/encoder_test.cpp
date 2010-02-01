@@ -45,7 +45,7 @@ public:
 		// dx = - ((r+l)/2.0) * (dtheta/2! - dtheta^3/4! + dtheta^5/6!)
 		//
 		
-		if (fabs(dtheta) > M_PI/36)
+		if (fabs(dtheta) > M_PI/36.0)
 		{
 			// anything more than five degrees: simple expression
 			dy = ((r+l)/(2.0 * dtheta)) * sin(dtheta);
@@ -54,8 +54,8 @@ public:
 		else
 		{
 			// anything less than five degrees: more complex expression
-			dy = ((r+l)/2.0 ) * ( 1 - (dtheta*dtheta)/ 6 + (dtheta*dtheta*dtheta*dtheta)/120);
-			dx = - ((r+l)/2.0) * (dtheta/2 - (dtheta*dtheta*dtheta)/24 + (dtheta*dtheta*dtheta*dtheta*dtheta)/720);
+			dy = ((r+l)/2.0 ) * ( 1.0 - (dtheta*dtheta)/ 6.0 + (dtheta*dtheta*dtheta*dtheta)/120.0);
+			dx = - ((r+l)/2.0) * (dtheta/2.0 - (dtheta*dtheta*dtheta)/24.0 + (dtheta*dtheta*dtheta*dtheta*dtheta)/720.0);
 		}
 
 		TransformCoordinates( dx, dy, dtheta );
@@ -123,43 +123,43 @@ int main()
 {
 	CoordinateSystem cs(1.0);
 	
-	SINGLE_CS( 0, 0 );
+	SINGLE_CS( 0.0, 0.0 );
 	
 	// obvious cases: straight ahead
-	SINGLE_CS( 1, 1 );				// x: 0, y: 1,  theta: 0
-	SINGLE_CS( -1, -1 );			// x: 0, y: -1, theta: 0
+	SINGLE_CS( 1.0, 1.0 );				// x: 0, y: 1,  theta: 0
+	SINGLE_CS( -1.0, -1.0 );			// x: 0, y: -1, theta: 0
 	
 	// turning in place
-	SINGLE_CS( -M_PI/4, M_PI/4 ); 	// left: x: 0, y: 0, theta: 90 
-	SINGLE_CS( M_PI/4, -M_PI/4 );	// right: x: 0, y: 0, theta: -90
+	SINGLE_CS( -M_PI/4.0, M_PI/4.0 ); 	// left: x: 0, y: 0, theta: 90 
+	SINGLE_CS( M_PI/4.0, -M_PI/4.0 );	// right: x: 0, y: 0, theta: -90
 	
 	
-	SINGLE_CS( 0 , M_PI/2.0 ); 		// turning left
+	SINGLE_CS( 0.0 , M_PI/2.0 ); 		// turning left
 									// x: -.5, y: .5, theta: 90
-	SINGLE_CS( M_PI/2.0, 0 );		// turning right
+	SINGLE_CS( M_PI/2.0, 0.0 );		// turning right
 									// x: .5, y: .5, theta: -90
 									
 	// three degrees left								
-	SINGLE_CS( 0, 3 * (M_PI/180.0) );
+	SINGLE_CS( 0.0, 3.0 * (M_PI/180.0) );
 	
 	// three degrees right
-	SINGLE_CS( 0, 3 * (M_PI/180.0) );
+	SINGLE_CS( 0.0, 3.0 * (M_PI/180.0) );
 	
 	// lots of circles
-	SINGLE_CS( 0, 18 * M_PI );
+	SINGLE_CS( 0.0, 18.0 * M_PI );
 			
 	// lots of circles and a half
-	SINGLE_CS( 0, 17 * M_PI );
+	SINGLE_CS( 0.0, 17.0 * M_PI );
 	
 	//
-	SINGLE_CS( 7 + M_PI / 2, 7 );
+	SINGLE_CS( 7.0 + M_PI / 2.0, 7.0 );
 			
 	// going forward, turning in place to left, forward, left
 	printf("Series:\n");
-	STEP_CS( 1, 1 );
-	STEP_CS( M_PI/4, -M_PI/4 );
-	STEP_CS( 1, 1 );
-	STEP_CS( 0 , M_PI/2.0 ); 
+	STEP_CS( 1.0, 1.0 );
+	STEP_CS( M_PI/4.0, -M_PI/4.0 );
+	STEP_CS( 1.0, 1.0 );
+	STEP_CS( 0.0 , M_PI/2.0 ); 
 									
 }
 

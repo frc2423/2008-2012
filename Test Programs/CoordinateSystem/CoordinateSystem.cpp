@@ -14,7 +14,7 @@ CoordinateSystem::CoordinateSystem(
 		Encoder* rightencoder, 
 		WebDMA* webdma
 ):
-	m_angle(0),
+	m_theta(0),
 	m_wheelBase(0),
 	m_notifier(CoordinateSystem::TimerFn, this),
 	m_leftEncoder(leftencoder),
@@ -38,7 +38,7 @@ CoordinateSystem::CoordinateSystem(
 					.readonly()
 			);
 	
-	m_xDistance = webdma->CreateDoubleProxy("Coordinate System", "X",
+	m_x = webdma->CreateDoubleProxy("Coordinate System", "X",
 				DoubleProxyFlags()
 					.default_value(0)
 					.minval(std::numeric_limits<double>::min())
@@ -47,7 +47,7 @@ CoordinateSystem::CoordinateSystem(
 					.readonly()
 			);
 	
-	m_yDistance = webdma->CreateDoubleProxy("Coordinate System", "Y",
+	m_y = webdma->CreateDoubleProxy("Coordinate System", "Y",
 				DoubleProxyFlags()
 					.default_value(0)
 					.minval(std::numeric_limits<double>::min())
@@ -64,6 +64,14 @@ CoordinateSystem::CoordinateSystem(
 					.step(1)
 					.readonly()
 			);
+	
+	m_l = webdma->CreateIntProxy("Coordinate System", "RawL", 
+			IntProxyFlags().readonly()
+	);
+	
+	m_r = webdma->CreateIntProxy("Coordinate System", "RawR",
+			IntProxyFlags().readonly()
+	);
 	
 	// create a mutex to allow us to synchronize access to variables
 	// since we're going to be running in multiple threads
@@ -84,7 +92,7 @@ void CoordinateSystem::SetWheelInformation (const double wheel_radius, const dou
 
 void CoordinateSystem::Start()
 {
-	m_notifier.StartPeriodic(.005);
+	m_notifier.StartPeriodic(.0025);
 }
 
 // callback function for the Notifier 
@@ -94,68 +102,80 @@ void CoordinateSystem::TimerFn(void * param)
 }
 
 // this is called every 50ms and performs calculations
+
 /*
-void CoordinateSystem::CalculationTimerFn ()
+	ComputeNewPosition
+	
+	Assumes a uniform motion for each wheel over some period
+	with no slippage. 
+
+	@param l		Left meters
+	@param r		Right meters
+
+	Left meters/right meters:
+		If they are positive, the wheel is moving in the forward
+		direction
+*/
+void CoordinateSystem::ComputeNewPosition(double l, double r)
 {
-	// make sure that nobody else can access our variables
-	Synchronized lock(m_mutex);
+	double dx, dy, dtheta;
+
+	dtheta = ( r - l ) / m_wheelBase;
 	
+	// dy = ((r+l)/(2.0 *dtheta)) * sin(dtheta);
+	// dx = - ((r+l)/(2.0 * dtheta)) * (1.0 - cos(dtheta))
+	//
+	// BUT
+	//
+	// you need to expand these out using a taylor series approximation
+	// to avoid divide by zero errors. So we end up with a more
+	// complicated expression that looks like this:
+	//
+	// dy = ((r+l)/2.0 ) * ( 1 - dtheta^2 / 3! + dtheta^4/5! );
+	// dx = - ((r+l)/2.0) * (dtheta/2! - dtheta^3/4! + dtheta^5/6!)
+	//
 	
-	// Store encoder values so we can use them next time.
-	double prev_leftMeters = m_leftMeters;
-	double prev_rightMeters = m_rightMeters;
-	
-	m_leftMeters = m_leftEncoder->GetDistance();
-	m_rightMeters = - m_rightEncoder->GetDistance();
-	
-	double leftDistance = m_leftMeters - prev_leftMeters;
-	double rightDistance = m_rightMeters - prev_rightMeters;
-	
-	double radius, leftRadius, rightRadius;
-	
-	if (fabs(leftDistance) >= fabs(rightDistance))
+	if (fabs(dtheta) > M_PI/36.0)
 	{
-		radius = (leftDistance / ( d_err(leftDistance - rightDistance))) * m_wheelBase - m_wheelBase;
-		leftRadius = m_wheelBase - fabs(radius);
-		rightRadius = fabs(radius);
+		// anything more than five degrees: simple expression
+		dy = ((r+l)/(2.0 * dtheta)) * sin(dtheta);
+		dx = - ((r+l)/(2.0 * dtheta)) * (1.0 - cos(dtheta));
 	}
 	else
 	{
-		radius = (rightDistance / (d_err(rightDistance - leftDistance))) * m_wheelBase - m_wheelBase;
-		leftRadius = fabs(radius);
-		rightRadius = m_wheelBase - fabs(radius);
+		// anything less than five degrees: more complex expression
+		dy = ((r+l)/2.0 ) * ( 1.0 - (dtheta*dtheta)/ 6.0 + (dtheta*dtheta*dtheta*dtheta)/120.0);
+		dx = - ((r+l)/2.0) * (dtheta/2.0 - (dtheta*dtheta*dtheta)/24.0 + (dtheta*dtheta*dtheta*dtheta*dtheta)/720.0);
 	}
+
+	TransformCoordinates( dx, dy, dtheta );
 	
-	double angle = (leftDistance / d_err(leftRadius)) - (rightDistance / d_err(rightRadius));
-	
-	m_angle += angle;
-	
-	m_display_angle = m_angle * (180.0 / M_PI);
-	
-	double modAngle = fmod(m_angle, (2.0 * M_PI));
-	
-	double x_Distance = leftDistance * fabs(cos(m_angle));
-	double y_Distance = leftDistance * fabs(sin(m_angle));
-	
-	if ((modAngle > M_PI) || (modAngle > -M_PI && modAngle < 0))
-	{
-		x_Distance *= -1.0;
-	}
-	
-	if ((abs(modAngle) > (M_PI / 2.0)) && (fabs(modAngle) < (3.0 * M_PI / 2.0)))
-	{
-		y_Distance *= -1.0;
-	}
-	
-	m_xDistance = m_xDistance + x_Distance;
-	m_yDistance = m_yDistance + y_Distance;
+	m_display_angle = m_theta * (180.0 / M_PI);
 }
+
+/**
+	Internal function
+	
+	Transforms coordinates to the original frame of reference
 */
+void CoordinateSystem::TransformCoordinates(double dx, double dy, double dtheta)
+{
+	m_x = m_x + dx * cos(m_theta) - dy * sin(m_theta);
+	m_y = m_y + dx * sin(m_theta) + dy * cos(m_theta);
+	
+	// calculate this last
+	m_theta = m_theta + dtheta;
+}
+
+
+
 void CoordinateSystem::CalculationTimerFn ()
 {
 	// make sure that nobody else can access our variables
 	Synchronized lock(m_mutex);
 	
+	m_l = m_leftEncoder->GetRaw();
+	m_r = m_rightEncoder->GetRaw();
 	
 	// Store encoder values so we can use them next time.
 	double prev_leftMeters = m_leftMeters;
@@ -167,32 +187,7 @@ void CoordinateSystem::CalculationTimerFn ()
 	double leftDistance = m_leftMeters - prev_leftMeters;
 	double rightDistance = m_rightMeters - prev_rightMeters;
 	
-
-	
-	
-	double angle = (leftDistance - rightDistance) / (m_wheelBase / 2.0);
-	
-	m_angle += angle;
-	
-	m_display_angle = m_angle * (180.0 / M_PI);
-	
-	double modAngle = fmod(m_angle, (2.0 * M_PI));
-	
-	double x_Distance = leftDistance * fabs(cos(m_angle));
-	double y_Distance = leftDistance * fabs(sin(m_angle));
-	
-	if ((modAngle > M_PI) || (modAngle > -M_PI && modAngle < 0))
-	{
-		x_Distance *= -1.0;
-	}
-	
-	if ((abs(modAngle) > (M_PI / 2.0)) && (fabs(modAngle) < (3.0 * M_PI / 2.0)))
-	{
-		y_Distance *= -1.0;
-	}
-	
-	m_xDistance = m_xDistance + x_Distance;
-	m_yDistance = m_yDistance + y_Distance;
+	ComputeNewPosition(leftDistance, rightDistance);
 }
 
 // returns x and y relative to robot starting posititon, and angle in degrees, by reference
@@ -201,21 +196,10 @@ void CoordinateSystem::getData(double &x, double &y, double &angle)
 	// make sure that nobody else can access our variables
 	Synchronized lock(m_mutex);
 	
-	x = m_xDistance;
-	y = m_yDistance;
-	angle = m_angle * (180 / M_PI);
+	x = m_x;
+	y = m_y;
+	angle = fmod(m_theta * (180.0 / M_PI), 360.0);
 }
 
-double CoordinateSystem::d_err(double number)
-{
-	if ( number < 0.000001 && number > -0.000001)
-	{
-		if (number < 0)
-			return -0.000001;
-		else
-			return 0.000001;
-	}				
-	else
-		return number;
-}
+
 

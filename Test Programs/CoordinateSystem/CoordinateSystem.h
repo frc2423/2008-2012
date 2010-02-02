@@ -21,18 +21,19 @@ public:
 private:
 	static void TimerFn(void * param); 
 	void CalculationTimerFn();
-	
-	double AngleCalc();
+	void ComputeNewPosition(double l, double r);
+	void TransformCoordinates(double dx, double dy, double dtheta);
 	
 	CoordinateSystem();
 	
-	double d_err(double number);
 	
-	double m_angle;								// Heading of the robot
+	double m_theta;								// Heading of the robot
 	DoubleProxy m_leftMeters, m_rightMeters;	// Stores distance in meters
-	DoubleProxy m_xDistance, m_yDistance;
+	DoubleProxy m_x, m_y;
 	DoubleProxy m_display_angle;
 	double m_wheelBase;							// Wheel base of the robot
+	
+	IntProxy m_l, m_r;
 	
 	Notifier m_notifier;
 	Encoder* m_leftEncoder;

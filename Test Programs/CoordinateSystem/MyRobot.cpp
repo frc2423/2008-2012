@@ -6,7 +6,7 @@
 #include <cmath>
 
 #define WHEEL_RADIUS (0.1524 * (22.0 / 15.0))
-#define WHEEL_BASE 0.61
+#define WHEEL_BASE 0.625
 #define SLOT_1 4
 #define SLOT_2 6
 #define SLOT SLOT_1
@@ -32,15 +32,15 @@ public:
 	RobotDemo(void):
 		myRobot(1, 2),	// these must be initialized in the same order
 		stick(1),		// as they are declared above.
-		leftEncoder(SLOT, 3, SLOT, 4),
-		rightEncoder(SLOT, 1, SLOT, 2),
+		leftEncoder(SLOT, 1, SLOT, 2),
+		rightEncoder(SLOT, 3, SLOT, 4),
 		coordinateSystem(&leftEncoder, &rightEncoder, &webdma)
 	{
 		coordinateSystem.SetWheelInformation(WHEEL_RADIUS, WHEEL_BASE);
 
 		
 		GetWatchdog().SetExpiration(0.1);
-		webdma.Enable("80", "/www");
+		webdma.Enable();
 		
 		leftEncoder.Start();
 		rightEncoder.Start();
@@ -83,28 +83,27 @@ public:
 						autonomousState = 2;
 					break;
 				case 2:
-					myRobot.Drive(-0.3, 0.3);
+					myRobot.Drive(-0.2, -0.3);
 					if( angle >= 90.0)
 						autonomousState = 3;
 					break;
 				case 3:
 					myRobot.Drive(-0.5, 0.0);
-					if( x >= 3.0)
+					if( x <= -1.0)
 						autonomousState = 4;
 					break;
 				case 4:
-					myRobot.Drive(-0.3, 0.3);
+					myRobot.Drive(-0.2, -0.3);
 					if( angle >= 180.0)
 						autonomousState = 5;
-					double temp_y = y;
 					break;
 				case 5:
 					myRobot.Drive(-0.5, 0.0);
-					if( y >= temp_y - 1.0)
+					if( y >= 0.0)
 						autonomousState = 6;
 					break;
 				case 6:
-					myRobot.Drive(-0.3, 0.3);
+					myRobot.Drive(-0.2, -0.3);
 					if( angle >= 270.0)
 						autonomousState = 7;
 					break;
@@ -114,6 +113,11 @@ public:
 						autonomousState = 8;
 					break;
 				case 8:
+					myRobot.Drive(-0.2, -0.3);
+					if( angle >= 0.0 )
+						autonomousState = 9;
+					break;
+				case 9:
 					myRobot.Drive(0.0, 0.0);
 					break;
 			}

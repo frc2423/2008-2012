@@ -5,18 +5,12 @@
 
 #include <cmath>
 
-#define WHEEL_RADIUS (0.1524 * (22.0 / 15.0))
-#define WHEEL_BASE 0.625
+#define WHEEL_RADIUS (0.1016 * (15.0 / 40.0))
+#define WHEEL_BASE 0.55245
 #define SLOT_1 4
 #define SLOT_2 6
 #define SLOT SLOT_1
 
-/**
- * This is a demo program showing the use of the RobotBase class.
- * The SimpleRobot class is the base of a robot application that will automatically call your
- * Autonomous and OperatorControl methods at the right time as controlled by the switches on
- * the driver station or the field controls.
- */ 
 class RobotDemo : public SimpleRobot
 {
 	RobotDrive myRobot; // robot drive system
@@ -26,7 +20,7 @@ class RobotDemo : public SimpleRobot
 	WebDMA webdma;
 
 	CoordinateSystem coordinateSystem;
-	
+	Jaguar roller;
 	
 public:
 	RobotDemo(void):
@@ -34,7 +28,9 @@ public:
 		stick(1),		// as they are declared above.
 		leftEncoder(SLOT, 1, SLOT, 2),
 		rightEncoder(SLOT, 3, SLOT, 4),
-		coordinateSystem(&leftEncoder, &rightEncoder, &webdma)
+		coordinateSystem(&leftEncoder, &rightEncoder, &webdma),
+		roller(SLOT, 3)
+		
 	{
 		coordinateSystem.SetWheelInformation(WHEEL_RADIUS, WHEEL_BASE);
 
@@ -153,16 +149,16 @@ public:
 		{
 			GetWatchdog().Feed();
 			
-		/*	if (abs(stick.GetX()) <= .1)
+			/*if (abs(stick.GetX()) <= .1)
 			{
 				myRobot.Drive( stick.GetMagnitude()* stick.GetY() / abs(stick.GetY()), 0.0 );
 			}
 			else
 			{
 				myRobot.Drive( stick.GetMagnitude()* stick.GetY() / abs(stick.GetY()), pow( (stick.GetThrottle()+ 1) / 2, abs(stick.GetY())) * stick.GetX() );
-			}
-		*/
-
+			}*/
+			//roller.Set((stick.GetThrottle() + 1.0) / 2.0);
+			roller.Set(stick.GetThrottle());
 			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			
 			Wait(0.005);				// wait for a motor update time

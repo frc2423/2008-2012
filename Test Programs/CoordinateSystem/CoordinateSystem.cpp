@@ -86,8 +86,8 @@ void CoordinateSystem::SetWheelInformation (const double wheel_radius, const dou
 {
 	m_wheelBase = wheel_base;
 	
-	m_leftEncoder->SetDistancePerPulse( (2 * M_PI * wheel_radius) / 1440.0 );
-	m_rightEncoder->SetDistancePerPulse( (2 * M_PI * wheel_radius) / 1440.0 );
+	m_leftEncoder->SetDistancePerPulse( (2.0 * M_PI * wheel_radius) / 1440.0 );
+	m_rightEncoder->SetDistancePerPulse( (2.0 * M_PI * wheel_radius) / 1440.0 );
 }
 
 void CoordinateSystem::Start()

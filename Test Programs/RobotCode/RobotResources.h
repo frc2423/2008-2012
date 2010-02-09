@@ -3,27 +3,30 @@
 
 #include <WPILib.h>
 
-class RobotResources
+struct RobotResources
 {
-public:
-	Gyro& GetGyro(){return (*m_gyro)};
-	Encoder& GetLeftEncoder(){return (*m_leftEncoder)};
-	Encoder& GetRightEncoder(){return (*m_rightEncoder)};
-	Joystick& GetJoystick(){return (*m_joystick)};
+	Encoder leftEncoder;
+	Encoder rightEncoder;
+	Gyro gyro;
+	Joystick joystick;
 	
-	
-	friend RobotResources& Resources()
+	RobotResources():
+		leftEncoder(),
+		rightEncoder(),
+		gyro(),
+		joystick()
+	{};
 
-private:
-	Gyro m_gyro;
-	Encoder m_leftEncoder;
-	Encoder m_rightEncoder;
-	Joystick m_joystick;
+public:
+	Encoder& GetLeftEncoder(void){return leftEncoder;};
+	Encoder& GetRightEncoder(void){return rightEncoder;};
+	Gyro& GetGyro(void){return gyro;};
+	Joystick& GetJoystick(void){return joystick;};
 	
-	RobotResources();
-	RobotResources (const RobotResouces&){};
-	RobotResources& operator=(const RobotResources&){};
-	static RobotResources* m_instance;
+	RobotResources resources;
+
+
 };
-	
+
+
 	

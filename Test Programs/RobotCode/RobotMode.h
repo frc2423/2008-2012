@@ -5,28 +5,37 @@
 
 class RobotMode
 {
-public:
-	RobotMode(const RobotResources&);
-	
-	void SetMode(int mode){m_mode = mode;};
-	void SetNext(void){m_mode++;};
-	void Current(void){mode();};
-	
-	
+	virtual void Main(void) = 0;
+};
 
+class mode
+{
+public:
+	mode():
+		current_mode(0)
+	{};
+	
+	void Add(RobotMode* newMode)
+	{
+		modes.push_back(newMode);
+	};
+	
+	void Next(void)
+	{
+		current_mode++;
+	};
+	
+	void run(void)
+	{
+		if(modes.size() > 0)
+		{
+			int mode_mod = current_mode % modes.size();
+			modes[mode_mod]->Main();
+		}
+	};
 	
 private:
-	
-	
-	
-	const Gyro m_gyro;
-	const Encoder m_leftEncoder;
-	const Encoder m_rightEncoder;
-	const Joystick m_joystick;
-	
-	void mode(void);
-	
-	int m_mode;
-	static int available_modes;
-	
+	vector<RobotMode*> modes;
+	current_mode;
 };
+

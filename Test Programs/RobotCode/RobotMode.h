@@ -1,17 +1,18 @@
-#ifndef ROBOTMODE.H
-#define ROBOTMODE.H
+#ifndef ROBOTMODE_H
+#define ROBOTMODE_H
 
 #include <WPILib.h>
 
-class RobotMode
+struct RobotMode
 {
 	virtual void Main(void) = 0;
+	virtual ~RobotMode(){}
 };
 
-class mode
+class Mode
 {
 public:
-	mode():
+	Mode():
 		current_mode(0)
 	{};
 	
@@ -36,6 +37,8 @@ public:
 	
 private:
 	vector<RobotMode*> modes;
-	current_mode;
+	int current_mode;
 };
+
+#endif
 

@@ -1,17 +1,15 @@
-#ifndef EXAMPLEMODE.H
-#define EXAMPLEMODE.H
+#ifndef EXAMPLEMODE_H
+#define EXAMPLEMODE_H
 
 #include <WPILib.h>
+#include "RobotMode.h"
 
 class ExampleMode: public RobotMode
 {
 public:
-	ExampleMode(const RobotResources& resources):
-		leftEncoder(resources.GetLeftEncoder()),
-		rightEncoder(resources.GetRightEncoder()),
-		gyro(resources.GetGyro()),
-		joystick(resources.GetJoystick())
-	{};
+	ExampleMode(RobotResources& resources):
+		m_resources(resources)		
+	{}
 		
 	void Main()
 	{
@@ -20,8 +18,9 @@ public:
 	
 	
 private:
-	Encoder leftEncoder;
-	Encoder rightEncoder;
-	Gyro gyro;
-	Joystick joystick;
+	RobotResources& m_resources;
+
 };
+
+#endif
+

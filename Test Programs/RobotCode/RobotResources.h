@@ -2,6 +2,7 @@
 #define ROBOTRESOURCES_H
 
 #include <WPILib.h>
+#include <WebDMA/WebDMA.h>
 
 #define WHEEL_RADIUS (0.1016 * (15.0 / 40.0))
 #define WHEEL_BASE 0.55245

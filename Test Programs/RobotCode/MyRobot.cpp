@@ -3,6 +3,9 @@
 #include "RobotResources.h"
 #include "ExampleMode.h"
 #include "RobotMode.h"
+#include "VisionMode.h"
+#include "CompassMode.h"
+#include "AutonomousMode.h"
 
 #include <limits>
 #undef min
@@ -12,16 +15,25 @@ class RobotDemo : public SimpleRobot
 {
 	RobotResources resources;
 	ExampleMode example;
+	VisionMode vision;
+	CompassMode compass;
+	AutonomousMode autonomous;
 	Mode mode;
-
 
 public:
 	RobotDemo(void):
-		example(resources)
+		example(resources),
+		vision(resources),
+		compass(resources),
+		autonomous(resources),
+		mode(&autonomous)
+
 	{
 		GetWatchdog().SetExpiration(0.1);
 		
 		mode.Add(&example);
+		mode.Add(&vision);
+		mode.Add(&compass);
 	}
 
 	/**
@@ -41,13 +53,35 @@ public:
 	void OperatorControl(void)
 	{
 		GetWatchdog().SetEnabled(true);
+		
+		bool prev_trigger = false;
+		int stored_mode = 0;
+		
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
 			
-			//mode switch code goes here
+			//mode switch code
 			
-
+			if(resources.stick.GetTop())
+			{
+				mode.Next();
+			}
+			if(resources.stick.GetTrigger() && !prev_trigger)
+			{
+				stored_mode = mode.GetMode();
+				prev_trigger = true;
+				mode.Set(1);
+			}
+			else if(!resources.stick.GetTrigger() && prev_trigger)
+			{
+				mode.Set(stored_mode);
+				prev_trigger = false;
+			}
+			else
+			{
+				mode.run();
+			}
 		}
 	}
 };

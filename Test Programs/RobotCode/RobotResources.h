@@ -18,6 +18,7 @@ struct RobotResources
 	
 	Jaguar roller;
 	Joystick stick;			// only joystick
+	Joystick stick2;
 	RobotDrive myRobot; 	// robot drive system
 
 	WebDMA webdma;
@@ -29,6 +30,7 @@ struct RobotResources
 		
 		roller(SLOT, 3),
 		stick(1),			// these must be initialized in the same order
+		stick2(2),
 		myRobot(1, 2)		// as they are declared above.
 	
 	{

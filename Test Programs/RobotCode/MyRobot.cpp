@@ -7,6 +7,7 @@
 #include "CompassMode.h"
 #include "AutonomousMode.h"
 #include "PSUSBMode.h"
+#include "AutonomousVisionMode.h"
 
 #include <limits>
 #undef min
@@ -20,6 +21,7 @@ class RobotDemo : public SimpleRobot
 	CompassMode compass;
 	AutonomousMode autonomous;
 	PSUSBMode PSUSB;
+	AutonomousVisionMode autonomousVision;
 	Mode mode;
 
 public:
@@ -29,7 +31,8 @@ public:
 		compass(resources),
 		autonomous(resources),
 		PSUSB(resources),
-		mode(&autonomous)
+		autonomousVision(resources, 1),
+		mode(&autonomousVision)
 
 	{
 		GetWatchdog().SetExpiration(0.1);

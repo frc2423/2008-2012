@@ -59,8 +59,9 @@ public:
 	{
 		GetWatchdog().SetEnabled(true);
 		
-		bool prev_top = false;
-		bool prev_trigger = false;
+		bool prev_Previous = false;
+		bool prev_Next = false;
+		bool prev_Trigger = false;
 		int stored_mode = 0;
 		
 		while (IsOperatorControl())
@@ -69,27 +70,37 @@ public:
 			
 			//mode switch code
 			
-			if(resources.stick.GetTop() && !prev_top)
+			if(resources.stick.GetRawButton(4) && !prev_Previous)
+			{	
+				mode.Previous();
+				prev_Previous = true;
+			}
+			else if(!resources.stick.GetRawButton(4) && prev_Previous)
+			{
+				prev_Previous = false;
+			}		
+			
+			if(resources.stick.GetRawButton(5) && !prev_Next)
 			{	
 				mode.Next();
-				prev_top = true;
+				prev_Next = true;
 			}
-			else if(!resources.stick.GetTop() && prev_top)
+			else if(!resources.stick.GetRawButton(5) && prev_Next)
 			{
-				prev_top = false;
+				prev_Next = false;
 			}
 			
 			
-			if(resources.stick.GetTrigger() && !prev_trigger)
+			if(resources.stick.GetRawButton(3) && !prev_Trigger)
 			{
 				stored_mode = mode.GetMode();
-				prev_trigger = true;
+				prev_Trigger = true;
 				mode.Set(1);
 			}
-			else if(!resources.stick.GetTrigger() && prev_trigger)
+			else if(!resources.stick.GetRawButton(3) && prev_Trigger)
 			{
 				mode.Set(stored_mode);
-				prev_trigger = false;
+				prev_Trigger = false;
 			}
 			else
 			{

@@ -16,6 +16,8 @@ struct RobotResources
 	Encoder rightEncoder;
 	Gyro gyro;
 	
+	Solenoid engage;
+	Solenoid release;
 	Jaguar roller;
 	Joystick stick;			// only joystick
 	Joystick stick2;
@@ -28,6 +30,8 @@ struct RobotResources
 		rightEncoder(SLOT, 3, SLOT, 4),
 		gyro(1),
 		
+		engage(1),
+		release(2),
 		roller(SLOT, 3),
 		stick(1),			// these must be initialized in the same order
 		stick2(2),

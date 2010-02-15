@@ -35,6 +35,13 @@ public:
 		current_mode++;
 		Enable();
 	}
+	
+	void Previous(void)
+	{
+		Disable();
+		current_mode--;
+		Enable();
+	}
 
 	void Set(int mode_number)
 	{

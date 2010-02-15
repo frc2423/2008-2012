@@ -56,6 +56,7 @@ public:
 	{
 		GetWatchdog().SetEnabled(true);
 		
+		bool prev_top = false;
 		bool prev_trigger = false;
 		int stored_mode = 0;
 		
@@ -65,10 +66,17 @@ public:
 			
 			//mode switch code
 			
-			if(resources.stick.GetTop())
-			{
+			if(resources.stick.GetTop() && !prev_top)
+			{	
 				mode.Next();
+				prev_top = true;
 			}
+			else if(!resources.stick.GetTop() && prev_top)
+			{
+				prev_top = false;
+			}
+			
+			
 			if(resources.stick.GetTrigger() && !prev_trigger)
 			{
 				stored_mode = mode.GetMode();

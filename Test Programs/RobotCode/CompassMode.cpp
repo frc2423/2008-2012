@@ -1,6 +1,6 @@
 #include "CompassMode.h"
 #include <math.h>
-
+#include "Error.h"
 
 
 
@@ -33,6 +33,16 @@ double CompassMode::turnRate()
 {
 	float direction_Stick = fmod(m_resources.stick.GetDirectionDegrees(), 360.0);
 	float direction_Robot = fmod(m_resources.gyro.GetAngle(), 360.0);
+	
+	float rotationDirection_Stick = fabs(direction_Stick) / d_err(direction_Stick);
+	float rotationDirection_Robot = fabs(direction_Robot) / d_err(direction_Robot);
+	
+	if(fabs(direction_Stick) > 180.0) 
+		direction_Stick = rotationDirection_Stick * (direction_Stick - 360.0);
+	
+	if(fabs(direction_Robot) > 180.0)
+			direction_Robot = rotationDirection_Robot * (direction_Robot - 360.0);
+	
 	
 	float direction_Err = direction_Stick - direction_Robot;
 	

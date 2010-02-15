@@ -1,5 +1,5 @@
-#ifndef VISIONMODE_H
-#define VISIONMODE_H
+#ifndef AUTONOMOUSVISIONMODE_H
+#define AUTONOMOUSVISIONMODE_H
 
 #include <WPILib.h>
 #include "RobotMode.h"
@@ -21,29 +21,30 @@ private:
 	RobotDrive& m_base;
 };
 
-class VisionMode : public RobotMode
+class AutonomousVisionMode : public RobotMode
 {
 public:
+	AutonomousVisionMode(RobotResources& resources, int balls);
 	
-	VisionMode(RobotResources& resources);
-
 	void Main();
 	
+	void FindTarget();
+	
 	void OnEnable();
-	
+		
 	void OnDisable();
-	
+		
 private:
-	
 	RobotResources& m_resources;
+	int m_balls;
 	SamplePIDOutput pidOutput;
 	DashboardDataSender dds;
 	PIDController turnController;
 	AxisCamera &camera;
 	
-	VisionMode();
-	DISALLOW_COPY_AND_ASSIGN(VisionMode);
+	AutonomousVisionMode();
+	DISALLOW_COPY_AND_ASSIGN(AutonomousVisionMode);
+	
 };
 
 #endif
-

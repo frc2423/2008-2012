@@ -14,12 +14,14 @@ public:
 		compressor(6, 1),
 		engage(1),
 		release(2),
+		roller_Encoder(DIGITAL_SLOT, 5, DIGITAL_SLOT, 6),
 		roller(DIGITAL_SLOT, 3),
 		time(),
 		kicker_state(STATE_IDLE)
 
 	{
 		compressor.Start();
+		roller_Encoder.SetDistancePerPulse( (2.0 * M_PI * ROLLER_RADIUS) / 1440.0 );
 		time.Start();
 		roller.Set(1.0);
 	}
@@ -30,7 +32,7 @@ public:
 	{		
 		//mutex thing here
 		
-		if (kicker_state == STATE_IDLE )
+		if (kicker_state == STATE_IDLE && roller_Encoder.GetRate() <= ROLLER_SPEED)
 			kicker_state = STATE_START_KICK;
 	}
 	
@@ -93,11 +95,14 @@ private:
 	
 	const static double KICK_TIME = .5;
 	const static double ROLLER_STOP_TIME = .1;
+	const static double ROLLER_RADIUS = 1.0;
+	const static double ROLLER_SPEED = .5;
 	RobotResources& m_resources;
 	Notifier m_notifier;
 	Compressor compressor;
 	Solenoid engage;
 	Solenoid release;
+	Encoder roller_Encoder;
 	Jaguar roller;
 	Timer time;
 	int kicker_state;

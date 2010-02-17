@@ -10,6 +10,7 @@ class Kicker
 public:
 	Kicker(RobotResources& resources):
 		m_resources(resources),
+		m_notifier(Kicker::TimerFn, this),
 		compressor(6, 1),
 		engage(1),
 		release(2),
@@ -32,7 +33,18 @@ public:
 		if (kicker_state == STATE_IDLE )
 			kicker_state = STATE_START_KICK;
 	}
-		
+	
+private:
+	static void TimerFn(void * param)
+	{ 
+		((Kicker*)param)->KickTimerFn(); 
+	}
+	
+	void Start()
+	{
+		m_notifier.StartPeriodic(.0025);
+	}
+	
 	void KickTimerFn()
 	{
 		switch(kicker_state)
@@ -41,33 +53,33 @@ public:
 		case STATE_DELAY_KICKER:
 			roller.Set(0.0);
 			time.Reset();
-			state = STATE_START_KICK;
+			kicker_state = STATE_START_KICK;
 			break;	
 		case STATE_START_KICK:
-			if(time.Get() > rollerStop_time)
+			if(time.Get() > ROLLER_STOP_TIME)
 			{
 				roller.Set(0.0);
 				engage.Set(true);
 				release.Set(false);
 				time.Reset();
-				state = STATE_RELEASE;
+				kicker_state = STATE_RELEASE;
 			}
 			break;
 		case STATE_RELEASE:
-			if(time.Get() > kick_time)
+			if(time.Get() > KICK_TIME)
 			{
 				roller.Set(-1.0);
 				engage.Set(false);
 				release.Set(true);
 				time.Reset();
-				state = STATE_RESET;
+				kicker_state = STATE_RESET;
 			}
 			break;
 		case STATE_RESET:
-			if(time.Get() < kick_time)
+			if(time.Get() < KICK_TIME)
 				break;
 			
-			state = STATE_IDLE;
+			kicker_state = STATE_IDLE;
 			
 		case STATE_IDLE:
 			roller.Set(-1.0);
@@ -77,12 +89,12 @@ public:
 		}
 	}
 
-private:
 	enum{ STATE_DELAY_KICKER, STATE_IDLE, STATE_START_KICK, STATE_RELEASE, STATE_RESET};
 	
-	const double kick_time = .5;
-	const double rollerStop_time = .1;
+	const static double KICK_TIME = .5;
+	const static double ROLLER_STOP_TIME = .1;
 	RobotResources& m_resources;
+	Notifier m_notifier;
 	Compressor compressor;
 	Solenoid engage;
 	Solenoid release;

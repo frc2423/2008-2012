@@ -53,30 +53,26 @@ void AutonomousVisionMode::Main()
 	{
 	case 1:
 		//against the wall, moving in a straight line, kicking
-		m_kicker.Kick(false);
 		m_resources.myRobot.Drive(-0.5, 0.0);
 		// if (photogate.SeesBall()) case_Number = 2;
 		break;
 	case 2:
 		//robot stops to kick ball
-		m_kicker.Kick(false);
 		m_resources.myRobot.Drive(0.0, 0.0);
 		case_Number = 3;
 		break;
 	case 3:
 		// robot aligns with ball
-		m_kicker.Kick(false);
 		FindTarget();
 		if (turnController.OnTarget()) case_Number = 4;
 		break;
 	case 4:
 		// robot kicks ball
-		m_kicker.Kick(true);
+		m_kicker.Kick();
 		balls_kicked++;
 		break;
 	case 5:
 		// robot realigns with next ball
-		m_kicker.Kick(false);
 		double error = m_resources.gyro.GetAngle();
 		error = error / 180.0;
 		m_resources.myRobot.Drive(0.2, error);
@@ -84,12 +80,10 @@ void AutonomousVisionMode::Main()
 		break;
 	case 6:
 		//Go back to case 1 if there are more balls to kick
-		m_kicker.Kick(false);
 		if(balls_kicked < m_balls) case_Number = 1;
 		else case_Number = 7;
 		break;
 	case 7:
-		m_kicker.Kick(false);
 		m_resources.myRobot.Drive(0.0, 0.0);
 		break;
 	}

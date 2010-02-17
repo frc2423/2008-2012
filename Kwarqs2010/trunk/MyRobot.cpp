@@ -67,7 +67,7 @@ public:
 		{
 			GetWatchdog().Feed();
 			
-			kicker.Kick(resources.stick.GetTrigger());
+			if( resources.stick.GetTrigger()) kicker.Kick();
 			
 			//mode switch code
 			

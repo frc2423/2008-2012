@@ -10,6 +10,7 @@
 #define DIGITAL_SLOT_2 6
 #define DIGITAL_SLOT DIGITAL_SLOT_1
 #define ANALOG_SLOT 1
+# define M_PI 3.14159265358979323846  /* pi */
 
 struct RobotResources
 {
@@ -33,7 +34,10 @@ struct RobotResources
 		myRobot(1, 2)		// as they are declared above.
 	
 	{
+		leftEncoder.SetDistancePerPulse( (2.0 * M_PI * WHEEL_RADIUS) / 1440.0 );
+		rightEncoder.SetDistancePerPulse( (2.0 * M_PI * WHEEL_RADIUS) / 1440.0 );
 		gyro.SetSensitivity(0.007);
+		
 	}
 	
 };

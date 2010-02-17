@@ -61,7 +61,7 @@ public:
 		
 		bool prev_Previous = false;
 		bool prev_Next = false;
-		bool prev_button3 = false;
+		//bool prev_button3 = false;
 		
 		while (IsOperatorControl())
 		{
@@ -91,7 +91,7 @@ public:
 				prev_Next = false;
 			}
 			
-			
+			/*
 			if(resources.stick.GetRawButton(3) && !prev_button3) 
 			{
 				vision.enable();
@@ -108,8 +108,9 @@ public:
 			}
 			else
 			{
-				mode.run();
-			}
+			*/
+			
+			mode.run();
 			
 			/*
 			if(resources.stick.GetRawButton(3) && !prev_button3)

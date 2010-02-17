@@ -6,25 +6,36 @@
 #include "DashboardDataSender.h"
 #include "SamplePIDOutput.h"
 
-class Vision
+class Vision : public PIDOutput
 {
 public:
 	
 	Vision(RobotResources& resources);
 
-	void run();
+	void EnableMotorControl();
+	void DisableMotorControl();
 	
-	void enable();
+	bool IsRobotAligned() const;
 	
-	void disable();
+	virtual ~Vision(){}
 	
 private:
 	
-	RobotResources& m_resources;
-	SamplePIDOutput pidOutput;
-	DashboardDataSender dds;
-	PIDController turnController;
-	AxisCamera &camera;
+	static void TimerFn(void *);
+	void ProcessVision();
+	
+	void PIDWrite(float output);
+	
+	DoubleProxy			m_horizontalAngle;
+	IntProxy			m_numTargets;
+	BoolProxy			m_isRobotAligned;
+	
+	RobotResources& 	m_resources;
+	DashboardDataSender m_dds;
+	PIDController 		m_turnController;
+	AxisCamera&			m_camera;
+	
+	Notifier			m_notifier;
 	
 	Vision();
 	DISALLOW_COPY_AND_ASSIGN(Vision);

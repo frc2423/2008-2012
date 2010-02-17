@@ -1,23 +1,22 @@
-#ifndef VISIONMODE_H
-#define VISIONMODE_H
+#ifndef VISION_H
+#define VISION_H
 
 #include <WPILib.h>
-#include "RobotMode.h"
 #include "RobotResources.h"
 #include "DashboardDataSender.h"
 #include "SamplePIDOutput.h"
 
-class VisionMode : public RobotMode
+class Vision
 {
 public:
 	
-	VisionMode(RobotResources& resources);
+	Vision(RobotResources& resources);
 
-	void Main();
+	void run();
 	
-	void OnEnable();
+	void enable();
 	
-	void OnDisable();
+	void disable();
 	
 private:
 	
@@ -27,8 +26,8 @@ private:
 	PIDController turnController;
 	AxisCamera &camera;
 	
-	VisionMode();
-	DISALLOW_COPY_AND_ASSIGN(VisionMode);
+	Vision();
+	DISALLOW_COPY_AND_ASSIGN(Vision);
 };
 
 #endif

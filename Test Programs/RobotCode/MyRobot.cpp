@@ -3,9 +3,8 @@
 #include "RobotResources.h"
 #include "ExampleMode.h"
 #include "RobotMode.h"
-#include "VisionMode.h"
+#include "Vision.h"
 #include "CompassMode.h"
-#include "AutonomousMode.h"
 #include "PSUSBMode.h"
 #include "AutonomousVisionMode.h"
 #include "Kicker.h"
@@ -18,9 +17,8 @@ class RobotDemo : public SimpleRobot
 {
 	RobotResources resources;
 	ExampleMode example;
-	VisionMode vision;
+	Vision vision;
 	CompassMode compass;
-	AutonomousMode autonomous;
 	PSUSBMode PSUSB;
 	Kicker kicker;
 	AutonomousVisionMode autonomousVision;
@@ -31,7 +29,6 @@ public:
 		example(resources),
 		vision(resources),
 		compass(resources),
-		autonomous(resources),
 		PSUSB(resources),
 		kicker(resources),
 		autonomousVision(resources, kicker, 1),
@@ -42,7 +39,6 @@ public:
 		GetWatchdog().SetExpiration(0.1);
 		
 		mode.Add(&example);
-		mode.Add(&vision);
 		mode.Add(&compass);
 		mode.Add(&PSUSB);
 	}
@@ -97,6 +93,26 @@ public:
 			}
 			
 			
+			if(resources.stick.GetRawButton(3) && !prev_button3) 
+			{
+				vision.enable();
+				prev_button3 = true;
+			}
+			else if(resources.stick.GetRawButton(3) && prev_button3) 
+			{	
+				vision.run();
+			}
+			else if(!resources.stick.GetRawButton(3) && prev_button3) 
+			{	
+				vision.disable();
+				prev_button3 = false;
+			}
+			else
+			{
+				mode.run();
+			}
+			
+			/*
 			if(resources.stick.GetRawButton(3) && !prev_button3)
 			{
 				stored_mode = mode.GetMode();
@@ -112,6 +128,7 @@ public:
 			{
 				mode.run();
 			}
+			*/
 		}
 	}
 };

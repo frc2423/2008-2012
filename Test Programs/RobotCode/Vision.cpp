@@ -4,10 +4,10 @@
  */
 
 
-#include "VisionMode.h"
+#include "Vision.h"
 #include "WPILib.h"
 
-VisionMode::VisionMode(RobotResources& resources):
+Vision::Vision(RobotResources& resources):
 	m_resources(resources),
 	pidOutput(m_resources.myRobot),
 	turnController( 0.1, // P
@@ -42,12 +42,12 @@ VisionMode::VisionMode(RobotResources& resources):
 	printf("Starting operator control loop\n");
 }
 
-void VisionMode::OnEnable()
+void Vision::enable()
 {
 	turnController.Enable();
 }
 
-void VisionMode::Main()
+void Vision::run()
 {
 	// if there's a fresh and we're at the previous target heading then
 	// get a camera image and process it
@@ -101,7 +101,7 @@ void VisionMode::Main()
 	dds.sendIOPortData();
 }
 
-void VisionMode::OnDisable()
+void Vision::disable()
 {
 	turnController.Disable();
 }

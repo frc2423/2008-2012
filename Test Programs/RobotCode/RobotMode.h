@@ -55,6 +55,7 @@ public:
 		if(modes.size() > 0)
 		{
 			int mode_mod = current_mode % modes.size();
+			if(mode_mod < 0) mode_mod = modes.size() - mode_mod;
 			modes[mode_mod]->Main();
 		}
 	}
@@ -64,6 +65,7 @@ public:
 		if(modes.size() > 0)
 		{
 			int mode_mod = current_mode % modes.size();
+			if(mode_mod < 0) mode_mod = modes.size() - mode_mod;
 			modes[mode_mod]->OnEnable();
 		}
 	}
@@ -73,6 +75,7 @@ public:
 		if(modes.size() > 0)
 		{
 			int mode_mod = current_mode % modes.size();
+			if(mode_mod < 0) mode_mod = modes.size() - mode_mod;
 			modes[mode_mod]->OnDisable();
 		}
 	}

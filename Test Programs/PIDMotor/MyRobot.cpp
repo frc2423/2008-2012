@@ -18,8 +18,8 @@
 class RobotDemo : public SimpleRobot
 {
 	// pid values to use
-	#define PID_P 0.5
-	#define PID_I 0.0
+	#define PID_P 0.9
+	#define PID_I 0.5
 	#define PID_D 0.0
 
 	// slot definitions: these should go in a header file somewhere
@@ -95,9 +95,9 @@ public:
 			GetWatchdog().Feed();
 			
 			// lets just test with one wheel at first (y is inverted)
-			leftMotor.Set( stick.GetY() * -1 );
+			// leftMotor.Set( stick.GetY() * -1 );
 			
-			//myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
+			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			Wait(0.005);				// wait for a motor update time
 		}
 		

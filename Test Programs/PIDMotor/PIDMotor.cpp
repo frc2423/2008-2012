@@ -20,10 +20,17 @@ PIDMotor::PIDMotor(
 	
 	m_max_velocity = webdma.CreateDoubleProxy(groupName, "Max Velocity",
 		DoubleProxyFlags()
-			.default_value(0.5)
+			.default_value(0.35)
 			.minval(0)
 			.maxval(2.0)
-			.step(0.1)
+			.step(0.001)
+			.precision(3)
+	);
+	
+	m_last_distance = webdma.CreateDoubleProxy(groupName, "Meters",
+					DoubleProxyFlags()
+						.default_value(0)
+						.readonly()
 	);
 	
 	m_mutex = semMCreate(0);

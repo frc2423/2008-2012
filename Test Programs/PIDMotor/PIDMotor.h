@@ -55,7 +55,7 @@ private:
 	DISALLOW_COPY_AND_ASSIGN(PIDMotor);
 	
 	
-	double 					m_last_distance;
+	DoubleProxy 			m_last_distance;
 	DoubleProxy 			m_max_velocity;
 	
 	Jaguar 					m_jaguar;

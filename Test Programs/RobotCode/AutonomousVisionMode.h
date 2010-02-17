@@ -6,11 +6,12 @@
 #include "RobotResources.h"
 #include "DashboardDataSender.h"
 #include "SamplePIDOutput.h"
+#include "Kicker.h"
 
 class AutonomousVisionMode : public RobotMode
 {
 public:
-	AutonomousVisionMode(RobotResources& resources, int balls);
+	AutonomousVisionMode(RobotResources& resources, Kicker& kicker, int balls);
 	
 	void Main();
 	
@@ -22,6 +23,7 @@ public:
 		
 private:
 	RobotResources& m_resources;
+	Kicker& m_kicker;
 	int m_balls;
 	SamplePIDOutput pidOutput;
 	DashboardDataSender dds;

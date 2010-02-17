@@ -16,7 +16,6 @@ public:
 	void Main(void)
 	{
 		Drive();
-		Roller();
 	}
 	void OnDisable(void){}
 	
@@ -29,11 +28,6 @@ private:
 		m_resources.myRobot.ArcadeDrive(m_resources.stick2);
 	}
 	
-	void Roller()
-	{
-		if(m_resources.stick2.GetRawButton(5)) m_resources.roller.Set(1.0);
-		else if(m_resources.stick2.GetRawButton(7)) m_resources.roller.Set(-1.0);
-	}
 	
 };
 

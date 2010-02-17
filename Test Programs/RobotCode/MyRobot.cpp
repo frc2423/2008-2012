@@ -8,6 +8,7 @@
 #include "AutonomousMode.h"
 #include "PSUSBMode.h"
 #include "AutonomousVisionMode.h"
+#include "Kicker.h"
 
 #include <limits>
 #undef min
@@ -21,6 +22,7 @@ class RobotDemo : public SimpleRobot
 	CompassMode compass;
 	AutonomousMode autonomous;
 	PSUSBMode PSUSB;
+	Kicker kicker;
 	AutonomousVisionMode autonomousVision;
 	Mode mode;
 
@@ -31,8 +33,10 @@ public:
 		compass(resources),
 		autonomous(resources),
 		PSUSB(resources),
-		autonomousVision(resources, 1),
+		kicker(resources),
+		autonomousVision(resources, kicker, 1),
 		mode(&autonomousVision)
+
 
 	{
 		GetWatchdog().SetExpiration(0.1);
@@ -61,12 +65,14 @@ public:
 		
 		bool prev_Previous = false;
 		bool prev_Next = false;
-		bool prev_Trigger = false;
+		bool prev_button3 = false;
 		int stored_mode = 0;
 		
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
+			
+			kicker.Kick(resources.stick.GetTrigger());
 			
 			//mode switch code
 			
@@ -91,16 +97,16 @@ public:
 			}
 			
 			
-			if(resources.stick.GetRawButton(3) && !prev_Trigger)
+			if(resources.stick.GetRawButton(3) && !prev_button3)
 			{
 				stored_mode = mode.GetMode();
-				prev_Trigger = true;
+				prev_button3 = true;
 				mode.Set(1);
 			}
-			else if(!resources.stick.GetRawButton(3) && prev_Trigger)
+			else if(!resources.stick.GetRawButton(3) && prev_button3)
 			{
 				mode.Set(stored_mode);
-				prev_Trigger = false;
+				prev_button3 = false;
 			}
 			else
 			{

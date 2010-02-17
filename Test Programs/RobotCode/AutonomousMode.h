@@ -1,5 +1,5 @@
 #ifndef AUTONOMOUSMODE_H
-#define AUTONMOUSMODE_H
+#define AUTONOMOUSMODE_H
 
 #include <WPILib.h>
 #include "RobotMode.h"

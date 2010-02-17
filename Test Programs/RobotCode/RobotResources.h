@@ -6,9 +6,10 @@
 
 #define WHEEL_RADIUS (0.1016 * (15.0 / 40.0))
 #define WHEEL_BASE 0.55245
-#define SLOT_1 4
-#define SLOT_2 6
-#define SLOT SLOT_1
+#define DIGITAL_SLOT_1 4
+#define DIGITAL_SLOT_2 6
+#define DIGITAL_SLOT DIGITAL_SLOT_1
+#define ANALOG_SLOT 1
 
 struct RobotResources
 {
@@ -16,9 +17,6 @@ struct RobotResources
 	Encoder rightEncoder;
 	Gyro gyro;
 	
-	Solenoid engage;
-	Solenoid release;
-	Jaguar roller;
 	Joystick stick;			// only joystick
 	Joystick stick2;
 	RobotDrive myRobot; 	// robot drive system
@@ -26,13 +24,10 @@ struct RobotResources
 	WebDMA webdma;
 	
 	RobotResources():
-		leftEncoder(SLOT, 1, SLOT, 2),
-		rightEncoder(SLOT, 3, SLOT, 4),
-		gyro(1),
+		leftEncoder(DIGITAL_SLOT, 1, DIGITAL_SLOT, 2),
+		rightEncoder(DIGITAL_SLOT, 3, DIGITAL_SLOT, 4),
+		gyro(ANALOG_SLOT),
 		
-		engage(1),
-		release(2),
-		roller(SLOT, 3),
 		stick(1),			// these must be initialized in the same order
 		stick2(2),
 		myRobot(1, 2)		// as they are declared above.

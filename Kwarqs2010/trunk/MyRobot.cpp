@@ -62,7 +62,6 @@ public:
 		bool prev_Previous = false;
 		bool prev_Next = false;
 		bool prev_button3 = false;
-		int stored_mode = 0;
 		
 		while (IsOperatorControl())
 		{

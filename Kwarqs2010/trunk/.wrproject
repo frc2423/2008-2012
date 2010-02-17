@@ -246,7 +246,7 @@
     <buildtargets>
         <buildtarget buildtool="Linker" name="RobotCode" passed="false" targetname="RobotCode">
             <contents>
-                <folder name="/RobotTestCode" recursive="true"/>
+                <folder name="/RobotCode2010" recursive="true"/>
             </contents>
         </buildtarget>
     </buildtargets>

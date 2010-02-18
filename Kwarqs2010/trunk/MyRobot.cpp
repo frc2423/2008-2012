@@ -41,6 +41,8 @@ public:
 		mode.Add(&example);
 		mode.Add(&compass);
 		mode.Add(&PSUSB);
+		
+		kicker.Start();
 	}
 
 	/**

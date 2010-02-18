@@ -26,9 +26,9 @@ private:
 	
 	void PIDWrite(float output);
 	
-	DoubleProxy			m_horizontalAngle;
-	IntProxy			m_numTargets;
-	BoolProxy			m_isRobotAligned;
+	double			m_horizontalAngle;
+	int			m_numTargets;
+	bool			m_isRobotAligned;
 	
 	RobotResources& 	m_resources;
 	DashboardDataSender m_dds;

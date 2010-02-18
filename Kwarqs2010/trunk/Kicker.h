@@ -46,15 +46,16 @@ public:
 		}
 	}
 	
+	void Start()
+	{
+		m_notifier.StartPeriodic(.0025);
+	}
+	
+	
 private:
 	static void TimerFn(void * param)
 	{ 
 		((Kicker*)param)->KickTimerFn(); 
-	}
-	
-	void Start()
-	{
-		m_notifier.StartPeriodic(.0025);
 	}
 	
 	void KickTimerFn()

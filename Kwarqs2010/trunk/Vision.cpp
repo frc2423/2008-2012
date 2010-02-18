@@ -29,6 +29,7 @@ Vision::Vision(RobotResources& resources):
 	
 	m_notifier( Vision::TimerFn, this )
 {	
+	/*
 	m_horizontalAngle = m_resources.webdma.CreateIntProxy("Vision", "NumTargets",
 		IntProxyFlags().readonly()
 	);
@@ -38,7 +39,8 @@ Vision::Vision(RobotResources& resources):
 	);
 	
 	m_isRobotAligned = m_resources.webdma.CreateBoolProxy("Vision", "Aligned", false );
-
+	*/
+	
 	/**
 	 * Set up the PID controller with some parameters that should be pretty
 	 * close for most kitbot robots.

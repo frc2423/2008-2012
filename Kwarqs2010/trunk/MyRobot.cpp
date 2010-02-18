@@ -91,6 +91,8 @@ public:
 				prev_Next = false;
 			}
 			
+			mode.run();
+			
 			/*
 			if(resources.stick.GetRawButton(3) && !prev_button3) 
 			{
@@ -109,8 +111,6 @@ public:
 			else
 			{
 			*/
-			
-			mode.run();
 			
 			/*
 			if(resources.stick.GetRawButton(3) && !prev_button3)

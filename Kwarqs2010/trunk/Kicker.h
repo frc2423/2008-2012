@@ -24,16 +24,26 @@ public:
 		roller_Encoder.SetDistancePerPulse( (2.0 * M_PI * ROLLER_RADIUS) / 1440.0 );
 		time.Start();
 		roller.Set(1.0);
+		
+		// create a mutex to allow us to synchronize access to variables
+		// since we're going to be running in multiple threads
+		m_mutex = semMCreate(0);
 	}
 
 	//Kick method controls kicker and roller. Activate_kicker parameter is needed for telling
 	//kicker when user or robot needs to engage the kicker.
 	void Kick()
 	{		
-		//mutex thing here
-		
-		if (kicker_state == STATE_IDLE && roller_Encoder.GetRate() <= ROLLER_SPEED)
-			kicker_state = STATE_START_KICK;
+		// make sure that nobody else can access our variables
+		Synchronized lock(m_mutex);
+			
+		if (kicker_state == STATE_IDLE)
+		{
+			if(!DriverStation::GetInstance()->GetDigitalIn(KICKER_DIGITAL_SWITCH)) 
+				kicker_state = STATE_START_KICK;
+			else if( roller_Encoder.GetRate() <= ROLLER_SPEED)
+				kicker_state = STATE_START_KICK;
+		}
 	}
 	
 private:
@@ -49,6 +59,9 @@ private:
 	
 	void KickTimerFn()
 	{
+		// make sure that nobody else can access our variables
+		Synchronized lock(m_mutex);
+		
 		switch(kicker_state)
 		{
 
@@ -97,6 +110,7 @@ private:
 	const static double ROLLER_STOP_TIME = .1;
 	const static double ROLLER_RADIUS = 1.0;
 	const static double ROLLER_SPEED = .5;
+	const static int KICKER_DIGITAL_SWITCH = 1;
 	RobotResources& m_resources;
 	Notifier m_notifier;
 	Compressor compressor;
@@ -105,6 +119,7 @@ private:
 	Encoder roller_Encoder;
 	Jaguar roller;
 	Timer time;
+	SEM_ID m_mutex;
 	int kicker_state;
 	
 

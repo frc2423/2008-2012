@@ -127,7 +127,7 @@ public:
 	*/
 	TimedLatch( bool initial_value = false, double interval = 0.15) :
 		LatchBase(initial_value), 
-		delay( interval )
+		allow_transition( interval )
 	{}
 	
 

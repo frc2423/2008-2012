@@ -9,7 +9,7 @@
 #include "kwarqs_math.h"
 
 
-#define VISION_TARGET_ACCURACY 2.5
+#define VISION_MINIMUM_SCORE 0.01
 
 #define VISION_P 0.1
 #define VISION_I 0.0
@@ -21,6 +21,7 @@
 
 #define VISION_AUTOSWEEP_EDGE 22.5
 
+// PreferLeft parameters
 #define VISION_PL_LEFT 		270.0
 #define VISION_PL_RIGHT		360.0
 #define VISION_PL_SETPOINT	315.0
@@ -28,6 +29,7 @@
 #define VISION_PE_LEFT		270.0
 #define VISION_PE_RIGHT		90.0
 
+// PreferRight parameters
 #define VISION_PR_LEFT		0.0
 #define VISION_PR_RIGHT		90.0
 #define VISION_PR_SETPOINT	45.0
@@ -110,9 +112,7 @@ void Vision::PreferLeft()
 	m_left_edge = VISION_PL_LEFT;
 	m_right_edge = VISION_PL_RIGHT;
 	
-	double current_setpoint = m_turnController.GetSetpoint();
-	
-	if (current_setpoint < m_left_edge || current_setpoint > m_right_edge)
+	if (!AngleWithinEdges( m_turnController.GetSetpoint()))
 	{
 		m_turnController.SetSetpoint(VISION_PL_SETPOINT);
 		m_setpointIsTarget = false;
@@ -138,9 +138,7 @@ void Vision::PreferRight()
 	m_left_edge = VISION_PR_LEFT;
 	m_right_edge = VISION_PR_RIGHT;
 	
-	double current_setpoint = m_turnController.GetSetpoint();
-	
-	if (current_setpoint < m_left_edge || current_setpoint > m_right_edge)
+	if (!AngleWithinEdges( m_turnController.GetSetpoint()))
 	{
 		m_turnController.SetSetpoint(VISION_PR_SETPOINT);
 		m_setpointIsTarget = false;
@@ -165,9 +163,7 @@ void Vision::ProcessVision()
 {
 	SEM_ID camera_ready = m_camera.GetNewImageSem();
 	
-	
-	// if there's a fresh and we're at the previous target heading then
-	// get a camera image and process it
+	// if there's a fresh image then get a camera image and process it
 	while (true)
 	{
 		// wait for the semaphore
@@ -185,7 +181,7 @@ void Vision::ProcessVision()
 		vector<Target> targets ( Target::FindCircularTargets(image) );
 		delete image;
 		
-		if (targets.size() == 0 || targets[0].m_score < MINIMUM_SCORE)
+		if (targets.size() == 0 || targets[0].m_score < VISION_MINIMUM_SCORE)
 		{
 			// no targets found. Make sure the first one in the list is 0,0
 			// since the dashboard program annotates the first target in green
@@ -216,16 +212,12 @@ void Vision::ProcessVision()
 			{
 				Synchronized lock(m_mutex);
 				
-				// dont screw with this statement, it works and has been tested
-				if ((m_right_edge > m_left_edge && 
-						setPoint > m_left_edge && setPoint < m_right_edge ) ||
-					(m_right_edge < m_left_edge &&
-						(setPoint > m_left_edge || setPoint < m_right_edge)))
+				if (AngleWithinEdges( setPoint ))
 				{
 					m_turnController.SetSetpoint(setPoint);
 					m_setpointIsTarget = true;
 					
-					sent_tgt_vision = true;
+					send_tgt_vision = true;
 				}
 			}
 			
@@ -237,7 +229,6 @@ void Vision::ProcessVision()
 				m_dds.sendVisionData(0.0, gyroAngle, 0.0, 0.0, targets);
 
 		}
-		
 		
 		// WebDMA output stuff:
 		m_horizontalAngle = horizontalAngle;
@@ -281,9 +272,27 @@ void Vision::AutoSweep()
 }
 
 
+bool Vision::AngleWithinEdges(double angle) const
+{
+	// read these first since WebDMA does locks
+	double right_edge = m_right_edge;
+	double left_edge = m_left_edge;
+	
+	// dont screw with this statement, it works and has been tested
+	return ((right_edge > left_edge && 
+			angle > left_edge && angle < right_edge ) ||
+		(right_edge < left_edge &&
+			(angle > left_edge || angle < right_edge)));
+}
+
 bool Vision::IsRobotPointingAtTarget() const 
 {
 	// doesn't need a mutex since WebDMA already locks for us
+	
+	// note that this checks for both the robot being
+	// aligned and for the setpoint to be on target. One
+	// or the other isn't sufficient, you need both to be
+	// certain
 	return m_isRobotAligned && m_setpointIsTarget;
 }
 
@@ -295,5 +304,6 @@ void Vision::PIDWrite(float output)
 
 double Vision::PIDGet()
 {
+	// this returns a normalized angle from the gyro
 	return angle_normalize( m_resources.gyro.PIDGet() );	
 }

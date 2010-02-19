@@ -29,6 +29,8 @@ private:
 	void ProcessVision();
 	void AutoSweep();
 	
+	bool AngleWithinEdges( double setpoint ) const;
+	
 	void PIDWrite(float output);
 	double PIDGet();
 	

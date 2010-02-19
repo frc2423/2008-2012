@@ -6,7 +6,7 @@ AutonomousVisionMode::AutonomousVisionMode(RobotResources& resources, Kicker& ki
 	m_resources(resources),
 	m_kicker(kicker),
 	m_vision(vision),
-	m_balls(balls),
+	m_balls(balls)
 {	
 
 }

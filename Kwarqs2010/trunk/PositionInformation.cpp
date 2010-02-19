@@ -66,6 +66,10 @@ PositionInformation::PositionInformation(RobotResources& resources, const double
 			IntProxyFlags().readonly()
 	);
 	
+	m_gyro_angle = m_resources.webdma.CreateDoubleProxy("Coordinate System", "Gyro Angle", 
+			DoubleProxyFlags().readonly()
+	);
+	
 	// create a mutex to allow us to synchronize access to variables
 	// since we're going to be running in multiple threads
 	m_mutex = semMCreate(0);
@@ -137,6 +141,8 @@ void PositionInformation::ComputeNewPosition(double l, double r)
 	TransformCoordinates( dx, dy, dtheta );
 	
 	m_display_angle = m_theta * (180.0 / M_PI);
+	
+	m_gyro_angle = m_resources.gyro.GetAngle();
 }
 
 /**
@@ -160,15 +166,15 @@ void PositionInformation::CalculationTimerFn ()
 	// make sure that nobody else can access our variables
 	Synchronized lock(m_mutex);
 	
-	m_l = m_leftEncoder->GetRaw();
-	m_r = m_rightEncoder->GetRaw();
+	m_l = m_resources.leftEncoder.GetRaw();
+	m_r = m_resources.rightEncoder.GetRaw();
 	
 	// Store encoder values so we can use them next time.
 	double prev_leftMeters = m_leftMeters;
 	double prev_rightMeters = m_rightMeters;
 	
-	m_leftMeters = m_leftEncoder->GetDistance();
-	m_rightMeters = - m_rightEncoder->GetDistance();
+	m_leftMeters = m_resources.leftEncoder.GetDistance();
+	m_rightMeters = - m_resources.rightEncoder.GetDistance();
 	
 	double leftDistance = m_leftMeters - prev_leftMeters;
 	double rightDistance = m_rightMeters - prev_rightMeters;

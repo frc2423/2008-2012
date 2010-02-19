@@ -26,14 +26,13 @@ private:
 	DoubleProxy m_leftMeters, m_rightMeters;	// Stores distance in meters
 	DoubleProxy m_x, m_y;
 	DoubleProxy m_display_angle;
+	DoubleProxy m_gyro_angle;
 	double m_wheelBase;							// Wheel base of the robot
 	
 	IntProxy m_l, m_r;
 	
 	Notifier m_notifier;
 	RobotResources& m_resources;
-	Encoder* m_leftEncoder;
-	Encoder* m_rightEncoder;
 	
 	SEM_ID m_mutex;
 };

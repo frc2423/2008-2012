@@ -5,37 +5,51 @@
 #include "RobotResources.h"
 #include "DashboardDataSender.h"
 #include "SamplePIDOutput.h"
+#include "ProxiedPIDController.h"
 
-class Vision : public PIDOutput
+class Vision : public PIDOutput, public PIDSource
 {
 public:
 	
 	Vision(RobotResources& resources);
 
-	void EnableMotorControl();
 	void DisableMotorControl();
 	
-	bool IsRobotAligned() const;
+	bool IsRobotPointingAtTarget() const;
 	
-	virtual ~Vision(){}
+	void PreferLeft();
+	void PreferRight();
+	void PreferEither();
+	
+	virtual ~Vision();
 	
 private:
 	
-	static void TimerFn(void *);
+	static int TimerFn(void * param);
 	void ProcessVision();
 	
 	void PIDWrite(float output);
+	double PIDGet();
 	
-	double			m_horizontalAngle;
-	int			m_numTargets;
-	bool			m_isRobotAligned;
+	SEM_ID 				m_mutex;
 	
-	RobotResources& 	m_resources;
-	DashboardDataSender m_dds;
-	PIDController 		m_turnController;
-	AxisCamera&			m_camera;
+	// protects these variables
+	DoubleProxy 		m_left_range;
+	DoubleProxy			m_right_range;
 	
-	Notifier			m_notifier;
+	DoubleProxy			m_horizontalAngle;
+	DoubleProxy			m_gyro_angle;
+	IntProxy			m_numTargets;
+	
+	BoolProxy			m_setpointIsTarget;
+	BoolProxy			m_isRobotAligned;
+	
+	RobotResources& 		m_resources;
+	DashboardDataSender 	m_dds;
+	ProxiedPIDController 	m_turnController;
+	AxisCamera&				m_camera;
+	
+	Task 				m_task;
 	
 	Vision();
 	DISALLOW_COPY_AND_ASSIGN(Vision);

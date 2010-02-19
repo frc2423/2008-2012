@@ -8,20 +8,31 @@
 #include "PSUSBMode.h"
 #include "AutonomousVisionMode.h"
 #include "Kicker.h"
+#include "EncoderMode.h"
+#include "ButtonLatch.h"
 
 #include <limits>
 #undef min
 #undef max
 
+struct StackEnable {
+	StackEnable()
+	{
+		wpi_stackTraceEnable(true);
+	}
+};
+
 class RobotDemo : public SimpleRobot
 {
+	StackEnable unused;
+	
 	RobotResources resources;
 	ExampleMode example;
 	Vision vision;
 	CompassMode compass;
-	PSUSBMode PSUSB;
 	Kicker kicker;
 	AutonomousVisionMode autonomousVision;
+	EncoderMode encoderMode;
 	Mode mode;
 
 public:
@@ -29,9 +40,9 @@ public:
 		example(resources),
 		vision(resources),
 		compass(resources),
-		PSUSB(resources),
 		kicker(resources),
 		autonomousVision(resources, kicker, 1),
+		encoderMode(resources),
 		mode(&autonomousVision)
 
 
@@ -39,8 +50,8 @@ public:
 		GetWatchdog().SetExpiration(0.1);
 		
 		mode.Add(&example);
-		mode.Add(&compass);
-		mode.Add(&PSUSB);
+		//mode.Add(&compass);
+		//mode.Add(&encoderMode);
 		
 		kicker.Start();
 	}
@@ -61,9 +72,9 @@ public:
 	{
 		GetWatchdog().SetEnabled(true);
 		
-		bool prev_Previous = false;
-		bool prev_Next = false;
-		//bool prev_button3 = false;
+		ButtonLatch eitherButton;
+		ButtonLatch leftVision;
+		ButtonLatch rightVision;
 		
 		while (IsOperatorControl())
 		{
@@ -71,66 +82,41 @@ public:
 			
 			if( resources.stick.GetTrigger()) kicker.Kick();
 			
-			//mode switch code
 			
-			if(resources.stick.GetRawButton(4) && !prev_Previous)
-			{	
-				mode.Previous();
-				prev_Previous = true;
-			}
-			else if(!resources.stick.GetRawButton(4) && prev_Previous)
-			{
-				prev_Previous = false;
-			}		
+			leftVision.Set( resources.stick.GetRawButton(4));
+			rightVision.Set( resources.stick.GetRawButton(5));
+			eitherButton.Set(resources.stick.GetRawButton(3));
 			
-			if(resources.stick.GetRawButton(5) && !prev_Next)
-			{	
-				mode.Next();
-				prev_Next = true;
-			}
-			else if(!resources.stick.GetRawButton(5) && prev_Next)
+			if (leftVision.TurnedOn())
 			{
-				prev_Next = false;
+				vision.PreferLeft();
 			}
-			
-			mode.run();
-			
-			/*
-			if(resources.stick.GetRawButton(3) && !prev_button3) 
+			else if (rightVision.TurnedOn())
 			{
-				vision.enable();
-				prev_button3 = true;
+				vision.PreferRight();
 			}
-			else if(resources.stick.GetRawButton(3) && prev_button3) 
-			{	
-				vision.run();
-			}
-			else if(!resources.stick.GetRawButton(3) && prev_button3) 
-			{	
-				vision.disable();
-				prev_button3 = false;
-			}
-			else
+			else if (eitherButton.TurnedOn())
 			{
-			*/
-			
-			/*
-			if(resources.stick.GetRawButton(3) && !prev_button3)
-			{
-				stored_mode = mode.GetMode();
-				prev_button3 = true;
-				mode.Set(1);
+				vision.PreferEither();
 			}
-			else if(!resources.stick.GetRawButton(3) && prev_button3)
-			{
-				mode.Set(stored_mode);
-				prev_button3 = false;
+			else if (
+				leftVision.TurnedOff() ||
+				rightVision.TurnedOff() ||
+				eitherButton.TurnedOff()
+			){
+				vision.DisableMotorControl();
 			}
-			else
-			{
+			else if (
+					leftVision.Off() &&
+					rightVision.Off() &&
+					eitherButton.Off()
+			){
+				// do normal things here
 				mode.run();
 			}
-			*/
+			
+			// DO NOT TAKE THIS OUT
+			Wait(0.005);
 		}
 	}
 };

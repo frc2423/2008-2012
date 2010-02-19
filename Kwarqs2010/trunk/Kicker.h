@@ -14,7 +14,7 @@ public:
 		compressor(6, 1),
 		engage(1),
 		release(2),
-		roller_Encoder(DIGITAL_SLOT, 5, DIGITAL_SLOT, 6),
+		roller_Encoder(DIGITAL_SLOT, 7, DIGITAL_SLOT, 8),
 		roller(DIGITAL_SLOT, 3),
 		time(),
 		kicker_state(STATE_IDLE)

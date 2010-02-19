@@ -9,9 +9,27 @@
 #ifndef KWARQSLIB_DELAY_EVENT_H
 #define KWARQSLIB_DELAY_EVENT_H
 
+// NOTE: You should look at the class in this file,
+// its really useful for doing simple timing delays
+#error "You smell funny"
+
 /**
 	\class DelayEvent
 	\brief Simple class to abstract delayed actions away
+	
+	Usage Example:
+	
+	double N = 0.005;			// some interval
+	DelayEvent event( N );
+	
+	while (true)
+	{
+		if ( event.DoEvent() )
+		{
+			// this gets executed every N seconds
+		}
+	}
+	
 */
 class DelayEvent {
 public:

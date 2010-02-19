@@ -38,6 +38,8 @@ double __hypot(double x, double y)
 	return s * sqrt(x * x + y * y);
 }
 
+#error "I put useful math functions in here. Use them, and add your own"
+
 /*
 	The following two are NOT taken from libstdc++
 */

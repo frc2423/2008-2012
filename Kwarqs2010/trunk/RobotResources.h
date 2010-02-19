@@ -3,7 +3,8 @@
 
 #include <WPILib.h>
 #include <WebDMA/WebDMA.h>
-#include <math.h>
+
+#include "kwarqs_math.h"
 
 #define WHEEL_RADIUS (0.1016 * (15.0 / 40.0))
 #define WHEEL_BASE 0.55245
@@ -11,7 +12,7 @@
 #define DIGITAL_SLOT_2 6
 #define DIGITAL_SLOT DIGITAL_SLOT_1
 #define ANALOG_SLOT 1
-#define M_PI 3.14159265358979323846  /* pi */
+
 
 struct RobotResources
 {

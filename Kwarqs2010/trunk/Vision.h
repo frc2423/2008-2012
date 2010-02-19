@@ -4,7 +4,6 @@
 #include <WPILib.h>
 #include "RobotResources.h"
 #include "DashboardDataSender.h"
-#include "SamplePIDOutput.h"
 #include "ProxiedPIDController.h"
 
 class Vision : public PIDOutput, public PIDSource
@@ -26,7 +25,9 @@ public:
 private:
 	
 	static int TimerFn(void * param);
+	
 	void ProcessVision();
+	void AutoSweep();
 	
 	void PIDWrite(float output);
 	double PIDGet();
@@ -34,8 +35,8 @@ private:
 	SEM_ID 				m_mutex;
 	
 	// protects these variables
-	DoubleProxy 		m_left_range;
-	DoubleProxy			m_right_range;
+	DoubleProxy 		m_left_edge;
+	DoubleProxy			m_right_edge;
 	
 	DoubleProxy			m_horizontalAngle;
 	DoubleProxy			m_gyro_angle;

@@ -6,7 +6,7 @@
 
 #include "WPILib.h"
 #include "Vision.h"
-#include <cmath>
+#include "kwarqs_math.h"
 
 
 #define VISION_TARGET_ACCURACY 2.5
@@ -18,6 +18,19 @@
 #define VISION_PERIOD 0.005
 
 #define VISION_TASK_PRIORITY 250
+
+#define VISION_AUTOSWEEP_EDGE 22.5
+
+#define VISION_PL_LEFT 		270.0
+#define VISION_PL_RIGHT		360.0
+#define VISION_PL_SETPOINT	315.0
+
+#define VISION_PE_LEFT		270.0
+#define VISION_PE_RIGHT		90.0
+
+#define VISION_PR_LEFT		0.0
+#define VISION_PR_RIGHT		90.0
+#define VISION_PR_SETPOINT	45.0
 
 
 Vision::Vision(RobotResources& resources):
@@ -44,11 +57,11 @@ Vision::Vision(RobotResources& resources):
 	m_setpointIsTarget = m_resources.webdma.CreateBoolProxy("Vision", "IsTarget", false );
 
 	
-	m_left_range = m_resources.webdma.CreateDoubleProxy("Vision", "Left Range",
+	m_left_edge = m_resources.webdma.CreateDoubleProxy("Vision", "Left Edge",
 		DoubleProxyFlags().readonly()
 	);
 	
-	m_right_range = m_resources.webdma.CreateDoubleProxy("Vision", "Right Range",
+	m_right_edge = m_resources.webdma.CreateDoubleProxy("Vision", "Right Edge",
 		DoubleProxyFlags().readonly()
 	);
 
@@ -94,14 +107,14 @@ void Vision::PreferLeft()
 {
 	Synchronized lock(m_mutex);
 	
-	m_left_range = 270.0;
-	m_right_range = 360.0;
+	m_left_edge = VISION_PL_LEFT;
+	m_right_edge = VISION_PL_RIGHT;
 	
 	double current_setpoint = m_turnController.GetSetpoint();
 	
-	if (current_setpoint < m_left_range || current_setpoint > m_right_range)
+	if (current_setpoint < m_left_edge || current_setpoint > m_right_edge)
 	{
-		m_turnController.SetSetpoint(315.0);
+		m_turnController.SetSetpoint(VISION_PL_SETPOINT);
 		m_setpointIsTarget = false;
 	}
 	
@@ -112,10 +125,8 @@ void Vision::PreferEither()
 {
 	Synchronized lock(m_mutex);
 	
-	m_left_range = 270.0;
-	m_right_range = 90.0;
-	
-	
+	m_left_edge = VISION_PE_LEFT;
+	m_right_edge = VISION_PE_RIGHT;
 	
 	m_turnController.Enable();
 }
@@ -124,14 +135,14 @@ void Vision::PreferRight()
 {
 	Synchronized lock(m_mutex);
 	
-	m_left_range = 0.0;
-	m_right_range = 90.0;
+	m_left_edge = VISION_PR_LEFT;
+	m_right_edge = VISION_PR_RIGHT;
 	
 	double current_setpoint = m_turnController.GetSetpoint();
 	
-	if (current_setpoint < m_left_range || current_setpoint > m_right_range)
+	if (current_setpoint < m_left_edge || current_setpoint > m_right_edge)
 	{
-		m_turnController.SetSetpoint(45.0);
+		m_turnController.SetSetpoint(VISION_PR_SETPOINT);
 		m_setpointIsTarget = false;
 	}
 	
@@ -164,7 +175,7 @@ void Vision::ProcessVision()
 		
 		double horizontalAngle = 0;
 	
-		// get the m_resources.gyro heading that goes with this image
+		// get the gyro heading that goes with this image
 		double gyroAngle = PIDGet();
 
 		// get the camera image
@@ -189,32 +200,42 @@ void Vision::ProcessVision()
 			else
 				targets.insert(targets.begin(), nullTarget);
 			
-			m_dds.sendVisionData(0.0, m_resources.gyro.GetAngle(), 0.0, 0.0, targets);
+			m_dds.sendVisionData(0.0, gyroAngle, 0.0, 0.0, targets);
 		}
-		else {
+		else 
+		{
 			// We have some targets.
 			// set the new PID heading setpoint to the first target in the list
 			horizontalAngle = targets[0].GetHorizontalAngle();
-			double setPoint = gyroAngle + horizontalAngle;
+			double setPoint = angle_normalize( gyroAngle + horizontalAngle );
+			
+			bool send_tgt_vision = false;
 
-			// only set the setpoint if we're pointing the right direction
+			// only set the setpoint if the target resides in the
+			// range we currently allow targets to reside in
 			{
 				Synchronized lock(m_mutex);
 				
-				if ((m_right_range > m_left_range && 
-						setPoint > m_left_range && setPoint < m_right_range ) ||
-					(m_right_range < m_left_range &&
-						(setPoint > m_left_range || setPoint < m_right_range)))
+				// dont screw with this statement, it works and has been tested
+				if ((m_right_edge > m_left_edge && 
+						setPoint > m_left_edge && setPoint < m_right_edge ) ||
+					(m_right_edge < m_left_edge &&
+						(setPoint > m_left_edge || setPoint < m_right_edge)))
 				{
 					m_turnController.SetSetpoint(setPoint);
 					m_setpointIsTarget = true;
+					
+					sent_tgt_vision = true;
 				}
 			}
 			
 			// send dashboard data for target tracking
-			m_dds.sendVisionData(0.0, m_resources.gyro.GetAngle(), 0.0, targets[0].m_xPos / targets[0].m_xMax, targets);
-			//printf("Target found %f ", targets[0].m_score);
-			// targets[0].Print();
+			// note: we only set the target IF we selected it (ie, only if it fell in our selected range)
+			if (send_tgt_vision)
+				m_dds.sendVisionData(0.0, gyroAngle, 0.0, targets[0].m_xPos / targets[0].m_xMax, targets);
+			else
+				m_dds.sendVisionData(0.0, gyroAngle, 0.0, 0.0, targets);
+
 		}
 		
 		
@@ -224,44 +245,41 @@ void Vision::ProcessVision()
 		
 		m_isRobotAligned = m_turnController.OnTarget();
 		
-		// autosweep!
+		// only sweep if there isn't a target and we're at the current
+		// setpoint for the robot
 		if ( m_isRobotAligned && !m_setpointIsTarget)
-		{
-			Synchronized lock(m_mutex);
-			
-			double current_setpoint = m_turnController.GetSetpoint();
-			
-			double left_distance = m_left_range - current_setpoint;
-			if (left_distance < 0 )
-				left_distance = 360 - left_distance;
-					
-			double right_distance = m_right_range - current_setpoint;
-			if (right_distance < 0)
-				right_distance = 360.0 - right_distance;
-			
-			if (right_distance > left_distance)
-			{
-				double new_point = m_right_range - 22.5;
-				if (new_point < 0)
-					new_point = 360 - new_point;
-				
-				m_turnController.SetSetpoint( new_point );
-			}
-			else
-			{
-				double new_point = m_left_range + 22.5;
-				if (new_point < 0)
-					new_point = 360 - new_point;
-				
-				m_turnController.SetSetpoint( new_point );
-			}
-		}
-	
+			AutoSweep();
 		
 		// send the dashboard data associated with the I/O ports
 		m_dds.sendIOPortData();
 	}
 }
+
+
+// code to do autosweeping
+void Vision::AutoSweep()
+{
+	double left_edge, right_edge;
+
+	{
+		// grab these variables in this block so we don't hold the lock for as long
+		Synchronized lock(m_mutex);
+		left_edge = m_left_edge;
+		right_edge = m_right_edge;
+	}
+	
+	double current_setpoint = m_turnController.GetSetpoint();
+	
+	// get distances
+	double left_distance = angle_distance(current_setpoint, left_edge);
+	double right_distance = angle_distance(current_setpoint, right_edge);
+
+	if (right_distance > left_distance)
+		m_turnController.SetSetpoint( angle_normalize( right_edge - VISION_AUTOSWEEP_EDGE ) );
+	else
+		m_turnController.SetSetpoint( angle_normalize( left_edge + VISION_AUTOSWEEP_EDGE) );
+}
+
 
 bool Vision::IsRobotPointingAtTarget() const 
 {
@@ -271,15 +289,11 @@ bool Vision::IsRobotPointingAtTarget() const
 
 void Vision::PIDWrite(float output)
 {
+	// first parameter is zero because we want to spin in place
 	m_resources.myRobot.ArcadeDrive(0.0, output);
 }
 
 double Vision::PIDGet()
 {
-	double angle = fmod(m_resources.gyro.PIDGet(), 360.0);
-	
-	if (angle < 0)
-		return 360.0 + angle;
-	
-	return angle; 	
+	return angle_normalize( m_resources.gyro.PIDGet() );	
 }

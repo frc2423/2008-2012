@@ -9,12 +9,13 @@
 #include "AutonomousVisionMode.h"
 #include "Kicker.h"
 #include "EncoderMode.h"
-#include "ButtonLatch.h"
+#include "Latches.h"
 
 #include <limits>
 #undef min
 #undef max
 
+// this just exists to make debugging easier
 struct StackEnable {
 	StackEnable()
 	{
@@ -24,6 +25,12 @@ struct StackEnable {
 
 class RobotDemo : public SimpleRobot
 {
+	static const int VISION_LEFT_BUTTON = 4;
+	static const int VISION_RIGHT_BUTTON = 5;
+	static const int VISION_EITHER_BUTTON = 3;
+
+
+
 	StackEnable unused;
 	
 	RobotResources resources;
@@ -41,11 +48,9 @@ public:
 		vision(resources),
 		compass(resources),
 		kicker(resources),
-		autonomousVision(resources, kicker, 1),
+		autonomousVision(resources, kicker, vision, 1),
 		encoderMode(resources),
 		mode(&autonomousVision)
-
-
 	{
 		GetWatchdog().SetExpiration(0.1);
 		
@@ -56,9 +61,6 @@ public:
 		kicker.Start();
 	}
 
-	/**
-	 * Drive left & right motors for 2 seconds then stop
-	 */
 	void Autonomous(void)
 	{
 		GetWatchdog().SetEnabled(false);
@@ -72,52 +74,95 @@ public:
 	{
 		GetWatchdog().SetEnabled(true);
 		
-		ButtonLatch eitherButton;
-		ButtonLatch leftVision;
-		ButtonLatch rightVision;
+		TimedLatch eitherButton;
+		TimedLatch leftVision;
+		TimedLatch rightVision;
+		
+		// this state variable keeps track of who is supposed to be
+		// touching the motors right now
+		enum { VB_LEFT, VB_RIGHT, VB_EITHER, VB_NONE } motor_state = VB_NONE;
+		
 		
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
 			
-			if( resources.stick.GetTrigger()) kicker.Kick();
+			if( resources.stick.GetTrigger() ) kicker.Kick();
 			
+			// update the buttons each time around
+			leftVision.Set( resources.stick.GetRawButton(VISION_LEFT_BUTTON));
+			rightVision.Set( resources.stick.GetRawButton(VISION_RIGHT_BUTTON));
+			eitherButton.Set(resources.stick.GetRawButton(VISION_EITHER_BUTTON));
 			
-			leftVision.Set( resources.stick.GetRawButton(4));
-			rightVision.Set( resources.stick.GetRawButton(5));
-			eitherButton.Set(resources.stick.GetRawButton(3));
-			
-			if (leftVision.TurnedOn())
+			// this switch statement decides who controls the motors
+			switch (motor_state)
 			{
-				vision.PreferLeft();
-			}
-			else if (rightVision.TurnedOn())
-			{
-				vision.PreferRight();
-			}
-			else if (eitherButton.TurnedOn())
-			{
-				vision.PreferEither();
-			}
-			else if (
-				leftVision.TurnedOff() ||
-				rightVision.TurnedOff() ||
-				eitherButton.TurnedOff()
-			){
-				vision.DisableMotorControl();
-			}
-			else if (
-					leftVision.Off() &&
-					rightVision.Off() &&
-					eitherButton.Off()
-			){
-				// do normal things here
-				mode.run();
+				case VB_LEFT:
+					
+					if (leftVision.TurnedOff())
+					{
+						vision.DisableMotorControl();
+						motor_state = VB_NONE;
+					}
+					
+					break;
+				
+				case VB_RIGHT:
+				
+					if (rightVision.TurnedOff())
+					{
+						vision.DisableMotorControl();
+						motor_state = VB_NONE;
+					}
+					
+					break;
+				
+				case VB_EITHER:
+
+					if (eitherButton.TurnedOff())
+					{
+						vision.DisableMotorControl();
+						motor_state = VB_NONE;
+					}
+				
+					break;
+				
+				case VB_NONE:
+				
+					// only do the transition here if no other
+					// button is selected, otherwise accidentally
+					// hitting two buttons may disable the targeting
+					
+					if (eitherButton.TurnedOn())
+					{
+						vision.PreferEither();
+						motor_state = VB_EITHER;
+					}
+					else if (leftVision.TurnedOn())
+					{
+						vision.PreferLeft();
+						motor_state = VB_LEFT;
+					}
+					else if (rightVision.TurnedOn())
+					{
+						vision.PreferRight();
+						motor_state = VB_RIGHT;
+					}
+					else
+					{
+						// do normal things here
+						mode.run();
+					}
+				
+					break;		
 			}
 			
 			// DO NOT TAKE THIS OUT
 			Wait(0.005);
 		}
+		
+		// disable the vision controlling if we exit operator control
+		vision.DisableMotorControl();
 	}
 };
 

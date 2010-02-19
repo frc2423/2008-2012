@@ -4,18 +4,15 @@
 #include <WPILib.h>
 #include "RobotMode.h"
 #include "RobotResources.h"
-#include "DashboardDataSender.h"
-#include "SamplePIDOutput.h"
 #include "Kicker.h"
+#include "Vision.h"
 
 class AutonomousVisionMode : public RobotMode
 {
 public:
-	AutonomousVisionMode(RobotResources& resources, Kicker& kicker, int balls);
+	AutonomousVisionMode(RobotResources& resources, Kicker& kicker, Vision &vision, int balls);
 	
 	void Main();
-	
-	void FindTarget();
 	
 	void OnEnable();
 		
@@ -24,11 +21,9 @@ public:
 private:
 	RobotResources& m_resources;
 	Kicker& m_kicker;
+	Vision& m_vision;
+	
 	int m_balls;
-	SamplePIDOutput pidOutput;
-	DashboardDataSender dds;
-	PIDController turnController;
-	AxisCamera &camera;
 	
 	AutonomousVisionMode();
 	DISALLOW_COPY_AND_ASSIGN(AutonomousVisionMode);

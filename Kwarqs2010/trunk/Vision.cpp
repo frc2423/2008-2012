@@ -173,6 +173,7 @@ void Vision::ProcessVision()
 	
 		// get the gyro heading that goes with this image
 		double gyroAngle = PIDGet();
+		double targetPos = 0.0;
 
 		// get the camera image
 		HSLImage *image = m_camera.GetImage();
@@ -181,65 +182,57 @@ void Vision::ProcessVision()
 		vector<Target> targets ( Target::FindCircularTargets(image) );
 		delete image;
 		
-		if (targets.size() == 0 || targets[0].m_score < VISION_MINIMUM_SCORE)
 		{
-			// no targets found. Make sure the first one in the list is 0,0
-			// since the dashboard program annotates the first target in green
-			// and the others in magenta. With no qualified targets, they'll all
-			// be magenta.
-			Target nullTarget;
-			nullTarget.m_majorRadius = 0.0;
-			nullTarget.m_minorRadius = 0.0;
-			nullTarget.m_score = 0.0;
-			if (targets.size() == 0)
-				targets.push_back(nullTarget);
-			else
-				targets.insert(targets.begin(), nullTarget);
-			
-			m_dds.sendVisionData(0.0, gyroAngle, 0.0, 0.0, targets);
-		}
-		else 
-		{
-			// We have some targets.
-			// set the new PID heading setpoint to the first target in the list
-			horizontalAngle = targets[0].GetHorizontalAngle();
-			double setPoint = angle_normalize( gyroAngle + horizontalAngle );
-			
-			bool send_tgt_vision = false;
-
-			// only set the setpoint if the target resides in the
-			// range we currently allow targets to reside in
+			// this block needs to be synchronized
+			Synchronized lock(m_mutex);
+		
+			if (targets.size() == 0 || targets[0].m_score < VISION_MINIMUM_SCORE)
 			{
-				Synchronized lock(m_mutex);
-				
+				// no targets found. Make sure the first one in the list is 0,0
+				// since the dashboard program annotates the first target in green
+				// and the others in magenta. With no qualified targets, they'll all
+				// be magenta.
+				Target nullTarget;
+				nullTarget.m_majorRadius = 0.0;
+				nullTarget.m_minorRadius = 0.0;
+				nullTarget.m_score = 0.0;
+				if (targets.size() == 0)
+					targets.push_back(nullTarget);
+				else
+					targets.insert(targets.begin(), nullTarget);
+			}
+			else 
+			{
+				// We have some targets.
+				// set the new PID heading setpoint to the first target in the list
+				horizontalAngle = targets[0].GetHorizontalAngle();
+				double setPoint = angle_normalize( gyroAngle + horizontalAngle );
+
+				// only set the setpoint if the target resides in the
+				// range we currently allow targets to reside in
+
 				if (AngleWithinEdges( setPoint ))
 				{
 					m_turnController.SetSetpoint(setPoint);
 					m_setpointIsTarget = true;
-					
-					send_tgt_vision = true;
+				
+					targetPos = targets[0].m_xPos / targets[0].m_xMax;
 				}
 			}
-			
-			// send dashboard data for target tracking
-			// note: we only set the target IF we selected it (ie, only if it fell in our selected range)
-			if (send_tgt_vision)
-				m_dds.sendVisionData(0.0, gyroAngle, 0.0, targets[0].m_xPos / targets[0].m_xMax, targets);
-			else
-				m_dds.sendVisionData(0.0, gyroAngle, 0.0, 0.0, targets);
-
+		
+			// WebDMA output stuff:
+			m_horizontalAngle = horizontalAngle;
+			m_numTargets = targets.size();
+		
+			m_isRobotAligned = m_turnController.OnTarget();
+		
+			// only sweep if there isn't a target and we're at the current
+			// setpoint for the robot
+			if ( m_isRobotAligned && !m_setpointIsTarget)
+				AutoSweep();
 		}
-		
-		// WebDMA output stuff:
-		m_horizontalAngle = horizontalAngle;
-		m_numTargets = targets.size();
-		
-		m_isRobotAligned = m_turnController.OnTarget();
-		
-		// only sweep if there isn't a target and we're at the current
-		// setpoint for the robot
-		if ( m_isRobotAligned && !m_setpointIsTarget)
-			AutoSweep();
+			
+		m_dds.sendVisionData(0.0, gyroAngle, 0.0, targetPos, targets);
 		
 		// send the dashboard data associated with the I/O ports
 		m_dds.sendIOPortData();
@@ -248,17 +241,13 @@ void Vision::ProcessVision()
 
 
 // code to do autosweeping
+// note: must be protected by mutex
 void Vision::AutoSweep()
 {
-	double left_edge, right_edge;
+	// read these first since WebDMA does locks
+	double left_edge = m_left_edge;
+	double right_edge = m_right_edge;
 
-	{
-		// grab these variables in this block so we don't hold the lock for as long
-		Synchronized lock(m_mutex);
-		left_edge = m_left_edge;
-		right_edge = m_right_edge;
-	}
-	
 	double current_setpoint = m_turnController.GetSetpoint();
 	
 	// get distances
@@ -287,7 +276,7 @@ bool Vision::AngleWithinEdges(double angle) const
 
 bool Vision::IsRobotPointingAtTarget() const 
 {
-	// doesn't need a mutex since WebDMA already locks for us
+	Synchronized lock(m_mutex);
 	
 	// note that this checks for both the robot being
 	// aligned and for the setpoint to be on target. One

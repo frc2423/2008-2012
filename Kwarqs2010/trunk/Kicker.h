@@ -17,7 +17,8 @@ public:
 		roller_Encoder(DIGITAL_SLOT, 7, DIGITAL_SLOT, 8),
 		roller(DIGITAL_SLOT, 3),
 		time(),
-		kicker_state(STATE_IDLE)
+		kicker_state(STATE_IDLE),
+		roller_on(true)
 
 	{
 		compressor.Start();
@@ -30,8 +31,30 @@ public:
 		m_mutex = semMCreate(0);
 	}
 
-	//Kick method controls kicker and roller. Activate_kicker parameter is needed for telling
-	//kicker when user or robot needs to engage the kicker.
+	
+//Returns true if roller is on, false if not.
+	bool GetRoller()
+	{
+		return roller_on;
+	}
+	
+//Returns true if ball is captured, false if not.
+	bool HasBall()
+	{
+		if(roller_Encoder.GetRate() <= ROLLER_SPEED)
+			return true;
+		else
+			return false;
+	}
+	
+
+/* Kick method used to engage kicker:
+ * 
+ * -If digital switch 1 on the Driverstation is off, kicker is activated regardless
+ * 	of roller speed.
+ * -If digital switch 1 on the Driverstation is on, kicker is activated only if the
+ * 	roller is not spinning.
+*/	
 	void Kick()
 	{		
 		// make sure that nobody else can access our variables
@@ -63,18 +86,25 @@ private:
 		// make sure that nobody else can access our variables
 		Synchronized lock(m_mutex);
 		
+		//Digital Input 1 turns roller on/off
+		if(DriverStation::GetInstance()->GetDigitalIn(ROLLER_DIGITAL_SWITCH))
+			setRoller(true);
+		else
+			setRoller(false);
+		
+		
 		switch(kicker_state)
 		{
 
 		case STATE_DELAY_KICKER:
-			roller.Set(0.0);
+			setRoller(false);
 			time.Reset();
 			kicker_state = STATE_START_KICK;
 			break;	
 		case STATE_START_KICK:
 			if(time.Get() > ROLLER_STOP_TIME)
 			{
-				roller.Set(0.0);
+				setRoller(false);
 				engage.Set(true);
 				release.Set(false);
 				time.Reset();
@@ -84,7 +114,7 @@ private:
 		case STATE_RELEASE:
 			if(time.Get() > KICK_TIME)
 			{
-				roller.Set(-1.0);
+				setRoller(true);
 				engage.Set(false);
 				release.Set(true);
 				time.Reset();
@@ -98,11 +128,22 @@ private:
 			kicker_state = STATE_IDLE;
 			
 		case STATE_IDLE:
-			roller.Set(-1.0);
+			setRoller(true);
 			engage.Set(false);
 			release.Set(false);
 			break;
 		}
+	}
+	
+	
+//Turns roller on and off
+	
+	void setRoller(bool on)
+	{
+		if(on)
+			roller.Set(-1.0);
+		else
+			roller.Set(0.0);
 	}
 
 	enum{ STATE_DELAY_KICKER, STATE_IDLE, STATE_START_KICK, STATE_RELEASE, STATE_RESET};
@@ -112,6 +153,7 @@ private:
 	const static double ROLLER_RADIUS = 1.0;
 	const static double ROLLER_SPEED = .5;
 	const static int KICKER_DIGITAL_SWITCH = 1;
+	const static int ROLLER_DIGITAL_SWITCH = 2;
 	RobotResources& m_resources;
 	Notifier m_notifier;
 	Compressor compressor;
@@ -122,6 +164,7 @@ private:
 	Timer time;
 	SEM_ID m_mutex;
 	int kicker_state;
+	bool roller_on;
 	
 
 };

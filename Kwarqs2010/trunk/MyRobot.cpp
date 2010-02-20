@@ -80,6 +80,7 @@ public:
 		
 		// this state variable keeps track of who is supposed to be
 		// touching the motors right now
+		enum {	NO_BALL, NO_TARGET, AUTO_KICK } autoTarget_state = NO_BALL;
 		enum { VB_LEFT, VB_RIGHT, VB_EITHER, VB_NONE } motor_state = VB_NONE;
 		
 		
@@ -94,68 +95,104 @@ public:
 			rightVision.Set( resources.stick.GetRawButton(VISION_RIGHT_BUTTON));
 			eitherButton.Set(resources.stick.GetRawButton(VISION_EITHER_BUTTON));
 			
-			// this switch statement decides who controls the motors
-			switch (motor_state)
-			{
-				case VB_LEFT:
-					
-					if (leftVision.TurnedOff())
+			if(DriverStation::GetInstance()->GetDigitalIn(3))
+			{	
+				
+				switch (autoTarget_state)
+				{
+				case NO_BALL:
+					mode.run();
+					if(kicker.HasBall())
 					{
-						vision.DisableMotorControl();
-						motor_state = VB_NONE;
-					}
-					
-					break;
-				
-				case VB_RIGHT:
-				
-					if (rightVision.TurnedOff())
-					{
-						vision.DisableMotorControl();
-						motor_state = VB_NONE;
-					}
-					
-					break;
-				
-				case VB_EITHER:
-
-					if (eitherButton.TurnedOff())
-					{
-						vision.DisableMotorControl();
-						motor_state = VB_NONE;
-					}
-				
-					break;
-				
-				case VB_NONE:
-				
-					// only do the transition here if no other
-					// button is selected, otherwise accidentally
-					// hitting two buttons may disable the targeting
-					
-					if (eitherButton.TurnedOn())
-					{
+						
 						vision.PreferEither();
 						motor_state = VB_EITHER;
+						autoTarget_state = NO_TARGET;
 					}
-					else if (leftVision.TurnedOn())
+					break;
+				case NO_TARGET:
+					if(vision.IsRobotPointingAtTarget()) 
 					{
-						vision.PreferLeft();
-						motor_state = VB_LEFT;
+						vision.DisableMotorControl();
+						autoTarget_state = AUTO_KICK;
 					}
-					else if (rightVision.TurnedOn())
-					{
-						vision.PreferRight();
-						motor_state = VB_RIGHT;
-					}
-					else
-					{
-						// do normal things here
-						mode.run();
-					}
-				
-					break;		
+					break;
+				case AUTO_KICK:
+					kicker.Kick();
+					autoTarget_state = NO_BALL;
+					break;
+				}
 			}
+			else
+			{
+				//returns autoTarget to first state if autoTarget is turned off
+				//in middle of 
+				autoTarget_state = NO_BALL;
+				// this switch statement decides who controls the motors
+				switch (motor_state)
+				{
+					case VB_LEFT:
+						
+						if (leftVision.TurnedOff())
+						{
+							vision.DisableMotorControl();
+							motor_state = VB_NONE;
+						}
+						
+						break;
+					
+					case VB_RIGHT:
+					
+						if (rightVision.TurnedOff())
+						{
+							vision.DisableMotorControl();
+							motor_state = VB_NONE;
+						}
+						
+						break;
+					
+					case VB_EITHER:
+	
+						if (eitherButton.TurnedOff())
+						{
+							vision.DisableMotorControl();
+							motor_state = VB_NONE;
+						}
+					
+						break;
+					
+					case VB_NONE:
+					
+						// only do the transition here if no other
+						// button is selected, otherwise accidentally
+						// hitting two buttons may disable the targeting
+						
+						if (eitherButton.TurnedOn())
+						{
+							vision.PreferEither();
+							motor_state = VB_EITHER;
+						}
+						else if (leftVision.TurnedOn())
+						{
+							vision.PreferLeft();
+							motor_state = VB_LEFT;
+						}
+						else if (rightVision.TurnedOn())
+						{
+							vision.PreferRight();
+							motor_state = VB_RIGHT;
+						}
+						else
+						{
+							// do normal things here
+							mode.run();
+						}
+					
+						break;		
+				}
+			}
+			
+			//DriverStation().GetDigitalIn(1)
 			
 			// DO NOT TAKE THIS OUT
 			Wait(0.005);

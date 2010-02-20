@@ -11,7 +11,7 @@
 
 // NOTE: You should look at the class in this file,
 // its really useful for doing simple timing delays
-#error "You smell funny"
+
 
 /**
 	\class DelayEvent

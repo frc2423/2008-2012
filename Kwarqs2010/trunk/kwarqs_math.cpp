@@ -38,7 +38,7 @@ double __hypot(double x, double y)
 	return s * sqrt(x * x + y * y);
 }
 
-#error "I put useful math functions in here. Use them, and add your own"
+
 
 /*
 	The following two are NOT taken from libstdc++
@@ -54,6 +54,7 @@ double angle_normalize( double angle )
 }
 
 
+
 double angle_distance( double angle1, double angle2 )
 {
 	double error1 = angle_normalize(angle1 - angle2);
@@ -65,5 +66,23 @@ double angle_distance( double angle1, double angle2 )
 		return error2;
 }
 
+/*Checks for the shortest way the robot must turn to get to desired angle.
+ *turn left = -1
+ *turn right = 1
+*/
 
+int shortDirection(double angle_controller, double angle_robot)
+{
+	double angle_controller_norm = angle_normalize(angle_controller);
+	double angle_robot_norm = angle_normalize(angle_robot);
+	
+	double angle_Distance = angle_distance(angle_controller_norm, angle_robot_norm);
+	
+	double turn_left = angle_normalize(angle_controller_norm - angle_Distance);
+	
+	if(turn_left == angle_robot_norm)
+		return 1;
+	else
+		return -1;
+}
 

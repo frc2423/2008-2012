@@ -8,6 +8,7 @@ double __hypot(double x, double y);
 
 double angle_normalize( double angle );
 double angle_distance( double angle1, double angle2 );
+int shortDirection(double angle_controller, double angle_robot);
 
 #endif
 

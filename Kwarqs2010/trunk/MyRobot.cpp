@@ -64,7 +64,13 @@ public:
 	void Autonomous(void)
 	{
 		GetWatchdog().SetEnabled(false);
-		mode.Autonomous();
+		
+		while(IsAutonomous())
+		{
+			mode.Autonomous();
+			// DO NOT TAKE THIS OUT
+			Wait(0.005);
+		}
 	}
 
 	/**
@@ -191,8 +197,6 @@ public:
 						break;		
 				}
 			}
-			
-			//DriverStation().GetDigitalIn(1)
 			
 			// DO NOT TAKE THIS OUT
 			Wait(0.005);

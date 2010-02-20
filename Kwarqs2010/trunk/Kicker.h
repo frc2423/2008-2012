@@ -64,7 +64,7 @@ public:
 		{
 			if(!DriverStation::GetInstance()->GetDigitalIn(KICKER_DIGITAL_SWITCH)) 
 				kicker_state = STATE_START_KICK;
-			else if( roller_Encoder.GetRate() <= ROLLER_SPEED)
+			else if( HasBall())
 				kicker_state = STATE_START_KICK;
 		}
 	}
@@ -86,7 +86,7 @@ private:
 		// make sure that nobody else can access our variables
 		Synchronized lock(m_mutex);
 		
-		//Digital Input 1 turns roller on/off
+		//Digital Input 2 turns roller on/off
 		if(DriverStation::GetInstance()->GetDigitalIn(ROLLER_DIGITAL_SWITCH))
 			setRoller(true);
 		else

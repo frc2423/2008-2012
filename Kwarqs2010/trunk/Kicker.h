@@ -15,7 +15,7 @@ public:
 		engage(1),
 		release(2),
 		roller_Encoder(DIGITAL_SLOT, 7, DIGITAL_SLOT, 8),
-		roller(DIGITAL_SLOT, 3),
+		roller(3),
 		time(),
 		kicker_state(STATE_IDLE),
 		roller_on(true)
@@ -29,6 +29,8 @@ public:
 		// create a mutex to allow us to synchronize access to variables
 		// since we're going to be running in multiple threads
 		m_mutex = semMCreate(0);
+		m_displayRollerVoltage = m_resources.webdma.CreateDoubleProxy("Roller", "Roller sensor voltage",
+			DoubleProxyFlags().readonly());
 	}
 
 	
@@ -41,7 +43,7 @@ public:
 //Returns true if ball is captured, false if not.
 	bool HasBall()
 	{
-		if(roller_Encoder.GetRate() <= ROLLER_SPEED)
+		if(m_resources.ballSensor.GetVoltage() >= BALLSENSOR_VOLTAGE)
 			return true;
 		else
 			return false;
@@ -86,18 +88,16 @@ private:
 		// make sure that nobody else can access our variables
 		Synchronized lock(m_mutex);
 		
-		//Digital Input 2 turns roller on/off
-		if(DriverStation::GetInstance()->GetDigitalIn(ROLLER_DIGITAL_SWITCH))
-			setRoller(true);
-		else
-			setRoller(false);
+		m_displayRollerVoltage = m_resources.ballSensor.GetVoltage();
 		
+		//Digital Input 2 turns roller on/off
 		
 		switch(kicker_state)
 		{
 
 		case STATE_DELAY_KICKER:
-			setRoller(false);
+			//setRoller(false);
+			roller.Set(1.0);
 			time.Reset();
 			kicker_state = STATE_START_KICK;
 			break;	
@@ -128,30 +128,36 @@ private:
 			kicker_state = STATE_IDLE;
 			
 		case STATE_IDLE:
-			setRoller(true);
+			//Digital Input 2 turns roller on/off
+			if(DriverStation::GetInstance()->GetDigitalIn(ROLLER_DIGITAL_SWITCH))
+				setRoller(true);
+			else
+				setRoller(false);
 			engage.Set(false);
 			release.Set(false);
 			break;
 		}
 	}
 	
-	
+
 //Turns roller on and off
 	
 	void setRoller(bool on)
-	{
+	{	
 		if(on)
 			roller.Set(-1.0);
 		else
 			roller.Set(0.0);
 	}
+	
+	
 
 	enum{ STATE_DELAY_KICKER, STATE_IDLE, STATE_START_KICK, STATE_RELEASE, STATE_RESET};
 	
 	const static double KICK_TIME = .5;
-	const static double ROLLER_STOP_TIME = .1;
+	const static double ROLLER_STOP_TIME = 1.0;
 	const static double ROLLER_RADIUS = 1.0;
-	const static double ROLLER_SPEED = .5;
+	const static double BALLSENSOR_VOLTAGE = 1.0;
 	const static int KICKER_DIGITAL_SWITCH = 1;
 	const static int ROLLER_DIGITAL_SWITCH = 2;
 	RobotResources& m_resources;
@@ -165,6 +171,7 @@ private:
 	SEM_ID m_mutex;
 	int kicker_state;
 	bool roller_on;
+	DoubleProxy m_displayRollerVoltage;
 	
 
 };

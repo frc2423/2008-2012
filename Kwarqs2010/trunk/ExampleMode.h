@@ -33,8 +33,8 @@ private:
 	void Drive()
 	{
 		
-		m_resources.myRobot.ArcadeDrive(m_resources.stick);
-		/*if(fabs(m_resources.stick.GetX()) <= .1 && fabs(m_resources.stick.GetY()) <= .05)
+		//m_resources.myRobot.ArcadeDrive(m_resources.stick);
+		if(fabs(m_resources.stick.GetX()) <= .1 && fabs(m_resources.stick.GetY()) <= .05)
 		{
 			m_resources.myRobot.Drive(0.0, 0.0);
 		}
@@ -48,7 +48,7 @@ private:
 			double speed = m_resources.stick.GetMagnitude()* m_resources.stick.GetY() / fabs(m_resources.stick.GetY());
 			double turn_rate = pow( (m_resources.stick.GetThrottle()+ 1.0) / 2.0, fabs(m_resources.stick.GetY())) * m_resources.stick.GetX(); 
 			m_resources.myRobot.Drive( speed, turn_rate );
-		}*/
+		}
 	}
 
 };

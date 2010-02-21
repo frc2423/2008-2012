@@ -84,6 +84,8 @@ public:
 		TimedLatch leftVision;
 		TimedLatch rightVision;
 		
+		
+		
 		// this state variable keeps track of who is supposed to be
 		// touching the motors right now
 		enum {	NO_BALL, NO_TARGET, AUTO_KICK } autoTarget_state = NO_BALL;
@@ -103,16 +105,17 @@ public:
 			
 			if(DriverStation::GetInstance()->GetDigitalIn(3))
 			{	
+				motor_state = VB_NONE;
 				
 				switch (autoTarget_state)
 				{
 				case NO_BALL:
 					mode.run();
+					vision.DisableMotorControl();
 					if(kicker.HasBall())
 					{
 						
 						vision.PreferEither();
-						motor_state = VB_EITHER;
 						autoTarget_state = NO_TARGET;
 					}
 					break;
@@ -191,6 +194,7 @@ public:
 						else
 						{
 							// do normal things here
+							vision.DisableMotorControl();
 							mode.run();
 						}
 					

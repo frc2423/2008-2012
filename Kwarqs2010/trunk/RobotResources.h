@@ -12,6 +12,7 @@
 #define DIGITAL_SLOT_2 6
 #define DIGITAL_SLOT DIGITAL_SLOT_1
 #define ANALOG_SLOT 1
+#define ANALOG_SLOT2 2
 
 
 struct RobotResources
@@ -19,6 +20,7 @@ struct RobotResources
 	Encoder leftEncoder;	// detects the speed that the wheels are turning at
 	Encoder rightEncoder;
 	Gyro gyro;
+	AnalogChannel ballSensor;
 	
 	Joystick stick;			// only joystick
 	Joystick stick2;
@@ -29,7 +31,8 @@ struct RobotResources
 	RobotResources():
 		leftEncoder(DIGITAL_SLOT, 1, DIGITAL_SLOT, 2),
 		rightEncoder(DIGITAL_SLOT, 3, DIGITAL_SLOT, 4),
-		gyro(ANALOG_SLOT, 1),
+		gyro(ANALOG_SLOT),
+		ballSensor(ANALOG_SLOT2),
 		
 		stick(1),			// these must be initialized in the same order
 		stick2(2),

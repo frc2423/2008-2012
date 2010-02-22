@@ -19,10 +19,14 @@ public:
 	void OnDisable();
 		
 private:
+	enum { STRAIGHTAWAY, STOP_FOR_KICK, ALIGN, BALL_KICK, REALIGN, SEARCH_FOR_BALLS, STOP };
+	
 	RobotResources& m_resources;
 	Kicker& m_kicker;
 	Vision& m_vision;
 	
+	int case_Number;
+	int balls_kicked;
 	int m_balls;
 	
 	AutonomousVisionMode();

@@ -40,7 +40,7 @@ public:
 	{}
 
 	/// returns true if the interval has expired
-	inline bool DoEvent()
+	bool DoEvent()
 	{
 		double current_time = GetTime();
 		if (current_time - m_lastUpdate > m_interval)
@@ -50,6 +50,11 @@ public:
 		}
 		
 		return false;
+	}
+	
+	void Reset()
+	{
+		m_lastUpdate = GetTime();
 	}
 
 private:

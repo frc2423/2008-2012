@@ -105,6 +105,7 @@ private:
 			if(time.Get() > ROLLER_STOP_TIME)
 			{
 				setRoller(false);
+				
 				engage.Set(true);
 				release.Set(false);
 				time.Reset();
@@ -115,6 +116,7 @@ private:
 			if(time.Get() > KICK_TIME)
 			{
 				setRoller(true);
+				
 				engage.Set(false);
 				release.Set(true);
 				time.Reset();
@@ -155,9 +157,9 @@ private:
 	enum{ STATE_DELAY_KICKER, STATE_IDLE, STATE_START_KICK, STATE_RELEASE, STATE_RESET};
 	
 	const static double KICK_TIME = .5;
-	const static double ROLLER_STOP_TIME = 1.0;
+	const static double ROLLER_STOP_TIME = .1;    
 	const static double ROLLER_RADIUS = 1.0;
-	const static double BALLSENSOR_VOLTAGE = 1.0;
+	const static double BALLSENSOR_VOLTAGE = 0.5;
 	const static int KICKER_DIGITAL_SWITCH = 1;
 	const static int ROLLER_DIGITAL_SWITCH = 2;
 	RobotResources& m_resources;

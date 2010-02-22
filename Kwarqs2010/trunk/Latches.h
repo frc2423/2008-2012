@@ -14,7 +14,7 @@
 
 /**
 	\class LatchBase
-	\brief Base class for latches
+	\brief Base class for boolean latches
 	
 	Do not create instances of this class, create a Latch or TimedLatch instead
 */
@@ -150,6 +150,62 @@ public:
 
 private:
 	DelayEvent allow_transition;
+};
+
+
+
+template <typename T>
+class StateLatch  {
+public:
+	
+	/**
+		\brief Default constructor for the latch
+		
+		@param initial_value	The initial value that the latch is set to
+	*/
+	StateLatch( const T &initial_value ) :
+		m_last_0(initial_value),
+		m_last_1(initial_value)
+	{}
+	
+	/// @return True if the latch was just set to true. False otherwise
+	bool EnteredState(const T &state) const
+	{
+		return m_last_0 == state && m_last_0 != m_last_1;
+	}
+	
+	/// @return True if the latch was just set to false. False otherwise
+	bool LeftState(const T &state) const
+	{
+		return m_last_1 == state && m_last_0 != state;
+	}
+	
+	/// @return True if latch is currently set, False if not set
+	bool operator==(const T& state) const
+	{
+		return m_last_0 == state;
+	}
+	
+	T State() const
+	{
+		return m_last_0;
+	}
+	
+	void Set(const T& state)
+	{
+		m_last_1 = m_last_0;
+		m_last_0 = state;
+	}
+	
+protected:
+	
+	StateLatch();
+
+
+	
+	T m_last_0;		// the current value set
+	T m_last_1;		// the value it was the last time
+	
 };
 
 

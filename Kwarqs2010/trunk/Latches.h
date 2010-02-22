@@ -160,7 +160,6 @@ private:
 	
 	@warning This is not threadsafe, you should use appropriate protection
 	mechanisms if using with threads
-
 */
 template <typename T>
 class StateLatch  {
@@ -191,24 +190,31 @@ public:
 	}
 	
 	// support implicit conversion to T
-	T operator T() const
+	operator T() const
 	{
 		return m_last_0;
 	}
 	
-	// assignment operator
+	/// assignment operator
 	StateLatch<T>& operator=(const T& state)
 	{
 		m_last_1 = m_last_0;
 		m_last_0 = state;
+		
+		return *this;
 	}
 	
-	/// @return True if latch is currently set, False if not set
+	/// equality comparison operator
 	bool operator==(const T& state) const
 	{
 		return m_last_0 == state;
 	}
-	
+
+	/// inequality comparison operator
+	bool operator!=(const T& state) const
+	{
+		return m_last_0 != state;
+	}
 	
 protected:
 	

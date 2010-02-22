@@ -22,7 +22,7 @@ struct RobotMode
 class ModeControl
 {
 public:
-	Mode():
+	ModeControl():
 		current_mode(0)
 	{}
 	

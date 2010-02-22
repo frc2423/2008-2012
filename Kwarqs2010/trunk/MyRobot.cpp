@@ -52,7 +52,7 @@ class RobotDemo : public SimpleRobot
 	EncoderMode encoderMode;
 	
 	ModeControl modeControl;
-	ModeControl autonomouseModeControl;
+	ModeControl autonomousModeControl;
 	
 	TimedLatch eitherButton;
 	TimedLatch leftVision;
@@ -96,16 +96,16 @@ public:
 	{
 		GetWatchdog().SetEnabled(false);
 		
-		autonomousModeControl.OnEnable();
+		autonomousModeControl.Enable();
 		
 		while(IsAutonomous())
 		{
-			autonomouseModeControl.Run();
+			autonomousModeControl.Run();
 			// DO NOT TAKE THIS OUT
 			Wait(0.005);
 		}
 		
-		autonomouseModeControl.OnDisable();
+		autonomousModeControl.Disable();
 	}
 
 	/**
@@ -119,7 +119,7 @@ public:
 		m_auto_target_state = AT_ACQUIRE_BALL;
 		m_motor_state = VB_NONE;
 		
-		modeControl.OnEnable();
+		modeControl.Enable();
 		
 		while (IsOperatorControl())
 		{
@@ -145,7 +145,7 @@ public:
 				{
 					// normal mode stuff here
 					vision.DisableMotorControl();
-					modeControl.run();
+					modeControl.Run();
 				}
 			}
 			
@@ -156,7 +156,7 @@ public:
 		// disable the vision controlling if we exit operator control
 		vision.DisableMotorControl();
 		
-		modeControl.OnDisable();
+		modeControl.Disable();
 	}
 	
 	/**
@@ -231,7 +231,7 @@ public:
 			}
 			else
 			{
-				ballAcquired.reset();
+				ballAcquired.Reset();
 			}
 			
 			break;

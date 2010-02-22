@@ -1,8 +1,8 @@
 /**
 	\file 		DelayEvent.h
-	\author 	Dustin Spicuzza: last changed by $Author: dspicuzz $
-	\date 		Last changed on $Date: 2009-03-05 01:27:36 -0500 (Thu, 05 Mar 2009) $
-	\version 	$Rev: 272 $
+	\author 	Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
 */
 
 

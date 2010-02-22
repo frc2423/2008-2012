@@ -1,3 +1,11 @@
+/**
+	\file 		Kicker.h
+	\author 	Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
+
 #ifndef KICKER_H
 #define KICKER_H
 
@@ -9,22 +17,18 @@ class Kicker
 {
 public:
 	Kicker(RobotResources& resources):
+		kicker_state(STATE_IDLE),
 		m_resources(resources),
 		m_notifier(Kicker::TimerFn, this),
 		compressor(6, 1),
 		engage(1),
 		release(2),
 		roller_Encoder(DIGITAL_SLOT, 7, DIGITAL_SLOT, 8),
-		roller(3),
-		time(),
-		kicker_state(STATE_IDLE),
-		roller_on(true)
-
+		roller(3)
 	{
 		compressor.Start();
 		roller_Encoder.SetDistancePerPulse( (2.0 * M_PI * ROLLER_RADIUS) / 1440.0 );
 		time.Start();
-		roller.Set(1.0);
 		
 		// create a mutex to allow us to synchronize access to variables
 		// since we're going to be running in multiple threads
@@ -32,15 +36,14 @@ public:
 		m_displayRollerVoltage = m_resources.webdma.CreateDoubleProxy("Roller", "Roller sensor voltage",
 			DoubleProxyFlags().readonly());
 	}
+	
+	void Start()
+	{
+		m_notifier.StartPeriodic(.0025);
+	}
 
 	
-//Returns true if roller is on, false if not.
-	bool GetRoller()
-	{
-		return roller_on;
-	}
-	
-//Returns true if ball is captured, false if not.
+	//Returns true if ball is captured, false if not.
 	bool HasBall()
 	{
 		if(m_resources.ballSensor.GetVoltage() >= BALLSENSOR_VOLTAGE)
@@ -50,13 +53,13 @@ public:
 	}
 	
 
-/* Kick method used to engage kicker:
- * 
- * -If digital switch 1 on the Driverstation is off, kicker is activated regardless
- * 	of roller speed.
- * -If digital switch 1 on the Driverstation is on, kicker is activated only if the
- * 	roller is not spinning.
-*/	
+	/* Kick method used to engage kicker:
+	 * 
+	 * -If digital switch 1 on the Driverstation is off, kicker is activated regardless
+	 * 	of roller speed.
+	 * -If digital switch 1 on the Driverstation is on, kicker is activated only if the
+	 * 	roller is not spinning.
+	*/	
 	void Kick()
 	{		
 		// make sure that nobody else can access our variables
@@ -66,15 +69,27 @@ public:
 		{
 			if(!DriverStation::GetInstance()->GetDigitalIn(KICKER_DIGITAL_SWITCH)) 
 				kicker_state = STATE_START_KICK;
-			else if( HasBall())
+			else if( HasBall() )
 				kicker_state = STATE_START_KICK;
+				
+			// ok, we're starting a kick, get ready for it
+			if (kicker_state == STATE_START_KICK)
+			{
+				// kicks always start by shutting down the roller
+				SetRoller(false);
+				time.Reset();
+			}
 		}
 	}
 	
-	void Start()
+	// returns True if in the process of kicking, false otherwise
+	bool IsKicking()
 	{
-		m_notifier.StartPeriodic(.0025);
+		Synchronized lock(m_mutex);
+		
+		return kicker_state != STATE_IDLE;
 	}
+
 	
 	
 private:
@@ -90,61 +105,71 @@ private:
 		
 		m_displayRollerVoltage = m_resources.ballSensor.GetVoltage();
 		
-		//Digital Input 2 turns roller on/off
+		// some specified input controls whether roller is normally on/off
+		bool roller_enabled = DriverStation::GetInstance()->GetDigitalIn(ROLLER_DIGITAL_SWITCH);		
 		
 		switch(kicker_state)
 		{
-
-		case STATE_DELAY_KICKER:
-			//setRoller(false);
-			roller.Set(1.0);
-			time.Reset();
-			kicker_state = STATE_START_KICK;
-			break;	
+					
 		case STATE_START_KICK:
+		
+			// this state engages the pnuematics to perform the kick
+			// appropriately after a short delay
+		
 			if(time.Get() > ROLLER_STOP_TIME)
-			{
-				setRoller(false);
-				
+			{				
 				engage.Set(true);
 				release.Set(false);
+				
 				time.Reset();
 				kicker_state = STATE_RELEASE;
 			}
+			
 			break;
+			
 		case STATE_RELEASE:
+		
+			// this state waits for the pnuematics to fully release
+			// before bringing them back
+		
 			if(time.Get() > KICK_TIME)
 			{
-				setRoller(true);
-				
+				SetRoller( roller_enabled );				
 				engage.Set(false);
 				release.Set(true);
+				
 				time.Reset();
 				kicker_state = STATE_RESET;
 			}
+			
 			break;
+			
 		case STATE_RESET:
+		
+			// this state waits for the pneumatics to come back to their
+			// starting position and then we fall back to idle mode
+		
 			if(time.Get() < KICK_TIME)
 				break;
 			
 			kicker_state = STATE_IDLE;
+			// fall through to the next state
 			
 		case STATE_IDLE:
-			//Digital Input 2 turns roller on/off
-			if(DriverStation::GetInstance()->GetDigitalIn(ROLLER_DIGITAL_SWITCH))
-				setRoller(true);
-			else
-				setRoller(false);
+			
+			// this is the normal operation of the kicker mechanism
+			
+			SetRoller( roller_enabled );			
 			engage.Set(false);
 			release.Set(false);
+			
 			break;
 		}
 	}
 	
 
-//Turns roller on and off
-	
-	void setRoller(bool on)
+	//Turns roller on and off
+	void SetRoller(bool on)
 	{	
 		if(on)
 			roller.Set(-1.0);
@@ -154,7 +179,7 @@ private:
 	
 	
 
-	enum{ STATE_DELAY_KICKER, STATE_IDLE, STATE_START_KICK, STATE_RELEASE, STATE_RESET};
+	enum{ STATE_IDLE, STATE_START_KICK, STATE_RELEASE, STATE_RESET } kicker_state;
 	
 	const static double KICK_TIME = .5;
 	const static double ROLLER_STOP_TIME = .1;    
@@ -162,6 +187,7 @@ private:
 	const static double BALLSENSOR_VOLTAGE = 0.5;
 	const static int KICKER_DIGITAL_SWITCH = 1;
 	const static int ROLLER_DIGITAL_SWITCH = 2;
+	
 	RobotResources& m_resources;
 	Notifier m_notifier;
 	Compressor compressor;
@@ -171,8 +197,6 @@ private:
 	Jaguar roller;
 	Timer time;
 	SEM_ID m_mutex;
-	int kicker_state;
-	bool roller_on;
 	DoubleProxy m_displayRollerVoltage;
 	
 

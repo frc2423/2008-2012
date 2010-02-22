@@ -1,3 +1,11 @@
+/**
+	\file 		AutonomousVisionMode.cpp
+	\author 	Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
+
 #include "AutonomousVisionMode.h"
 #include "WPILib.h"
 #include <math.h>
@@ -23,6 +31,16 @@ void AutonomousVisionMode::OnEnable()
 
 void AutonomousVisionMode::Main()
 {
+	// TODO: Need to adjust this to make sure we don't go too far in the Y direction
+	
+	// TODO: Need more robust state handling, what happens if we miss a ball? Also
+	// need to build in delays a bit better.
+	
+	// TODO: Need to share the PID controller with the vision system probably, 
+	// after some thought that sounds more attractive. Probably should
+	// move it to its own wrapper class and allow different types of access
+	// depending on which function is calling it. Or something like that.
+
 	switch(case_Number)
 	{
 	case STRAIGHTAWAY:

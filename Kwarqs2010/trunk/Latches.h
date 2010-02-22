@@ -153,7 +153,15 @@ private:
 };
 
 
+/**
+	\class StateLatch
+	\brief A type of latch that is (hopefully) useful for state machine
+	construction. 
+	
+	@warning This is not threadsafe, you should use appropriate protection
+	mechanisms if using with threads
 
+*/
 template <typename T>
 class StateLatch  {
 public:
@@ -168,16 +176,31 @@ public:
 		m_last_1(initial_value)
 	{}
 	
+	/// \brief Think of this as a constructor for a particular state
 	/// @return True if the latch was just set to true. False otherwise
 	bool EnteredState(const T &state) const
 	{
 		return m_last_0 == state && m_last_0 != m_last_1;
 	}
 	
+	/// \brief Think of this as a destructor for a particular state
 	/// @return True if the latch was just set to false. False otherwise
 	bool LeftState(const T &state) const
 	{
 		return m_last_1 == state && m_last_0 != state;
+	}
+	
+	// support implicit conversion to T
+	T operator T() const
+	{
+		return m_last_0;
+	}
+	
+	// assignment operator
+	StateLatch<T>& operator=(const T& state)
+	{
+		m_last_1 = m_last_0;
+		m_last_0 = state;
 	}
 	
 	/// @return True if latch is currently set, False if not set
@@ -186,23 +209,11 @@ public:
 		return m_last_0 == state;
 	}
 	
-	T State() const
-	{
-		return m_last_0;
-	}
-	
-	void Set(const T& state)
-	{
-		m_last_1 = m_last_0;
-		m_last_0 = state;
-	}
 	
 protected:
 	
 	StateLatch();
 
-
-	
 	T m_last_0;		// the current value set
 	T m_last_1;		// the value it was the last time
 	

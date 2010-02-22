@@ -1,3 +1,12 @@
+/**
+	\file 		MyRobot.cpp
+	\author 	Amory Galili, Dustin Spicuzza: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
+
+
 #include "WPILib.h"
 #include <WebDMA/WebDMA.h>
 #include "RobotResources.h"
@@ -30,7 +39,7 @@ class RobotDemo : public SimpleRobot
 	static const int VISION_EITHER_BUTTON = 3;
 
 	enum { VB_LEFT, VB_RIGHT, VB_EITHER, VB_NONE } m_motor_state;
-	enum AutoTargetState { AT_NONE, AT_ACQUIRE_BALL, AT_ACQUIRE_TARGET };
+	enum AutoTargetState { AT_NONE, AT_ACQUIRE_BALL, AT_ACQUIRE_TARGET, AT_KICKING };
 
 	StackEnable unused;
 	
@@ -41,7 +50,9 @@ class RobotDemo : public SimpleRobot
 	Kicker kicker;
 	AutonomousVisionMode autonomousVision;
 	EncoderMode encoderMode;
-	Mode mode;
+	
+	ModeControl modeControl;
+	ModeControl autonomouseModeControl;
 	
 	TimedLatch eitherButton;
 	TimedLatch leftVision;
@@ -49,8 +60,8 @@ class RobotDemo : public SimpleRobot
 	
 	TimedLatch autoKickButton;
 	
-	DelayEvent kickerPossession;
-	DelayEvent autoKickDelay;
+	DelayEvent ballAcquired;
+	DelayEvent targetAcquired;
 	
 	StateLatch< AutoTargetState > m_auto_target_state;
 
@@ -62,18 +73,21 @@ public:
 		kicker(resources),
 		autonomousVision(resources, kicker, vision, 1),
 		encoderMode(resources),
-		mode(&autonomousVision),
 		
-		kickerPossession(0.5),
-		autoKickDelay(0.5),
+		ballAcquired(0.5),
+		targetAcquired(0.5),
 		
 		m_auto_target_state(AT_NONE)
 	{
 		GetWatchdog().SetExpiration(0.1);
+
+		// setup normal modes		
+		modeControl.Add(&example);
+		//modeControl.Add(&compass);
+		//modeControl.Add(&encoderMode);
 		
-		mode.Add(&example);
-		//mode.Add(&compass);
-		//mode.Add(&encoderMode);
+		// setup autonomous modes
+		autonomousModeControl.Add(&autonomousVision);
 		
 		kicker.Start();
 	}
@@ -82,12 +96,16 @@ public:
 	{
 		GetWatchdog().SetEnabled(false);
 		
+		autonomousModeControl.OnEnable();
+		
 		while(IsAutonomous())
 		{
-			mode.Autonomous();
+			autonomouseModeControl.Run();
 			// DO NOT TAKE THIS OUT
 			Wait(0.005);
 		}
+		
+		autonomouseModeControl.OnDisable();
 	}
 
 	/**
@@ -97,13 +115,11 @@ public:
 	{
 		GetWatchdog().SetEnabled(true);
 		
-
-		
 		// reset things each time
 		m_auto_target_state = AT_ACQUIRE_BALL;
 		m_motor_state = VB_NONE;
 		
-		
+		modeControl.OnEnable();
 		
 		while (IsOperatorControl())
 		{
@@ -120,7 +136,8 @@ public:
 			
 			AutomatedKicking();
 			
-			if (m_auto_target_state == AT_ACQUIRE_BALL)
+			// if the automated kicking isn't trying to acquire a target...
+			if (m_auto_target_state != AT_ACQUIRE_TARGET)
 			{
 				ManualVisionTargeting();
 				
@@ -128,7 +145,7 @@ public:
 				{
 					// normal mode stuff here
 					vision.DisableMotorControl();
-					mode.run();
+					modeControl.run();
 				}
 			}
 			
@@ -138,35 +155,46 @@ public:
 		
 		// disable the vision controlling if we exit operator control
 		vision.DisableMotorControl();
+		
+		modeControl.OnDisable();
 	}
 	
-	
+	/**
+		\brief This function tries to do automated kicking using a simple state 
+		machine. The way this should work is something like this:
+		
+			- Wait for ball detection event
+			- Once ball is detected, attempt to focus on a target
+			- Once target is acquired, kick ball away
+			- Wait for kick to complete before trying again
+	*/
 	void AutomatedKicking()
 	{
 		bool has_ball = kicker.HasBall();
 		
-		if (autoKickButton.TurnedOn() || !has_ball)
+		// turning on/off the auto kick control button
+		if (autoKickButton.TurnedOn())
 		{
-			m_auto_target_state.Set( AT_ACQUIRE_BALL );
+			m_auto_target_state = AT_ACQUIRE_BALL;
 		}
 		else if (autoKickButton.TurnedOff())
 		{
-			m_auto_target_state.Set( AT_NONE );
+			m_auto_target_state = AT_NONE;
 		}
 	
-		if (autoKickButton.Off())
-			return;
 		
+		// enter/leave acquire ball stage
 		if (m_auto_target_state.EnteredState( AT_ACQUIRE_BALL ))
 		{
-			kickerPossession.Reset();
+			ballAcquired.Reset();
 		}
 		
+		
+		// enter/leave acquire target stage
 		if (m_auto_target_state.EnteredState( AT_ACQUIRE_TARGET)) 
 		{
-			autoKickDelay.Reset();
-		}
-		
+			targetAcquired.Reset();
+		}		
 		else if (m_auto_target_state.LeftState( AT_ACQUIRE_TARGET ))
 		{
 			vision.DisableMotorControl();
@@ -174,47 +202,75 @@ public:
 		}
 		
 		
+		// if the button is off, then just return and don't bother
+		// -> note that this comes after the various state transitions
+		//    that are done above this code. This is intentional.
+		if (autoKickButton.Off())
+			return;
 		
-		switch (m_auto_target_state.State())
+		
+		switch (m_auto_target_state)
 		{
 		case AT_ACQUIRE_BALL:
 
 			// wait until the human gets the ball
 			if( has_ball )
 			{
-				if (kickerPossession.DoEvent())
+				// for more than a split second
+				if (ballAcquired.DoEvent())
 				{
-					vision.PreferEither();
-					m_auto_target_state.Set( AT_ACQUIRE_TARGET );
-					autoKickDelay.Reset();
+					// once they have it, take over and focus on a target
+					// of course: if the user is currently trying to focus on a 
+					// target, then prefer to let them continue on that path
+					
+					if (m_motor_state == VB_NONE)
+						vision.PreferEither();
+						
+					m_auto_target_state = AT_ACQUIRE_TARGET;
 				}
 			}
 			else
 			{
-				kickerPossession.DoEvent();
+				ballAcquired.reset();
 			}
 			
 			break;
 			
 		case AT_ACQUIRE_TARGET:
+		
+			// We have a ball, so attempt to focus on a target
+			
+			// .. unless we lost the ball, then give the human control again
+			if (!has_ball)
+				m_auto_target_state = AT_ACQUIRE_BALL;
 						
 			if(vision.IsRobotPointingAtTarget()) 
 			{
-				// wait until some period of time elapses before kicking
-				if (autoKickDelay.DoEvent())
+				// wait until we have had the target in our sights for more than
+				// a half second or so
+				if (targetAcquired.DoEvent())
 				{
-					// reset the manual targeting state too
 					kicker.Kick();
-					m_auto_target_state.Set( AT_ACQUIRE_BALL );
+					m_auto_target_state = AT_KICKING;
 				}
 			}
 			else
 			{
 				// reset the delay if we lose the target
-				autoKickDelay.Reset();
+				targetAcquired.Reset();
 			}
 			
 			break;	
+			
+		case AT_KICKING:
+		
+			// wait for the kick sequence to complete before trying to
+			// do another auto kick
+		
+			if (!kicker.IsKicking())
+				m_auto_target_state = AT_ACQUIRE_BALL;
+				
+			break;
 			
 		case AT_NONE:
 			break;

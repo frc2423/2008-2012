@@ -1,3 +1,11 @@
+/**
+	\file 		RobotMode.h
+	\author 	Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
+
 #ifndef ROBOTMODE_H
 #define ROBOTMODE_H
 
@@ -11,18 +19,12 @@ struct RobotMode
 	virtual ~RobotMode(){}
 };
 
-class Mode
+class ModeControl
 {
 public:
-	Mode(RobotMode* autonomous):
-		m_autonomous(autonomous),
+	Mode():
 		current_mode(0)
 	{}
-	
-	void Autonomous()
-	{
-		m_autonomous->Main();
-	}
 	
 	void Add(RobotMode* newMode)
 	{
@@ -43,14 +45,18 @@ public:
 		Enable();
 	}
 
-	void Set(int mode_number)
+	void Set(int mode_number, bool do_enable_disable = true)
 	{
-		Disable();
+		if (do_enable_disable)
+			Disable();
+		
 		current_mode = mode_number;
-		Enable();
+		
+		if (do_enable_disable)
+			Enable();
 	}
 	
-	void run(void)
+	void Run(void)
 	{
 		if(modes.size() > 0)
 		{
@@ -87,7 +93,6 @@ public:
 	
 private:
 	vector<RobotMode*> modes;
-	RobotMode* m_autonomous;
 	int current_mode;
 };
 

@@ -1,3 +1,11 @@
+/**
+	\file 		RobotResources.h
+	\author 	Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
+
 #ifndef ROBOTRESOURCES_H
 #define ROBOTRESOURCES_H
 

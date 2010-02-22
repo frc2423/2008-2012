@@ -1,3 +1,11 @@
+/**
+	\file 		AutonomousVisionMode.h
+	\author 	Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
+
 #ifndef AUTONOMOUSVISIONMODE_H
 #define AUTONOMOUSVISIONMODE_H
 

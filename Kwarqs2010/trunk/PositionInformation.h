@@ -1,3 +1,11 @@
+/**
+	\file 		PositionInformation.h
+	\author 	Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
+
 #ifndef POSITIONINFORMATION_H
 #define POSITIONINFORMATION_H
 

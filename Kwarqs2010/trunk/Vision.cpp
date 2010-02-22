@@ -1,7 +1,10 @@
-/*
- * This implements the vision mode.
- * 
- */
+/**
+	\file 		Vision.cpp
+	\author 	Dustin Spicuzza, Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
 
 
 #include "WPILib.h"
@@ -279,7 +282,7 @@ bool Vision::IsRobotPointingAtTarget() const
 	Synchronized lock(m_mutex);
 	
 	// note that this checks for both the robot being
-	// aligned and for the setpoint to be on target. One
+	// aligned and for the setpoint to be on a target. One
 	// or the other isn't sufficient, you need both to be
 	// certain
 	return m_isRobotAligned && m_setpointIsTarget;

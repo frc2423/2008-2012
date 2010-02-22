@@ -1,6 +1,14 @@
 #ifndef EXAMPLEMODE_H
 #define EXAMPLEMODE_H
 
+/**
+	\file 		ExampleMode.h
+	\author 	Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
+
 #include <WPILib.h>
 #include "RobotMode.h"
 #include "RobotResources.h"
@@ -36,6 +44,9 @@ private:
 		m_resources.myRobot.ArcadeDrive(m_resources.stick);
 		
 		/*
+		
+		DO NOT RE-ENABLE THIS WITHOUT FIXING IT PROPERLY. PERIOD. 
+		
 		if(fabs(m_resources.stick.GetX()) <= .1 && fabs(m_resources.stick.GetY()) <= .05)
 		{
 			m_resources.myRobot.Drive(0.0, 0.0);

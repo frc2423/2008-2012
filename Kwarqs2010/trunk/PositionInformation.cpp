@@ -1,3 +1,10 @@
+/**
+	\file 		PositionInformation.cpp
+	\author 	Amory Galili, Maeve: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
 
 #include "PositionInformation.h"
 #include <cmath>

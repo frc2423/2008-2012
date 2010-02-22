@@ -1,3 +1,11 @@
+/**
+	\file 		CompassMode.cpp
+	\author 	Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+*/
+
+
 #include "CompassMode.h"
 #include <math.h>
 #include "Error.h"

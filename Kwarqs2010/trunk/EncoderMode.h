@@ -1,3 +1,13 @@
+/**
+	\file 		EncoderMode.h
+	\author 	Amory Galili: last changed by $Author$
+	\date 		Last changed on $Date$
+	\version 	$Rev$
+	
+	This doesn't work, don't use it
+*/
+
+
 #ifndef ENCODERMODE_H
 #define ENCODERMODE_H
 

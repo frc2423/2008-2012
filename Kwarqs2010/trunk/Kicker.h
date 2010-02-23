@@ -46,7 +46,7 @@ public:
 	//Returns true if ball is captured, false if not.
 	bool HasBall()
 	{
-		if(m_resources.ballSensor.GetVoltage() >= BALLSENSOR_VOLTAGE)
+		if(m_resources.ballSensor.GetVoltage() >= BALLSENSOR_VOLTAGE && kicker_state == STATE_IDLE)
 			return true;
 		else
 			return false;
@@ -198,6 +198,7 @@ private:
 	Timer time;
 	SEM_ID m_mutex;
 	DoubleProxy m_displayRollerVoltage;
+
 	
 
 };

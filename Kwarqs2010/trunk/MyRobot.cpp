@@ -13,11 +13,11 @@
 #include "ExampleMode.h"
 #include "RobotMode.h"
 #include "Vision.h"
-#include "CompassMode.h"
+#include "CompassDrive.h"
 #include "PSUSBMode.h"
 #include "AutonomousVisionMode.h"
 #include "Kicker.h"
-#include "EncoderMode.h"
+//#include "EncoderMode.h"
 #include "Latches.h"
 
 #include <limits>
@@ -32,6 +32,8 @@ struct StackEnable {
 	}
 };
 
+
+
 class RobotDemo : public SimpleRobot
 {
 	static const int VISION_LEFT_BUTTON = 4;
@@ -39,17 +41,20 @@ class RobotDemo : public SimpleRobot
 	static const int VISION_EITHER_BUTTON = 3;
 
 	enum { VB_LEFT, VB_RIGHT, VB_EITHER, VB_NONE } m_motor_state;
-	enum AutoTargetState { AT_NONE, AT_ACQUIRE_BALL, AT_ACQUIRE_TARGET, AT_KICKING };
+	enum AutoTargetState { AT_NONE, AT_ACQUIRE_BALL, AT_ACQUIRE_TARGET };
 
 	StackEnable unused;
 	
 	RobotResources resources;
+	
+	PIDControllerWrapper 	m_turnController;
+	PositionInformation		m_position;
+	
 	ExampleMode example;
 	Vision vision;
-	CompassMode compass;
+	CompassDrive compass;
 	Kicker kicker;
 	AutonomousVisionMode autonomousVision;
-	EncoderMode encoderMode;
 	
 	ModeControl modeControl;
 	ModeControl autonomousModeControl;
@@ -67,12 +72,15 @@ class RobotDemo : public SimpleRobot
 
 public:
 	RobotDemo(void):
+		
+		m_turnController( resources ),
+		m_position(resources, WHEEL_BASE),
+		
 		example(resources),
-		vision(resources),
+		vision(resources, m_turnController),
 		compass(resources),
 		kicker(resources),
-		autonomousVision(resources, kicker, vision, 1),
-		encoderMode(resources),
+		autonomousVision(resources, kicker, vision, m_position, 1),
 		
 		ballAcquired(0.5),
 		targetAcquired(0.5),
@@ -83,12 +91,14 @@ public:
 
 		// setup normal modes		
 		modeControl.Add(&example);
-		//modeControl.Add(&compass);
 		//modeControl.Add(&encoderMode);
 		
 		// setup autonomous modes
 		autonomousModeControl.Add(&autonomousVision);
 		
+		m_position.Start();
+		
+		printf("Starting kicker\n");
 		kicker.Start();
 	}
 
@@ -251,7 +261,7 @@ public:
 				if (targetAcquired.DoEvent())
 				{
 					kicker.Kick();
-					m_auto_target_state = AT_KICKING;
+					m_auto_target_state = AT_ACQUIRE_BALL;
 				}
 			}
 			else
@@ -261,16 +271,6 @@ public:
 			}
 			
 			break;	
-			
-		case AT_KICKING:
-		
-			// wait for the kick sequence to complete before trying to
-			// do another auto kick
-		
-			if (!kicker.IsKicking())
-				m_auto_target_state = AT_ACQUIRE_BALL;
-				
-			break;
 			
 		case AT_NONE:
 			break;

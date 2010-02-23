@@ -14,11 +14,6 @@
 
 #define VISION_MINIMUM_SCORE 0.01
 
-#define VISION_P 0.1
-#define VISION_I 0.0
-#define VISION_D 0.5
-
-#define VISION_PERIOD 0.005
 
 #define VISION_TASK_PRIORITY 250
 
@@ -38,14 +33,9 @@
 #define VISION_PR_SETPOINT	45.0
 
 
-Vision::Vision(RobotResources& resources):
+Vision::Vision(RobotResources& resources, PIDControllerWrapper &turnController):
 	m_resources(resources),
-	m_turnController( 
-				VISION_P, VISION_I, VISION_D, 
-				this, // source
-				this, // output
-				"Vision", m_resources.webdma,
-				VISION_PERIOD), // period
+	m_turnController( turnController ), // period
 	m_camera(AxisCamera::GetInstance()),
 	
 	m_task( "Kwarqs Vision Task", (FUNCPTR)Vision::TimerFn, VISION_TASK_PRIORITY )
@@ -69,22 +59,16 @@ Vision::Vision(RobotResources& resources):
 	m_right_edge = m_resources.webdma.CreateDoubleProxy("Vision", "Right Edge",
 		DoubleProxyFlags().readonly()
 	);
+	
+	m_setpoint = m_resources.webdma.CreateDoubleProxy("Vision", "Setpoint",
+			DoubleProxyFlags().readonly()
+	);
+	
+	m_enabled = m_resources.webdma.CreateBoolProxy("Vision", "Enabled", false );
 
 	m_numTargets = 0;
 	m_horizontalAngle = 0;
 	m_isRobotAligned = false;
-	
-	/**
-	 * Set up the PID controller with some parameters that should be pretty
-	 * close for most kitbot robots.
-	 */
-	printf("Initializing PIDController\n");
-	
-	m_turnController.SetContinuous();
-	m_turnController.SetInputRange(0.0, 360.0);
-	m_turnController.SetOutputRange(-0.8, 0.8);
-	m_turnController.SetTolerance(1.0 / 90.0 * 100);
-	m_turnController.Disable();
 
 	// Create and set up a camera instance. first wait for the camera to start
 	// if the robot was just powered on. This gives the camera time to boot.
@@ -112,15 +96,18 @@ void Vision::PreferLeft()
 {
 	Synchronized lock(m_mutex);
 	
+	m_turnController.SetSetpoint( m_setpoint );
+	
 	m_left_edge = VISION_PL_LEFT;
 	m_right_edge = VISION_PL_RIGHT;
 	
 	if (!AngleWithinEdges( m_turnController.GetSetpoint()))
 	{
 		m_turnController.SetSetpoint(VISION_PL_SETPOINT);
-		m_setpointIsTarget = false;
 	}
 	
+	m_setpointIsTarget = false;
+	m_enabled = true;
 	m_turnController.Enable();
 }
 
@@ -131,6 +118,9 @@ void Vision::PreferEither()
 	m_left_edge = VISION_PE_LEFT;
 	m_right_edge = VISION_PE_RIGHT;
 	
+	m_turnController.SetSetpoint( m_setpoint );
+	m_setpointIsTarget = false;
+	m_enabled = true;
 	m_turnController.Enable();
 }
 
@@ -138,20 +128,24 @@ void Vision::PreferRight()
 {
 	Synchronized lock(m_mutex);
 	
+	m_turnController.SetSetpoint( m_setpoint );
+	
 	m_left_edge = VISION_PR_LEFT;
 	m_right_edge = VISION_PR_RIGHT;
 	
 	if (!AngleWithinEdges( m_turnController.GetSetpoint()))
 	{
 		m_turnController.SetSetpoint(VISION_PR_SETPOINT);
-		m_setpointIsTarget = false;
 	}
 	
+	m_setpointIsTarget = false;
+	m_enabled = true;
 	m_turnController.Enable();
 }
 
 void Vision::DisableMotorControl()
 {
+	m_enabled = false;
 	m_turnController.Disable();
 }
 
@@ -175,7 +169,7 @@ void Vision::ProcessVision()
 		double horizontalAngle = 0;
 	
 		// get the gyro heading that goes with this image
-		double gyroAngle = PIDGet();
+		double gyroAngle = m_turnController.PIDGet();
 		double targetPos = 0.0;
 
 		// get the camera image
@@ -216,7 +210,11 @@ void Vision::ProcessVision()
 
 				if (AngleWithinEdges( setPoint ))
 				{
-					m_turnController.SetSetpoint(setPoint);
+					m_setpoint = setPoint;
+					
+					if (m_enabled)
+						m_turnController.SetSetpoint(setPoint);
+					
 					m_setpointIsTarget = true;
 				
 					targetPos = targets[0].m_xPos / targets[0].m_xMax;
@@ -250,17 +248,18 @@ void Vision::AutoSweep()
 	// read these first since WebDMA does locks
 	double left_edge = m_left_edge;
 	double right_edge = m_right_edge;
-
-	double current_setpoint = m_turnController.GetSetpoint();
 	
 	// get distances
-	double left_distance = angle_distance(current_setpoint, left_edge);
-	double right_distance = angle_distance(current_setpoint, right_edge);
+	double left_distance = angle_distance(m_setpoint, left_edge);
+	double right_distance = angle_distance(m_setpoint, right_edge);
 
 	if (right_distance > left_distance)
-		m_turnController.SetSetpoint( angle_normalize( right_edge - VISION_AUTOSWEEP_EDGE ) );
+		m_setpoint = angle_normalize( right_edge - VISION_AUTOSWEEP_EDGE );
 	else
-		m_turnController.SetSetpoint( angle_normalize( left_edge + VISION_AUTOSWEEP_EDGE) );
+		m_setpoint = angle_normalize( left_edge + VISION_AUTOSWEEP_EDGE);
+	
+	if (m_enabled)
+		m_turnController.SetSetpoint( m_setpoint );
 }
 
 
@@ -286,16 +285,4 @@ bool Vision::IsRobotPointingAtTarget() const
 	// or the other isn't sufficient, you need both to be
 	// certain
 	return m_isRobotAligned && m_setpointIsTarget;
-}
-
-void Vision::PIDWrite(float output)
-{
-	// first parameter is zero because we want to spin in place
-	m_resources.myRobot.ArcadeDrive(0.0, output);
-}
-
-double Vision::PIDGet()
-{
-	// this returns a normalized angle from the gyro
-	return angle_normalize( m_resources.gyro.PIDGet() );	
 }

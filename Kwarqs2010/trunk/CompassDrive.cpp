@@ -6,30 +6,17 @@
 */
 
 
-#include "CompassMode.h"
+#include "CompassDrive.h"
 #include <math.h>
-#include "Error.h"
 #include "kwarqs_math.h"
 
 
-
-CompassMode::CompassMode(RobotResources& resources):
+CompassDrive::CompassDrive(RobotResources& resources):
 	m_resources(resources)
 {}
 
-void CompassMode::OnEnable()
-{}
 
-void CompassMode::Main()
-{
-	m_resources.myRobot.Drive(speed(), turnRate());
-}
-
-void CompassMode::OnDisable()
-{}
-
-
-double CompassMode::speed()
+double CompassDrive::speed()
 {
 	/* float direction = fabs(m_resources.stick.GetY()) / m_resources.stick.GetY();
 	 * return (m_resources.stick.GetMagnitude() * direction);
@@ -37,10 +24,10 @@ double CompassMode::speed()
 	
 	return (m_resources.stick.GetMagnitude());
 }
- 
-double CompassMode::turnRate()
+
+//Makes the robot face a specific direction relative to gyro angle
+double CompassDrive::turnRate(float direction_Stick)
 {
-	float direction_Stick = m_resources.stick.GetDirectionDegrees();
 	float direction_Robot = m_resources.gyro.GetAngle();
 	
 	double rate = angle_distance( direction_Stick, direction_Robot );

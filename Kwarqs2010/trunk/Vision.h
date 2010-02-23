@@ -11,13 +11,13 @@
 #include <WPILib.h>
 #include "RobotResources.h"
 #include "DashboardDataSender.h"
-#include "ProxiedPIDController.h"
+#include "PIDControllerWrapper.h"
 
-class Vision : public PIDOutput, public PIDSource
+class Vision 
 {
 public:
 	
-	Vision(RobotResources& resources);
+	Vision(RobotResources& resources, PIDControllerWrapper &turnController);
 
 	void DisableMotorControl();
 	
@@ -38,14 +38,15 @@ private:
 	
 	bool AngleWithinEdges( double setpoint ) const;
 	
-	void PIDWrite(float output);
-	double PIDGet();
-	
 	SEM_ID 					m_mutex;
 	
 	// protects these variables
 	DoubleProxy 			m_left_edge;
 	DoubleProxy				m_right_edge;
+	
+	// values that are held until enabled
+	DoubleProxy				m_setpoint;
+	BoolProxy				m_enabled;
 	
 	DoubleProxy				m_horizontalAngle;
 	DoubleProxy				m_gyro_angle;
@@ -56,7 +57,7 @@ private:
 	
 	RobotResources& 		m_resources;
 	DashboardDataSender 	m_dds;
-	ProxiedPIDController 	m_turnController;
+	PIDControllerWrapper& 	m_turnController;
 	AxisCamera&				m_camera;
 	
 	Task 					m_task;

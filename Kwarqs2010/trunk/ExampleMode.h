@@ -12,6 +12,7 @@
 #include <WPILib.h>
 #include "RobotMode.h"
 #include "RobotResources.h"
+#include "Error.h"
 
 class ExampleMode: public RobotMode
 {
@@ -43,23 +44,24 @@ private:
 		
 		m_resources.myRobot.ArcadeDrive(m_resources.stick);
 		
+		
+		
+		//DO NOT RE-ENABLE THIS WITHOUT FIXING IT PROPERLY. PERIOD. 
 		/*
-		
-		DO NOT RE-ENABLE THIS WITHOUT FIXING IT PROPERLY. PERIOD. 
-		
 		if(fabs(m_resources.stick.GetX()) <= .1 && fabs(m_resources.stick.GetY()) <= .05)
 		{
 			m_resources.myRobot.Drive(0.0, 0.0);
 		}
 		else if (fabs(m_resources.stick.GetX()) <= .1)
 		{
-			double speed = m_resources.stick.GetMagnitude() * m_resources.stick.GetY() / fabs(m_resources.stick.GetY());
+			double speed = m_resources.stick.GetMagnitude() * m_resources.stick.GetY() / d_err(fabs(m_resources.stick.GetY()));
 			m_resources.myRobot.Drive( speed, 0.0 );
 		}
 		else
 		{
-			double speed = m_resources.stick.GetMagnitude()* m_resources.stick.GetY() / fabs(m_resources.stick.GetY());
-			double turn_rate = pow( (m_resources.stick.GetThrottle()+ 1.0) / 2.0, fabs(m_resources.stick.GetY())) * m_resources.stick.GetX(); 
+			double speed = m_resources.stick.GetMagnitude()* m_resources.stick.GetY() / d_err(fabs(m_resources.stick.GetY()));
+			double throttle = d_err(((m_resources.stick.GetThrottle()+ 1.0) / 2.0));
+			double turn_rate = pow( throttle, fabs(m_resources.stick.GetY())) * m_resources.stick.GetX(); 
 			m_resources.myRobot.Drive( speed, turn_rate );
 		}
 		*/

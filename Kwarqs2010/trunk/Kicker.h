@@ -12,9 +12,15 @@
 #include <WPILib.h>
 #include "RobotResources.h"
 
+#include "filters.h"
+
 
 class Kicker
 {
+	
+
+	enum RollerState { ROLLER_STATE_ON, ROLLER_STATE_OFF, ROLLER_STATE_ACTION };
+	
 public:
 	Kicker(RobotResources& resources):
 		kicker_state(STATE_IDLE),
@@ -24,7 +30,8 @@ public:
 		engage(1),
 		release(2),
 		roller_Encoder(DIGITAL_SLOT, 7, DIGITAL_SLOT, 8),
-		roller(3)
+		roller(3),
+		ballInput(10)
 	{
 		compressor.Start();
 		roller_Encoder.SetDistancePerPulse( (2.0 * M_PI * ROLLER_RADIUS) / 1440.0 );
@@ -33,8 +40,29 @@ public:
 		// create a mutex to allow us to synchronize access to variables
 		// since we're going to be running in multiple threads
 		m_mutex = semMCreate(0);
-		m_displayRollerVoltage = m_resources.webdma.CreateDoubleProxy("Roller", "Roller sensor voltage",
+		m_displayRollerVoltage = m_resources.webdma.CreateDoubleProxy("Kicker", "Roller sensor voltage",
 			DoubleProxyFlags().readonly());
+		
+		m_hasBall = m_resources.webdma.CreateBoolProxy("Kicker", "Has Ball", false );
+		
+		m_ballSwitch = m_resources.webdma.CreateBoolProxy("Kicker", "Ball Switch", false );
+			
+		
+		m_rollerActionTime = m_resources.webdma.CreateDoubleProxy("Kicker", "Kicker Action Time",
+					DoubleProxyFlags()
+						.default_value(0.00)
+						.minval(0.0)
+						.maxval(2.0)
+						.step(0.01)
+				);
+		
+		m_rollerActionSpeed = m_resources.webdma.CreateDoubleProxy("Kicker", "Kicker Action Speed",
+					DoubleProxyFlags()
+						.default_value(1)
+						.minval(-1.0)
+						.maxval(1.0)
+						.step(0.1)
+				);
 	}
 	
 	void Start()
@@ -46,10 +74,7 @@ public:
 	//Returns true if ball is captured, false if not.
 	bool HasBall()
 	{
-		if(m_resources.ballSensor.GetVoltage() >= BALLSENSOR_VOLTAGE && kicker_state == STATE_IDLE)
-			return true;
-		else
-			return false;
+		return m_hasBall;
 	}
 	
 
@@ -76,7 +101,7 @@ public:
 			if (kicker_state == STATE_START_KICK)
 			{
 				// kicks always start by shutting down the roller
-				SetRoller(false);
+				SetRoller( ROLLER_STATE_ACTION );
 				time.Reset();
 			}
 		}
@@ -103,11 +128,18 @@ private:
 		// make sure that nobody else can access our variables
 		Synchronized lock(m_mutex);
 		
-		m_displayRollerVoltage = m_resources.ballSensor.GetVoltage();
+		//roller_filter.AddPoint( m_resources.ballSensor.GetVoltage() );
 		
-		// some specified input controls whether roller is normally on/off
-		bool roller_enabled = DriverStation::GetInstance()->GetDigitalIn(ROLLER_DIGITAL_SWITCH);		
+		//m_displayRollerVoltage = roller_filter.GetAverage();
 		
+		m_ballSwitch = ballInput.Get();
+		
+		if(!m_ballSwitch && kicker_state == STATE_IDLE)
+			m_hasBall = true;
+		else
+			m_hasBall = false;
+		
+
 		switch(kicker_state)
 		{
 					
@@ -116,7 +148,7 @@ private:
 			// this state engages the pnuematics to perform the kick
 			// appropriately after a short delay
 		
-			if(time.Get() > ROLLER_STOP_TIME)
+			if(time.Get() > m_rollerActionTime)
 			{				
 				engage.Set(true);
 				release.Set(false);
@@ -134,7 +166,7 @@ private:
 		
 			if(time.Get() > KICK_TIME)
 			{
-				SetRoller( roller_enabled );				
+				SetRoller( ROLLER_STATE_ON );				
 				engage.Set(false);
 				release.Set(true);
 				
@@ -159,7 +191,7 @@ private:
 			
 			// this is the normal operation of the kicker mechanism
 			
-			SetRoller( roller_enabled );			
+			SetRoller( ROLLER_STATE_ON );			
 			engage.Set(false);
 			release.Set(false);
 			
@@ -169,22 +201,37 @@ private:
 	
 
 	//Turns roller on and off
-	void SetRoller(bool on)
+	void SetRoller(RollerState state)
 	{	
-		if(on)
-			roller.Set(-1.0);
-		else
+		// some specified input controls whether roller is normally on/off
+		bool roller_enabled = DriverStation::GetInstance()->GetDigitalIn(ROLLER_DIGITAL_SWITCH);		
+		
+		if (!roller_enabled)
+		{
 			roller.Set(0.0);
+			return;
+		}
+		
+		switch (state)
+		{
+		case ROLLER_STATE_ON:
+			roller.Set(-1.0);
+			break;
+		case ROLLER_STATE_OFF:
+			roller.Set(0.0);
+			break;
+		case ROLLER_STATE_ACTION:
+			roller.Set(m_rollerActionSpeed);
+			break;
+		}
 	}
 	
 	
-
 	enum{ STATE_IDLE, STATE_START_KICK, STATE_RELEASE, STATE_RESET } kicker_state;
 	
-	const static double KICK_TIME = .5;
-	const static double ROLLER_STOP_TIME = .1;    
+	const static double KICK_TIME = .5; 
 	const static double ROLLER_RADIUS = 1.0;
-	const static double BALLSENSOR_VOLTAGE = 0.5;
+	const static double BALLSENSOR_VOLTAGE = 0.7;
 	const static int KICKER_DIGITAL_SWITCH = 1;
 	const static int ROLLER_DIGITAL_SWITCH = 2;
 	
@@ -197,8 +244,16 @@ private:
 	Jaguar roller;
 	Timer time;
 	SEM_ID m_mutex;
+	
+	DoubleProxy m_rollerActionSpeed;
+	DoubleProxy m_rollerActionTime;
 	DoubleProxy m_displayRollerVoltage;
-
+	BoolProxy	m_hasBall;
+	BoolProxy 	m_ballSwitch;
+	
+	DigitalInput ballInput;
+	
+	//AverageWindowFilter<double, 10> roller_filter;
 	
 
 };

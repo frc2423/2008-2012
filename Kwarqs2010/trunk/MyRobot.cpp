@@ -227,8 +227,8 @@ public:
 			if( has_ball )
 			{
 				// for more than a split second
-				if (ballAcquired.DoEvent())
-				{
+				//if (ballAcquired.DoEvent())
+				//{
 					// once they have it, take over and focus on a target
 					// of course: if the user is currently trying to focus on a 
 					// target, then prefer to let them continue on that path
@@ -237,7 +237,7 @@ public:
 						vision.PreferEither();
 						
 					m_auto_target_state = AT_ACQUIRE_TARGET;
-				}
+				//}
 			}
 			else
 			{

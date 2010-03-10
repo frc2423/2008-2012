@@ -46,9 +46,10 @@ void AutonomousVisionMode::Main()
 	// after some thought that sounds more attractive. Probably should
 	// move it to its own wrapper class and allow different types of access
 	// depending on which function is calling it. Or something like that.
-
+	
+	
 	double turn_Rate;
-	turn_Rate = m_compass.turnRate(0.0);
+	turn_Rate = m_compass.turnRate(1.0, 1.0);
 	
 	m_position.getData(m_positionX, m_positionY, m_angle);
 	

@@ -18,7 +18,7 @@ public:
 	CompassDrive(RobotResources& resources);
 	
 	double speed();
-	double turnRate(float direction_Stick);
+	double turnRate(float turnHigh, float turnOn);
 
 
 private:

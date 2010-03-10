@@ -73,14 +73,14 @@ double angle_distance( double angle1, double angle2 )
 
 int shortDirection(double angle_controller, double angle_robot)
 {
-	double angle_controller_norm = angle_normalize(angle_controller);
-	double angle_robot_norm = angle_normalize(angle_robot);
+	angle_controller = angle_normalize(angle_controller);
+	angle_robot = angle_normalize(angle_robot);
 	
-	double angle_Distance = angle_distance(angle_controller_norm, angle_robot_norm);
+	double angle_Distance = angle_distance(angle_controller, angle_robot);
 	
-	double turn_left = angle_normalize(angle_controller_norm - angle_Distance);
+	double turn_left = angle_normalize(angle_controller - angle_Distance);
 	
-	if(turn_left == angle_robot_norm)
+	if(turn_left < (angle_robot + 1.0) && turn_left > (angle_robot - 1.0))
 		return 1;
 	else
 		return -1;

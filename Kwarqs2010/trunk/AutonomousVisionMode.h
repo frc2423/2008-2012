@@ -15,6 +15,7 @@
 #include "Kicker.h"
 #include "Vision.h"
 #include "PositionInformation.h"
+#include "NosePointer.h"
 
 class AutonomousVisionMode : public RobotMode
 {

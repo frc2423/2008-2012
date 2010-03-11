@@ -44,6 +44,8 @@ private:
 	
 	bool AngleWithinEdges( double setpoint ) const;
 	
+	RobotResources&			m_resources;
+	
 	SEM_ID 					m_mutex;
 	
 	// protects these variables

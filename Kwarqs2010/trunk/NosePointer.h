@@ -25,7 +25,7 @@ public:
 	double GetTurnRate( double angleToPoint );
 	
 	// returns true when we are facing the correct direction
-	bool IsPointingCorrectly() const ;
+	bool IsPointingCorrectly();
 	
 	
 	void PIDWrite(float output);

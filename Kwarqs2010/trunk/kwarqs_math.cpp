@@ -66,6 +66,15 @@ double angle_distance( double angle1, double angle2 )
 		return error2;
 }
 
+// @param point1 	First point to compare (in degrees)
+// @param point2	Second point to compare (in degrees)
+// @param how_near	How many degrees should they be apart before they are considered near?
+bool is_near_point( double point1, double point2, double how_near)
+{
+	return angle_distance(point1, point2) < how_near;
+}
+
+
 /*Checks for the shortest way the robot must turn to get to desired angle.
  *turn left = -1
  *turn right = 1

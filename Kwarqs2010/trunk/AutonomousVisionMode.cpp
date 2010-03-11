@@ -69,7 +69,6 @@ void AutonomousVisionMode::Main()
 			// robot aligns with ball
 			if (m_vision.IsRobotPointingAtTarget()) 
 			{
-				m_vision.DisableMotorControl();
 				case_Number = BALL_KICK;
 			}
 			break;

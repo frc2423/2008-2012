@@ -73,7 +73,7 @@ public:
 		m_position(resources, WHEEL_BASE),
 		
 		example(resources),
-		vision(resources, m_turnController),
+		vision(resources),
 		kicker(resources),
 		autonomousVision(resources, kicker, vision, m_nosePointer, m_position, 1),
 		
@@ -153,15 +153,15 @@ public:
 			}
 			else
 			{
-				m_resources.myRobot.ArcadeDrive(0.0, m_nosePointer.GetTurnRate( m_vision.GetVisionAngle() ) );
+				resources.myRobot.ArcadeDrive(0.0, m_nosePointer.GetTurnRate( vision.GetVisionAngle() ) );
 			}
 						
 			// DO NOT TAKE THIS OUT
 			Wait(0.002);
 		}
 		
-		// disable the vision controlling if we exit operator control
-		vision.DisableMotorControl();
+		// disable the motors when exiting user control
+		resources.myRobot.ArcadeDrive(0.0, 0.0);
 		
 		modeControl.Disable();
 	}

@@ -34,16 +34,17 @@
 
 
 Vision::Vision(RobotResources& resources):
+	m_resources(resources),
 	m_camera(AxisCamera::GetInstance()),
 	
 	m_task( "Kwarqs Vision Task", (FUNCPTR)Vision::TimerFn, VISION_TASK_PRIORITY )
 {	
 	m_numTargets = resources.webdma.CreateIntProxy("Vision", "NumTargets",
-		IntProxyFlags().readonly().default(0)
+		IntProxyFlags().readonly().default_value(0)
 	);
 	
 	m_horizontalAngle = resources.webdma.CreateDoubleProxy("Vision", "Horizontal Angle",
-		DoubleProxyFlags().readonly().default(0)
+		DoubleProxyFlags().readonly().default_value(0)
 	);
 	
 	m_isRobotAligned = resources.webdma.CreateBoolProxy("Vision", "Aligned", false );
@@ -51,18 +52,16 @@ Vision::Vision(RobotResources& resources):
 
 	
 	m_left_edge = resources.webdma.CreateDoubleProxy("Vision", "Left Edge",
-		DoubleProxyFlags().readonly().default(VISION_PE_LEFT)
+		DoubleProxyFlags().readonly().default_value(VISION_PE_LEFT)
 	);
 	
 	m_right_edge = resources.webdma.CreateDoubleProxy("Vision", "Right Edge",
-		DoubleProxyFlags().readonly().default(VISION_PE_RIGHT)
+		DoubleProxyFlags().readonly().default_value(VISION_PE_RIGHT)
 	);
 	
 	m_setpoint = resources.webdma.CreateDoubleProxy("Vision", "Setpoint",
-		DoubleProxyFlags().readonly().default(0)
+		DoubleProxyFlags().readonly().default_value(0)
 	);
-	
-	m_enabled = resources.webdma.CreateBoolProxy("Vision", "Enabled", false );
 
 	m_numTargets = 0;
 	m_horizontalAngle = 0;
@@ -166,7 +165,7 @@ void Vision::ProcessVision()
 		double horizontalAngle = 0;
 	
 		// get the gyro heading that goes with this image
-		double gyroAngle = m_turnController.PIDGet();
+		double gyroAngle = angle_normalize( m_resources.gyro.PIDGet() );
 		double targetPos = 0.0;
 
 		// get the camera image
@@ -217,8 +216,9 @@ void Vision::ProcessVision()
 			// WebDMA output stuff:
 			m_horizontalAngle = horizontalAngle;
 			m_numTargets = targets.size();
-		
-			m_isRobotAligned = m_turnController.OnTarget();
+							
+			m_isRobotAligned =  is_near_point(m_setpoint, gyroAngle, 1.0); 
+				
 		
 			// only sweep if there isn't a target and we're at the current
 			// setpoint for the robot

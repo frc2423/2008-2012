@@ -8,6 +8,12 @@ double __hypot(double x, double y);
 
 double angle_normalize( double angle );
 double angle_distance( double angle1, double angle2 );
+
+// @param point1 	First point to compare (in degrees)
+// @param point2	Second point to compare (in degrees)
+// @param how_near	How many degrees should they be apart before they are considered near?
+bool is_near_point( double point1, double point2, double how_near);
+
 int shortDirection(double angle_controller, double angle_robot);
 
 #endif

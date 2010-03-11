@@ -14,11 +14,11 @@
 #define AUTONOMOUSVISION_I 0.0
 #define AUTONOMOUSVISION_D 0.5
 
-AutonomousVisionMode::AutonomousVisionMode(RobotResources& resources, Kicker& kicker, Vision& vision, PositionInformation &position, const int balls):
+AutonomousVisionMode::AutonomousVisionMode(RobotResources& resources, Kicker& kicker, Vision& vision, NosePointer &nosePointer, PositionInformation &position, const int balls):
 	m_resources(resources),
 	m_kicker(kicker),
 	m_vision(vision),
-	m_compass(m_resources),
+	m_nosePointer(nosePointer),
 	m_position( position ),
 	m_positionX(0.0),
 	m_positionY(0.0),
@@ -42,14 +42,9 @@ void AutonomousVisionMode::Main()
 	// TODO: Need more robust state handling, what happens if we miss a ball? Also
 	// need to build in delays a bit better.
 	
-	// TODO: Need to share the PID controller with the vision system probably, 
-	// after some thought that sounds more attractive. Probably should
-	// move it to its own wrapper class and allow different types of access
-	// depending on which function is calling it. Or something like that.
-	
-	
 	double turn_Rate;
-	turn_Rate = m_compass.turnRate(1.0, 1.0);
+	
+	turn_Rate = m_nosePointer.GetTurnRate(0.0);
 	
 	m_position.getData(m_positionX, m_positionY, m_angle);
 	

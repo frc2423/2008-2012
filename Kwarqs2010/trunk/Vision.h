@@ -11,21 +11,27 @@
 #include <WPILib.h>
 #include "RobotResources.h"
 #include "DashboardDataSender.h"
-#include "PIDControllerWrapper.h"
 
 class Vision 
 {
 public:
 	
-	Vision(RobotResources& resources, PIDControllerWrapper &turnController);
-
-	void DisableMotorControl();
+	Vision(RobotResources& resources);
 	
-	bool IsRobotPointingAtTarget() const;
+	// these three tell the vision system which target to focus on
 	
 	void PreferLeft();
 	void PreferRight();
 	void PreferEither();
+	
+	// returns the angle the vision system thinks you should be pointing 
+	// right now. Use in conjunction with IsRobotPointingAtTarget()
+	// to figure out when to shoot the ball
+	double GetVisionAngle();
+	
+	// returns true when the vision system believes the robot is pointing
+	// at the target
+	bool IsRobotPointingAtTarget() const;
 	
 	virtual ~Vision();
 	
@@ -46,7 +52,6 @@ private:
 	
 	// values that are held until enabled
 	DoubleProxy				m_setpoint;
-	BoolProxy				m_enabled;
 	
 	DoubleProxy				m_horizontalAngle;
 	DoubleProxy				m_gyro_angle;
@@ -55,9 +60,7 @@ private:
 	BoolProxy				m_setpointIsTarget;
 	BoolProxy				m_isRobotAligned;
 	
-	RobotResources& 		m_resources;
 	DashboardDataSender 	m_dds;
-	PIDControllerWrapper& 	m_turnController;
 	AxisCamera&				m_camera;
 	
 	Task 					m_task;

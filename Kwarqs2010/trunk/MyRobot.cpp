@@ -13,11 +13,8 @@
 #include "ExampleMode.h"
 #include "RobotMode.h"
 #include "Vision.h"
-#include "CompassDrive.h"
-#include "PSUSBMode.h"
 #include "AutonomousVisionMode.h"
 #include "Kicker.h"
-//#include "EncoderMode.h"
 #include "Latches.h"
 
 #include <limits>
@@ -47,12 +44,11 @@ class RobotDemo : public SimpleRobot
 	
 	RobotResources resources;
 	
-	PIDControllerWrapper 	m_turnController;
+	NosePointer 			m_nosePointer;
 	PositionInformation		m_position;
 	
 	ExampleMode example;
 	Vision vision;
-	CompassDrive compass;
 	Kicker kicker;
 	AutonomousVisionMode autonomousVision;
 	
@@ -73,14 +69,13 @@ class RobotDemo : public SimpleRobot
 public:
 	RobotDemo(void):
 		
-		m_turnController( resources ),
+		m_nosePointer( resources, 0.8, 1.0 ),
 		m_position(resources, WHEEL_BASE),
 		
 		example(resources),
 		vision(resources, m_turnController),
-		compass(resources),
 		kicker(resources),
-		autonomousVision(resources, kicker, vision, m_position, 1),
+		autonomousVision(resources, kicker, vision, m_nosePointer, m_position, 1),
 		
 		ballAcquired(0.5),
 		targetAcquired(0.5),
@@ -112,7 +107,7 @@ public:
 		{
 			autonomousModeControl.Run();
 			// DO NOT TAKE THIS OUT
-			Wait(0.005);
+			Wait(0.002);
 		}
 		
 		autonomousModeControl.Disable();
@@ -150,17 +145,19 @@ public:
 			if (m_auto_target_state != AT_ACQUIRE_TARGET)
 			{
 				ManualVisionTargeting();
-				
-				if (m_motor_state == VB_NONE)
-				{
-					// normal mode stuff here
-					vision.DisableMotorControl();
-					modeControl.Run();
-				}
 			}
 			
+			if (m_motor_state == VB_NONE)
+			{
+				modeControl.Run();
+			}
+			else
+			{
+				m_resources.myRobot.ArcadeDrive(0.0, m_nosePointer.GetTurnRate( m_vision.GetVisionAngle() ) );
+			}
+						
 			// DO NOT TAKE THIS OUT
-			Wait(0.005);
+			Wait(0.002);
 		}
 		
 		// disable the vision controlling if we exit operator control
@@ -207,7 +204,6 @@ public:
 		}		
 		else if (m_auto_target_state.LeftState( AT_ACQUIRE_TARGET ))
 		{
-			vision.DisableMotorControl();
 			m_motor_state = VB_NONE;
 		}
 		
@@ -234,7 +230,10 @@ public:
 					// target, then prefer to let them continue on that path
 					
 					if (m_motor_state == VB_NONE)
+					{
+						m_motor_state = VB_EITHER;
 						vision.PreferEither();
+					}
 						
 					m_auto_target_state = AT_ACQUIRE_TARGET;
 				//}
@@ -261,7 +260,9 @@ public:
 				if (targetAcquired.DoEvent())
 				{
 					kicker.Kick();
+					
 					m_auto_target_state = AT_ACQUIRE_BALL;
+					m_motor_state = VB_NONE;
 				}
 			}
 			else
@@ -277,7 +278,10 @@ public:
 		}
 	}
 	
-	
+	/**
+		Controls the state of vision targeting based on the buttons
+		the user presses on the joystick
+	*/
 	void ManualVisionTargeting()
 	{
 		switch (m_motor_state)
@@ -285,30 +289,21 @@ public:
 			case VB_LEFT:
 				
 				if (leftVision.TurnedOff())
-				{
-					vision.DisableMotorControl();
 					m_motor_state = VB_NONE;
-				}
 				
 				break;
 			
 			case VB_RIGHT:
 			
 				if (rightVision.TurnedOff())
-				{
-					vision.DisableMotorControl();
 					m_motor_state = VB_NONE;
-				}
 				
 				break;
 			
 			case VB_EITHER:
 
 				if (eitherButton.TurnedOff())
-				{
-					vision.DisableMotorControl();
 					m_motor_state = VB_NONE;
-				}
 			
 				break;
 			

@@ -14,13 +14,12 @@
 #include "RobotResources.h"
 #include "Kicker.h"
 #include "Vision.h"
-#include "CompassDrive.h"
 #include "PositionInformation.h"
 
 class AutonomousVisionMode : public RobotMode
 {
 public:
-	AutonomousVisionMode(RobotResources& resources, Kicker& kicker, Vision &vision, PositionInformation &position, int balls);
+	AutonomousVisionMode(RobotResources& resources, Kicker& kicker, Vision &vision, NosePointer &nosePointer, PositionInformation &position, int balls);
 	
 	void Main();
 	
@@ -34,7 +33,7 @@ private:
 	RobotResources& m_resources;
 	Kicker& m_kicker;
 	Vision& m_vision;
-	CompassDrive m_compass;
+	NosePointer& m_nosePointer;
 	PositionInformation &m_position;
 	double m_positionX, m_positionY, m_angle;
 	

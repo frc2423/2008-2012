@@ -217,7 +217,8 @@ void Vision::ProcessVision()
 			m_horizontalAngle = horizontalAngle;
 			m_numTargets = targets.size();
 							
-			m_isRobotAligned =  is_near_point(m_setpoint, gyroAngle, 1.0); 
+			// is the robot aligned with the target (within 4 degrees)
+			m_isRobotAligned =  is_near_point(m_setpoint, gyroAngle, 4.0); 
 				
 		
 			// only sweep if there isn't a target and we're at the current

@@ -38,7 +38,6 @@ NosePointer::NosePointer(
 		VISION_PERIOD),
 		
 	m_pid_output(0.0),
-	m_turnHigh(turnHigh),
 	m_turnOn(turnOn),
 	m_last_angle(0.0)
 {
@@ -48,12 +47,20 @@ NosePointer::NosePointer(
 
 
 	if (turnHigh < 0.0)
-		m_turnHigh = 0.0;
+		turnHigh = 0.0;
 	else if (turnHigh > 1.0)
-		m_turnHigh = 1.0;
+		turnHigh = 1.0;
+	
+	m_turnHigh = m_resources.webdma.CreateDoubleProxy("Nose Pointer", "Turn Rate",
+				DoubleProxyFlags()
+					.default_value(turnHigh)
+					.minval(0.0)
+					.maxval(1.0)
+					.step(0.1)
+			);
 	
 	// set it up to switch between the two types of pointers
-	m_use_compass_drive = resources.webdma.CreateBoolProxy("Nose Pointer", "Use Compass Drive", true );
+	m_use_compass_drive = resources.webdma.CreateBoolProxy("Nose Pointer", "Use Compass Drive", false );
 
 
 	/**
@@ -81,6 +88,8 @@ NosePointer::NosePointer(
 */
 double NosePointer::GetTurnRate(double angleToPoint)
 {
+	angleToPoint = angle_normalize(angleToPoint);
+	
 	m_last_angle = angleToPoint;
 	m_pid.SetSetpoint(angleToPoint);
 

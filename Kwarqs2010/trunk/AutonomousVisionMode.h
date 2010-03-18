@@ -25,20 +25,24 @@ public:
 	void Main();
 	
 	void OnEnable();
+
 		
 	void OnDisable();
 		
 private:
-	enum { STRAIGHTAWAY, STOP_FOR_KICK, ALIGN, BALL_KICK, REALIGN, SEARCH_FOR_BALLS, STOP };
+	enum { STRAIGHTAWAY, STOP_FOR_KICK, ALIGN, WAIT_FOR_ALIGN, BALL_KICK, REALIGN, SEARCH_FOR_BALLS, STOP };
 	
 	RobotResources& m_resources;
 	Kicker& m_kicker;
 	Vision& m_vision;
 	NosePointer& m_nosePointer;
 	PositionInformation &m_position;
-	double m_positionX, m_positionY, m_angle;
+	double m_positionX, m_positionY, m_initialY, m_angle;
+	Timer alignTimer;
 	
+	double m_Speed, m_turnRate;
 	const static double Y_LIMIT = 10.0;
+	const static double TIME_FOR_ALIGN = 1.0;
 	int case_Number;
 	int balls_kicked;
 	int m_balls;

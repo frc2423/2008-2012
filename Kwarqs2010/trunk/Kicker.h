@@ -132,7 +132,7 @@ private:
 		
 		//m_displayRollerVoltage = roller_filter.GetAverage();
 		
-		m_ballSwitch = ballInput.Get();
+		//m_ballSwitch = ballInput.Get();
 		
 		if(!m_ballSwitch && kicker_state == STATE_IDLE)
 			m_hasBall = true;

@@ -72,7 +72,7 @@ public:
 		m_nosePointer( resources, 0.8, 1.0 ),
 		m_position(resources, WHEEL_BASE),
 		
-		example(resources),
+		example(resources, m_nosePointer),
 		vision(resources),
 		kicker(resources),
 		autonomousVision(resources, kicker, vision, m_nosePointer, m_position, 1),

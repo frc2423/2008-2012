@@ -13,12 +13,14 @@
 #include "RobotMode.h"
 #include "RobotResources.h"
 #include "Error.h"
+#include "NosePointer.h"
 
 class ExampleMode: public RobotMode
 {
 public:
-	ExampleMode(RobotResources& resources):
-		m_resources(resources)
+	ExampleMode(RobotResources& resources, NosePointer &nosePointer):
+		m_resources(resources),
+		m_nosePointer(nosePointer)
 	{}
 		
 	void Main()
@@ -38,11 +40,22 @@ public:
 	
 private:
 	RobotResources& m_resources;
+	NosePointer &m_nosePointer;
 
 	void Drive()
 	{
-		
-		m_resources.myRobot.ArcadeDrive(m_resources.stick);
+		if (m_resources.stick.GetRawButton(2))
+		{
+			double turn_rate = 0.0;
+			
+			if (m_resources.stick.GetMagnitude() > 0.1)
+				turn_rate = m_nosePointer.GetTurnRate( m_resources.stick.GetDirectionDegrees()); 
+			
+			m_resources.myRobot.ArcadeDrive( 0.0, turn_rate );
+			
+		}
+		else
+			m_resources.myRobot.ArcadeDrive(m_resources.stick);
 		
 		
 		

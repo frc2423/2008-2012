@@ -12,9 +12,6 @@
 #include "kwarqs_math.h"
 
 
-#define VISION_MINIMUM_SCORE 0.01
-
-
 #define VISION_TASK_PRIORITY 250
 
 #define VISION_AUTOSWEEP_EDGE 22.5
@@ -43,8 +40,20 @@ Vision::Vision(RobotResources& resources):
 		IntProxyFlags().readonly().default_value(0)
 	);
 	
+	m_vision_score = resources.webdma.CreateDoubleProxy("Vision", "Current Score",
+			DoubleProxyFlags().readonly().default_value(0)
+	);
+	
 	m_horizontalAngle = resources.webdma.CreateDoubleProxy("Vision", "Horizontal Angle",
 		DoubleProxyFlags().readonly().default_value(0)
+	);
+	
+	m_vision_minscore = resources.webdma.CreateDoubleProxy("Vision", "Minimum Score",
+		DoubleProxyFlags()
+				.default_value(0.01)
+				.minval(0.0)
+				.maxval(1.0)
+				.step(0.01)
 	);
 	
 	m_isRobotAligned = resources.webdma.CreateBoolProxy("Vision", "Aligned", false );
@@ -178,8 +187,13 @@ void Vision::ProcessVision()
 		{
 			// this block needs to be synchronized
 			Synchronized lock(m_mutex);
+			
+			if (targets.size() == 0)
+				m_vision_score = 0.0;
+			else
+				m_vision_score = targets[0].m_score;		
 		
-			if (targets.size() == 0 || targets[0].m_score < VISION_MINIMUM_SCORE)
+			if (targets.size() == 0 || targets[0].m_score < m_vision_minscore)
 			{
 				// no targets found. Make sure the first one in the list is 0,0
 				// since the dashboard program annotates the first target in green
@@ -195,7 +209,7 @@ void Vision::ProcessVision()
 					targets.insert(targets.begin(), nullTarget);
 			}
 			else 
-			{
+			{	
 				// We have some targets.
 				// set the new PID heading setpoint to the first target in the list
 				horizontalAngle = targets[0].GetHorizontalAngle();

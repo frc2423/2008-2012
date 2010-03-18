@@ -48,6 +48,9 @@ private:
 	
 	SEM_ID 					m_mutex;
 	
+	DoubleProxy				m_vision_minscore;
+	DoubleProxy				m_vision_score;
+	
 	// protects these variables
 	DoubleProxy 			m_left_edge;
 	DoubleProxy				m_right_edge;

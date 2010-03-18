@@ -48,7 +48,7 @@ private:
 	double 					m_pid_output;
 	
 	// parameters
-	double					m_turnHigh;
+	DoubleProxy				m_turnHigh;
 	double					m_turnOn;
 	
 	// state

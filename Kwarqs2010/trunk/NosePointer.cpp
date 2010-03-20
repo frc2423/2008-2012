@@ -60,7 +60,8 @@ NosePointer::NosePointer(
 			);
 	
 	// set it up to switch between the two types of pointers
-	m_use_compass_drive = resources.webdma.CreateBoolProxy("Nose Pointer", "Use Compass Drive", false );
+	m_use_compass_drive = resources.webdma.CreateBoolProxy("Nose Pointer", "Use Compass Drive", 
+			BoolProxyFlags().default_value(false));
 
 
 	/**

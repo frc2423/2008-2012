@@ -43,9 +43,14 @@ public:
 		m_displayRollerVoltage = m_resources.webdma.CreateDoubleProxy("Kicker", "Roller sensor voltage",
 			DoubleProxyFlags().readonly());
 		
-		m_hasBall = m_resources.webdma.CreateBoolProxy("Kicker", "Has Ball", false );
+		m_hasBall = m_resources.webdma.CreateBoolProxy("Kicker", "Has Ball",
+				BoolProxyFlags().readonly());
 		
-		m_ballSwitch = m_resources.webdma.CreateBoolProxy("Kicker", "Ball Switch", false );
+		m_ballSwitch = m_resources.webdma.CreateBoolProxy("Kicker", "Ball Switch", 
+				BoolProxyFlags().default_value(false));
+		
+		m_kicker_state_proxy = m_resources.webdma.CreateIntProxy("Kicker", "Kicker State", 
+					IntProxyFlags().readonly());
 			
 		
 		m_rollerActionTime = m_resources.webdma.CreateDoubleProxy("Kicker", "Kicker Action Time",
@@ -132,13 +137,23 @@ private:
 		
 		//m_displayRollerVoltage = roller_filter.GetAverage();
 		
-		//m_ballSwitch = ballInput.Get();
+		//m_ballSwitch = !ballInput.Get();
 		
-		if(!m_ballSwitch && kicker_state == STATE_IDLE)
-			m_hasBall = true;
+		if (kicker_state == STATE_IDLE)
+		{
+			if (m_ballSwitch)
+				m_hasBall = true;
+			else
+				m_hasBall = false;
+		}
 		else
+		{
+			// code for testing only
+			m_ballSwitch = false;
 			m_hasBall = false;
+		}
 		
+		DriverStation::GetInstance()->SetDigitalOut(1, m_hasBall);
 
 		switch(kicker_state)
 		{
@@ -197,6 +212,8 @@ private:
 			
 			break;
 		}
+		
+		m_kicker_state_proxy = kicker_state;
 	}
 	
 
@@ -250,6 +267,7 @@ private:
 	DoubleProxy m_displayRollerVoltage;
 	BoolProxy	m_hasBall;
 	BoolProxy 	m_ballSwitch;
+	IntProxy	m_kicker_state_proxy;
 	
 	DigitalInput ballInput;
 	

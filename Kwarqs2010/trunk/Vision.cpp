@@ -56,8 +56,10 @@ Vision::Vision(RobotResources& resources):
 				.step(0.01)
 	);
 	
-	m_isRobotAligned = resources.webdma.CreateBoolProxy("Vision", "Aligned", false );
-	m_setpointIsTarget = resources.webdma.CreateBoolProxy("Vision", "IsTarget", false );
+	m_isRobotAligned = resources.webdma.CreateBoolProxy("Vision", "Aligned", 
+			BoolProxyFlags().readonly());
+	m_setpointIsTarget = resources.webdma.CreateBoolProxy("Vision", "IsTarget", 
+			BoolProxyFlags().readonly());
 
 	
 	m_left_edge = resources.webdma.CreateDoubleProxy("Vision", "Left Edge",

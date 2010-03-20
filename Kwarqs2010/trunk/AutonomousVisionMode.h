@@ -30,21 +30,28 @@ public:
 	void OnDisable();
 		
 private:
-	enum { STRAIGHTAWAY, STOP_FOR_KICK, ALIGN, WAIT_FOR_ALIGN, BALL_KICK, REALIGN, SEARCH_FOR_BALLS, STOP };
-	
+
+	enum AutoState {
+		GO_FORWARD,
+		ALIGN_ROBOT_WITH_TARGET,
+		WAIT_FOR_TARGET_ALIGN_TO_FINISH,
+		WAIT_FOR_KICK_TO_COMPLETE,
+		ALIGN_ROBOT_TO_ZERO,
+		WAIT_FOR_ZERO_ALIGN_TO_FINISH,
+		STOP
+	} m_state ;
+
 	RobotResources& m_resources;
 	Kicker& m_kicker;
 	Vision& m_vision;
 	NosePointer& m_nosePointer;
 	PositionInformation &m_position;
 	double m_positionX, m_positionY, m_initialY, m_angle;
-	Timer alignTimer;
+	Timer state_timer;
 	
-	double m_Speed, m_turnRate;
 	const static double Y_LIMIT = 10.0;
 	const static double TIME_FOR_ALIGN = 1.0;
-	int case_Number;
-	int balls_kicked;
+	int m_balls_kicked;
 	int m_balls;
 	
 	AutonomousVisionMode();

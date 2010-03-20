@@ -69,7 +69,7 @@ class RobotDemo : public SimpleRobot
 public:
 	RobotDemo(void):
 		
-		m_nosePointer( resources, 0.8, 1.0 ),
+		m_nosePointer( resources, 0.7, 1.0 ),
 		m_position(resources, WHEEL_BASE),
 		
 		example(resources, m_nosePointer),
@@ -103,7 +103,7 @@ public:
 		
 		autonomousModeControl.Enable();
 		
-		while(IsAutonomous())
+		while(IsAutonomous() && IsEnabled())
 		{
 			autonomousModeControl.Run();
 			// DO NOT TAKE THIS OUT

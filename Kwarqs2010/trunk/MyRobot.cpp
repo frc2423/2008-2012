@@ -66,6 +66,7 @@ class RobotDemo : public SimpleRobot
 	
 	StateLatch< AutoTargetState > m_auto_target_state;
 
+	DoubleProxy gyroVoltage;
 public:
 	RobotDemo(void):
 		
@@ -75,7 +76,7 @@ public:
 		example(resources, m_nosePointer),
 		vision(resources),
 		kicker(resources),
-		autonomousVision(resources, kicker, vision, m_nosePointer, m_position, 1),
+		autonomousVision(resources, kicker, vision, m_nosePointer, m_position),
 		
 		ballAcquired(0.5),
 		targetAcquired(0.5),
@@ -92,6 +93,10 @@ public:
 		autonomousModeControl.Add(&autonomousVision);
 		
 		m_position.Start();
+		
+		gyroVoltage = resources.webdma.CreateDoubleProxy("Main", "Voltage",
+						DoubleProxyFlags().readonly()
+		);
 		
 		printf("Starting kicker\n");
 		kicker.Start();
@@ -129,6 +134,8 @@ public:
 		while (IsOperatorControl())
 		{
 			GetWatchdog().Feed();
+			
+			gyroVoltage = resources.gyroChannel.GetVoltage();
 			
 			// kick the ball manually
 			if( resources.stick.GetTrigger() ) kicker.Kick();

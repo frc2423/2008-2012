@@ -11,7 +11,7 @@
 #include <math.h>
 
 
-AutonomousVisionMode::AutonomousVisionMode(RobotResources& resources, Kicker& kicker, Vision& vision, NosePointer &nosePointer, PositionInformation &position, const int balls):
+AutonomousVisionMode::AutonomousVisionMode(RobotResources& resources, Kicker& kicker, Vision& vision, NosePointer &nosePointer, PositionInformation &position):
 	m_resources(resources),
 	m_kicker(kicker),
 	m_vision(vision),
@@ -22,8 +22,7 @@ AutonomousVisionMode::AutonomousVisionMode(RobotResources& resources, Kicker& ki
 	m_initialY(0.0),
 	m_angle(0.0),
 
-	m_balls_kicked(0),
-	m_balls(balls)
+	m_balls_kicked(0)
 {	
 	state_timer.Start();
 }
@@ -35,6 +34,15 @@ void AutonomousVisionMode::OnEnable()
 	
 	double x, a;
 	m_position.getData(x, m_initialY, a);
+	
+	if(DriverStation::GetInstance()->GetDigitalIn(DIGITAL_1BALL))
+		m_balls = 1;
+	else if(DriverStation::GetInstance()->GetDigitalIn(DIGITAL_2BALLS))
+		m_balls = 2;
+	else if(DriverStation::GetInstance()->GetDigitalIn(DIGITAL_3BALLS))
+		m_balls = 3;
+	else
+		m_balls = 0;
 	
 }
 

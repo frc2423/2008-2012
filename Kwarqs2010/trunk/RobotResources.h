@@ -25,6 +25,8 @@
 
 struct RobotResources
 {
+	AnalogChannel gyroChannel;
+	
 	Encoder leftEncoder;	// detects the speed that the wheels are turning at
 	Encoder rightEncoder;
 	Gyro gyro;
@@ -37,9 +39,10 @@ struct RobotResources
 	WebDMA webdma;
 	
 	RobotResources():
+		gyroChannel(1, 1),
 		leftEncoder(DIGITAL_SLOT, 1, DIGITAL_SLOT, 2),
 		rightEncoder(DIGITAL_SLOT, 3, DIGITAL_SLOT, 4),
-		gyro(ANALOG_SLOT),
+		gyro(&gyroChannel),
 		ballSensor(ANALOG_SLOT2),
 		
 		stick(1),			// these must be initialized in the same order
@@ -51,7 +54,7 @@ struct RobotResources
 		
 		leftEncoder.SetDistancePerPulse( (2.0 * M_PI * WHEEL_RADIUS) / 1440.0 );
 		rightEncoder.SetDistancePerPulse( (2.0 * M_PI * WHEEL_RADIUS) / 1440.0 );
-		gyro.SetSensitivity(0.007);
+		//gyro.SetSensitivity(0.0033);
 		
 		webdma.Enable();
 		

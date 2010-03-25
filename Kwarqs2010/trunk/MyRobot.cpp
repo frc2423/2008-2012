@@ -140,9 +140,9 @@ public:
 			// kick the ball manually
 			if( resources.stick.GetTrigger() ) kicker.Kick();
 			
-			// update the buttons each time around
-			leftVision.Set( resources.stick.GetRawButton(VISION_LEFT_BUTTON) );
-			rightVision.Set( resources.stick.GetRawButton(VISION_RIGHT_BUTTON) );
+			// update the buttons each time around (inverted on purpose!)
+			leftVision.Set( resources.stick.GetRawButton(VISION_RIGHT_BUTTON) );
+			rightVision.Set( resources.stick.GetRawButton(VISION_LEFT_BUTTON) );
 			eitherButton.Set( resources.stick.GetRawButton(VISION_EITHER_BUTTON) );
 			autoKickButton.Set( DriverStation::GetInstance()->GetDigitalIn(3) );
 			

@@ -49,7 +49,7 @@ private:
 			double turn_rate = 0.0;
 			
 			if (m_resources.stick.GetMagnitude() > 0.1)
-				turn_rate = m_nosePointer.GetTurnRate( m_resources.stick.GetDirectionDegrees()); 
+				turn_rate = m_nosePointer.GetTurnRate( m_resources.stick.GetDirectionDegrees() - 180.0); 
 			
 			m_resources.myRobot.ArcadeDrive( 0.0, turn_rate );
 			

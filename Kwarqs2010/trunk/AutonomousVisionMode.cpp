@@ -100,7 +100,7 @@ void AutonomousVisionMode::Main()
 			}	
 			
 			// ok, we're aligned. Lets kick. 
-			m_kicker.Kick();
+			m_kicker.Kick(true);
 			
 			m_state = WAIT_FOR_KICK_TO_COMPLETE;
 			

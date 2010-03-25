@@ -89,18 +89,23 @@ public:
 	 * 	of roller speed.
 	 * -If digital switch 1 on the Driverstation is on, kicker is activated only if the
 	 * 	roller is not spinning.
+	 * 
+	 * Kicker is NEVER engaged if the kicker is still in the process of kicking
 	*/	
-	void Kick()
+	void Kick(bool ignore_autoswitch = false)
 	{		
 		// make sure that nobody else can access our variables
 		Synchronized lock(m_mutex);
 			
 		if (kicker_state == STATE_IDLE)
 		{
-			if(!DriverStation::GetInstance()->GetDigitalIn(KICKER_DIGITAL_SWITCH)) 
+			if(ignore_autoswitch || 
+				!DriverStation::GetInstance()->GetDigitalIn(KICKER_DIGITAL_SWITCH) ||
+				HasBall()
+			)
+			{
 				kicker_state = STATE_START_KICK;
-			else if( HasBall() )
-				kicker_state = STATE_START_KICK;
+			}
 				
 			// ok, we're starting a kick, get ready for it
 			if (kicker_state == STATE_START_KICK)

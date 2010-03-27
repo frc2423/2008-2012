@@ -25,6 +25,7 @@ AutonomousVisionMode::AutonomousVisionMode(RobotResources& resources, Kicker& ki
 	m_balls_kicked(0)
 {	
 	state_timer.Start();
+	m_timeout.Start();
 }
 
 void AutonomousVisionMode::OnEnable()
@@ -45,6 +46,8 @@ void AutonomousVisionMode::OnEnable()
 		m_balls = 3;
 	else
 		m_balls = 0;
+		
+	m_timeout.Reset();
 	
 }
 
@@ -55,10 +58,16 @@ void AutonomousVisionMode::Main()
 	
 	double speed = 0.0, turn_rate = 0.0;
 	
+	const double curvy_rate = -0.05;
+	
 	
 	m_position.getData(m_positionX, m_positionY, m_angle);
 	
-	if( (m_positionY - m_initialY) > Y_LIMIT)
+	// kill the robot if it has gone too far or if a timeout expires
+	if( 
+		(m_positionY - m_initialY) > Y_LIMIT ||
+		m_timeout.Get() > 8.0
+	)
 	{
 		m_resources.myRobot.Drive(0.0, 0.0);
 		return;
@@ -72,7 +81,8 @@ void AutonomousVisionMode::Main()
 			if (!m_kicker.HasBall())
 			{
 				speed = -0.7;
-				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+				turn_rate = curvy_rate;
+				//turn_rate = m_nosePointer.GetTurnRate( 0.0 );
 				break;
 			}
 				
@@ -91,9 +101,10 @@ void AutonomousVisionMode::Main()
 				break;
 			}*/
 			
+			// keep going until ball is firmly stuck in roller
 			if (state_timer.Get() < 0.5)
 			{
-				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+				turn_rate = curvy_rate;
 				speed = -0.7;
 			}
 			
@@ -105,7 +116,7 @@ void AutonomousVisionMode::Main()
 			if (state_timer.Get() < 0.5 )
 			{
 				//turn_rate = m_nosePointer.GetTurnRate( m_vision.GetVisionAngle() );
-				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+				//turn_rate = m_nosePointer.GetTurnRate( 0.0 );
 				break;
 			}	
 			
@@ -125,24 +136,24 @@ void AutonomousVisionMode::Main()
 		case ALIGN_ROBOT_TO_ZERO:
 	
 			// we have the ball, lets try to align ourselves correctly
-			if (!m_nosePointer.IsPointingCorrectly())
-			{
-				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
-				break;
-			}
+			//if (!m_nosePointer.IsPointingCorrectly())
+			//{
+			//	turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+			//	break;
+			//}
 			
 			state_timer.Reset();
 			m_state = WAIT_FOR_ZERO_ALIGN_TO_FINISH;
 			
 		case WAIT_FOR_ZERO_ALIGN_TO_FINISH:
 		
-			if (state_timer.Get() < 0.5 )
-			{
-				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
-				break;
-			}
+			//if (state_timer.Get() < 0.5 )
+			//{
+			//	turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+			//	break;
+			//}
 	
-			if (++m_balls_kicked > m_balls)
+			if (++m_balls_kicked >= m_balls)
 				m_state = STOP;
 			else
 				m_state = GO_FORWARD;

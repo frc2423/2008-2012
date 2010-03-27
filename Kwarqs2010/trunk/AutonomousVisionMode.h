@@ -47,7 +47,8 @@ private:
 	NosePointer& m_nosePointer;
 	PositionInformation &m_position;
 	double m_positionX, m_positionY, m_initialY, m_angle;
-	Timer state_timer;
+	
+	Timer state_timer, m_timeout;
 	
 	const static double Y_LIMIT = 100.0;
 	const static double TIME_FOR_ALIGN = 1.0;

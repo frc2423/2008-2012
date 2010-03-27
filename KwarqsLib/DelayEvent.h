@@ -6,13 +6,12 @@
 */
 
 
-#ifndef KWARQSLIB_DELAY_TIME_H
-#define KWARQSLIB_DELAY_TIME_H
+#ifndef KWARQSLIB_DELAY_EVENT_H
+#define KWARQSLIB_DELAY_EVENT_H
 
 /**
 	\class DelayEvent
-	\brief Simple class to abstract all that delay stuff away so we don't
-	have to keep making silly variables to do it for us
+	\brief Simple class to abstract delayed actions away
 */
 class DelayEvent {
 public:

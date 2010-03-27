@@ -17,11 +17,22 @@
 
 class ExampleMode: public RobotMode
 {
+	DoubleProxy m_adjust;
+	
 public:
 	ExampleMode(RobotResources& resources, NosePointer &nosePointer):
 		m_resources(resources),
 		m_nosePointer(nosePointer)
-	{}
+	{
+		
+		m_adjust = resources.webdma.CreateDoubleProxy("Main", "Turn Adjustment",
+				DoubleProxyFlags()
+						.default_value(0.7)
+						.minval(0.0)
+						.maxval(1.0)
+						.step(0.1)
+		);
+	}
 		
 	void Main()
 	{
@@ -44,6 +55,28 @@ private:
 
 	void Drive()
 	{
+		double y = m_resources.stick.GetY();
+		double x = m_resources.stick.GetX() * m_adjust;
+		
+
+		if ( !m_resources.stick.GetRawButton(2))
+		{
+			if (x >= 0.0)
+			{
+				x = (x * x);
+			}
+			else
+			{
+				x = -(x * x);
+			}
+		}
+		
+		if (y > 0)
+			y = y * 0.7;
+		
+		m_resources.myRobot.ArcadeDrive( y, x, false );
+		
+		/*
 		if (m_resources.stick.GetRawButton(2))
 		{
 			double turn_rate = 0.0;
@@ -55,8 +88,15 @@ private:
 			
 		}
 		else
-			m_resources.myRobot.ArcadeDrive(m_resources.stick);
-		/*
+		{
+			//m_resources.myRobot.ArcadeDrive(m_resources.stick);
+			
+			m_resources.myRobot.ArcadeDrive( 
+					m_resources.stick.GetY(), 
+					m_resources.stick.GetX(), 
+					m_resources.stick.GetRawButton(2) );
+		}
+		
 		{
 		
 		

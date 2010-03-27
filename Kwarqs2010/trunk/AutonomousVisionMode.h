@@ -49,7 +49,7 @@ private:
 	double m_positionX, m_positionY, m_initialY, m_angle;
 	Timer state_timer;
 	
-	const static double Y_LIMIT = 10.0;
+	const static double Y_LIMIT = 100.0;
 	const static double TIME_FOR_ALIGN = 1.0;
 	const static int DIGITAL_1BALL = 6;
 	const static int DIGITAL_2BALLS = 7;

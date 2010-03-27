@@ -32,6 +32,8 @@ void AutonomousVisionMode::OnEnable()
 	m_balls_kicked = 0;
 	m_state = GO_FORWARD;
 	
+	m_resources.gyro.Reset();
+	
 	double x, a;
 	m_position.getData(x, m_initialY, a);
 	
@@ -69,23 +71,30 @@ void AutonomousVisionMode::Main()
 			// if we don't have the ball, keep going forward
 			if (!m_kicker.HasBall())
 			{
-				speed = -0.5;
+				speed = -0.7;
 				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
 				break;
 			}
 				
 			// this only runs once
-			m_vision.PreferEither();
+			//m_vision.PreferEither();
+			state_timer.Reset();
 			
 			m_state = ALIGN_ROBOT_WITH_TARGET;
 	
 		case ALIGN_ROBOT_WITH_TARGET:
 		
 			// we have the ball, lets try to align ourselves correctly
-			if (!m_vision.IsRobotPointingAtTarget())
+			/*if (!m_vision.IsRobotPointingAtTarget())
 			{
 				turn_rate = m_nosePointer.GetTurnRate( m_vision.GetVisionAngle() );
 				break;
+			}*/
+			
+			if (state_timer.Get() < 0.5)
+			{
+				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+				speed = -0.7;
 			}
 			
 			state_timer.Reset();
@@ -95,7 +104,8 @@ void AutonomousVisionMode::Main()
 		
 			if (state_timer.Get() < 0.5 )
 			{
-				turn_rate = m_nosePointer.GetTurnRate( m_vision.GetVisionAngle() );
+				//turn_rate = m_nosePointer.GetTurnRate( m_vision.GetVisionAngle() );
+				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
 				break;
 			}	
 			

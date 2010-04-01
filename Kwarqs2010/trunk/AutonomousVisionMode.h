@@ -58,6 +58,7 @@ private:
 	int m_balls_kicked;
 	int m_balls;
 	
+	double m_stop_timeout;
 	
 	AutonomousVisionMode();
 	DISALLOW_COPY_AND_ASSIGN(AutonomousVisionMode);

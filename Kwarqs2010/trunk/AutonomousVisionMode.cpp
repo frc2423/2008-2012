@@ -22,7 +22,8 @@ AutonomousVisionMode::AutonomousVisionMode(RobotResources& resources, Kicker& ki
 	m_initialY(0.0),
 	m_angle(0.0),
 
-	m_balls_kicked(0)
+	m_balls_kicked(0),
+	m_stop_timeout(5.0)
 {	
 	state_timer.Start();
 	m_timeout.Start();
@@ -39,13 +40,24 @@ void AutonomousVisionMode::OnEnable()
 	m_position.getData(x, m_initialY, a);
 	
 	if(DriverStation::GetInstance()->GetDigitalIn(DIGITAL_1BALL))
+	{
 		m_balls = 1;
+		m_stop_timeout = 7.0;
+	}
 	else if(DriverStation::GetInstance()->GetDigitalIn(DIGITAL_2BALLS))
+	{
 		m_balls = 2;
+		m_stop_timeout = 9.0;
+	}
 	else if(DriverStation::GetInstance()->GetDigitalIn(DIGITAL_3BALLS))
+	{
 		m_balls = 3;
+		m_stop_timeout = 9.0;
+	}
 	else
+	{
 		m_balls = 0;
+	}
 		
 	m_timeout.Reset();
 	
@@ -58,7 +70,7 @@ void AutonomousVisionMode::Main()
 	
 	double speed = 0.0, turn_rate = 0.0;
 	
-	const double curvy_rate = -0.05;
+	const double curvy_rate = -0.2;
 	
 	
 	m_position.getData(m_positionX, m_positionY, m_angle);
@@ -66,7 +78,7 @@ void AutonomousVisionMode::Main()
 	// kill the robot if it has gone too far or if a timeout expires
 	if( 
 		(m_positionY - m_initialY) > Y_LIMIT ||
-		m_timeout.Get() > 8.0
+		m_timeout.Get() > m_stop_timeout
 	)
 	{
 		m_resources.myRobot.Drive(0.0, 0.0);

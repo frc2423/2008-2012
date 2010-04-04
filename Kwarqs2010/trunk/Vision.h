@@ -20,8 +20,12 @@ public:
 	
 	// these three tell the vision system which target to focus on
 	
+	// prefer the target to the left
 	void PreferLeft();
+	// prefer the target to the right
 	void PreferRight();
+	
+	// pick a target in front of us, doesn't matter
 	void PreferEither();
 	
 	// returns the angle the vision system thinks you should be pointing 

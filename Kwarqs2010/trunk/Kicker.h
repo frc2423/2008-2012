@@ -12,8 +12,6 @@
 #include <WPILib.h>
 #include "RobotResources.h"
 
-#include "filters.h"
-
 
 class Kicker
 {
@@ -40,6 +38,9 @@ public:
 		// create a mutex to allow us to synchronize access to variables
 		// since we're going to be running in multiple threads
 		m_mutex = semMCreate(0);
+		
+		// various WebDMA proxy variables.. 
+		
 		m_displayRollerVoltage = m_resources.webdma.CreateDoubleProxy("Kicker", "Roller sensor voltage",
 			DoubleProxyFlags().readonly());
 		
@@ -138,9 +139,6 @@ private:
 		// make sure that nobody else can access our variables
 		Synchronized lock(m_mutex);
 		
-		//roller_filter.AddPoint( m_resources.ballSensor.GetVoltage() );
-		
-		//m_displayRollerVoltage = roller_filter.GetAverage();
 		
 		m_ballSwitch = !ballInput.Get();
 		
@@ -275,10 +273,6 @@ private:
 	IntProxy	m_kicker_state_proxy;
 	
 	DigitalInput ballInput;
-	
-	//AverageWindowFilter<double, 10> roller_filter;
-	
-
 };
 
 #endif

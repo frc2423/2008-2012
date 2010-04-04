@@ -40,9 +40,9 @@ double __hypot(double x, double y)
 
 
 
-/*
-	The following two are NOT taken from libstdc++
-*/
+/**********************************************************************
+ *	The following are NOT taken from libstdc++
+ **********************************************************************/
 
 double angle_normalize( double angle )
 {

@@ -55,7 +55,7 @@ struct RobotResources
 		leftEncoder.SetDistancePerPulse( (2.0 * M_PI * WHEEL_RADIUS) / 1440.0 );
 		rightEncoder.SetDistancePerPulse( (2.0 * M_PI * WHEEL_RADIUS) / 1440.0 );
 		
-		gyro.SetSensitivity(-1.0 * 0.0033);
+		gyro.SetSensitivity(0.007);
 		
 		webdma.Enable();
 		

@@ -35,6 +35,9 @@
 #include "WPILib.h"
 #include <math.h>
 
+// define this if you want to use vision, or comment
+// it out if you want to just do it dead
+//#define USE_VISION
 
 AutonomousVisionMode::AutonomousVisionMode(
 	RobotResources& resources, 
@@ -102,9 +105,10 @@ void AutonomousVisionMode::Main()
 	// need to build in delays a bit better.
 	
 	double speed = 0.0, turn_rate = 0.0;
-	
+
+#ifndef USE_VISION
 	const double curvy_rate = -0.2;
-	
+#endif	
 	
 	m_position.getData(m_positionX, m_positionY, m_angle);
 	
@@ -125,33 +129,50 @@ void AutonomousVisionMode::Main()
 			// if we don't have the ball, keep going forward
 			if (!m_kicker.HasBall())
 			{
-				speed = -0.7;
+				speed = -0.6;
+#ifdef USE_VISION
+				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+#else				
 				turn_rate = curvy_rate;
-				//turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+#endif
 				break;
 			}
 				
 			// this only runs once
-			//m_vision.PreferEither();
+#ifdef USE_VISION	
+			m_vision.PreferEither();
+#endif
 			state_timer.Reset();
 			
 			m_state = ALIGN_ROBOT_WITH_TARGET;
 	
+		case CONTINUE_FORWARD_TO_GET_BALL_STUCK:
+			
+			// continue the previous movement until the
+			// ball gets stuck in the roller
+			if (state_timer.Get() < 0.5)
+			{
+#ifdef USE_VISION
+				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+#else
+				turn_rate = curvy_rate;
+#endif
+				speed = -0.6;
+				break;
+			}
+			
+			m_state = ALIGN_ROBOT_WITH_TARGET;
+			
 		case ALIGN_ROBOT_WITH_TARGET:
 		
+#ifdef USE_VISION
 			// we have the ball, lets try to align ourselves correctly
-			/*if (!m_vision.IsRobotPointingAtTarget())
+			if (!m_vision.IsRobotPointingAtTarget())
 			{
 				turn_rate = m_nosePointer.GetTurnRate( m_vision.GetVisionAngle() );
 				break;
-			}*/
-			
-			// keep going until ball is firmly stuck in roller
-			if (state_timer.Get() < 0.5)
-			{
-				turn_rate = curvy_rate;
-				speed = -0.7;
 			}
+#endif
 			
 			state_timer.Reset();
 			m_state = WAIT_FOR_TARGET_ALIGN_TO_FINISH;
@@ -160,8 +181,9 @@ void AutonomousVisionMode::Main()
 		
 			if (state_timer.Get() < 0.5 )
 			{
-				//turn_rate = m_nosePointer.GetTurnRate( m_vision.GetVisionAngle() );
-				//turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+#ifdef USE_VISION
+				turn_rate = m_nosePointer.GetTurnRate( m_vision.GetVisionAngle() );
+#endif
 				break;
 			}	
 			
@@ -180,24 +202,29 @@ void AutonomousVisionMode::Main()
 		
 		case ALIGN_ROBOT_TO_ZERO:
 	
+#ifdef USE_VISION
+			
 			// we have the ball, lets try to align ourselves correctly
-			//if (!m_nosePointer.IsPointingCorrectly())
-			//{
-			//	turn_rate = m_nosePointer.GetTurnRate( 0.0 );
-			//	break;
-			//}
+			if (!m_nosePointer.IsPointingCorrectly())
+			{
+				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+				break;
+			}
+#endif
 			
 			state_timer.Reset();
 			m_state = WAIT_FOR_ZERO_ALIGN_TO_FINISH;
 			
 		case WAIT_FOR_ZERO_ALIGN_TO_FINISH:
 		
-			//if (state_timer.Get() < 0.5 )
-			//{
-			//	turn_rate = m_nosePointer.GetTurnRate( 0.0 );
-			//	break;
-			//}
-	
+#ifdef USE_VISION
+
+			if (state_timer.Get() < 0.5 )
+			{
+				turn_rate = m_nosePointer.GetTurnRate( 0.0 );
+				break;
+			}
+#endif	
 	
 			// are we there yet?
 			if (++m_balls_kicked >= m_balls)

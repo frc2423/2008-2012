@@ -95,7 +95,7 @@ class RobotDemo : public SimpleRobot
 public:
 	RobotDemo(void):
 		
-		m_nosePointer( resources, 0.7, 1.0 ),
+		m_nosePointer( resources, 0.6, 1.0 ),
 		m_position(resources, WHEEL_BASE),
 		
 		example(resources, m_nosePointer),

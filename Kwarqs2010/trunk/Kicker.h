@@ -75,6 +75,9 @@ public:
 		m_ballSwitch = m_resources.webdma.CreateBoolProxy("Kicker", "Ball Switch", 
 				BoolProxyFlags().default_value(false));
 		
+		m_ballSwitchOverride = m_resources.webdma.CreateBoolProxy("Kicker", "Ball Switch Override", 
+						BoolProxyFlags().default_value(false));
+		
 		m_kicker_state_proxy = m_resources.webdma.CreateIntProxy("Kicker", "Kicker State", 
 					IntProxyFlags().readonly());
 			
@@ -164,8 +167,8 @@ private:
 		// make sure that nobody else can access our variables
 		Synchronized lock(m_mutex);
 		
-		
-		m_ballSwitch = !ballInput.Get();
+		if (!m_ballSwitchOverride)
+			m_ballSwitch = ballInput.Get();
 		
 		if (kicker_state == STATE_IDLE)
 		{
@@ -295,6 +298,7 @@ private:
 	DoubleProxy m_displayRollerVoltage;
 	BoolProxy	m_hasBall;
 	BoolProxy 	m_ballSwitch;
+	BoolProxy 	m_ballSwitchOverride;
 	IntProxy	m_kicker_state_proxy;
 	
 	DigitalInput ballInput;

@@ -78,7 +78,7 @@ NosePointer::NosePointer(
 					.default_value(turnHigh)
 					.minval(0.0)
 					.maxval(1.0)
-					.step(0.1)
+					.step(0.01)
 			);
 	
 	// set it up to switch between the two types of pointers

@@ -73,7 +73,7 @@ private:
 		
 		// limit going backwards so we can pull the ball with us more easily
 		if (y > 0)
-			y = y * 0.7;
+			y = y * 0.6;
 		
 		m_resources.myRobot.ArcadeDrive( y, x, false );
 		

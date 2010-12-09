@@ -1,10 +1,10 @@
 import wpilib
-from kicker import kicker
+from kicker import Kicker
 
 # define needed robot resources here
 stick = wpilib.Joystick(1)
 my_robot = wpilib.RobotDrive( 1, 2 )
-kicker = kicker()
+kicker = Kicker()
 
 
 def CheckRestart():
@@ -34,11 +34,11 @@ class MyRobot(wpilib.SimpleRobot):
         x = stick.GetX() * 0.7
         
         # by default, enable smoother turning
-        if not stick.GetRawButton( 0.2 ):
+        if not stick.GetRawButton( 2 ):
             
             if x >= 0.0:
                 x = x * x
-            else
+            else:
                 x = -(x * x)
     
         # limit going backwards so we can pull the ball with us more easily

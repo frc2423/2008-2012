@@ -287,7 +287,7 @@ import signal
 import errno
 import time
 import copy
-import hmac
+#import hmac RobotPy does not support hmac either
 import stat
 import zlib
 import sys
@@ -296,12 +296,13 @@ import imp
 import os
 import re
 
-try:
-    import hashlib
-    _md5 = hashlib.md5
-except:
-    import md5
-    _md5 = md5
+# RobotPy: does not support md5
+#try:
+#    import hashlib
+#    _md5 = hashlib.md5
+#except:
+#    import md5
+#    _md5 = md5
 
 try:
     import compiler
@@ -389,8 +390,8 @@ TIMEOUT_THIRTY_SECONDS = 30.0
 
 
 def start_embedded_debugger(
-            _rpdb2_pwd = 'FRC', 
-            fAllowUnencrypted = True, 
+            _rpdb2_pwd='FRC', 
+            fAllowUnencrypted = True,
             fAllowRemote = True, 
             timeout = TIMEOUT_THIRTY_SECONDS, 
             source_provider = None, 
@@ -3838,7 +3839,7 @@ def is_encryption_supported():
     Is the Crypto module imported/available.
     """
     
-    return 'DES' in globals()
+    return False
 
 
 
@@ -4659,7 +4660,7 @@ class CCrypto:
     Handle authentication and encryption of data, using password protection.
     """
 
-    m_keys = {}
+    m_keys = { 'FRC': b'+\x9e\xa8&DH\xe9<D\xd4\x02\xfa\xd1\x84\x9ba'}
     
     def __init__(self, _rpdb2_pwd, fAllowUnencrypted, rid):
         assert(is_unicode(_rpdb2_pwd))
@@ -4821,8 +4822,9 @@ class CCrypto:
         s = pickle.dumps(pack, 2)
         #print_debug('***** 2' + repr(args)[:50]) 
         
-        h = hmac.new(self.m_key, s, digestmod = _md5)
-        d = h.hexdigest()
+        #h = hmac.new(self.m_key, s, digestmod = _md5)
+        #d = h.hexdigest()
+        d = 'xFakeDigest'
 
         #if 'coding:' in s:
         #    print_debug('%s, %s, %s\n\n==========\n\n%s' % (len(s), d, repr(args), repr(s)))
@@ -4843,15 +4845,15 @@ class CCrypto:
 
     def __verify_signature(self, digest, s, fVerifyIndex):
         try:
-            h = hmac.new(self.m_key, s, digestmod = _md5)
-            d = h.hexdigest()
+            #h = hmac.new(self.m_key, s, digestmod = _md5)
+            #d = h.hexdigest()
 
             #if 'coding:' in s:
             #    print_debug('%s, %s, %s, %s' % (len(s), digest, d, repr(s)))
 
-            if d != digest:
-                self.__wait_a_little()
-                raise AuthenticationFailure
+            #if d != digest:
+            #    self.__wait_a_little()
+            #    raise AuthenticationFailure
 
             pack = pickle.loads(s)
             (anchor, i, id, args) = pack

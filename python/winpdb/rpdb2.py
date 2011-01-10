@@ -2279,7 +2279,10 @@ def safe_wait(lock, timeout = None):
     while True:
         try:
             t0 = time.time()
-            return lock.wait(timeout)
+            print_debug("1: %s" % lock)
+            foo = lock.wait(timeout)
+            print_debug("2")
+            return foo
 
         except:
             if timeout == None:
@@ -5604,7 +5607,9 @@ class CStateManager:
             while True:
                 index = self.__add_waiter()
             
+                print_debug("bet this is where we are")
                 alertable_wait(self.m_state_lock, PING_TIMEOUT)
+                print_debug("check this shit out")
 
                 states = self.__get_states(index)
                 self.__remove_waiter(index)
@@ -7331,11 +7336,11 @@ class CDebuggerCore:
         Initial tracing method.
         """
         
-        print_debug("trace_dispatch_init")
+        print_debug("%s: trace_dispatch_init 1: %s" % (frame, event))
         
         if event not in ['call', 'line', 'return']:
             return None
-
+            
         code_context = self.get_code_context(frame)
         if event == 'call' and code_context.is_untraced():
             return None
@@ -7351,21 +7356,32 @@ class CDebuggerCore:
         if name == 'MainThread':
             self.__set_signal_handler()
 
+        print_debug("%s: trace_dispatch_init 2" % frame)
+            
         ctx = CDebuggerCoreThread(name, self, frame, event)
         ctx.set_tracers()
 
         try:
+        
+            print_debug("%s: trace_dispatch_init 3" % frame)
+        
             self.m_threads_lock.acquire() 
 
             self.m_threads[ctx.m_thread_id] = ctx
             nthreads = len(self.m_threads)
+            
+            print_debug("%s: trace_dispatch_init 4" % frame)
 
             if nthreads == 1:
                 self.prepare_embedded_sync()
+                
+            print_debug("%s: trace_dispatch_init 5" % frame)
 
         finally:
             self.m_threads_lock.release()
 
+        print_debug("%s: trace_dispatch_init 6" % frame)
+            
         if nthreads == 1:
             self.clear_source_cache()
             
@@ -7374,18 +7390,24 @@ class CDebuggerCore:
 
             if self.m_f_break_on_init:
                 self.m_f_break_on_init = False
+                print_debug("%s: trace_dispatch_init 7" % frame)
                 self.request_break()
-
+                
+        print_debug("%s: trace_dispatch_init 8" % frame)
+                
         sys.settrace(ctx.trace_dispatch_call)
         sys.setprofile(ctx.profile)
       
         self.wait_embedded_sync(nthreads == 1)
 
         if event == 'call':
+            print_debug("%s: trace_dispatch_init 9" % frame)
             return ctx.trace_dispatch_call(frame, event, arg)
-        elif hasattr(frame, 'f_trace') and (frame.f_trace is not None):    
+        elif hasattr(frame, 'f_trace') and (frame.f_trace is not None):  
+            print_debug("%s: trace_dispatch_init 10" % frame)
             return frame.f_trace(frame, event, arg)
         else:
+            print_debug("%s: trace_dispatch_init 11" % frame)
             return None
 
     
@@ -7427,8 +7449,12 @@ class CDebuggerCore:
             event = CEventEmbeddedSync()
             self.m_event_dispatcher.fire_event(event)
 
+        print_debug("wait_embedded sync: safe")
+            
         safe_wait(self.m_embedded_event, EMBEDDED_SYNC_TIMEOUT - (t - t1))
 
+        print_debug("wait_embedded sync: end safe")
+        
         if ftrigger:
             self.m_embedded_sync_t1 = 0
 
@@ -7530,7 +7556,10 @@ class CDebuggerCore:
         global g_fos_exit
         global g_module_main
         
+        print_debug("1")
+        
         if not self.is_break(ctx, frame, event) and not ctx.is_breakpoint():
+            print_debug("2")
             ctx.set_tracers()
             return 
             
@@ -7541,6 +7570,9 @@ class CDebuggerCore:
         step_tid = self.m_step_tid
 
         try: 
+        
+            print_debug("3")
+        
             self.m_state_manager.acquire()
             if self.m_state_manager.get_state() != STATE_BROKEN:
                 self.set_break_dont_lock()
@@ -7589,26 +7621,33 @@ class CDebuggerCore:
         finally:
             self.m_state_manager.release()
 
+        print_debug("4")
+            
         ffork_second_stage = self.handle_fork(ctx)
         self.handle_exec(ctx)
 
         if self.is_auto_fork_first_stage(ctx.m_thread_id):
+            print_debug("5-1")
             self.request_go_quiet()
 
         elif self.m_ffork_auto and ffork_second_stage:
+            print_debug("5-2")
             (self.m_step_tid, self.m_next_frame, self.m_return_frame) = self.m_saved_step
             self.m_saved_step = (None, None, None)
             self.m_bp_manager.m_fhard_tbp = False
             self.request_go_quiet()
 
         elif self.get_clients_attached() == 0:
-            #print_debug('state: %s' % self.m_state_manager.get_state())
+            print_debug('state: %s' % self.m_state_manager.get_state())
+            print_debug("5-3")
             self.request_go_quiet()
 
         elif step_tid == ctx.m_thread_id and frame.f_code.co_name == 'rpdb2_import_wrapper':
+            print_debug("5-4")
             self.request_step_quiet()
 
         else:
+            print_debug("5-5")
             if f_full_notification:
                 self.send_events(None) 
             else:
@@ -7618,8 +7657,10 @@ class CDebuggerCore:
             if f_uhe_notification:
                 self.send_unhandled_exception_event()
                 
+            print_debug("5-6")
             state = self.m_state_manager.wait_for_state([STATE_RUNNING])
       
+        print_debug("6")
         self.prepare_fork_step(ctx.m_thread_id)
         self.prepare_exec_step(ctx.m_thread_id)
 
@@ -7629,10 +7670,13 @@ class CDebuggerCore:
         ctx.reset_exc_info()
 
         if g_fos_exit:
+            print_debug("7")
             g_fos_exit = False
             self.send_event_exit()
             time.sleep(1.0)
             self.stoptrace()
+            
+        print_debug("8")
 
 
     def is_auto_fork_first_stage(self, tid):
@@ -9684,7 +9728,6 @@ class CIOServer:
         Process RPC call.
         """
         
-        traceback.print_stack()
         #print_debug('dispatcher_method() called with: %s, %s, %s, %s' % (rpdb_version, fencrypt, digest, msg[:100]))
 
         if rpdb_version != as_unicode(get_interface_compatibility_version()):

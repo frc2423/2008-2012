@@ -384,6 +384,7 @@ except:
 
 
 TIMEOUT_FIVE_MINUTES = 5 * 60.0
+TIMEOUT_THIRTY_SECONDS = 30.0
 
 
 
@@ -391,7 +392,7 @@ def start_embedded_debugger(
             _rpdb2_pwd = 'FRC', 
             fAllowUnencrypted = True, 
             fAllowRemote = True, 
-            timeout = TIMEOUT_FIVE_MINUTES, 
+            timeout = TIMEOUT_THIRTY_SECONDS, 
             source_provider = None, 
             fDebug = True,
             depth = 0
@@ -2412,6 +2413,12 @@ if not hasattr(g_builtins_module, 'bytes'):
     #
     g_builtins_module.bytes = _rpdb2_bytes
 
+if is_py3k():
+    _decodebytes = base64.decodebytes
+    _encodebytes = base64.encodebytes
+else:
+    _decodebytes = base64.decodestring
+    _encodebytes = base64.encodestring
 
 if is_py3k():
     class sets:
@@ -3386,8 +3393,11 @@ def FindFile(
         #
         cwd = [getcwdu()]
 
-    env_path = os.environ['PATH']
-    paths = sources_paths + cwd + g_initial_cwd + sys.path + env_path.split(os.pathsep)
+    env_path = []
+    if 'PATH' in os.environ:
+        env_path = os.environ['PATH'].split(os.pathsep)
+
+    paths = sources_paths + cwd + g_initial_cwd + sys.path + env_path
     
     try:
         lowered = None
@@ -4744,7 +4754,7 @@ class CCrypto:
         if fencrypt:
             s = self.__encrypt(s)
 
-        s = base64.encodestring(s)
+        s = _encodebytes(s)
         u = as_unicode(s)
         
         return (fcompress, digest, u)
@@ -4763,7 +4773,7 @@ class CCrypto:
             raise EncryptionNotSupported
 
         s = as_bytes(msg)
-        s = base64.decodestring(s)
+        s = _decodebytes(s)
 
         if fencrypt:
             s = self.__decrypt(s)
@@ -9729,9 +9739,9 @@ class CIOServer:
         Looks for an available tcp port to listen on.
         """
         
-        host = [LOOPBACK, ""][self.m_fAllowRemote]
+        host = '10.24.23.2'
         port = SERVER_PORT_RANGE_START
-
+                
         while True:
             try:
                 server = CXMLRPCServer((host, port), logRequests = 0)
@@ -10575,7 +10585,7 @@ class CSessionManagerInternal:
 
         if as_bytes('?') in as_bytes(ExpandedFilename, encoding, fstrict = False):
             _u = as_bytes(ExpandedFilename)
-            _b = base64.encodestring(_u)
+            _b = _encodebytes(_u)
             _b = _b.strip(as_bytes('\n')).translate(g_safe_base64_to)
             _b = as_string(_b, fstrict = True)
             b = ' --base64=%s' % _b
@@ -14456,7 +14466,7 @@ def main(StartClient_func = StartClient, version = RPDB_TITLE):
         try:
             if encoded_path != None:
                 _b = as_bytes(encoded_path).translate(g_safe_base64_from)
-                _u = base64.decodestring(_b)
+                _u = _decodebytes(_b)
                 _path = as_unicode(_u)
                 _rpdb2_args[0] = _path
 

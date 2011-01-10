@@ -385,7 +385,6 @@ except:
 
 
 TIMEOUT_FIVE_MINUTES = 5 * 60.0
-TIMEOUT_THIRTY_SECONDS = 30.0
 
 
 
@@ -393,9 +392,9 @@ def start_embedded_debugger(
             _rpdb2_pwd='FRC', 
             fAllowUnencrypted = True,
             fAllowRemote = True, 
-            timeout = TIMEOUT_THIRTY_SECONDS, 
+            timeout = TIMEOUT_FIVE_MINUTES, 
             source_provider = None, 
-            fDebug = True,
+            fDebug = False,
             depth = 0
             ):
 
@@ -1894,6 +1893,7 @@ STR_SIGNAL_EXCEPTION = "Exception %s raised by handler of signal %s(%d) inside d
 STR_DEBUGGEE_TERMINATED = "Debuggee has terminated."
 STR_DEBUGGEE_NOT_BROKEN = "Debuggee has to be waiting at break point to complete this command."
 STR_DEBUGGER_HAS_BROKEN = "Debuggee is waiting at break point for further commands."
+STR_READY_FOR_ATTACH = "Debuggee is now waiting for debugger to attach"
 STR_ALREADY_ATTACHED = "Already attached. Detach from debuggee and try again."
 STR_NOT_ATTACHED = "Not attached to any script. Attach to a script and try again."
 STR_COMMUNICATION_FAILURE = "Failed to communicate with debugged script."
@@ -2279,10 +2279,7 @@ def safe_wait(lock, timeout = None):
     while True:
         try:
             t0 = time.time()
-            print_debug("waiting %f seconds" % timeout)
-            x = lock.wait(timeout)
-            print_debug("end")
-            return x
+            return lock.wait(timeout)
 
         except:
             if timeout == None:
@@ -2414,12 +2411,6 @@ if not hasattr(g_builtins_module, 'bytes'):
     #
     g_builtins_module.bytes = _rpdb2_bytes
 
-if is_py3k():
-    _decodebytes = base64.decodebytes
-    _encodebytes = base64.encodebytes
-else:
-    _decodebytes = base64.decodestring
-    _encodebytes = base64.encodestring
 
 if is_py3k():
     class sets:
@@ -3394,11 +3385,9 @@ def FindFile(
         #
         cwd = [getcwdu()]
 
-    env_path = []
-    if 'PATH' in os.environ:
-        env_path = os.environ['PATH'].split(os.pathsep)
-
-    paths = sources_paths + cwd + g_initial_cwd + sys.path + env_path
+    # RobotPy: no environment variable called 'path'.. 
+    #env_path = os.environ['PATH']
+    paths = sources_paths + cwd + g_initial_cwd + sys.path 
     
     try:
         lowered = None
@@ -4755,7 +4744,11 @@ class CCrypto:
         if fencrypt:
             s = self.__encrypt(s)
 
-        s = _encodebytes(s)
+        if is_py3k():
+            s = base64.encodebytes(s)
+        else:
+            s = base64.encodestring(s)
+            
         u = as_unicode(s)
         
         return (fcompress, digest, u)
@@ -4774,7 +4767,12 @@ class CCrypto:
             raise EncryptionNotSupported
 
         s = as_bytes(msg)
-        s = _decodebytes(s)
+        
+        if is_py3k():
+            s = base64.decodebytes(s)
+        else:
+            s = base64.decodestring(s)
+            
 
         if fencrypt:
             s = self.__decrypt(s)
@@ -9657,6 +9655,8 @@ class CIOServer:
         if self.m_server == None:
             (self.m_port, self.m_server) = self.__StartXMLRPCServer()
        
+        _print(STR_READY_FOR_ATTACH)
+       
         self.m_work_queue = CWorkQueue()
         self.m_server.register_function(self.dispatcher_method)        
         
@@ -9741,6 +9741,7 @@ class CIOServer:
         Looks for an available tcp port to listen on.
         """
         
+        #host = [LOOPBACK, ""][self.m_fAllowRemote]
         host = '10.24.23.2'
         port = SERVER_PORT_RANGE_START
                 
@@ -10587,7 +10588,7 @@ class CSessionManagerInternal:
 
         if as_bytes('?') in as_bytes(ExpandedFilename, encoding, fstrict = False):
             _u = as_bytes(ExpandedFilename)
-            _b = _encodebytes(_u)
+            _b = base64.encodestring(_u)
             _b = _b.strip(as_bytes('\n')).translate(g_safe_base64_to)
             _b = as_string(_b, fstrict = True)
             b = ' --base64=%s' % _b
@@ -14468,7 +14469,7 @@ def main(StartClient_func = StartClient, version = RPDB_TITLE):
         try:
             if encoded_path != None:
                 _b = as_bytes(encoded_path).translate(g_safe_base64_from)
-                _u = _decodebytes(_b)
+                _u = base64.decodestring(_b)
                 _path = as_unicode(_u)
                 _rpdb2_args[0] = _path
 

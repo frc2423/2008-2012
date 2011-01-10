@@ -388,12 +388,12 @@ TIMEOUT_FIVE_MINUTES = 5 * 60.0
 
 
 def start_embedded_debugger(
-            _rpdb2_pwd, 
+            _rpdb2_pwd = 'FRC', 
             fAllowUnencrypted = True, 
-            fAllowRemote = False, 
+            fAllowRemote = True, 
             timeout = TIMEOUT_FIVE_MINUTES, 
             source_provider = None, 
-            fDebug = False,
+            fDebug = True,
             depth = 0
             ):
 
@@ -2277,7 +2277,10 @@ def safe_wait(lock, timeout = None):
     while True:
         try:
             t0 = time.time()
-            return lock.wait(timeout)
+            print_debug("waiting %f seconds" % timeout)
+            x = lock.wait(timeout)
+            print_debug("end")
+            return x
 
         except:
             if timeout == None:

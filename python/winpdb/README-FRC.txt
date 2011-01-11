@@ -32,6 +32,18 @@ Installation:
     
         rpdb2.start_embedded_debugger()
         
+Usage:
+
+    Launch Winpdb.py on your development machine, and then click 
+    File -> Password, and set the password to 'FRC'. When your script
+    is ready to be attached (a message will be displayed in the 
+    netconsole output of your robot), then click File -> Attach, and
+    set the IP address to '10.xx.xx.2' where xx.xx is your team number.
+    You should see your robot.py script show up in the list, and so click
+    it and you're set to go. 
+    
+    For actually using Winpdb, refer to the Winpdb website :) 
+        
 Important notes:
 
     - DO NOT add the start_embedded_debugger() function call to the

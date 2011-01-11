@@ -9741,8 +9741,7 @@ class CIOServer:
         Looks for an available tcp port to listen on.
         """
         
-        #host = [LOOPBACK, ""][self.m_fAllowRemote]
-        host = '10.24.23.2'
+        host = [LOOPBACK, '0.0.0.0'][self.m_fAllowRemote]
         port = SERVER_PORT_RANGE_START
                 
         while True:

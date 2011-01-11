@@ -3385,9 +3385,11 @@ def FindFile(
         #
         cwd = [getcwdu()]
 
-    # RobotPy: no environment variable called 'path'.. 
-    #env_path = os.environ['PATH']
-    paths = sources_paths + cwd + g_initial_cwd + sys.path 
+
+    if 'PATH' in os.environ:
+        paths = sources_paths + cwd + g_initial_cwd + sys.path + os.environ['PATH'].split(os.pathsep)
+    else:
+        paths = sources_paths + cwd + g_initial_cwd + sys.path
     
     try:
         lowered = None

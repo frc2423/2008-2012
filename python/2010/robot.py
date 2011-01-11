@@ -1,6 +1,5 @@
 
 import rpdb2
-rpdb2.start_embedded_debugger()
 
 import wpilib
 from kicker import Kicker
@@ -84,6 +83,8 @@ class MyRobot(wpilib.SimpleRobot):
 
         
 def run():
+    rpdb2.start_embedded_debugger()
+
     '''This function must be present for the robot to start'''
     robot = MyRobot()
     robot.StartCompetition()

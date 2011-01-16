@@ -1,5 +1,5 @@
 
-import rpdb2
+#import rpdb2
 
 import wpilib
 from kicker import Kicker
@@ -14,7 +14,6 @@ def CheckRestart():
     '''This function restarts the robot when button 10 is pressed'''
     if stick.GetRawButton(10):
         raise RuntimeError("Restart")
-        
 
 class MyRobot(wpilib.SimpleRobot):
 
@@ -83,7 +82,7 @@ class MyRobot(wpilib.SimpleRobot):
 
         
 def run():
-    rpdb2.start_embedded_debugger()
+    #rpdb2.start_embedded_debugger()
 
     '''This function must be present for the robot to start'''
     robot = MyRobot()

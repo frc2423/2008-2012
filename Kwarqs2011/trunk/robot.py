@@ -69,8 +69,12 @@ class MyRobot(wpilib.SimpleRobot):
     def Autonomous(self):
         self.GetWatchdog().SetEnabled(False)
         while self.IsAutonomous() and self.IsEnabled():
-            wpilib.Wait(0.04)
+            
+            # control loops
             self.auto.do_control_loop(self.drive, self.arm)
+            self.arm.do_control_loop()
+            
+            wpilib.Wait(0.04)
 
     def OperatorControl(self):
         dog = self.GetWatchdog()

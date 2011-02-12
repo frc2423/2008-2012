@@ -5,10 +5,19 @@ Driver controls:
         - X/Y drives the robot
         - Trigger causes automated deployment
         - Button 7 deploys minibot
+        
     Joystick 2 (arm_stick):
         - Y does manual arm movement
-        - Trigger causes tube deployment
-        - Top causes tube retrieval
+        
+        Original proposal:
+            - Trigger causes tube deployment
+            - Top causes tube retrieval
+            
+        Current implementation:
+            - Holding trigger lets Y do manual arm movement
+            - 6 does deployment
+            - 7 does retrieval
+            
     Driver station:
         - 6 buttons set vertical position
         - 6 LEDs indicate vertical position
@@ -89,21 +98,21 @@ class MyRobot(wpilib.SimpleRobot):
             # Decisions #
             #############
             
-            # Manual Arm Control
-            arm_y = self.arm_stick.GetY()
-            
-            if arm_y > 0.3 or arm_y < -0.3:
-                self.arm.manual_vertical_control(arm_y)
-            
             # Arm Height
             for k,v in arm_height_map:
                 if self.ds.GetDigitalIn(k):
                     self.arm.set_vertical_position(v)
+            
+            # Manual Arm Control
+            arm_y = self.arm_stick.GetY()
+            
+            if self.arm_stick.GetTrigger():
+                self.arm.manual_vertical_control(arm_y)
                 
             # Tube Deployment
-            if self.arm_stick.GetTrigger():
+            if self.arm_stick.GetRawButton(6):
                 self.arm.deploy_tube()
-            elif self.arm_stick.GetTop():
+            elif self.arm_stick.GetRawButton(7):
                 self.arm.retrieve_tube()
             
             if self.drive_stick.GetTrigger():

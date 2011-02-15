@@ -28,16 +28,7 @@ import wpilib
 import arm
 import auto
 
-# key:   digital input port
-# value: arm position
-arm_height_map = {
-    1: ARM_1,
-    2: ARM_2,
-    3: ARM_3,
-    4: ARM_4,
-    5: ARM_5,
-    6: ARM_6
-}
+
 
 class MyRobot(wpilib.SimpleRobot):
 
@@ -99,7 +90,7 @@ class MyRobot(wpilib.SimpleRobot):
             #############
             
             # Arm Height
-            for k,v in arm_height_map:
+            for k,v in arm.arm_height_map:
                 if self.ds.GetDigitalIn(k):
                     self.arm.set_vertical_position(v)
             
@@ -115,6 +106,11 @@ class MyRobot(wpilib.SimpleRobot):
             elif self.arm_stick.GetRawButton(7):
                 self.arm.retrieve_tube()
             
+            
+            #################
+            # Control Loops #
+            #################
+            
             if self.drive_stick.GetTrigger():
                 # Automated Placement
                 self.auto.do_control_loop(self.drive, self.arm)
@@ -123,11 +119,8 @@ class MyRobot(wpilib.SimpleRobot):
                 # Driver Control
                 self.drive_robot_with_joystick()
             
-            #################
-            # Control Loops #
-            #################
-            
             self.arm.do_control_loop()
+            self.arm.set_arm_indicators(self.ds)
             
             wpilib.Wait(0.04)
 

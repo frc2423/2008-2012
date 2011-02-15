@@ -1,8 +1,8 @@
 import wpilib
 
 # The vertical positions for the arm
-ARM_1 = 1
-ARM_2 = 2
+ARM_1 = 1       # topmost
+ARM_2 = 2       # next topmost..
 ARM_3 = 3
 ARM_4 = 4
 ARM_5 = 5
@@ -23,8 +23,8 @@ TUBE_STATE_OFF = 3
 # key:   digital/output input port
 # value: arm position
 arm_height_map = {
-    1: ARM_1,
-    2: ARM_2,
+    1: ARM_1,       # topmost
+    2: ARM_2,       # next topmost.. 
     3: ARM_3,
     4: ARM_4,
     5: ARM_5,

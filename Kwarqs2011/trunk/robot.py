@@ -4,6 +4,7 @@ Driver controls:
     Joystick 1 (drive_stick):
         - X/Y drives the robot
         - Trigger causes automated deployment
+        - Top button lets you turn faster
         - Button 7 deploys minibot
         
     Joystick 2 (arm_stick):
@@ -19,9 +20,10 @@ Driver controls:
             - 7 does retrieval
             
     Driver station:
-        - 6 buttons set vertical position
-        - 6 LEDs indicate vertical position
-        - 1 LED indicates line tracking
+        - Inputs 1-6 set vertical position
+        - Input 7 determines autonomous behavior??
+        - Outputs 1-6 indicate vertical position (LED)
+        - Output 7 indicates line tracking (LED)
 '''
 
 import wpilib
@@ -33,12 +35,20 @@ import auto
 class MyRobot(wpilib.SimpleRobot):
 
     def __init__(self):
+    
+        # drive motors
+        self.l_motor = wpilib.CANJaguar( 24 )
+        self.r_motor = wpilib.CANJaguar( 23 )
+        
+        self.drive = wpilib.RobotDrive(self.l_motor, self.r_motor)
+        
+        # other useful things
         self.arm = arm.Arm()
         self.driver_stick = wpilib.Joystick(1)
         self.arm_stick = wpilib.Joystick(2)
         self.ds = wpilib.DriverStation.GetInstance()
         self.auto = auto.Auto()
-        self.drive = wpilib.RobotDrive(1, 2)
+        
         
     def CheckRestart():
         if self.driver_stick.GetRawButton(10):
@@ -68,9 +78,17 @@ class MyRobot(wpilib.SimpleRobot):
             
     def Autonomous(self):
         self.GetWatchdog().SetEnabled(False)
+        
+        # determine which position we want the arm to go to..
+        if self.ds.GetDigitalIn(7):
+            self.arm.set_vertical_position( arm.ARM_1 )
+        else:
+            self.arm.set_vertical_position( arm.ARM_2 )
+        
         while self.IsAutonomous() and self.IsEnabled():
             
             # control loops
+            self.auto.update_line_tracking(self.ds)
             self.auto.do_control_loop(self.drive, self.arm)
             self.arm.do_control_loop()
             
@@ -82,6 +100,7 @@ class MyRobot(wpilib.SimpleRobot):
         dog.SetExpiration(0.25)
 
         while self.IsOperatorControl() and self.IsEnabled():
+        
             dog.Feed()
             self.CheckRestart()
             
@@ -111,6 +130,9 @@ class MyRobot(wpilib.SimpleRobot):
             # Control Loops #
             #################
             
+            # update line tracking state first (always)
+            self.auto.update_line_tracking(self.ds)
+            
             if self.drive_stick.GetTrigger():
                 # Automated Placement
                 self.auto.do_control_loop(self.drive, self.arm)
@@ -121,6 +143,8 @@ class MyRobot(wpilib.SimpleRobot):
             
             self.arm.do_control_loop()
             self.arm.set_arm_indicators(self.ds)
+            
+            
             
             wpilib.Wait(0.04)
 

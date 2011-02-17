@@ -3,6 +3,8 @@ import wpilib
 
 LT_STEER_AMOUNT = 0.65
 LT_MAX_CROSS_DISTANCE = 24.0
+LT_DEPLOY_RANGE = 24.0
+LT_TOO_CLOSE = 48.0
 
 
 class Auto(object):
@@ -98,21 +100,52 @@ class Auto(object):
             
         if binaryValue != 0:
             self.ltp_previous = binaryValue
-        
-        
+    
+    
+    def line_tracking_drive(self, drive):
+    
+        x = self.lt_steering
+
+        # Relative distance from wall
+        y = 
+    
+        drive.ArcadeDrive(y, x, False)
+    
         
     def do_control_loop(self, drive, arm):
         '''Implements automated tube placement'''
         
         # Is arm at height?
+        if arm.arm_is_in_position() == True:
+            
             # Yes! -> In deploy range?
-                # Yes! -> Turn speed off, then...
-                # Is the middle sensor on?
-                    # Yes! -> Deploy tube
-                    # No! -> Line tracking
-                # No! -> Set speed, then...
-                    # Line tracking
-            # No! -> Are we too close?
-                # Yes! -> Stop motors
-                # No! -> Line tracking
+            if self.ultrasonic.GetRangeInches() <= LT_DEPLOY_RANGE:
                 
+                # Is the middle sensor on?
+                if self.middle_tracker.Get(1):
+                
+                    # Turn drive motors off
+                    drive.ArcadeDrive(0, 0, False)
+                
+                    # Yes! -> Deploy tube
+                    arm.deploy_tube()
+                    
+                # No! -> Line tracking
+                else:
+                    self.line_tracking_drive(drive)
+                    
+            # No! -> Set speed, then...
+            else:
+                # Line tracking
+                self.line_tracking_drive(drive)
+        
+        # No! -> Are we too close?
+        elif self.ultrasonic.GetRangeInches() <= LT_TOO_CLOSE:
+    
+            # Yes! -> Stop motors
+            drive.ArcadeDrive(0, 0, False)
+        
+        # No! -> Line tracking
+        else:
+            self.line_tracking_drive(drive)
+            

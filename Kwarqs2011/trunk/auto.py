@@ -30,7 +30,7 @@ class Auto(object):
         self.lt_steering = 0        # value to steer left or right
         
     
-    def update_line_tracking(self):
+    def update_line_tracking(self, ds):
         '''
         Decides to go left or right based on the state of line tracking
         sensors. This function does not actually cause the motors to do
@@ -107,7 +107,7 @@ class Auto(object):
         x = self.lt_steering
 
         # Relative distance from wall
-        y = 
+        y = 0
     
         drive.ArcadeDrive(y, x, False)
     

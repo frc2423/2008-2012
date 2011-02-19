@@ -36,25 +36,28 @@ class MyRobot(wpilib.SimpleRobot):
 
     def __init__(self):
     
+        print("MyRobot::__init__()")
+    
         # drive motors
         self.l_motor = wpilib.CANJaguar( 24 )
         self.r_motor = wpilib.CANJaguar( 23 )
-        
+ 
         self.drive = wpilib.RobotDrive(self.l_motor, self.r_motor)
         
         # other useful things
         self.arm = arm.Arm()
-        self.driver_stick = wpilib.Joystick(1)
+        self.drive_stick = wpilib.Joystick(1)
         self.arm_stick = wpilib.Joystick(2)
         self.ds = wpilib.DriverStation.GetInstance()
         self.auto = auto.Auto()
         
         
-    def CheckRestart():
-        if self.driver_stick.GetRawButton(10):
+    def CheckRestart(self):
+        if self.drive_stick.GetRawButton(10):
             raise RuntimeError("Restart")
 
     def Disabled(self):
+        print("MyRobot::Disabled()")
         while self.IsDisabled():
             self.CheckRestart()
             wpilib.Wait(0.01)
@@ -62,11 +65,11 @@ class MyRobot(wpilib.SimpleRobot):
     def drive_robot_with_joystick(self):
         '''Utility function to allow the user to control the robot with a joystick'''
     
-        y = self.driver_stick.GetY()
-        x = self.driver_stick.GetX() * 0.7
+        y = self.drive_stick.GetY()
+        x = self.drive_stick.GetX() * 0.7
         
         # By default, enable smoother turning
-        if not self.driver_stick.GetTop():
+        if not self.drive_stick.GetTop():
             
             if x >= 0.0:
                 x = x * x
@@ -77,6 +80,9 @@ class MyRobot(wpilib.SimpleRobot):
         self.drive.ArcadeDrive(y, x, False)
             
     def Autonomous(self):
+    
+        print("MyRobot::Autonomous()")
+    
         self.GetWatchdog().SetEnabled(False)
         
         # determine which position we want the arm to go to..
@@ -95,8 +101,11 @@ class MyRobot(wpilib.SimpleRobot):
             wpilib.Wait(0.04)
 
     def OperatorControl(self):
+    
+        print("MyRobot::OperatorControl()")
+        
         dog = self.GetWatchdog()
-        dog.SetEnabled(True)
+        dog.SetEnabled(False)
         dog.SetExpiration(0.25)
 
         while self.IsOperatorControl() and self.IsEnabled():
@@ -109,8 +118,9 @@ class MyRobot(wpilib.SimpleRobot):
             #############
             
             # Arm Height
-            for k,v in arm.arm_height_map:
-                if self.ds.GetDigitalIn(k):
+            for k,v in arm.arm_height_map.items():
+                # inputs are inverted
+                if not self.ds.GetDigitalIn(k):
                     self.arm.set_vertical_position(v)
             
             # Manual Arm Control
@@ -149,5 +159,9 @@ class MyRobot(wpilib.SimpleRobot):
             wpilib.Wait(0.04)
 
 def run():
+
+    import rpdb2
+    rpdb2.start_embedded_debugger()
+
     robot = MyRobot()
     robot.StartCompetition()

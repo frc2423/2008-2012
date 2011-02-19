@@ -1,12 +1,12 @@
 import wpilib
 
 # The vertical positions for the arm
-ARM_1 = 1       # topmost
-ARM_2 = 2       # next topmost..
-ARM_3 = 3
-ARM_4 = 4
-ARM_5 = 5
-ARM_6 = 6
+ARM_1 = .1       #   2
+ARM_2 = .2       # 1
+ARM_3 = .3       #   4
+ARM_4 = .4       # 3
+ARM_5 = .5       #   6
+ARM_6 = .6       # 5
 
 ARM_TOLERANCE = 45
 ARM_POSITION_MIN = -5000
@@ -23,22 +23,20 @@ TUBE_STATE_OFF = 3
 # key:   digital/output input port
 # value: arm position
 arm_height_map = {
-    1: ARM_1,       # topmost
-    2: ARM_2,       # next topmost.. 
-    3: ARM_3,
-    4: ARM_4,
-    5: ARM_5,
-    6: ARM_6
+    3: ARM_1,       #   2 
+    6: ARM_2,       # 1
+    2: ARM_3,       #   4
+    5: ARM_4,       # 3
+    1: ARM_5,       #   6
+    4: ARM_6        # 5
 }
 
 class Arm(object):
     
     def __init__(self):
         '''Constructor'''
-        self.vertical_motor = wpilib.CANJaguar()
+        self.vertical_motor = wpilib.CANJaguar(10)
         self.scooper_motor = wpilib.Relay(1)
-        self.thump_motor = wpilib.CANJaguar()
-        self.thump_button = wpilib.DigitalInput(1)
         
         # configure the vertical motor to be in the correct mode and such
         self.vertical_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_QuadEncoder )
@@ -75,11 +73,11 @@ class Arm(object):
     def arm_is_in_position(self):
         '''Check if placement of arm is correct'''
         
-        if self.vertical_motor_value is not None:
+        if self.vertical_motor_position is not None:
             # automated mode
             position = self.vertical_motor.GetPosition()
             
-            if position <= self.vertical_motor_value + ARM_TOLERANCE and position >= self.vertical_motor_value - ARM_TOLERANCE:
+            if position <= self.vertical_motor_position + ARM_TOLERANCE and position >= self.vertical_motor_position - ARM_TOLERANCE:
                 return True
             else:
                 return False
@@ -98,6 +96,14 @@ class Arm(object):
     def retrieve_tube(self):
         '''Pick up the tube'''
         self.tube_state = TUBE_STATE_RETRIEVE
+        
+        
+    def set_jaguar_control_mode(self, mode):
+        '''Sets the control mode for the Jaguar'''
+    
+        if self.vertical_motor.GetControlMode() != mode:
+            self.vertical_motor.ChangeControlMode(mode)
+            self.vertical_motor.EnableControl()
         
     def set_arm_indicators(self, ds):
         '''Controls the arm-related LED indicators on the driver station
@@ -121,7 +127,7 @@ class Arm(object):
             on_off = self.blinky or self.arm_is_in_position()
             
             # Use the arm map to map buttons/lights to arm positions
-            for k,v in arm_height_map:
+            for k,v in arm_height_map.items():
                 if self.vertical_motor_position == v:
                     lights[k-1] = on_off
                 
@@ -148,18 +154,11 @@ class Arm(object):
         # Make sure to turn the scooper off each time so it doesn't run continuously
         self.tube_state = TUBE_STATE_OFF
         
-        # Make the thump motor deploy the arm
-        if self.thump_button.Get():
-            self.thump_motor.Set(1)
-        else:
-            self.thump_motor.Set(0)
-        
         if self.manual_mode:
             # If it is in Manual mode, and...
             
             # If the Jaguar is not in the correct control mode, set the output mode
-            if self.vertical_motor.GetControlMode() != wpilib.CANJaguar.kPercentVbus:
-                self.vertical_motor.SetControlMode(wpilib.CANJaguar.kPercentVbus)
+            self.set_jaguar_control_mode( wpilib.CANJaguar.kPercentVbus )
             
             # Set motor value and turn off Manual Mode and automatic mode
             self.vertical_motor.Set(self.vertical_motor_value)
@@ -173,8 +172,7 @@ class Arm(object):
         elif self.automatic_mode:
                 
             # If the Jaguar is not in the correct control mode, set the output mode
-            if self.vertical_motor.GetControlMode() != wpilib.CANJaguar.kPosition:
-                self.vertical_motor.SetControlMode(wpilib.CANJaguar.kPosition)
+            self.set_jaguar_control_mode( wpilib.CANJaguar.kPosition )
             
             # Set motor value               
             self.vertical_motor.Set(self.vertical_motor_position)
@@ -183,9 +181,9 @@ class Arm(object):
             self.manual_mode = False
             self.automatic_mode = False
                     
-        else:
-            # If the Jaguar is in manual mode, turn the motor off
-            if self.vertical_motor.GetControlMode() == wpilib.CANJaguar.kPercentVbus:
-                self.vertical_motor.Set(0)
+        elif self.vertical_motor_position == None:
+        
+            # If the Jaguar was previously in manual mode, turn the motor off
+            self.vertical_motor.Set(0)
                     
                     

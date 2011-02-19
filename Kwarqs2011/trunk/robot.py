@@ -39,8 +39,8 @@ class MyRobot(wpilib.SimpleRobot):
         print("MyRobot::__init__()")
     
         # drive motors
-        self.l_motor = wpilib.CANJaguar( 24 )
-        self.r_motor = wpilib.CANJaguar( 23 )
+        self.l_motor = wpilib.CANJaguar( 23 )
+        self.r_motor = wpilib.CANJaguar( 24 )
  
         self.drive = wpilib.RobotDrive(self.l_motor, self.r_motor)
         
@@ -160,8 +160,8 @@ class MyRobot(wpilib.SimpleRobot):
 
 def run():
 
-    import rpdb2
-    rpdb2.start_embedded_debugger()
+    #import rpdb2
+    #rpdb2.start_embedded_debugger()
 
     robot = MyRobot()
     robot.StartCompetition()

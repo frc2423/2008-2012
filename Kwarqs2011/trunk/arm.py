@@ -1,4 +1,5 @@
 import wpilib
+from util import *
 
 # The vertical positions for the arm
 ARM_1 = .1       #   2
@@ -11,7 +12,9 @@ ARM_6 = .6       # 5
 ARM_TOLERANCE = 45
 ARM_POSITION_MIN = -5000
 ARM_POSITION_MAX = 5000
-ENCODER_TURNS_PER_REVOLUTION = 1024
+ENCODER_TURNS_PER_REVOLUTION = 360
+
+CALIBRATION_DOWN_TIME = 1
 
 BLINKY_TIME = 0.15
 
@@ -41,15 +44,20 @@ class Arm(object):
         # configure the vertical motor to be in the correct mode and such
         self.vertical_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_QuadEncoder )
         self.vertical_motor.ConfigEncoderCodesPerRev( ENCODER_TURNS_PER_REVOLUTION )
-        self.vertical_motor.ConfigSoftPositionLimits( ARM_POSITION_MIN, ARM_POSITION_MAX )
+        #self.vertical_motor.ConfigSoftPositionLimits( ARM_POSITION_MIN, ARM_POSITION_MAX )
         
         self.manual_mode = False
         self.automatic_mode = False
+        self.calibration_mode = True
+        
+        self.calibration_timer = None
         
         # For the blinkies
         self.timer = wpilib.Timer()
         self.timer.Start()
         self.blinky = True
+        
+        self.encoder_print = SometimesPrint()
         
         # Manual motor value of vertical motor
         self.vertical_motor_value = None
@@ -154,6 +162,23 @@ class Arm(object):
         # Make sure to turn the scooper off each time so it doesn't run continuously
         self.tube_state = TUBE_STATE_OFF
         
+        self.encoder_print.print( "Arm: C: %s encoder value: %f" % (self.calibration_mode, self.vertical_motor.GetPosition()) )
+        
+        
+        # if we're in calibration mode, take any opportunity that we have
+        # to detect that we've reached a calibration point
+        if self.calibration_mode:
+            
+            # once we've reached a spot, then calibration mode is done
+            if self.vertical_motor.GetReverseLimitOK():
+                # we've reached the bottom
+                self.calibration_mode = False
+                
+            elif self.vertical_motor.GetForwardLimitOK():
+                # we've reached the top
+                self.calibration_mode = False
+        
+        
         if self.manual_mode:
             # If it is in Manual mode, and...
             
@@ -169,6 +194,22 @@ class Arm(object):
             self.automatic_mode = False
             self.vertical_motor_position = None
             
+        elif self.calibration_mode and self.automatic_mode:
+            
+            # Calibration mode is special -- only run this the first time that
+            # we go into automatic mode
+            
+            if self.calibration_timer is None:
+                self.calibration_timer = wpilib.Timer()
+                self.calibration_timer.Start()
+                
+            if self.calibration_timer.HasPeriodPassed( CALIBRATION_DOWN_TIME ):
+                # go back up
+                self.vertical_motor.Set( 1.0 )
+            else:
+                # go down
+                self.vertical_motor.Set( -1.0 )
+                
         elif self.automatic_mode:
                 
             # If the Jaguar is not in the correct control mode, set the output mode

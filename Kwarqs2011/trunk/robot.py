@@ -16,6 +16,7 @@ Driver controls:
             
         Current implementation:
             - Holding trigger lets Y do manual arm movement
+            - Top button does a 'hold'
             - 6 does deployment
             - 7 does retrieval
             
@@ -41,6 +42,10 @@ class MyRobot(wpilib.SimpleRobot):
         # drive motors
         self.l_motor = wpilib.CANJaguar( 23 )
         self.r_motor = wpilib.CANJaguar( 24 )
+        
+        # set to coast
+        self.l_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
+        self.r_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
  
         self.drive = wpilib.RobotDrive(self.l_motor, self.r_motor)
         
@@ -85,6 +90,10 @@ class MyRobot(wpilib.SimpleRobot):
     
         self.GetWatchdog().SetEnabled(False)
         
+        # keep track of how much time has passed in autonomous mode
+        timer = wpilib.Timer()
+        timer.Start()
+        
         # determine which position we want the arm to go to..
         if self.ds.GetDigitalIn(7):
             self.arm.set_vertical_position( arm.ARM_1 )
@@ -94,8 +103,8 @@ class MyRobot(wpilib.SimpleRobot):
         while self.IsAutonomous() and self.IsEnabled():
             
             # control loops
-            self.auto.update_line_tracking(self.ds)
-            self.auto.do_control_loop(self.drive, self.arm)
+            self.auto.update_line_tracking(self.ds, timer.Get())
+            self.auto.do_control_loop(self.drive, self.arm, timer.Get())
             self.arm.do_control_loop()
             
             wpilib.Wait(0.04)
@@ -107,6 +116,8 @@ class MyRobot(wpilib.SimpleRobot):
         dog = self.GetWatchdog()
         dog.SetEnabled(False)
         dog.SetExpiration(0.25)
+        
+        holding = False
 
         while self.IsOperatorControl() and self.IsEnabled():
         
@@ -118,7 +129,7 @@ class MyRobot(wpilib.SimpleRobot):
             #############
             
             # Arm Height
-            for k,v in arm.arm_height_map.items():
+            for k,v in arm.arm_position_map.items():
                 # inputs are inverted
                 if not self.ds.GetDigitalIn(k):
                     self.arm.set_vertical_position(v)
@@ -126,8 +137,21 @@ class MyRobot(wpilib.SimpleRobot):
             # Manual Arm Control
             arm_y = self.arm_stick.GetY()
             
-            if self.arm_stick.GetTrigger():
-                self.arm.manual_vertical_control(arm_y)
+            arm_trigger = self.arm_stick.GetTrigger()
+            
+            # make sure that if you press the hold button while holding
+            # the trigger (manual arm mode), then you should not allow
+            # manual control until you let go of the trigger again
+            if not holding:
+                if arm_trigger:
+                    self.arm.manual_vertical_control(self.arm_stick.GetY())
+            else:
+                if arm_trigger == False:
+                    holding = False
+            
+            if self.arm_stick.GetTop():
+                self.arm.set_hold_position()
+                holding = True
                 
             # Tube Deployment
             if self.arm_stick.GetRawButton(6):
@@ -141,11 +165,11 @@ class MyRobot(wpilib.SimpleRobot):
             #################
             
             # update line tracking state first (always)
-            self.auto.update_line_tracking(self.ds)
+            self.auto.update_line_tracking(self.ds, None)
             
             if self.drive_stick.GetTrigger():
                 # Automated Placement
-                self.auto.do_control_loop(self.drive, self.arm)
+                self.auto.do_control_loop(self.drive, self.arm, None)
                 
             else:
                 # Driver Control

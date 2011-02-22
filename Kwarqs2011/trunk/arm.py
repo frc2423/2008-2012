@@ -63,7 +63,6 @@ class Arm(object):
         
         # For the blinkies
         self.timer = wpilib.Timer()
-        self.timer.Start()
         self.blinky = True
         
         self.encoder_print = PrintTimer()
@@ -124,7 +123,7 @@ class Arm(object):
         self.tube_state = TUBE_STATE_RETRIEVE
         
         
-    def set_jaguar_control_mode(self, mode):
+    def _set_jaguar_control_mode(self, mode):
         '''Sets the control mode for the Jaguar'''
     
         if self.vertical_motor.GetControlMode() != mode:
@@ -246,7 +245,7 @@ class Arm(object):
             print("In hold state")
         
             # Set the correct output mode
-            self.set_jaguar_control_mode( wpilib.CANJaguar.kPosition )
+            self._set_jaguar_control_mode( wpilib.CANJaguar.kPosition )
         
             # reset our state
             self._reset_state()
@@ -254,7 +253,7 @@ class Arm(object):
         elif self.manual_set:
             
             # If the Jaguar is not in the correct control mode, set the output mode
-            self.set_jaguar_control_mode( wpilib.CANJaguar.kPercentVbus )
+            self._set_jaguar_control_mode( wpilib.CANJaguar.kPercentVbus )
             
             # Set motor value and turn off Manual Mode and automatic mode
             motor_value = self.manual_value
@@ -273,7 +272,7 @@ class Arm(object):
                 self.calibration_timer.Start()
                 
             # enforce the motor mode
-            self.set_jaguar_control_mode( wpilib.CANJaguar.kPercentVbus )
+            self._set_jaguar_control_mode( wpilib.CANJaguar.kPercentVbus )
                 
             if self.calibration_timer.Get() >= CALIBRATION_DOWN_TIME:
                 # go back up
@@ -287,7 +286,7 @@ class Arm(object):
             print("In position set")
                 
             # Set the correct output mode
-            self.set_jaguar_control_mode( wpilib.CANJaguar.kPosition )
+            self._set_jaguar_control_mode( wpilib.CANJaguar.kPosition )
             
             # Set the position to hold at        
             self.hold_position = arm_height[ self.position_set_value ]

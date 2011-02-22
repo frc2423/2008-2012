@@ -95,10 +95,7 @@ class MyRobot(wpilib.SimpleRobot):
         timer.Start()
         
         # determine which position we want the arm to go to..
-        if self.ds.GetDigitalIn(7):
-            self.arm.set_vertical_position( arm.ARM_1 )
-        else:
-            self.arm.set_vertical_position( arm.ARM_2 )
+        #self.arm.set_vertical_position( 3 )
         
         while self.IsAutonomous() and self.IsEnabled():
             

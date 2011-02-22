@@ -173,10 +173,15 @@ class Auto(object):
         arm_in_position = True
         
         # autonomous mode: get out of dodge if time expires!
-        if autonomous_time > 12.0
-            arm.deploy_tube()
-            drive.ArcadeDrive( 0, 0.3, False )
+        if autonomous_time is not None and autonomous_time > 12.0:
+            if autonomous_time < 16:
+                arm.deploy_tube()
+                drive.ArcadeDrive( 0.3, 0, False )
+            else:
+                drive.ArcadeDrive( 0, 0, False )
+                
             return
+            
         
         # Is arm at height?
         if True:

@@ -75,6 +75,7 @@ class Arm(object):
         # Position (1-6) we want the arm to be in
         self.position_set_value = None
         
+        self.manual_value = None
         self.hold_position = None
         
         self.tube_state = TUBE_STATE_OFF
@@ -136,7 +137,7 @@ class Arm(object):
                 self.vertical_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_QuadEncoder )
                 self.vertical_motor.SetPID( ARM_P, ARM_I, ARM_D )
         
-            self.vertical_motor.EnableControl()
+                self.vertical_motor.EnableControl()
         
     def set_arm_indicators(self, ds):
         '''Controls the arm-related LED indicators on the driver station

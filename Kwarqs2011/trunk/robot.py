@@ -62,6 +62,9 @@ class MyRobot(wpilib.SimpleRobot):
             raise RuntimeError("Restart")
 
     def Disabled(self):
+    
+        # TODO: Set arm positions here? 
+    
         print("MyRobot::Disabled()")
         while self.IsDisabled():
             self.CheckRestart()
@@ -94,7 +97,8 @@ class MyRobot(wpilib.SimpleRobot):
         timer = wpilib.Timer()
         timer.Start()
         
-        # determine which position we want the arm to go to..
+        # determine which position we want the arm to go to.. sets
+        # the thump position automatically
         #self.arm.set_vertical_position( 3 )
         
         while self.IsAutonomous() and self.IsEnabled():
@@ -125,7 +129,7 @@ class MyRobot(wpilib.SimpleRobot):
             # Decisions #
             #############
             
-            # Arm Height
+            # Automated arm height
             for k,v in arm.arm_position_map.items():
                 # inputs are inverted
                 if not self.ds.GetDigitalIn(k):
@@ -156,6 +160,11 @@ class MyRobot(wpilib.SimpleRobot):
             elif self.arm_stick.GetRawButton(7):
                 self.arm.retrieve_tube()
             
+            # Thump motor position
+            # TODO: This is non-optimal. We really want the position set
+            # automatically if the user hits a button -- particularly for
+            # one of the top sections. How do we do that intuitively?
+            self.arm.set_thump_position( (self.arm_stick.GetZ() + 1.0) / 2.0 )
             
             #################
             # Control Loops #
@@ -177,7 +186,7 @@ class MyRobot(wpilib.SimpleRobot):
             
             
             
-            wpilib.Wait(0.04)
+            wpilib.Wait(0.05)
 
 def run():
 

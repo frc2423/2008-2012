@@ -1,0 +1,16 @@
+
+1. Mount arm tasks:
+    - Replace encoder on pulley
+        - Test to see that the encoder values are consistent
+    
+    - Ensure that arm can be elevated & controlled properly
+        - Ensure elevating code works properly
+        - Check switching between manual and automatic mode
+
+2. General tasks:
+    - Calibrate light sensors on field
+    
+3. Autonomous tasks:
+    - Simulate a full autonomous mode in the pit
+        - In particular, see if the arm positioning does
+        the right thing if you get too close

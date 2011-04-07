@@ -10,7 +10,6 @@
     error that could have been prevented.. 
 '''
 
-import msvcrt
 
 # state variables
 disabled = True
@@ -117,6 +116,15 @@ class OperatorStateMachine(object):
             # we put something nasty in there
             pass
             
+        elif self.loop == 21:
+            # set the thump motor position
+            self.robot.arm_stick.buttons[9] = True
+            self.robot.arm_stick.z = 1.0
+            
+        elif self.loop == 22:
+            # disable thump motor positioning
+            self.robot.arm_stick.buttons[9] = False
+            
         else:
             ret = False
         
@@ -164,10 +172,6 @@ if __name__ == '__main__':
     from fake_wpilib import global_time
     print("Fake time passed: %f" % global_time )
     
-    # and we're done... wait for the user to press a key, in case
-    # they run it by double clicking it
-    print()
-    print("Press any key to continue")
-    msvcrt.getch()
+
     
     

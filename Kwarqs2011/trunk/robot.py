@@ -22,6 +22,7 @@ Driver controls:
             
             - 4 & 8 - thump motor down
             - 5 & 9 - thump motor up
+            - 10 - Set thump motor position using Z
             
     Driver station:
         - Inputs 1-6 set vertical position
@@ -63,11 +64,7 @@ class MyRobot(wpilib.SimpleRobot):
         self.arm_stick = wpilib.Joystick(2)
         self.ds = wpilib.DriverStation.GetInstance()
         self.auto = auto.Auto()
-        
-        
-    def CheckRestart(self):
-        if self.drive_stick.GetRawButton(10):
-            raise RuntimeError("Restart")
+
 
     def Disabled(self):
     
@@ -75,7 +72,6 @@ class MyRobot(wpilib.SimpleRobot):
     
         print("MyRobot::Disabled()")
         while self.IsDisabled():
-            self.CheckRestart()
             wpilib.Wait(0.01)
 
     def drive_robot_with_joystick(self):
@@ -131,7 +127,6 @@ class MyRobot(wpilib.SimpleRobot):
         while self.IsOperatorControl() and self.IsEnabled():
         
             dog.Feed()
-            self.CheckRestart()
             
             #############
             # Decisions #
@@ -168,16 +163,16 @@ class MyRobot(wpilib.SimpleRobot):
             elif self.arm_stick.GetRawButton(7):
                 self.arm.retrieve_tube()
             
-            # Thump motor position
-            # TODO: This is non-optimal. We really want the position set
-            # automatically if the user hits a button -- particularly for
-            # one of the top sections. How do we do that intuitively?
-            #self.arm.set_thump_position( (self.arm_stick.GetZ() + 1.0) / 2.0 )
+            # Thump motor positioning
             
             if self.arm_stick.GetRawButton(4) or self.arm_stick.GetRawButton(8):
                 self.arm.manual_thump_control( 1.0 )
+                
             elif self.arm_stick.GetRawButton(5) or self.arm_stick.GetRawButton(9):
                 self.arm.manual_thump_control( -1.0 )
+                
+            elif self.arm_stick.GetRawButton(10):
+                self.arm.set_thump_position( (self.arm_stick.GetZ() + 1.0) / 2.0 )
             
             #################
             # Control Loops #
@@ -196,8 +191,6 @@ class MyRobot(wpilib.SimpleRobot):
             
             self.arm.do_control_loop()
             self.arm.set_arm_indicators(self.ds)
-            
-            
             
             wpilib.Wait(0.05)
 

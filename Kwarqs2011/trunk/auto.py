@@ -173,12 +173,12 @@ class Auto(object):
     def do_control_loop(self, drive, arm, autonomous_time):
         '''Implements automated tube placement'''
         
-        #arm_in_position = arm.arm_is_in_position()
-        arm_in_position = True
+        arm_in_position = arm.arm_is_in_position()
         
         # autonomous mode: get out of dodge if time expires!
         if autonomous_time is not None and autonomous_time > 12.0:
             if autonomous_time < 16:
+                self.arm.manual_thump_control( 0.0 )
                 arm.deploy_tube()
                 drive.ArcadeDrive( 0.3, 0, False )
             else:
@@ -188,7 +188,7 @@ class Auto(object):
             
         
         # Is arm at height?
-        if True:
+        if arm_in_position:
             
             # Yes! -> In deploy range?
             if self.ultrasonic.IsRangeValid() and self.ultrasonic.GetRangeInches() <= LT_DEPLOY_RANGE:
@@ -200,6 +200,7 @@ class Auto(object):
                     drive.ArcadeDrive(0, 0, False)
                 
                     # Yes! -> Deploy tube
+                    self.arm.manual_thump_control( 0.0 )
                     arm.deploy_tube()
                     
                 # No! -> Line tracking

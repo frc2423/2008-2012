@@ -68,6 +68,8 @@ class OperatorStateMachine(object):
         ret = True
         print("[osm]: loop %d" % self.loop)
         
+        self.robot.drive_stick.buttons[9] = True
+        
         if self.loop == 1:
             # simulate making the arm go up
             self.robot.arm_stick.buttons[0] = True
@@ -112,6 +114,7 @@ class OperatorStateMachine(object):
             self.robot.arm_stick.buttons[6] = False
             
         elif self.loop <= 20:
+            
             # cause the first set of print statements to happen, in case 
             # we put something nasty in there
             pass

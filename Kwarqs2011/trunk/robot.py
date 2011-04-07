@@ -38,6 +38,7 @@ except:
 
 import arm
 import auto
+import util
 
 robot = None
 
@@ -102,15 +103,31 @@ class MyRobot(wpilib.SimpleRobot):
         timer.Start()
         
         # determine which position we want the arm to go to..
-        self.arm.set_vertical_position( 3 )
-        self.arm.set_thump_position( .5 )
+        self.arm.set_vertical_position( 4 )
+        #self.arm.set_thump_position( .46 )
+        self.arm.set_thump_position( 0.08 )
         
         while self.IsAutonomous() and self.IsEnabled():
             
             # control loops
-            self.auto.update_line_tracking(self.ds, timer.Get())
-            self.auto.do_control_loop(self.drive, self.arm, timer.Get())
-            self.arm.do_control_loop()
+            
+            try:
+                self.auto.update_line_tracking(self.ds, timer.Get())
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
+
+            try:
+                self.auto.do_control_loop(self.drive, self.arm, timer.Get())
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
+                
+            try:
+                self.arm.do_control_loop()
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
             
             wpilib.Wait(0.04)
 
@@ -123,6 +140,7 @@ class MyRobot(wpilib.SimpleRobot):
         dog.SetExpiration(0.25)
         
         holding = False
+        print_timer = util.PrintTimer()
 
         while self.IsOperatorControl() and self.IsEnabled():
         
@@ -133,10 +151,14 @@ class MyRobot(wpilib.SimpleRobot):
             #############
             
             # Automated arm height
-            for k,v in arm.arm_position_map.items():
-                # inputs are inverted
-                if not self.ds.GetDigitalIn(k):
-                    self.arm.set_vertical_position(v)
+            try:
+                for k,v in arm.arm_position_map.items():
+                    # inputs are inverted
+                    if not self.ds.GetDigitalIn(k):
+                        self.arm.set_vertical_position(v)
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
             
             # Manual Arm Control
             arm_y = self.arm_stick.GetY()
@@ -146,51 +168,85 @@ class MyRobot(wpilib.SimpleRobot):
             # make sure that if you press the hold button while holding
             # the trigger (manual arm mode), then you should not allow
             # manual control until you let go of the trigger again
-            if not holding:
-                if arm_trigger:
-                    self.arm.manual_vertical_control(self.arm_stick.GetY())
-            else:
-                if arm_trigger == False:
-                    holding = False
+            try:
+                if not holding:
+                    if arm_trigger:
+                        self.arm.manual_vertical_control(self.arm_stick.GetY())
+                else:
+                    if arm_trigger == False:
+                        holding = False
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
             
-            if self.arm_stick.GetTop():
-                self.arm.set_hold_position()
-                holding = True
+            try:
+                if self.arm_stick.GetTop():
+                    self.arm.set_hold_position()
+                    holding = True
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
                 
             # Tube Deployment
-            if self.arm_stick.GetRawButton(6):
-                self.arm.deploy_tube()
-            elif self.arm_stick.GetRawButton(7):
-                self.arm.retrieve_tube()
+            try:
+                if self.arm_stick.GetRawButton(6):
+                    self.arm.deploy_tube()
+                elif self.arm_stick.GetRawButton(7):
+                    self.arm.retrieve_tube()
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
             
             # Thump motor positioning
-            
-            if self.arm_stick.GetRawButton(4) or self.arm_stick.GetRawButton(8):
-                self.arm.manual_thump_control( 1.0 )
-                
-            elif self.arm_stick.GetRawButton(5) or self.arm_stick.GetRawButton(9):
-                self.arm.manual_thump_control( -1.0 )
-                
-            elif self.arm_stick.GetRawButton(10):
-                self.arm.set_thump_position( (self.arm_stick.GetZ() + 1.0) / 2.0 )
+            try:
+                if self.arm_stick.GetRawButton(4) or self.arm_stick.GetRawButton(8):
+                    self.arm.manual_thump_control( -1.0 )
+                    
+                elif self.arm_stick.GetRawButton(5) or self.arm_stick.GetRawButton(9):
+                    self.arm.manual_thump_control( 1.0 )
+                    
+                elif self.arm_stick.GetRawButton(10):
+                    self.arm.set_thump_position( (self.arm_stick.GetZ() + 1.0) / 2.0 )
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
+                    
+            try:
+                if self.drive_stick.GetRawButton(10) and print_timer.should_print():
+                    self.arm.print_diagnostics()
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
             
             #################
             # Control Loops #
             #################
             
             # update line tracking state first (always)
-            self.auto.update_line_tracking(self.ds, None)
+            try:
+                self.auto.update_line_tracking(self.ds, None)
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
             
-            if self.drive_stick.GetTrigger():
-                # Automated Placement
-                self.auto.do_control_loop(self.drive, self.arm, None)
-                
-            else:
+            try:
                 # Driver Control
                 self.drive_robot_with_joystick()
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
             
-            self.arm.do_control_loop()
-            self.arm.set_arm_indicators(self.ds)
+            try:
+                self.arm.do_control_loop()
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
+                
+            try:
+                self.arm.set_arm_indicators(self.ds)
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
             
             wpilib.Wait(0.05)
 

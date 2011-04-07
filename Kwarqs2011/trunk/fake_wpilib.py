@@ -108,7 +108,10 @@ class DriverStation(object):
     
     def GetDigitalIn(self, number):
         return self.digital_in[number-1]
-        
+    
+    def IsFMSAttached(self):
+        return False
+    
     def SetDigitalOut(self, number, value):
         pass
         

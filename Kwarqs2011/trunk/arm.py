@@ -20,13 +20,27 @@ except:
 from util import *
 
 # The vertical positions for the arm, relative to the bottom!
-ARM_TOP = 8.00
-ARM_1 = 8.00       #   2
-ARM_2 = 8.00       # 1
-ARM_3 = 6.26       #   4
-ARM_4 = 6.10       # 3
-ARM_5 = 3.53       #   6
-ARM_6 = 2.88       # 5
+ARM_TOP = 18.4
+ARM_1 = 19.0        #   2
+ARM_2 = 19.0        # 1
+ARM_3 = 17.1        #   4
+ARM_4 = 19.0        # 3
+ARM_5 = 9.0        #   6
+ARM_6 = 11.2         # 5
+
+'''
+    bottom = .1722, .204, .22, .151, .206
+    first = 9.08, 9.31
+    next = 17.30, 17.02  
+    top = 18.63, 18.60
+
+    bottom = .26, .21, .14
+    first = 11.41
+    next = 18.62
+    top = 18.62
+'''
+
+
 
 # the thump positions for the arm, matches the ARM_X positions 
 # as shown above
@@ -40,21 +54,22 @@ THUMP_6 = .35
 # these are relative to the bottom!
 arm_offsets = [ ARM_1, ARM_2, ARM_3, ARM_4, ARM_5, ARM_6 ]
 arm_height = []
+bottom_position = None
 
 thumps = [ THUMP_1, THUMP_2, THUMP_3, THUMP_4, THUMP_5, THUMP_6 ]
 
 # PID constants
-ARM_P = 0.95
+ARM_P = 1500.0
 ARM_I = 0.0
 ARM_D = 0.0
 
 # Thump motor PID constants
-THUMP_P = 1500
-THUMP_I = 0.5
+THUMP_P = 1500.0
+THUMP_I = 0.0
 THUMP_D = 0.0
 
-THUMP_MIN_POSITION = .5
-THUMP_MAX_POSITION = .82
+THUMP_MIN_POSITION = .40
+THUMP_MAX_POSITION = .65
 
 
 ARM_TOLERANCE = .2
@@ -90,10 +105,14 @@ class Arm(object):
         # configure the thump motor 
         self.thump_motor = wpilib.CANJaguar(11)
         self.thump_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Brake )
+        self.thump_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_Potentiometer )
+        self.thump_motor.ConfigPotentiometerTurns( 1 )
         self.thump_motor.current_mode = wpilib.CANJaguar.kPercentVbus
         
         # configure the vertical motor
         self.vertical_motor = wpilib.CANJaguar(10)
+        self.vertical_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_QuadEncoder )
+        self.vertical_motor.ConfigEncoderCodesPerRev( ENCODER_TURNS_PER_REVOLUTION )
         self.vertical_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Brake )
         self.vertical_motor.current_mode = wpilib.CANJaguar.kPercentVbus
         
@@ -209,8 +228,8 @@ class Arm(object):
         
             if mode == wpilib.CANJaguar.kPosition:
                 
-                self.vertical_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_QuadEncoder )
                 self.vertical_motor.ConfigEncoderCodesPerRev( ENCODER_TURNS_PER_REVOLUTION )
+                self.vertical_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_QuadEncoder )
                 self.vertical_motor.SetPID( ARM_P, ARM_I, ARM_D )
                 self.vertical_motor.EnableControl( self.vertical_motor.GetPosition() )
                 
@@ -292,7 +311,7 @@ class Arm(object):
     def _do_calibration(self):
         '''This routine only gets called when we're doing calibration'''
         
-        bottom_position = None
+        global bottom_position
         
         # once we've reached a spot, then calibration mode is done
         if not self.vertical_motor.GetReverseLimitOK():
@@ -319,8 +338,41 @@ class Arm(object):
     def _translate_thump(self, z):
     
         # Xmax - (Ymax - Y)( (Xmax - Xmin) / (Ymax - Ymin) )
-        return THUMP_MAX_POSITION - ((1 - z)*( (THUMP_MAX_POSITION - THUMP_MIN_POSITION) / (1-0) ) )
+        value = THUMP_MAX_POSITION - ((1 - z)*( (THUMP_MAX_POSITION - THUMP_MIN_POSITION) / (1-0) ) )
         
+        if value > THUMP_MAX_POSITION:
+            return THUMP_MAX_POSITION
+        elif value < THUMP_MIN_POSITION:
+            return THUMP_MIN_POSITION
+        return value
+        
+        
+    def print_diagnostics(self):
+    
+        print( "*** ARM DIAGS ***" )
+    
+        print( "Vertical : Mode: %d; encoder value: %f; Set: %f; In position: %s" % ( \
+                int(self.vertical_motor.GetControlMode()), 
+                self.vertical_motor.GetPosition(),
+                self.vertical_motor.Get(),
+                str(self.arm_is_in_position()) ))
+                                
+        print( "Sets     : cal: %s; pos: %s; man: %s(%s); hold: %s (%s)" % (\
+                str(self.calibration_mode),
+                str(self.position_set),
+                str(self.manual_set),
+                str(self.manual_value),
+                str(self.hold_set),
+                str(self.hold_position) ))
+            
+        print( 'Thump    : %f; Set: %f; Input: %s' % ( \
+                self.thump_motor.GetPosition(),
+                self.thump_motor.Get(),
+                str(self.thump_position)))
+        
+        print( 'Bottom   : %s' % str( bottom_position ) )
+        print( 'Offsets  : %s' % ' '.join( [ str(i) for i in arm_offsets] ) )
+        print( 'Heights  : %s' % ' '.join( [ str(i) for i in arm_height] ) )
         
     def do_control_loop(self):
         '''This control function makes sure all the motors are doing 
@@ -336,19 +388,6 @@ class Arm(object):
         
         # Make sure to turn the scooper off each time so it doesn't run continuously
         self.tube_state = TUBE_STATE_OFF
-        
-        
-        #TODO: Turn this off in competition, or log it (both?)
-        if self.encoder_print.should_print():
-            print( "Vertical: C: %s; mode: %d; encoder value: %f" % ( \
-                    self.calibration_mode, 
-                    int(self.vertical_motor.GetControlMode()), 
-                    self.vertical_motor.GetPosition()) )
-            print( "Thump: %f; Current: %f; Voltage: %f; Set: %f" % ( \
-                    self.thump_motor.GetPosition(),
-                    self.thump_motor.GetOutputCurrent(),
-                    self.thump_motor.GetOutputVoltage(),
-                    self.thump_motor.Get() ))
         
         
         # if we're in calibration mode, take any opportunity that we have
@@ -367,6 +406,8 @@ class Arm(object):
             # Set the correct output mode
             self._set_vertical_control_mode( wpilib.CANJaguar.kPosition )
         
+            self.hold_position = self.vertical_motor.GetPosition()
+        
             # reset our state
             self._reset_state()
         
@@ -380,6 +421,7 @@ class Arm(object):
             
             # reset our state
             self._reset_state(reset_manual=False)
+            self.hold_position = None
             
             
         elif self.calibration_mode and self.position_set:
@@ -400,6 +442,8 @@ class Arm(object):
             else:
                 # go down
                 motor_value = -1.0
+                
+            self.hold_position = None
                 
         elif self.position_set:
         

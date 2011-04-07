@@ -30,10 +30,15 @@ Driver controls:
         - Output 7 indicates line tracking (LED)
 '''
 
-import wpilib
+try:
+    import wpilib
+except:
+    import fake_wpilib as wpilib
+
 import arm
 import auto
 
+robot = None
 
 
 class MyRobot(wpilib.SimpleRobot):
@@ -100,9 +105,9 @@ class MyRobot(wpilib.SimpleRobot):
         timer = wpilib.Timer()
         timer.Start()
         
-        # determine which position we want the arm to go to.. sets
-        # the thump position automatically
-        #self.arm.set_vertical_position( 3 )
+        # determine which position we want the arm to go to..
+        self.arm.set_vertical_position( 3 )
+        self.arm.set_thump_position( .5 )
         
         while self.IsAutonomous() and self.IsEnabled():
             
@@ -167,7 +172,12 @@ class MyRobot(wpilib.SimpleRobot):
             # TODO: This is non-optimal. We really want the position set
             # automatically if the user hits a button -- particularly for
             # one of the top sections. How do we do that intuitively?
-            self.arm.set_thump_position( (self.arm_stick.GetZ() + 1.0) / 2.0 )
+            #self.arm.set_thump_position( (self.arm_stick.GetZ() + 1.0) / 2.0 )
+            
+            if self.arm_stick.GetRawButton(4) or self.arm_stick.GetRawButton(8):
+                self.arm.manual_thump_control( 1.0 )
+            elif self.arm_stick.GetRawButton(5) or self.arm_stick.GetRawButton(9):
+                self.arm.manual_thump_control( -1.0 )
             
             #################
             # Control Loops #
@@ -192,6 +202,9 @@ class MyRobot(wpilib.SimpleRobot):
             wpilib.Wait(0.05)
 
 def run():
+
+    # for unit tests.. 
+    global robot
 
     #import rpdb2
     #rpdb2.start_embedded_debugger()

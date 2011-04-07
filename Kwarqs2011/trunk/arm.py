@@ -12,8 +12,11 @@
     
 '''
 
+try:
+    import wpilib
+except:
+    import fake_wpilib as wpilib
 
-import wpilib
 from util import *
 
 # The vertical positions for the arm, relative to the bottom!
@@ -84,27 +87,24 @@ class Arm(object):
         
         self.scooper_motor = wpilib.Relay(1)
         
-        # configure the thump motor so its setup correctly. It will
-        # always run in automated mode.. since the potentiometer should
-        # give us reasonable values
-        self.thump_motor = wpilib.CANJaguar(11, wpilib.CANJaguar.kPosition)
-        
-        self.thump_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_Potentiometer )
-        self.thump_motor.ConfigPotentiometerTurns( 1 )
-        self.thump_motor.ConfigSoftPositionLimits( THUMP_MIN_POSITION, THUMP_MAX_POSITION )
-        self.thump_motor.SetPID( THUMP_P, THUMP_I, THUMP_D )
-
-        self.thump_motor.EnableControl()
+        # configure the thump motor 
+        self.thump_motor = wpilib.CANJaguar(11)
+        self.thump_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Brake )
+        self.thump_motor.current_mode = wpilib.CANJaguar.kPercentVbus
         
         # configure the vertical motor
         self.vertical_motor = wpilib.CANJaguar(10)
         self.vertical_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Brake )
+        self.vertical_motor.current_mode = wpilib.CANJaguar.kPercentVbus
         
         # state variables
         self.manual_set = False
         self.position_set = False
         self.hold_set = False
         self.calibration_mode = True
+        
+        self.thump_value_set = False
+        self.thump_position_set = False
         
         self.calibration_timer = None
         
@@ -127,7 +127,8 @@ class Arm(object):
         self.hold_position = None
         
         # Position (0-1.0) we want the arm to be angled
-        self.thump_position = 0.0
+        self.thump_position = None
+        self.thump_value = None
         
         self.tube_state = TUBE_STATE_OFF
     
@@ -136,8 +137,6 @@ class Arm(object):
         '''Tell the arm to go to a specific position'''
         self.position_set_value = y
         self.position_set = True
-        
-        self.set_thump_position( thumps[y] )
         
     def manual_vertical_control(self, y):
     
@@ -150,14 +149,21 @@ class Arm(object):
         self.hold_position = self.vertical_motor.GetPosition()
         self.hold_set = True
         
-    def set_thump_position(self, z):
+    def set_thump_position(self, y):
         '''Sets the position of the thump motor: 0 is all the way down, 1 is all the way up'''
-        if z > 1.0:
+        if y > 1.0:
             self.thump_position = 1.0
-        elif z < 0.0:
+        elif y < 0.0:
             self.thump_position = 0.0
         else:
-            self.thump_position = z
+            self.thump_position = y
+            
+        self.thump_position_set = True
+            
+    def manual_thump_control(self, y):
+        '''Tell the thump motor to go up or down'''
+        self.thump_value = y
+        self.thump_value_set = True
         
     def arm_is_in_position(self):
         '''Check if placement of arm is correct'''
@@ -192,9 +198,14 @@ class Arm(object):
     def _set_vertical_control_mode(self, mode):
         '''Sets the control mode for the Jaguar'''
     
-        if self.vertical_motor.GetControlMode() != mode:
+        # current_mode is a custom variable we attach to the thing to
+        # prevent us from querying the thing over CAN each time we want
+        # to do a manual movement (which is what happens when you call
+        # GetControlMode() ... )
+        if self.vertical_motor.current_mode != mode:
         
             self.vertical_motor.ChangeControlMode(mode)
+            self.vertical_motor.current_mode = mode
         
             if mode == wpilib.CANJaguar.kPosition:
                 
@@ -205,6 +216,30 @@ class Arm(object):
                 
             else:
                 self.vertical_motor.DisableControl()
+    
+                
+    def _set_thump_control_mode(self, mode):
+        '''Sets the control mode for the thump motor jaguar'''
+        
+        # current_mode is a custom variable we attach to the thing to
+        # prevent us from querying the thing over CAN each time we want
+        # to do a manual movement (which is what happens when you call
+        # GetControlMode() ... )
+        if self.thump_motor.current_mode != mode:
+        
+            self.thump_motor.ChangeControlMode(mode)
+            self.thump_motor.current_mode = mode
+        
+            if mode == wpilib.CANJaguar.kPosition:
+        
+                self.thump_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_Potentiometer )
+                self.thump_motor.ConfigPotentiometerTurns( 1 )
+                #self.thump_motor.ConfigSoftPositionLimits( THUMP_MIN_POSITION, THUMP_MAX_POSITION )
+                self.thump_motor.SetPID( THUMP_P, THUMP_I, THUMP_D )
+        
+                self.thump_motor.EnableControl()
+            else:
+                self.thump_motor.DisableControl()
     
         
     def set_arm_indicators(self, ds):
@@ -252,6 +287,7 @@ class Arm(object):
             
         if reset_automatic:
             self.position_set_value = None
+    
             
     def _do_calibration(self):
         '''This routine only gets called when we're doing calibration'''
@@ -292,17 +328,15 @@ class Arm(object):
     
         # Telling the scooper what to do
         if self.tube_state == TUBE_STATE_DEPLOY:
-            self.scooper_motor.Set(wpilib.Relay.kReverse)
-        elif self.tube_state == TUBE_STATE_RETRIEVE:
             self.scooper_motor.Set(wpilib.Relay.kForward)
+        elif self.tube_state == TUBE_STATE_RETRIEVE:
+            self.scooper_motor.Set(wpilib.Relay.kReverse)
         elif self.tube_state == TUBE_STATE_OFF:
             self.scooper_motor.Set(wpilib.Relay.kOff)
         
         # Make sure to turn the scooper off each time so it doesn't run continuously
         self.tube_state = TUBE_STATE_OFF
         
-        # thump motor control
-        self.thump_motor.Set( self._translate_thump( self.thump_position ) )
         
         #TODO: Turn this off in competition, or log it (both?)
         if self.encoder_print.should_print():
@@ -395,3 +429,32 @@ class Arm(object):
         self.vertical_motor.Set( motor_value )
                     
                     
+        # Ok, do the thump motor stuff. Same pattern
+        thump_motor_value = 0
+        
+        if self.thump_value_set:
+        
+            self._set_thump_control_mode( wpilib.CANJaguar.kPercentVbus )
+        
+            thump_motor_value = self.thump_value
+        
+            self.thump_value_set = False
+            
+            self.thump_position = None
+            self.thump_position_set = False
+        
+        elif self.thump_position_set:
+
+            # switch to positioning mode
+            self._set_thump_control_mode( wpilib.CANJaguar.kPosition )
+            
+            self.thump_value_set = False
+            self.thump_position_set = False
+        
+            
+        # thump motor control
+        if self.thump_position is not None:
+            thump_motor_value = self._translate_thump( self.thump_position )
+        
+        self.thump_motor.Set( thump_motor_value )
+        

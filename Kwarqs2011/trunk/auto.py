@@ -1,5 +1,9 @@
 
-import wpilib
+try:
+    import wpilib
+except:
+    import fake_wpilib as wpilib
+    
 from util import *
 
 # autonomous mode stuff

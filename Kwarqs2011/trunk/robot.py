@@ -20,6 +20,9 @@ Driver controls:
             - 6 does deployment
             - 7 does retrieval
             
+            - 4 & 8 - thump motor down
+            - 5 & 9 - thump motor up
+            
     Driver station:
         - Inputs 1-6 set vertical position
         - Input 7 determines autonomous behavior??

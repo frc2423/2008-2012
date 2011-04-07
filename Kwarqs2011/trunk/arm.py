@@ -46,12 +46,12 @@ ARM_I = 0.0
 ARM_D = 0.0
 
 # Thump motor PID constants
-THUMP_P = 1000
+THUMP_P = 1500
 THUMP_I = 0.5
 THUMP_D = 0.0
 
 THUMP_MIN_POSITION = .5
-THUMP_MAX_POSITION = .8
+THUMP_MAX_POSITION = .82
 
 
 ARM_TOLERANCE = .2
@@ -306,7 +306,15 @@ class Arm(object):
         
         #TODO: Turn this off in competition, or log it (both?)
         if self.encoder_print.should_print():
-            print( "Arm: C: %s; mode: %d; encoder value: %f" % (self.calibration_mode, int(self.vertical_motor.GetControlMode()), self.vertical_motor.GetPosition()) )
+            print( "Vertical: C: %s; mode: %d; encoder value: %f" % ( \
+                    self.calibration_mode, 
+                    int(self.vertical_motor.GetControlMode()), 
+                    self.vertical_motor.GetPosition()) )
+            print( "Thump: %f; Current: %f; Voltage: %f; Set: %f" % ( \
+                    self.thump_motor.GetPosition(),
+                    self.thump_motor.GetOutputCurrent(),
+                    self.thump_motor.GetOutputVoltage(),
+                    self.thump_motor.Get() ))
         
         
         # if we're in calibration mode, take any opportunity that we have

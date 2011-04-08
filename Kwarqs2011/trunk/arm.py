@@ -184,6 +184,14 @@ class Arm(object):
         self.thump_value = y
         self.thump_value_set = True
         
+    def at_top_limit(self):
+        '''Returns true if we're hitting the top of the elevator'''
+        return not self.vertical_motor.GetForwardLimitOK()
+        
+    def at_bottom_limit(self):
+        '''Returns true if we're hitting the bottom of the elevator'''
+        return not self.vertical_motor.GetReverseLimitOK() 
+        
     def arm_is_in_position(self):
         '''Check if placement of arm is correct'''
         
@@ -316,6 +324,7 @@ class Arm(object):
         if reset_automatic:
             self.position_set_value = None
     
+    
             
     def _detect_calibration(self):
         '''This routine only gets called when we're doing calibration'''
@@ -323,7 +332,7 @@ class Arm(object):
         global bottom_position
         
         # once we've reached a spot, then calibration mode is done
-        if not self.vertical_motor.GetReverseLimitOK():
+        if self.at_bottom_limit():
             # we've reached the bottom
             self.calibration_mode = False
             
@@ -332,7 +341,8 @@ class Arm(object):
             
             print("[arm] Arm calibration complete -- found bottom limit switch at %f" % bottom_position);
             
-        elif not self.vertical_motor.GetForwardLimitOK():
+        elif self.at_top_limit():
+        
             # we've reached the top
             self.calibration_mode = False
             
@@ -488,10 +498,20 @@ class Arm(object):
             self._reset_state(reset_automatic=False)
             
             
+
+            
+            
         # ok, now that we've figured out what motor value to set
         # ... so set the motor value to the value
         
         if self.hold_position is not None:
+        
+            # special case: if we keep bumping the top thing when we're in
+            # a position mode, just reset that position to the spot we're 
+            # currently in so that arm_is_in_position will return true
+            if self.position_set_value is not None and self.at_top_limit():
+                self.hold_position = self.vertical_motor.GetPosition()
+                arm_height[ self.position_set_value ] = self.hold_position
         
             # set the motor to the hold position
             motor_value = self.hold_position

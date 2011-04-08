@@ -22,6 +22,10 @@ LT_DEPLOY_RANGE = 36.0      # distance at which arm should deploy
 LT_TOO_CLOSE = 96.0         # distance that robot should stop at if arm isn't right
 LT_MAX = 240.0              # placeholder
 
+# autonomous mode times
+AUTON_MODE_ABORT_TIME = 11.5    # time when the robot gives up and backs away from the pole
+AUTON_MODE_MAX_TIME = 16.0
+
 class Auto(object):
 
     def __init__(self):
@@ -180,9 +184,9 @@ class Auto(object):
             wall_distance = self.ultrasonic.GetRangeInches()
         
         # autonomous mode: get out of dodge if time expires!
-        if autonomous_time is not None and autonomous_time > 11.0:
+        if autonomous_time is not None and autonomous_time > AUTON_MODE_ABORT_TIME:
         
-            if autonomous_time < 16:
+            if autonomous_time < AUTON_MODE_MAX_TIME:
             
                 if self.timer.should_print(2):
                     print("[auton: %4s; Arm: %5s; Wall: %6s] Getting out of dodge!!" % (\
@@ -196,7 +200,7 @@ class Auto(object):
                 
                 # after it backs up, bring the arm back down 
                 # so the operator can use it when the match starts
-                if autonomous_time > 12.5:
+                if autonomous_time > AUTON_MODE_ABORT_TIME + 1.0:
                     arm.set_vertical_position( 5 )
                 
                 drive.ArcadeDrive( 0.35, 0, False )
@@ -230,7 +234,7 @@ class Auto(object):
                     arm.manual_thump_control( 0.0 )
                     arm.deploy_tube()
                     
-                    if self.timer.should_print(3):
+                    if self.timer.should_print(4):
                         print("[auton: %4s; Arm: %5s; Wall: %6s] DONE: deploying tube" % (\
                             str(autonomous_time),
                             str(arm_in_position),
@@ -240,7 +244,7 @@ class Auto(object):
                 # No! -> Line tracking
                 else:
                 
-                    if self.timer.should_print(4):
+                    if self.timer.should_print(5):
                         print("[auton: %4s; Arm: %5s; Wall: %6s] line tracking in deploy range" % (\
                             str(autonomous_time),
                             str(arm_in_position),
@@ -251,7 +255,7 @@ class Auto(object):
                     
             # No! -> Set speed, then...
             else:
-                if self.timer.should_print(5):
+                if self.timer.should_print(6):
                     print("[auton: %4s; Arm: %5s; Wall: %6s] arm ready, not close enough to deploy" % (\
                         str(autonomous_time),
                         str(arm_in_position),
@@ -266,7 +270,7 @@ class Auto(object):
         # No! -> Are we too close?
         elif wall_distance <= LT_TOO_CLOSE:
     
-            if self.timer.should_print(6):
+            if self.timer.should_print(7):
                 print("[auton: %4s; Arm: %5s; Wall: %6s] TOO CLOSE: Waiting for arm to finish deploying"% (\
                     str(autonomous_time),
                     str(arm_in_position),
@@ -279,7 +283,7 @@ class Auto(object):
         # No! -> Line tracking
         else:
         
-            if self.timer.should_print(7):
+            if self.timer.should_print(8):
                 print("[auton: %4s; Arm: %5s; Wall: %6s] line tracking, arm not in position" % (\
                     str(autonomous_time),
                     str(arm_in_position),

@@ -10,6 +10,8 @@
     error that could have been prevented.. 
 '''
 
+from optparse import OptionParser
+
 
 # state variables
 disabled = True
@@ -41,17 +43,31 @@ class AutonomousStateMachine(object):
     def __init__(self, robot):
         self.robot = robot
         self.loop = 1
+        self.wall_distance = 120
         
     def run(self):
         ret = True
-        print("[asm]: loop %d" % self.loop)
+        #print("[asm]: loop %d" % self.loop)
         
-        if self.loop == 1:
-            pass
-        elif self.loop == 2:
-            pass
-            
-        else:
+        # increase/decrease the wall distance depending on our speed
+        self.wall_distance += self.robot.drive.y*2
+        
+        # set it
+        self.robot.auto.ultrasonic.distance = self.wall_distance
+        
+        # at 1.5 seconds in, pretend we hit the bottom for our calibration,
+        # and then inch the vertical motor closer to our destination
+        if self.loop == 30:
+            self.robot.arm.vertical_motor.reverse_ok = False
+        
+        if self.loop > 30:
+            self.robot.arm.vertical_motor.position += (self.robot.arm.vertical_motor.value - self.robot.arm.vertical_motor.position )/16.0
+        
+        #if self.loop == 160:
+        #    self.robot.arm.print_diagnostics()
+        
+        # autonomous is done after 15 seconds
+        if self.loop > 20*15:
             ret = False
         
         self.loop += 1
@@ -137,6 +153,19 @@ class OperatorStateMachine(object):
     
 if __name__ == '__main__':
 
+    parser = OptionParser()
+    
+    parser.add_option(  '--no-user-control',
+                        action='store_true', dest='no_user_control', default=False,
+                        help='Do not run the operator control mode tests' )
+                        
+    parser.add_option(  '--fms',
+                        action='store_true', dest='fms_attached', default=False,
+                        help='Pretend that the robot is on the field' )
+    
+    (options, args) = parser.parse_args()
+
+
     # start it up
     from robot import run
     run() 
@@ -144,6 +173,7 @@ if __name__ == '__main__':
     # get the primary robot object
     from robot import robot
     
+    robot.ds.fms_attached = options.fms_attached
     
     # patch up the robot object so it works
     robot.IsAutonomous = IsAutonomous
@@ -163,18 +193,18 @@ if __name__ == '__main__':
     from fake_wpilib import global_time
     print("Fake time passed: %f" % global_time )
     
-    # and do disabled again
-    disabled = True
-    robot.Disabled()
-
-    # do at least one control loop execution
-    disabled = False
-    operator_state_machine = OperatorStateMachine(robot)
-    robot.OperatorControl()
-        
-    from fake_wpilib import global_time
-    print("Fake time passed: %f" % global_time )
+    # do operator control
+    if not options.no_user_control:
     
-
+        # and do disabled again
+        disabled = True
+        robot.Disabled()
+    
+        disabled = False
+        operator_state_machine = OperatorStateMachine(robot)
+        robot.OperatorControl()
+        
+        from fake_wpilib import global_time
+        print("Fake time passed: %f" % global_time )
     
     

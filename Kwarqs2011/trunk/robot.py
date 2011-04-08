@@ -38,10 +38,11 @@ except:
 
 import arm
 import auto
-import util
+from util import *
 
 robot = None
 
+AUTONOMOUS_DISABLED = False
 
 class MyRobot(wpilib.SimpleRobot):
 
@@ -70,9 +71,14 @@ class MyRobot(wpilib.SimpleRobot):
     def Disabled(self):
     
         # TODO: Set arm positions here? 
-    
+        timer = PrintTimer()
+        
         print("MyRobot::Disabled()")
         while self.IsDisabled():
+        
+            if self.ds.IsFMSAttached() and timer.should_print():
+                print("[%10f] Waiting for competition to start" % timer.Get())
+        
             wpilib.Wait(0.01)
 
     def drive_robot_with_joystick(self):
@@ -110,26 +116,27 @@ class MyRobot(wpilib.SimpleRobot):
         while self.IsAutonomous() and self.IsEnabled():
             
             # control loops
+            if not AUTONOMOUS_DISABLED:
             
-            try:
-                self.auto.update_line_tracking(self.ds, timer.Get())
-            except:
-                if not self.ds.IsFMSAttached():
-                    raise
+                try:
+                    self.auto.update_line_tracking(self.ds, timer.Get())
+                except:
+                    if not self.ds.IsFMSAttached():
+                        raise
 
-            try:
-                self.auto.do_control_loop(self.drive, self.arm, timer.Get())
-            except:
-                if not self.ds.IsFMSAttached():
-                    raise
-                
-            try:
-                self.arm.do_control_loop()
-            except:
-                if not self.ds.IsFMSAttached():
-                    raise
+                try:
+                    self.auto.do_control_loop(self.drive, self.arm, timer.Get())
+                except:
+                    if not self.ds.IsFMSAttached():
+                        raise
+                    
+                try:
+                    self.arm.do_control_loop()
+                except:
+                    if not self.ds.IsFMSAttached():
+                        raise
             
-            wpilib.Wait(0.04)
+            wpilib.Wait(0.05)
 
     def OperatorControl(self):
     
@@ -140,7 +147,7 @@ class MyRobot(wpilib.SimpleRobot):
         dog.SetExpiration(0.25)
         
         holding = False
-        print_timer = util.PrintTimer()
+        print_timer = PrintTimer()
 
         while self.IsOperatorControl() and self.IsEnabled():
         

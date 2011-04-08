@@ -5,9 +5,6 @@ Things to get done before competition
     - (done) Netconsole for driver station
         - What kind of output is going to be useful in the competition?
 
-    - Design unit tests for the things
-        - How much of this is really needed? I mean, really?
-        
     - Better autonomous options?
         - Autonomous mode selection during disabled mode?
     
@@ -19,15 +16,16 @@ Things to get done before competition
         - Anything worth graphing?
         - Is there a python graphing library? That would be sweet. :) 
         
-    - Protection against exceptions killing the robot if the FMS is
+    - (done) Protection against exceptions killing the robot if the FMS is
     attached
         
     ... ooh. What about.. a logging data structure? start at autonomous
     mode, then dump after autonomous mode ends
     
-    - A basic set of unit tests is needed because... 
+    - (done) A basic set of unit tests is needed because... 
         - We need to make sure that we have something to quickly
         run at the competition when we make changes to ensure things
         aren't too terribly broken. Syntax errors and such too. 
 
+    - Think on this problem of reversing the thump motor on accident    
     

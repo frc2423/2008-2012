@@ -11,16 +11,16 @@ LTA_STEER_LEFT = -0.1
 LTA_STEER_MIDDLE = 0.0
 LTA_STEER_RIGHT = 0.1
 
-# teleoperated mode parameters
+# teleoperated mode parameters (no longer used)
 LTT_STEER_LEFT = -0.5
 LTT_STEER_MIDDLE = 0.3
 LTT_STEER_RIGHT = 0.5
 
+# autonomous mode distances:
 
-LT_MAX_CROSS_DISTANCE = 24.0
-LT_DEPLOY_RANGE = 36.0
-LT_TOO_CLOSE = 72.0
-
+LT_DEPLOY_RANGE = 36.0      # distance at which arm should deploy
+LT_TOO_CLOSE = 96.0         # distance that robot should stop at if arm isn't right
+LT_MAX = 240.0              # placeholder
 
 class Auto(object):
 
@@ -44,7 +44,7 @@ class Auto(object):
         self.lt_at_line = False     # Set to True if we're at the end of the line
         self.lt_steering = 0        # value to steer left or right
         
-        self.line_timer = PrintTimer()
+        self.timer = PrintTimer()
         
         
     
@@ -143,8 +143,8 @@ class Auto(object):
         #if binaryValue != 0:
         #   self.ltp_previous = binaryValue
             
-        if self.line_timer.should_print():
-            print( "Line tracking: L: %s; M: %s; R: %s; Speed: %f; Wall: %s" % (left, middle, right, self.lt_steering, self.ultrasonic.GetRangeInches() ) )
+        #if self.timer.should_print(1):
+        #    print( "Line tracking: L: %s; M: %s; R: %s; Speed: %f; Wall: %s" % (left, middle, right, self.lt_steering, self.ultrasonic.GetRangeInches() ) )
     
     
     def line_tracking_drive(self, drive):
@@ -152,17 +152,17 @@ class Auto(object):
         x = self.lt_steering
 
         # Relative distance from wall
-        distance = 0
+        wall_distance = 0
         if self.ultrasonic.IsRangeValid():
-            distance = self.ultrasonic.GetRangeInches()
+            wall_distance = self.ultrasonic.GetRangeInches()
         
-        if distance > LT_DEPLOY_RANGE + 36.0:
+        if wall_distance > LT_DEPLOY_RANGE + 40.0:
             y = -0.6
-        elif distance > LT_DEPLOY_RANGE + 24.0:
+        elif wall_distance > LT_DEPLOY_RANGE + 32.0:
             y = -0.5
-        elif distance > LT_DEPLOY_RANGE + 12.0:
+        elif wall_distance > LT_DEPLOY_RANGE + 16.0:
             y = -0.3
-        elif distance > LT_DEPLOY_RANGE:
+        elif wall_distance > LT_DEPLOY_RANGE:
             y = -0.2
         else:
             y = 0.0
@@ -174,14 +174,41 @@ class Auto(object):
         '''Implements automated tube placement'''
         
         arm_in_position = arm.arm_is_in_position()
+        wall_distance = LT_MAX
+        
+        if self.ultrasonic.IsRangeValid():
+            wall_distance = self.ultrasonic.GetRangeInches()
         
         # autonomous mode: get out of dodge if time expires!
-        if autonomous_time is not None and autonomous_time > 12.0:
+        if autonomous_time is not None and autonomous_time > 11.0:
+        
             if autonomous_time < 16:
-                self.arm.manual_thump_control( 0.0 )
+            
+                if self.timer.should_print(2):
+                    print("[auton: %4s; Arm: %5s; Wall: %6s] Getting out of dodge!!" % (\
+                        str(autonomous_time),
+                        str(arm_in_position),
+                        str(wall_distance)
+                    ))
+            
+                arm.manual_thump_control( 0.0 )
                 arm.deploy_tube()
-                drive.ArcadeDrive( 0.3, 0, False )
+                
+                # after it backs up, bring the arm back down 
+                # so the operator can use it when the match starts
+                if autonomous_time > 12.5:
+                    arm.set_vertical_position( 5 )
+                
+                drive.ArcadeDrive( 0.35, 0, False )
             else:
+            
+                if self.timer.should_print(3):
+                    print("[auton: %4s; Arm: %5s; Wall: %6s] Waiting for teleoperated..." % (\
+                        str(autonomous_time),
+                        str(arm_in_position),
+                        str(wall_distance)
+                    ))
+            
                 drive.ArcadeDrive( 0, 0, False )
                 
             return
@@ -191,7 +218,7 @@ class Auto(object):
         if arm_in_position:
             
             # Yes! -> In deploy range?
-            if self.ultrasonic.IsRangeValid() and self.ultrasonic.GetRangeInches() <= LT_DEPLOY_RANGE:
+            if wall_distance <= LT_DEPLOY_RANGE:
                 
                 # Is the middle sensor on?
                 if autonomous_time is not None or self.middle_tracker.Get():
@@ -200,25 +227,64 @@ class Auto(object):
                     drive.ArcadeDrive(0, 0, False)
                 
                     # Yes! -> Deploy tube
-                    self.arm.manual_thump_control( 0.0 )
+                    arm.manual_thump_control( 0.0 )
                     arm.deploy_tube()
                     
+                    if self.timer.should_print(3):
+                        print("[auton: %4s; Arm: %5s; Wall: %6s] DONE: deploying tube" % (\
+                            str(autonomous_time),
+                            str(arm_in_position),
+                            str(wall_distance)
+                        ))
+                        
                 # No! -> Line tracking
                 else:
+                
+                    if self.timer.should_print(4):
+                        print("[auton: %4s; Arm: %5s; Wall: %6s] line tracking in deploy range" % (\
+                            str(autonomous_time),
+                            str(arm_in_position),
+                            str(wall_distance)
+                        ))
+                
                     self.line_tracking_drive(drive)
                     
             # No! -> Set speed, then...
             else:
+                if self.timer.should_print(5):
+                    print("[auton: %4s; Arm: %5s; Wall: %6s] arm ready, not close enough to deploy" % (\
+                        str(autonomous_time),
+                        str(arm_in_position),
+                        str(wall_distance)
+                    ))
+            
                 # Line tracking
                 self.line_tracking_drive(drive)
+                
+                
         
         # No! -> Are we too close?
-        elif self.ultrasonic.IsRangeValid() and self.ultrasonic.GetRangeInches() <= LT_TOO_CLOSE:
+        elif wall_distance <= LT_TOO_CLOSE:
+    
+            if self.timer.should_print(6):
+                print("[auton: %4s; Arm: %5s; Wall: %6s] TOO CLOSE: Waiting for arm to finish deploying"% (\
+                    str(autonomous_time),
+                    str(arm_in_position),
+                    str(wall_distance)
+                ))
     
             # Yes! -> Stop motors
             drive.ArcadeDrive(0, 0, False)
         
         # No! -> Line tracking
         else:
+        
+            if self.timer.should_print(7):
+                print("[auton: %4s; Arm: %5s; Wall: %6s] line tracking, arm not in position" % (\
+                    str(autonomous_time),
+                    str(arm_in_position),
+                    str(wall_distance)
+                ))
+        
             self.line_tracking_drive(drive)
             

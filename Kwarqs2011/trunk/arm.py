@@ -128,10 +128,10 @@ class Arm(object):
         self.calibration_timer = None
         
         # For the blinkies
-        self.timer = wpilib.Timer()
+        self.blinky_timer = PrintTimer( BLINKY_TIME )
         self.blinky = True
         
-        self.encoder_print = PrintTimer()
+        self.print_timer = PrintTimer()
         
         # Manual motor value of vertical motor
         self.vertical_motor_value = None
@@ -198,11 +198,20 @@ class Arm(object):
             else:
                 return False
                 
-        else:
+        elif self.calibration_mode and self.position_set:
+        
+            # If we're calibrating, we can't possibly be ready yet
+            return False
+                
+        elif self.manual_value == None:
+            
             # We're in manual mode here -- we assume that if the human
             # has let go of the trigger ( manual_vertical_control hasn't
             # been called ), then we must be in the correct position
-            return self.manual_value == None
+        
+            return True
+            
+        return False
     
         
     def deploy_tube(self):
@@ -275,7 +284,7 @@ class Arm(object):
         
         if self.position_set_value is not None:
             
-            if self.timer.HasPeriodPassed(BLINKY_TIME):
+            if self.blinky_timer.should_print():
                 self.blinky = not self.blinky
             
             # if the arm is in position, then the light stays solid. 
@@ -308,7 +317,7 @@ class Arm(object):
             self.position_set_value = None
     
             
-    def _do_calibration(self):
+    def _detect_calibration(self):
         '''This routine only gets called when we're doing calibration'''
         
         global bottom_position
@@ -321,11 +330,17 @@ class Arm(object):
             # this is the bottom position... 
             bottom_position = self.vertical_motor.GetPosition()
             
+            print("[arm] Arm calibration complete -- found bottom limit switch at %f" % bottom_position);
+            
         elif not self.vertical_motor.GetForwardLimitOK():
             # we've reached the top
             self.calibration_mode = False
             
-            bottom_position = self.vertical_motor.GetPosition() - ARM_TOP
+            pos = self.vertical_motor.GetPosition()
+            bottom_position = pos - ARM_TOP
+            
+            print("[arm] Arm calibration complete -- found top limit switch at %f" % pos);
+            
             
         if bottom_position is not None:
             
@@ -334,11 +349,12 @@ class Arm(object):
             
             for i in arm_offsets:
                 arm_height.append( bottom_position + i )
+                
         
     def _translate_thump(self, z):
     
-        # Xmax - (Ymax - Y)( (Xmax - Xmin) / (Ymax - Ymin) )
-        value = THUMP_MAX_POSITION - ((1 - z)*( (THUMP_MAX_POSITION - THUMP_MIN_POSITION) / (1-0) ) )
+        # P = Xmax - (Ymax - Y)( (Xmax - Xmin) / (Ymax - Ymin) )
+        value = THUMP_MAX_POSITION - ((1 - z)*( (THUMP_MAX_POSITION - THUMP_MIN_POSITION) / (1.0-0) ) )
         
         if value > THUMP_MAX_POSITION:
             return THUMP_MAX_POSITION
@@ -346,6 +362,12 @@ class Arm(object):
             return THUMP_MIN_POSITION
         return value
         
+    def _invert_thump(self, p):
+        '''Does the inverse of _translate_thump -- take a thump position and
+        translate it into a value. Used only for diagnostics'''
+        
+        # -Y = (P - Xmax) / ((Xmax - Xmin) / (Ymax - Ymin))) + Ymax
+        return ( (p - THUMP_MAX_POSITION) / ((THUMP_MAX_POSITION-THUMP_MIN_POSITION)/(1.0-0)) + 1.0)
         
     def print_diagnostics(self):
     
@@ -357,20 +379,24 @@ class Arm(object):
                 self.vertical_motor.Get(),
                 str(self.arm_is_in_position()) ))
                                 
-        print( "Sets     : cal: %s; pos: %s; man: %s(%s); hold: %s (%s)" % (\
+        print( "Modes    : cal_mode: %s(%s); pos_mode: %s(%s); man_mode: %s(%s); hold: %s(%s)" % (\
                 str(self.calibration_mode),
+                str( bottom_position ),
                 str(self.position_set),
+                str(self.position_set_value),
                 str(self.manual_set),
                 str(self.manual_value),
                 str(self.hold_set),
                 str(self.hold_position) ))
             
-        print( 'Thump    : %f; Set: %f; Input: %s' % ( \
-                self.thump_motor.GetPosition(),
+        t_p = self.thump_motor.GetPosition()
+            
+        print( 'Thump    : Position: %f; Set: %f; Input: %s; ValueForPos: %s' % ( \
+                t_p,
                 self.thump_motor.Get(),
-                str(self.thump_position)))
+                str(self.thump_position),
+                str(self._invert_thump(t_p))))
         
-        print( 'Bottom   : %s' % str( bottom_position ) )
         print( 'Offsets  : %s' % ' '.join( [ str(i) for i in arm_offsets] ) )
         print( 'Heights  : %s' % ' '.join( [ str(i) for i in arm_height] ) )
         
@@ -393,7 +419,7 @@ class Arm(object):
         # if we're in calibration mode, take any opportunity that we have
         # to detect that we've reached a calibration point
         if self.calibration_mode:
-            self._do_calibration()
+            self._detect_calibration()
             
         
         # this set of if statements determines what to set the motor to
@@ -401,12 +427,13 @@ class Arm(object):
         
         if self.hold_set:
         
-            print("In hold state")
-        
             # Set the correct output mode
             self._set_vertical_control_mode( wpilib.CANJaguar.kPosition )
         
             self.hold_position = self.vertical_motor.GetPosition()
+        
+            if self.print_timer.should_print(1):
+                print("[arm] In hold state: holding at %s" % str(self.hold_position))
         
             # reset our state
             self._reset_state()
@@ -432,6 +459,7 @@ class Arm(object):
             if self.calibration_timer is None:
                 self.calibration_timer = wpilib.Timer()
                 self.calibration_timer.Start()
+                print("[arm] Arm calibration started");
                 
             # enforce the motor mode
             self._set_vertical_control_mode( wpilib.CANJaguar.kPercentVbus )
@@ -446,8 +474,9 @@ class Arm(object):
             self.hold_position = None
                 
         elif self.position_set:
-        
-            print("In position set")
+            
+            if self.print_timer.should_print(2):
+                print("[arm] Position set to %s" % str(self.position_set_value))
                 
             # Set the correct output mode
             self._set_vertical_control_mode( wpilib.CANJaguar.kPosition )
@@ -489,6 +518,9 @@ class Arm(object):
         
         elif self.thump_position_set:
 
+            if self.print_timer.should_print(10):
+                print("[arm] WARNING: Thump motor in position mode: %s" % str(self.thump_position))
+        
             # switch to positioning mode
             self._set_thump_control_mode( wpilib.CANJaguar.kPosition )
             

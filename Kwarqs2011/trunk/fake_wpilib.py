@@ -30,8 +30,11 @@ class CANJaguar(object):
     kNeutralMode_Coast = 2
     
     def __init__(self, deviceNumber):
-        self.value = 0
         self.control_mode = CANJaguar.kPercentVbus
+        self.forward_ok = True
+        self.reverse_ok = True
+        self.position = 0
+        self.value = 0
         
     def ConfigEncoderCodesPerRev(self, codes):
         pass
@@ -58,7 +61,7 @@ class CANJaguar(object):
         return self.control_mode
         
     def GetForwardLimitOK(self):
-        return True
+        return self.forward_ok
         
     def GetOutputCurrent(self):
         return 0.0
@@ -67,10 +70,10 @@ class CANJaguar(object):
         return 0.0
         
     def GetReverseLimitOK(self):
-        return True
+        return self.reverse_ok
         
     def GetPosition(self):            
-        return self.value
+        return self.position
         
     def Set(self, value):
         self.value = value
@@ -105,12 +108,13 @@ class DriverStation(object):
     
     def __init__(self):
         self.digital_in = [ False, False, False, False, False, False, False, False ]
+        self.fms_attached = False
     
     def GetDigitalIn(self, number):
         return self.digital_in[number-1]
     
     def IsFMSAttached(self):
-        return False
+        return self.fms_attached 
     
     def SetDigitalOut(self, number, value):
         pass
@@ -148,10 +152,12 @@ class Joystick(object):
 class RobotDrive(object):
     
     def __init__(self, l_motor, r_motor):
-        pass
+        self.x = 0.0
+        self.y = 0.0
         
-    def ArcadeDrive(self, x, y, tight):
-        pass
+    def ArcadeDrive(self, y, x, tight):
+        self.x = x
+        self.y = y
         
 class Relay(object):
     
@@ -208,7 +214,7 @@ class Ultrasonic(object):
         pass
 
     def __init__(self, pingChannel, echoChannel):
-        self.distance = 120
+        self.distance = 240
     
     def GetRangeInches(self):
         return self.distance

@@ -120,6 +120,15 @@ class DriverStation(object):
         pass
         
         
+class Jaguar(object):
+
+    def __init__(self, port):
+        self.value = 0
+        
+    def Set(self, value):
+        self.value = value
+        
+        
 class Joystick(object):
     
     def __init__(self, port):

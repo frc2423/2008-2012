@@ -21,12 +21,12 @@ from util import *
 
 # The vertical positions for the arm, relative to the bottom!
 ARM_TOP = 18.4
-ARM_1 = 19.0        #   2
-ARM_2 = 19.0        # 1
-ARM_3 = 17.1        #   4
-ARM_4 = 19.0        # 3
-ARM_5 = 9.0        #   6
-ARM_6 = 11.2         # 5
+ARM_1 = 19.0        #   2  -- 0
+ARM_2 = 19.0        # 1    -- 1
+ARM_3 = 17.1        #   4  -- 2
+ARM_4 = 19.0        # 3    -- 3
+ARM_5 = 9.0         #   6  -- 4
+ARM_6 = 11.2        # 5    -- 5
 
 '''
     bottom = .1722, .204, .22, .151, .206
@@ -486,7 +486,7 @@ class Arm(object):
         elif self.position_set:
             
             if self.print_timer.should_print(2):
-                print("[arm] Position set to %s" % str(self.position_set_value))
+                print("[arm] Position set to %s (height %s)" % (str(self.position_set_value), str(arm_height[self.position_set_value]) ))
                 
             # Set the correct output mode
             self._set_vertical_control_mode( wpilib.CANJaguar.kPosition )

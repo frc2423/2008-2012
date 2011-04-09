@@ -200,8 +200,8 @@ class Auto(object):
                 
                 # after it backs up, bring the arm back down 
                 # so the operator can use it when the match starts
-                if autonomous_time > AUTON_MODE_ABORT_TIME + 1.0:
-                    arm.set_vertical_position( 5 )
+                if autonomous_time > AUTON_MODE_ABORT_TIME + .5:
+                    arm.set_vertical_position( 4 )
                 
                 drive.ArcadeDrive( 0.35, 0, False )
             else:

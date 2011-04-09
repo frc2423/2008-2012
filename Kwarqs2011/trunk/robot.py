@@ -51,12 +51,14 @@ class MyRobot(wpilib.SimpleRobot):
         print("MyRobot::__init__()")
     
         # drive motors
-        self.l_motor = wpilib.CANJaguar( 23 )
-        self.r_motor = wpilib.CANJaguar( 24 )
+        #self.l_motor = wpilib.CANJaguar( 23 )
+        #self.r_motor = wpilib.CANJaguar( 24 )
+        self.l_motor = wpilib.Jaguar( 1 )
+        self.r_motor = wpilib.Jaguar( 2 )
         
         # set to coast
-        self.l_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
-        self.r_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
+        #self.l_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
+        #self.r_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
  
         self.drive = wpilib.RobotDrive(self.l_motor, self.r_motor)
         
@@ -109,9 +111,10 @@ class MyRobot(wpilib.SimpleRobot):
         timer.Start()
         
         # determine which position we want the arm to go to..
-        self.arm.set_vertical_position( 4 )
+        self.arm.set_vertical_position( 2 )
         #self.arm.set_thump_position( .46 )
-        self.arm.set_thump_position( 0.08 )
+        #self.arm.set_thump_position( 0.08 )
+        self.arm.set_thump_position( 0.25 )
         
         while self.IsAutonomous() and self.IsEnabled():
             

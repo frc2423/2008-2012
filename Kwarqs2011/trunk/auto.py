@@ -48,6 +48,9 @@ class Auto(object):
         self.lt_at_line = False     # Set to True if we're at the end of the line
         self.lt_steering = 0        # value to steer left or right
         
+        self.deploy_range = LT_DEPLOY_RANGE
+        self.down_time = AUTON_MODE_ABORT_TIME + .5
+        
         self.timer = PrintTimer()
         
         
@@ -160,13 +163,13 @@ class Auto(object):
         if self.ultrasonic.IsRangeValid():
             wall_distance = self.ultrasonic.GetRangeInches()
         
-        if wall_distance > LT_DEPLOY_RANGE + 40.0:
+        if wall_distance > self.deploy_range + 40.0:
             y = -0.6
-        elif wall_distance > LT_DEPLOY_RANGE + 32.0:
+        elif wall_distance > self.deploy_range + 32.0:
             y = -0.5
-        elif wall_distance > LT_DEPLOY_RANGE + 16.0:
+        elif wall_distance > self.deploy_range + 16.0:
             y = -0.3
-        elif wall_distance > LT_DEPLOY_RANGE:
+        elif wall_distance > self.deploy_range:
             y = -0.2
         else:
             y = 0.0
@@ -200,7 +203,7 @@ class Auto(object):
                 
                 # after it backs up, bring the arm back down 
                 # so the operator can use it when the match starts
-                if autonomous_time > AUTON_MODE_ABORT_TIME + .5:
+                if autonomous_time > self.down_time:
                     arm.set_vertical_position( 4 )
                 
                 drive.ArcadeDrive( 0.35, 0, False )
@@ -222,7 +225,7 @@ class Auto(object):
         if arm_in_position:
             
             # Yes! -> In deploy range?
-            if wall_distance <= LT_DEPLOY_RANGE:
+            if wall_distance <= self.deploy_range:
                 
                 # Is the middle sensor on?
                 if autonomous_time is not None or self.middle_tracker.Get():

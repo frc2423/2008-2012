@@ -90,10 +90,12 @@ class OperatorStateMachine(object):
             # simulate making the arm go up
             self.robot.arm_stick.buttons[0] = True
             self.robot.arm_stick.y = -1
+            self.robot.drive_stick.buttons[6] = True
             
         elif self.loop == 2:
             # press the hold button
             self.robot.arm_stick.buttons[1] = True
+            self.robot.drive_stick.buttons[6] = False
             
         elif self.loop == 3:
             # let go of it

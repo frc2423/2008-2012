@@ -149,6 +149,10 @@ class Arm(object):
         self.thump_position = None
         self.thump_value = None
         
+        self.thump_dropping = False
+        self.thump_drop_timer = wpilib.Timer()
+        self.thump_drop_timer.Start()
+        
         self.tube_state = TUBE_STATE_OFF
     
     
@@ -170,14 +174,29 @@ class Arm(object):
         
     def set_thump_position(self, y):
         '''Sets the position of the thump motor: 0 is all the way down, 1 is all the way up'''
-        if y > 1.0:
-            self.thump_position = 1.0
-        elif y < 0.0:
-            self.thump_position = 0.0
-        else:
-            self.thump_position = y
+        #if y > 1.0:
+        #    self.thump_position = 1.0
+        #elif y < 0.0:
+        #    self.thump_position = 0.0
+        #else:
+        #    self.thump_position = y
             
-        self.thump_position_set = True
+        #self.thump_position_set = True
+        
+        # We removed the pot, so let's make sure we don't accidentally try to switch modes
+        pass
+        
+    def do_thump_drop(self, seconds):
+        '''Drop the thump motor for N seconds'''
+        if self.thump_dropping == True:
+            return
+            
+        self.thump_dropping = True
+        self.thump_drop_timer.Reset()
+        self.thump_drop_time = seconds
+        print("[arm] Thump drop time set to %s" % str(seconds))
+            
+            
             
     def manual_thump_control(self, y):
         '''Tell the thump motor to go up or down'''
@@ -399,13 +418,13 @@ class Arm(object):
                 str(self.hold_set),
                 str(self.hold_position) ))
             
-        t_p = self.thump_motor.GetPosition()
-            
-        print( 'Thump    : Position: %f; Set: %f; Input: %s; ValueForPos: %s' % ( \
-                t_p,
-                self.thump_motor.Get(),
-                str(self.thump_position),
-                str(self._invert_thump(t_p))))
+        #t_p = self.thump_motor.GetPosition()
+        #    
+        #print( 'Thump    : Position: %f; Set: %f; Input: %s; ValueForPos: %s' % ( \
+        #        t_p,
+        #        self.thump_motor.Get(),
+        #        str(self.thump_position),
+        #        str(self._invert_thump(t_p))))
         
         print( 'Offsets  : %s' % ' '.join( [ str(i) for i in arm_offsets] ) )
         print( 'Heights  : %s' % ' '.join( [ str(i) for i in arm_height] ) )
@@ -525,7 +544,18 @@ class Arm(object):
         # Ok, do the thump motor stuff. Same pattern
         thump_motor_value = 0
         
-        if self.thump_value_set:
+        if self.thump_dropping:
+        
+            tm = self.thump_drop_timer.Get()
+            
+            if tm > self.thump_drop_time:
+                print("[arm] Thump drop stopped after %s seconds (wanted %s seconds)" % (str(tm), str(self.thump_drop_time)))
+                self.thump_dropping = False
+                self.thump_drop_time = None
+            else:
+                thump_motor_value = -1.0
+        
+        elif self.thump_value_set:
         
             self._set_thump_control_mode( wpilib.CANJaguar.kPercentVbus )
         

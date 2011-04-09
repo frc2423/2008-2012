@@ -98,7 +98,7 @@ class MyRobot(wpilib.SimpleRobot):
                 x = -(x * x)
             
         # Send the control to the motor
-        self.drive.ArcadeDrive(y, x, False)
+        self.drive.ArcadeDrive(y, x, self.drive_stick.GetTrigger())
             
     def Autonomous(self):
     
@@ -111,10 +111,21 @@ class MyRobot(wpilib.SimpleRobot):
         timer.Start()
         
         # determine which position we want the arm to go to..
-        self.arm.set_vertical_position( 2 )
+        
+        # middle
+        #self.arm.set_vertical_position( 2 )
+        #self.arm.do_thump_drop( 1.5 )
+        
+        # top
+        self.arm.set_vertical_position( 0 )
+        self.arm.do_thump_drop( .7 )
+        self.auto.deploy_range -= 12.0        # need to be six inches closer
+        self.auto.down_time -= 1.0
+        
+        # these were for the first day
         #self.arm.set_thump_position( .46 )
         #self.arm.set_thump_position( 0.08 )
-        self.arm.set_thump_position( 0.25 )
+        #self.arm.set_thump_position( 0.25 )
         
         while self.IsAutonomous() and self.IsEnabled():
             
@@ -227,6 +238,17 @@ class MyRobot(wpilib.SimpleRobot):
             except:
                 if not self.ds.IsFMSAttached():
                     raise
+                    
+            if not self.ds.IsFMSAttached():
+                if self.drive_stick.GetRawButton(7):
+                    if print_timer.should_print(83):
+                        self.arm.do_thump_drop( 0.7 )
+                elif self.drive_stick.GetRawButton(8):
+                    if print_timer.should_print(83):
+                        self.arm.do_thump_drop( 1.4 )
+                elif self.drive_stick.GetRawButton(9):
+                    if print_timer.should_print(83):
+                        self.arm.do_thump_drop( 1.9 )
             
             #################
             # Control Loops #

@@ -214,8 +214,6 @@ class Arm(object):
     def arm_is_in_position(self):
         '''Check if placement of arm is correct'''
         
-        # TODO: Is this right?
-        
         if self.hold_position is not None:
             # automated mode
             position = self.vertical_motor.GetPosition()
@@ -399,6 +397,7 @@ class Arm(object):
         return ( (p - THUMP_MAX_POSITION) / ((THUMP_MAX_POSITION-THUMP_MIN_POSITION)/(1.0-0)) + 1.0)
         
     def print_diagnostics(self):
+        '''These are useful to use to figure out if the arm is working correctly'''
     
         print( "*** ARM DIAGS ***" )
     

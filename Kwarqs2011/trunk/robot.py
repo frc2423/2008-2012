@@ -50,7 +50,10 @@ class MyRobot(wpilib.SimpleRobot):
     
         print("MyRobot::__init__()")
     
-        # drive motors
+        # drive motors -- originally these were CANJaguar motors, but
+        # after various timeout issues we switched them back to PWM 
+        # control because we couldn't afford the stalls
+        
         #self.l_motor = wpilib.CANJaguar( 23 )
         #self.r_motor = wpilib.CANJaguar( 24 )
         self.l_motor = wpilib.Jaguar( 1 )
@@ -153,6 +156,18 @@ class MyRobot(wpilib.SimpleRobot):
             wpilib.Wait(0.05)
 
     def OperatorControl(self):
+        '''
+        Main operator control loop
+        
+        Note that each statement is surrounded by a try.. except block
+        that swallows the exception if the FMS is attached. This is so
+        that code failures won't kill the entire robot, but just small
+        parts of it. 
+        
+        Or at the very least, we're still going to be able to drive
+        around and play defense. :)
+        
+        '''
     
         print("MyRobot::OperatorControl()")
         

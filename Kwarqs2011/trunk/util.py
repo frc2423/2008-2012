@@ -5,6 +5,9 @@ except:
     import fake_wpilib as wpilib
 
 class PrintTimer(object):
+    '''This is a useful class that we can use to determine if we
+    want to print something or not. Better than the WPILib timer
+    class, because it doesn't play catchup... '''
 
     def __init__(self, timeout=1.0):
         self.timer = wpilib.Timer()

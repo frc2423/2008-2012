@@ -209,4 +209,15 @@ if __name__ == '__main__':
         from fake_wpilib import global_time
         print("Fake time passed: %f" % global_time )
     
+    # just for giggles, try autonomous mode again to see
+    # if we have any lingering state problems
+    disabled = True
+    robot.Disabled()
+    
+    disabled = False
+    autonomous_state_machine = AutonomousStateMachine(robot)
+    robot.Autonomous()
+    
+    from fake_wpilib import global_time
+    print("Fake time passed: %f" % global_time )
     

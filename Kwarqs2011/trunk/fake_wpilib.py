@@ -186,32 +186,36 @@ class Timer(object):
     
     def __init__(self):
         self.start_time = 0
+        self.accumulated_time = 0
         self.running = False
+        self.Reset()
         
     def Get(self):
         global global_time
         if self.running:
-            return global_time - self.start_time
+            return (global_time - self.start_time) + self.accumulated_time
         else:
-            return self.start_time
+            return self.accumulated_time
         
     def Reset(self):
         global global_time
+        self.accumulated_time = 0
         self.start_time = global_time
         
     def Start(self):
         global global_time
-        self.start_time = global_time
-        self.running = True
+        if not self.running:
+            self.start_time = global_time
+            self.running = True
         
     def Stop(self):
-        global global_time
-        self.stop_time = global_time
-        self.running = False
+        if self.running:
+            self.accumulated_time += self.Get()
+            self.running = False
         
     def HasPeriodPassed(self, period):
         global global_time
-        if self.start_time + period < global_time:
+        if self.Get() > period:
             self.start_time += period
             return True
         return False

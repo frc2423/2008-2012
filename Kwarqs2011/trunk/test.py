@@ -11,6 +11,7 @@
 '''
 
 from optparse import OptionParser
+import fake_wpilib as wpilib
 
 
 # state variables
@@ -38,6 +39,36 @@ def IsOperatorControl():
     return operator_state_machine.run()
 
     
+def adjust_arm_positions(motor):
+    '''Set the parameters of the arm's vertical motor appropriately'''
+    
+    motor_min = -2.0
+    motor_max = 16.2
+    
+    if motor.control_mode == wpilib.CANJaguar.kPercentVbus:
+        motor.position += motor.value/5.0
+    
+    elif motor.control_mode == wpilib.CANJaguar.kPosition:
+        val = (motor.value - motor.position )/15.0
+        if val < -0.2:
+            val = -0.2
+        elif val > 0.2:
+            val = 0.2
+            
+        motor.position += val
+        
+    if motor.position < motor_min:
+        motor.reverse_ok = False
+        motor.position = motor_min
+    else:
+        motor.reverse_ok = True
+       
+    if motor.position > motor_max:
+        motor.forward_ok = False
+        motor.position = motor_max
+    else:
+        motor.forward_ok = True
+    
 class AutonomousStateMachine(object):
     
     def __init__(self, robot):
@@ -55,13 +86,7 @@ class AutonomousStateMachine(object):
         # set it
         self.robot.auto.ultrasonic.distance = self.wall_distance
         
-        # at 1.5 seconds in, pretend we hit the bottom for our calibration,
-        # and then inch the vertical motor closer to our destination
-        if self.loop == 30:
-            self.robot.arm.vertical_motor.reverse_ok = False
-        
-        if self.loop > 30:
-            self.robot.arm.vertical_motor.position += (self.robot.arm.vertical_motor.value - self.robot.arm.vertical_motor.position )/16.0
+        adjust_arm_positions( self.robot.arm.vertical_motor )
         
         #if self.loop == 160:
         #    self.robot.arm.print_diagnostics()
@@ -85,6 +110,8 @@ class OperatorStateMachine(object):
         print("[osm]: loop %d" % self.loop)
         
         self.robot.drive_stick.buttons[9] = True
+        
+        adjust_arm_positions( self.robot.arm.vertical_motor )
         
         if self.loop == 1:
             # simulate making the arm go up
@@ -191,6 +218,8 @@ if __name__ == '__main__':
     disabled = False
     autonomous_state_machine = AutonomousStateMachine(robot)
     robot.Autonomous()
+    
+    robot.arm.print_diagnostics()
     
     from fake_wpilib import global_time
     print("Fake time passed: %f" % global_time )

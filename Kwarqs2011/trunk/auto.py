@@ -23,6 +23,7 @@ LT_TOO_CLOSE = 96.0         # distance that robot should stop at if arm isn't ri
 LT_MAX = 240.0              # placeholder
 
 # autonomous mode times
+AUTON_MODE_ARM_DOWN_TIME = 10.0 # time when the robot starts dropping the arm after deployment
 AUTON_MODE_ABORT_TIME = 11.5    # time when the robot gives up and backs away from the pole
 AUTON_MODE_MAX_TIME = 16.0
 
@@ -49,7 +50,7 @@ class Auto(object):
         self.lt_steering = 0        # value to steer left or right
         
         self.deploy_range = LT_DEPLOY_RANGE
-        self.down_time = AUTON_MODE_ABORT_TIME + .5
+        self.down_time = AUTON_MODE_ARM_DOWN_TIME
         
         self.timer = PrintTimer()
         
@@ -186,10 +187,20 @@ class Auto(object):
         if self.ultrasonic.IsRangeValid():
             wall_distance = self.ultrasonic.GetRangeInches()
         
-        # autonomous mode: get out of dodge if time expires!
-        if autonomous_time is not None and autonomous_time > AUTON_MODE_ABORT_TIME:
+        # if it's time to drop the arm, do it
+        if autonomous_time > self.down_time:
+            if self.timer.should_print(1):
+                print("[auton: %4s; Arm: %5s; Wall: %6s] IM DROPPING DA BOMB" % (\
+                        str(autonomous_time),
+                        str(arm_in_position),
+                        str(wall_distance)
+                    ))
+            arm.set_vertical_position( arm.BOTTOM )
         
-            if autonomous_time < AUTON_MODE_MAX_TIME:
+        # autonomous mode: get out of dodge if time expires!
+        if autonomous_time is not None and autonomous_time >= AUTON_MODE_ABORT_TIME:
+        
+            if autonomous_time <= AUTON_MODE_MAX_TIME:
             
                 if self.timer.should_print(2):
                     print("[auton: %4s; Arm: %5s; Wall: %6s] Getting out of dodge!!" % (\
@@ -200,11 +211,6 @@ class Auto(object):
             
                 arm.manual_thump_control( 0.0 )
                 arm.deploy_tube()
-                
-                # after it backs up, bring the arm back down 
-                # so the operator can use it when the match starts
-                if autonomous_time > self.down_time:
-                    arm.set_vertical_position( 4 )
                 
                 drive.ArcadeDrive( 0.35, 0, False )
             else:

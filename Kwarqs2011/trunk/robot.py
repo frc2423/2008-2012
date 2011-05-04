@@ -120,10 +120,10 @@ class MyRobot(wpilib.SimpleRobot):
         #self.arm.do_thump_drop( 1.5 )
         
         # top
-        self.arm.set_vertical_position( 0 )
-        self.arm.do_thump_drop( .7 )
-        self.auto.deploy_range -= 12.0        # need to be six inches closer
-        self.auto.down_time -= 1.0
+        self.arm.set_vertical_position( self.arm.TOP )
+        self.arm.do_thump_drop( 1.0 )
+        #self.arm.do_thump_drop( 0.7 )
+        #self.auto.deploy_range -= 12.0        # need to be six inches closer
         
         # these were for the first day
         #self.arm.set_thump_position( .46 )

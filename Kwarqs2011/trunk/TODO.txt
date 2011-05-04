@@ -2,6 +2,13 @@
 Things to get done before competition
 ======================================
 
+    (done) - Need some mechanism to calibrate based on top and bottom of elevator
+    (done) - Need to have a 'go to the X and hold' mode for the arm
+        (done) - Top, bottom needed for autonomous, methinks
+    (done) - Adjust autonomous mode to drop sooner for longer period of time?
+        (done) - Add a print statement IM DROPPING DA BOMB
+        - Maybe autonomous mode adjusts distance based on drop time?
+
     - (done) Netconsole for driver station
         - What kind of output is going to be useful in the competition?
 

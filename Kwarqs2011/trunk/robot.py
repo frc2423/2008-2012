@@ -22,7 +22,8 @@ Driver controls:
             
             - 4 & 8 - thump motor down
             - 5 & 9 - thump motor up
-            - 10 - Set thump motor position using Z
+            - 10 - Minibot deploy out
+            - 11 - Minibot deploy in
             
     Driver station:
         - Inputs 1-6 set vertical position
@@ -71,6 +72,9 @@ class MyRobot(wpilib.SimpleRobot):
         self.arm_stick = wpilib.Joystick(2)
         self.ds = wpilib.DriverStation.GetInstance()
         self.auto = auto.Auto()
+        
+        # minibot deploy
+        self.minibot_deploy = wpilib.Relay(2)
 
 
     def Disabled(self):
@@ -242,8 +246,6 @@ class MyRobot(wpilib.SimpleRobot):
                 elif self.arm_stick.GetRawButton(5) or self.arm_stick.GetRawButton(9):
                     self.arm.manual_thump_control( 1.0 )
                     
-                elif self.arm_stick.GetRawButton(10):
-                    self.arm.set_thump_position( (self.arm_stick.GetZ() + 1.0) / 2.0 )
             except:
                 if not self.ds.IsFMSAttached():
                     raise
@@ -295,6 +297,24 @@ class MyRobot(wpilib.SimpleRobot):
             except:
                 if not self.ds.IsFMSAttached():
                     raise
+           
+           # Minibot deployment
+            try:
+                # miniboy deploy
+                if self.arm_stick.GetRawButton(10):
+                    self.minibot_deploy.Set(wpilib.Relay.kForward)
+                
+                # minibot retrieve
+                elif self.arm_stick.GetRawButton(11):
+                    self.minibot_deploy.Set(wpilib.Relay.kReverse)
+                    
+                # minibot motor off
+                else:
+                    self.minibot_deploy.Set(wpilib.Relay.kOff)
+                
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise            
             
             wpilib.Wait(0.05)
 

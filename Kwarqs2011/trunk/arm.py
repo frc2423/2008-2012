@@ -29,7 +29,7 @@ except:
 from util import *
 
 # the expected distance between the top and bottom limit switches
-ARM_TOP = 18.4
+ARM_TOP = 19.8
 
 # The vertical positions for the arm, relative to the bottom. In percentages!
 #ARM_1 = 19.0        #   2  -- 0
@@ -669,11 +669,19 @@ class Arm(object):
                 self.vertical_motor.GetPosition(),
                 self.vertical_motor.Get(),
                 str(self.arm_is_in_position()) ))
-                                
-        print( "Modes     : cal_mode: %s(%s-%s); pos_mode: %s(%s); man_mode: %s(%s); hold: %s(%s)" % (\
+        
+        if actual_top_position is not None and actual_bottom_position is not None:
+            cal_range = actual_top_position - actual_bottom_position
+        else:
+            cal_range = None
+        
+        print( "Calibrate : mode: %s; bottom: %s; top: %s; range: %s" % (\
                 str(self.calibration_mode),
                 str( actual_bottom_position ),
                 str( actual_top_position ),
+                str( cal_range ) ))
+            
+        print( "Modes     : pos_mode: %s(%s); man_mode: %s(%s); hold: %s(%s)" % (\
                 str(self.position_set),
                 str(self.position_set_value),
                 str(self.manual_set),

@@ -24,7 +24,7 @@ LT_MAX = 240.0              # placeholder
 
 # autonomous mode times
 AUTON_MODE_ARM_DOWN_TIME = 10.0 # time when the robot starts dropping the arm after deployment
-AUTON_MODE_ABORT_TIME = 11.5    # time when the robot gives up and backs away from the pole
+AUTON_MODE_ABORT_TIME = 10.40   # time when the robot gives up and backs away from the pole
 AUTON_MODE_MAX_TIME = 16.0
 
 class Auto(object):

@@ -137,7 +137,7 @@ class Joystick(object):
         self.z = 0
         
         # trigger, top, 3... 
-        self.buttons = [ False, False, False, False, False, False, False, False, False, False ]
+        self.buttons = [ False, False, False, False, False, False, False, False, False, False, False ]
         
     def GetRawButton(self, number):
         return self.buttons[number-1]

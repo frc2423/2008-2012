@@ -1,0 +1,4 @@
+#!/bin/bash
+
+python -B test.py $@
+

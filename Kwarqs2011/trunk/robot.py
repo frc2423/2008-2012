@@ -43,7 +43,11 @@ from util import *
 
 robot = None
 
+# enable/disable autonomous mode
 AUTONOMOUS_DISABLED = False
+
+# enable/disable kinect based autonomous mode
+KINECT_AUTONOMOUS = True
 
 class MyRobot(wpilib.SimpleRobot):
 
@@ -55,14 +59,14 @@ class MyRobot(wpilib.SimpleRobot):
         # after various timeout issues we switched them back to PWM 
         # control because we couldn't afford the stalls
         
-        #self.l_motor = wpilib.CANJaguar( 23 )
-        #self.r_motor = wpilib.CANJaguar( 24 )
-        self.l_motor = wpilib.Jaguar( 1 )
-        self.r_motor = wpilib.Jaguar( 2 )
+        self.l_motor = wpilib.CANJaguar( 3 )
+        self.r_motor = wpilib.CANJaguar( 4 )
+        #self.l_motor = wpilib.Jaguar( 1 )
+        #self.r_motor = wpilib.Jaguar( 2 )
         
         # set to coast
-        #self.l_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
-        #self.r_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
+        self.l_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
+        self.r_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
  
         self.drive = wpilib.RobotDrive(self.l_motor, self.r_motor)
         
@@ -72,6 +76,16 @@ class MyRobot(wpilib.SimpleRobot):
         self.arm_stick = wpilib.Joystick(2)
         self.ds = wpilib.DriverStation.GetInstance()
         self.auto = auto.Auto()
+        
+        # beta kinect support
+        try:
+            self.kinect1 = wpilib.KinectStick(1)
+            self.kinect2 = wpilib.KinectStick(2)
+        except AttributeError:
+            print("MyRobot::__init__() WARNING: Kinect not enabled!")
+            self.kinect1 = None
+            self.kinect2 = None
+            KINECT_AUTONOMOUS = False
         
         # minibot deploy
         self.minibot_deploy = wpilib.Relay(2)
@@ -110,6 +124,8 @@ class MyRobot(wpilib.SimpleRobot):
     def Autonomous(self):
     
         print("MyRobot::Autonomous()")
+        print("  -> Enabled:     %s" % (not AUTONOMOUS_DISABLED) )
+        print("  -> Kinect Mode: %s" % (KINECT_AUTONOMOUS) )
     
         self.GetWatchdog().SetEnabled(False)
         
@@ -135,22 +151,57 @@ class MyRobot(wpilib.SimpleRobot):
         #self.arm.set_thump_position( 0.08 )
         #self.arm.set_thump_position( 0.25 )
         
+        holding = False
+        
         while self.IsAutonomous() and self.IsEnabled():
             
             # control loops
             if not AUTONOMOUS_DISABLED:
             
+                time = timer.Get()
+            
                 try:
-                    self.auto.update_line_tracking(self.ds, timer.Get())
+                    self.auto.update_line_tracking(self.ds, time)
                 except:
                     if not self.ds.IsFMSAttached():
                         raise
+                
+                if KINECT_AUTONOMOUS:
+                
+                    # User assisted autonomous mode (via Kinect)
+                    try:
+                        self.auto.assisted_line_tracking_driving(self.drive, self.kinect1, time)
+                    except:
+                        if not self.ds.IsFMSAttached():
+                            raise
 
-                try:
-                    self.auto.do_control_loop(self.drive, self.arm, timer.Get())
-                except:
-                    if not self.ds.IsFMSAttached():
-                        raise
+                    try:
+                        y = self.kinect2.GetY()
+                    
+                        # 
+                        # If the input is non-zero, move the arm. Otherwise hold
+                        # the current position
+                        #
+                    
+                        if abs(y) > 0.2:
+                            self.arm.manual_vertical_control(y)
+                            holding = False
+                        elif not holding:
+                            self.arm.set_hold_position()
+                            holding = True
+                            
+                    except:
+                        if not self.ds.IsFMSAttached():
+                            raise
+                
+                else:
+                
+                    # Normal autonomous mode
+                    try:
+                        self.auto.do_control_loop(self.drive, self.arm, time)
+                    except:
+                        if not self.ds.IsFMSAttached():
+                            raise
                     
                 try:
                     self.arm.do_control_loop()
@@ -256,17 +307,20 @@ class MyRobot(wpilib.SimpleRobot):
             except:
                 if not self.ds.IsFMSAttached():
                     raise
-                    
-            if not self.ds.IsFMSAttached():
-                if self.drive_stick.GetRawButton(7):
-                    if print_timer.should_print(83):
-                        self.arm.do_thump_drop( 0.7 )
-                elif self.drive_stick.GetRawButton(8):
-                    if print_timer.should_print(83):
-                        self.arm.do_thump_drop( 1.4 )
-                elif self.drive_stick.GetRawButton(9):
-                    if print_timer.should_print(83):
-                        self.arm.do_thump_drop( 1.9 )
+             
+            #
+            # ... old testing code
+            #
+            #if not self.ds.IsFMSAttached():
+            #    if self.drive_stick.GetRawButton(7):
+            #        if print_timer.should_print(83):
+            #            self.arm.do_thump_drop( 0.7 )
+            #    elif self.drive_stick.GetRawButton(8):
+            #        if print_timer.should_print(83):
+            #            self.arm.do_thump_drop( 1.4 )
+            #    elif self.drive_stick.GetRawButton(9):
+            #        if print_timer.should_print(83):
+            #            self.arm.do_thump_drop( 1.9 )
             
             #################
             # Control Loops #
@@ -298,7 +352,7 @@ class MyRobot(wpilib.SimpleRobot):
                 if not self.ds.IsFMSAttached():
                     raise
            
-           # Minibot deployment
+            # Minibot deployment
             try:
                 # miniboy deploy
                 if self.arm_stick.GetRawButton(10):

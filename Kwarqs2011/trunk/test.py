@@ -11,7 +11,6 @@
 '''
 
 from optparse import OptionParser
-import fake_wpilib as wpilib
 
 
 # state variables
@@ -78,7 +77,6 @@ class AutonomousStateMachine(object):
         
     def run(self):
         ret = True
-        #print("[asm]: loop %d" % self.loop)
         
         # increase/decrease the wall distance depending on our speed
         self.wall_distance += self.robot.drive.y*2
@@ -88,16 +86,35 @@ class AutonomousStateMachine(object):
         
         adjust_arm_positions( self.robot.arm.vertical_motor )
         
-        #if self.loop == 160:
-        #    self.robot.arm.print_diagnostics()
-        
         # autonomous is done after 15 seconds
         if self.loop > 20*15:
             ret = False
         
         self.loop += 1
         return ret
-    
+
+
+class KinectAutonomousStateMachine(AutonomousStateMachine):
+
+    def __init__(self, robot):
+        AutonomousStateMachine.__init__(self, robot)
+        
+    def run(self):
+        
+        # do kinect things here.. 
+        if self.loop == 1:
+            self.robot.kinect1.y = 0.0        # robot motion
+            self.robot.kinect2.y = 0.0        # arm motion
+        elif self.loop == 2:
+            self.robot.kinect1.y = -.3
+            self.robot.kinect2.y = 1.0
+        elif self.loop == 20*5:
+            self.robot.kinect2.y = 0.0
+        
+        
+        # run the base autonomous state machine
+        return AutonomousStateMachine.run(self)
+        
 
 class OperatorStateMachine(object):
 
@@ -191,11 +208,15 @@ if __name__ == '__main__':
     parser.add_option(  '--fms',
                         action='store_true', dest='fms_attached', default=False,
                         help='Pretend that the robot is on the field' )
+                        
+    parser.add_option(  '--test-kinect-auto',
+                        action='store_true', dest='test_kinect_auto', default=False,
+                        help='Run testing for the Kinect-based autonomous mode' )
     
     (options, args) = parser.parse_args()
 
-
     # start it up
+    import fake_wpilib as wpilib
     from robot import run
     run() 
     
@@ -216,7 +237,12 @@ if __name__ == '__main__':
 
     # go through autonomous mode at least once
     disabled = False
-    autonomous_state_machine = AutonomousStateMachine(robot)
+    
+    if options.test_kinect_auto:
+        autonomous_state_machine = KinectAutonomousStateMachine(robot)
+    else:
+        autonomous_state_machine = AutonomousStateMachine(robot)
+        
     robot.Autonomous()
     
     robot.arm.print_diagnostics()
@@ -244,7 +270,12 @@ if __name__ == '__main__':
     robot.Disabled()
     
     disabled = False
-    autonomous_state_machine = AutonomousStateMachine(robot)
+    
+    if options.test_kinect_auto:
+        autonomous_state_machine = KinectAutonomousStateMachine(robot)
+    else:
+        autonomous_state_machine = AutonomousStateMachine(robot)
+        
     robot.Autonomous()
     
     from fake_wpilib import global_time

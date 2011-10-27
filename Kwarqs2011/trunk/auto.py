@@ -159,7 +159,6 @@ class Auto(object):
     
         x = self.lt_steering
 
-        # Relative distance from wall
         wall_distance = 0
         if self.ultrasonic.IsRangeValid():
             wall_distance = self.ultrasonic.GetRangeInches()
@@ -175,6 +174,30 @@ class Auto(object):
         else:
             y = 0.0
     
+        drive.ArcadeDrive(y, x, False)
+    
+    def assisted_line_tracking_driving(self, drive, stick, autonomous_time):
+        '''Takes a Joystick (Kinect) to assist with line tracking'''
+        
+        x = self.lt_steering
+        
+        # Relative distance from wall
+        wall_distance = 0
+        if self.ultrasonic.IsRangeValid():
+            wall_distance = self.ultrasonic.GetRangeInches()
+        
+        y = stick.GetY()
+        
+        # only allow moving away from the wall if we're too close
+        if wall_distance <= self.deploy_range and y < 0.0:
+            if self.timer.should_print(-1):
+                print("[auton: %4s; Wall: %6s] Stopping robot from getting too close!" % (\
+                        str(autonomous_time),
+                        str(wall_distance)
+                    ))
+                
+            y = 0.0
+            
         drive.ArcadeDrive(y, x, False)
     
         

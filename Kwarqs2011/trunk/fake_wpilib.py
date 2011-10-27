@@ -157,7 +157,11 @@ class Joystick(object):
     def GetZ(self):
         return self.z
     
-    
+
+class KinectStick(Joystick):
+    pass
+
+
 class RobotDrive(object):
     
     def __init__(self, l_motor, r_motor):

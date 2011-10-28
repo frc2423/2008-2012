@@ -151,6 +151,8 @@ class MyRobot(wpilib.SimpleRobot):
         #self.arm.set_thump_position( 0.08 )
         #self.arm.set_thump_position( 0.25 )
         
+        kprint = PrintTimer()
+        
         holding = False
         
         while self.IsAutonomous() and self.IsEnabled():
@@ -168,6 +170,10 @@ class MyRobot(wpilib.SimpleRobot):
                 
                 if KINECT_AUTONOMOUS:
                 
+                    if kprint.should_print():
+                        print("[robot] Kinect1: %f,%f; Kinect2: %f,%f" % (self.kinect1.GetX(), self.kinect1.GetY(), self.kinect2.GetX(), self.kinect2.GetY() ))
+                
+                
                     # User assisted autonomous mode (via Kinect)
                     try:
                         self.auto.assisted_line_tracking_driving(self.drive, self.kinect1, time)
@@ -176,7 +182,7 @@ class MyRobot(wpilib.SimpleRobot):
                             raise
 
                     try:
-                        y = self.kinect2.GetY()
+                        y = self.kinect2.GetY()*-1.0
                     
                         # 
                         # If the input is non-zero, move the arm. Otherwise hold

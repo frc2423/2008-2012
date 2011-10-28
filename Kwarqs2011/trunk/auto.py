@@ -188,15 +188,22 @@ class Auto(object):
         
         y = stick.GetY()
         
-        # only allow moving away from the wall if we're too close
-        if wall_distance <= self.deploy_range and y < 0.0:
-            if self.timer.should_print(-1):
-                print("[auton: %4s; Wall: %6s] Stopping robot from getting too close!" % (\
-                        str(autonomous_time),
-                        str(wall_distance)
-                    ))
+        if self.timer.should_print(101):
+            print("[auton: %4s; Wall: %6s]" % (\
+                    str(autonomous_time),
+                    str(wall_distance)
+                ))
                 
-            y = 0.0
+        if wall_distance > self.deploy_range + 40.0:
+            y = max(-0.6, y)
+        elif wall_distance > self.deploy_range + 32.0:
+            y = max(-0.5, y)
+        elif wall_distance > self.deploy_range + 16.0:
+            y = max(-0.3, y)
+        elif wall_distance > self.deploy_range:
+            y = max(-0.2, y)
+        else:
+            y = max(0.0, y)
             
         drive.ArcadeDrive(y, x, False)
     

@@ -10,8 +10,8 @@ THUMP_MAX_POSITION = .82
 THUMP_MIN_POSITION = .50
 
 # PID constants
-ARM_P = 1000.0
-ARM_I = 0.2
+ARM_P = 1500.0
+ARM_I = 0.5
 ARM_D = 0.0
 
 
@@ -23,6 +23,9 @@ class MyRobot(wpilib.SimpleRobot):
         self.thump_motor = wpilib.CANJaguar(11)
         
         self.position = False
+        
+        self.thump_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_Potentiometer )
+        self.thump_motor.ConfigPotentiometerTurns( 1 )
         
         # self.thump_motor = wpilib.CANJaguar(11, wpilib.CANJaguar.kPosition )
         # self.thump_motor.SetPID( .95, 0.0, 0.0 )
@@ -83,7 +86,7 @@ class MyRobot(wpilib.SimpleRobot):
     def _translate_z(self, z):
     
         # Xmax - (Ymax - Y)( (Xmax - Xmin) / (Ymax - Ymin) )
-        return THUMP_MAX_POSITION - ((1 - z)*( (THUMP_MAX_POSITION - THUMP_MIN_POSITION) / 2 ) )
+        return THUMP_MAX_POSITION - ((1 - z)*( (THUMP_MAX_POSITION - THUMP_MIN_POSITION) / 1 ) )
 
         
     def OperatorControl(self):
@@ -105,7 +108,7 @@ class MyRobot(wpilib.SimpleRobot):
             
             # vertical arm code
             if self.position:
-                self.thump_motor.Set( self._translate_z( stick2.GetZ() ) )
+                self.thump_motor.Set( self._translate_z( (stick2.GetZ() + 1.0) / 2.0 ) )
             else:
                 if stick2.GetTrigger():
                     self.thump_motor.Set( stick2.GetY() )

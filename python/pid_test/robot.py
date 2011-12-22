@@ -88,10 +88,11 @@ class MyRobot(wpilib.SimpleRobot):
             dog.Feed()
             
             # vertical arm code
-            if stick2.GetTrigger():
-                self.vertical_motor.Set( stick2.GetY() )
-            else:
-                self.vertical_motor.Set( 0.0 )
+            #if stick2.GetTrigger():
+            #    self.vertical_motor.Set( stick2.GetY() )
+            #else:
+            #    self.vertical_motor.Set( 0.0 )
+            self.vertical_motor.Set( stick2.GetZ() )
                 
             if stick2.GetTop() and not on:
                 on = True

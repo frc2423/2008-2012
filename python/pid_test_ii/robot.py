@@ -13,7 +13,7 @@ encoder = wpilib.Encoder(10,11)
 class MyRobot(wpilib.SimpleRobot):
 
     def __init__(self):
-        pass
+        encoder.Start()
 
     def Disabled(self):
         

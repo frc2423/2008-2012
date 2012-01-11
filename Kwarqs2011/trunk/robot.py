@@ -47,27 +47,41 @@ robot = None
 AUTONOMOUS_DISABLED = False
 
 # enable/disable kinect based autonomous mode
-KINECT_AUTONOMOUS = True
+KINECT_AUTONOMOUS = False
+
+# enable/disable using the CAN Jaguars for the drivetrain
+USE_CAN_DRIVETRAIN = False
 
 class MyRobot(wpilib.SimpleRobot):
 
     def __init__(self):
     
-        print("MyRobot::__init__()")
+        global AUTONOMOUS_DISABLED
+        global KINECT_AUTONOMOUS
+        global USE_CAN_DRIVETRAIN
+    
+        print("MyRobot::__init__() Configuration:")
+        print("     Autonomous: %s" % AUTONOMOUS_DISABLED )
+        print("     Kinect:     %s" % KINECT_AUTONOMOUS )
+        print("     Drivetrain: %s" % ('CAN' if USE_CAN_DRIVETRAIN else 'PWM'))
     
         # drive motors -- originally these were CANJaguar motors, but
         # after various timeout issues we switched them back to PWM 
         # control because we couldn't afford the stalls
         
-        self.l_motor = wpilib.CANJaguar( 3 )
-        self.r_motor = wpilib.CANJaguar( 4 )
-        #self.l_motor = wpilib.Jaguar( 1 )
-        #self.r_motor = wpilib.Jaguar( 2 )
+        if USE_CAN_DRIVETRAIN:
+            self.l_motor = wpilib.CANJaguar( 3 )
+            self.r_motor = wpilib.CANJaguar( 4 )
         
-        # set to coast
-        self.l_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
-        self.r_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
+            # set to coast
+            self.l_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
+            self.r_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
  
+        else:
+            self.l_motor = wpilib.Jaguar( 1 )
+            self.r_motor = wpilib.Jaguar( 2 )
+        
+        # associate motors with the drivetrain
         self.drive = wpilib.RobotDrive(self.l_motor, self.r_motor)
         
         # other useful things

@@ -6,13 +6,19 @@ import wpilib
 stick1 = wpilib.Joystick(1)
 stick2 = wpilib.Joystick(2)
 
+# this is the motor attached to the encoder
 motor = wpilib.Jaguar(3)
 encoder = wpilib.Encoder(10,11)
+
+motor1 = wpilib.Jaguar(1)
+motor2 = wpilib.CANJaguar(10)
+
 
 
 class MyRobot(wpilib.SimpleRobot):
 
     def __init__(self):
+        wpilib.SimpleRobot.__init__(self)
         encoder.Start()
 
     def Disabled(self):
@@ -45,7 +51,10 @@ class MyRobot(wpilib.SimpleRobot):
         while self.IsOperatorControl() and self.IsEnabled():
    
             dog.Feed()
-            motor.Set( stick1.GetY() )
+            motor1.Set( stick1.GetY() )
+            motor2.Set( stick1.GetY() )
+            
+            motor.Set( stick2.GetY() )
                
             if timer.HasPeriodPassed( 1.0 ):
                 print( "Motor: %f; Encoder: %d" % ( motor.Get(), encoder.Get() ) )

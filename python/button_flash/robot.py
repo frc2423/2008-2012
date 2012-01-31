@@ -46,7 +46,7 @@ class MyRobot(wpilib.SimpleRobot):
             on = stick.GetTrigger()
             
             for i in range(1,9):
-                ds.SetDigitalOut(i,on)
+                ds.SetDigitalOut(i,on) 
     
             wpilib.Wait(0.04)
 

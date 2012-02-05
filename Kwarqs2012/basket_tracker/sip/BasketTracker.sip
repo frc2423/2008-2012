@@ -25,7 +25,7 @@ class BasketTracker {
     public:
     
         // constructor
-        BasketTracker();
+        BasketTracker() /NewThread/;
         
         // destructor
         ~BasketTracker();

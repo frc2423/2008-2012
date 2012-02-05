@@ -1,0 +1,44 @@
+//
+// SIP module definition for Kwarqs 2012 basket tracker
+//
+
+%Module _basket_tracker
+
+%DefaultEncoding "UTF-8"
+
+
+struct TrackingData {
+    %TypeHeaderCode
+    #include "TrackingData.h"
+    %End
+    
+    double x;
+    double y;
+};
+
+
+class BasketTracker {
+    %TypeHeaderCode
+    #include "BasketTracker.h"
+    %End
+    
+    public:
+    
+        // constructor
+        BasketTracker();
+        
+        // destructor
+        ~BasketTracker();
+        
+        ///////////////////////////////
+        // python API
+        ///////////////////////////////
+        
+        // retrieves current vision tracking data
+        TrackingData GetData();
+        
+    private:
+    
+        // no copy or assign
+        BasketTracker( const BasketTracker &other);
+};

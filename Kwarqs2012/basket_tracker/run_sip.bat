@@ -1,0 +1,1 @@
+sip -c . -g -w sip/BasketTracker.sip

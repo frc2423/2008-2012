@@ -7,6 +7,8 @@
 BasketTracker::BasketTracker()
 {
     // TODO: Initialize the tracking data
+    m_data.x = 0.0;
+    m_data.y = 0.0;
     
     // create a lock to use for synchronization
     m_lock = semBCreate(SEM_Q_PRIORITY, SEM_FULL);
@@ -68,9 +70,11 @@ void BasketTracker::Main()
             // you can either set the parameters individually, or perhaps 
             // just keep your own local copy, and then just copy the whole
             // thing when its time to update the data?
-            m_data.x = 0.0;
-            m_data.y = 1.0;
+            m_data.x = m_data.x + 1.0;
+            m_data.y = m_data.y - 1.0;
         }
+        
+        Wait( 1.0 );
     }
 }
 

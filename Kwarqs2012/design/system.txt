@@ -1,0 +1,54 @@
+
+
+Various components of the robot, and associated sensors:
+
+    Shooter:
+        Wheel:
+            - CAN Jaguar + CIM Motor
+            - CAN Jaguar + CIM Motor
+            - US Digital Encoder 
+                -- attached to Jaguar
+                -- may need an isolation circuit to hook it up to both Jags.. 
+            
+        Angle Adjustment:
+            - CAN Jaguar + Motor
+            - Magnetic absolute angle encoder 
+                -- attached to Jaguar
+            - Do we need limit switches for extremities? 
+        
+        Lazy Susan:
+            - CAN Jaguar + Vex Motor
+            - Vex Motor Encoder
+            - 2 limit switches for each extreme of the lazy susan rotation
+                -- attached to Jaguar
+            - Gyro for angle sensing
+        
+        Camera:
+            - Camera
+            - Servo
+        
+    Chamber:
+        - Jaguar + Motor
+        - Ball detection (1 ball):
+            - Distance sensor or limit switch (maybe both?)
+    
+    Feeder:
+        - Jaguar + Motor
+        - Ball detection (2 balls):
+            - Distance sensor or limit switch
+            - Distance sensor or limit switch
+    
+    Ramp Arm:
+        - Relay + Motor
+        - Limit switch
+    
+    Drivetrain:
+        - PWM Jaguar + CIM
+        - PWM Jaguar + CIM
+        
+    Other:
+        - Perhaps put distance sensor at feeder entrance to detect incoming?
+        - Additional Gyro for angle sensing
+
+        
+TODO: Make this into an excel spreadsheet... 

@@ -28,12 +28,12 @@ Various components of the robot, and associated sensors:
             - Servo
         
     Chamber:
-        - Jaguar + Motor
+        - Relay + Motor
         - Ball detection (1 ball):
             - Distance sensor or limit switch (maybe both?)
     
     Feeder:
-        - Jaguar + Motor
+        - Relay + Motor
         - Ball detection (2 balls):
             - Distance sensor or limit switch
             - Distance sensor or limit switch
@@ -50,4 +50,5 @@ Various components of the robot, and associated sensors:
         - Perhaps put distance sensor at feeder entrance to detect incoming?
         - Additional Gyro for angle sensing
 
-See spreadsheet for numbers and such!
+        
+TODO: Make this into an excel spreadsheet... 

@@ -26,9 +26,16 @@ class RobotManager(Object):
     '''
     Calls the shoot function if the bot is ready to shoot
     '''
-    def ShootFunction(self):
+    def ShootIfReady(self):
         if shooter.Ready() and chamber.Ready():
-            self.chamber.Release():
+            self.chamber.Release()
+    
+    '''
+    Releases chamber no matter the state, only to be used when things malfunction
+    '''
+    def ShootOverride(self):
+        self.chamber.Release()
+        
     '''
     Calls functions within the components based on every possible state
     '''    

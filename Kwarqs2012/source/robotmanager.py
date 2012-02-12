@@ -27,7 +27,7 @@ class RobotManager(Object):
     Calls the shoot function if the bot is ready to shoot
     '''
     def ShootIfReady(self):
-        if shooter.Ready() and chamber.Ready():
+        if shooter.IsReady() and chamber.IsReady():
             self.chamber.Release()
     
     '''
@@ -40,15 +40,15 @@ class RobotManager(Object):
     Calls functions within the components based on every possible state
     '''    
     def Update(self):
-        if chamber.Full() and feeder.Full():
+        if chamber.IsFull() and feeder.IsFull():
             self.feeder.Stop()
             #chamber.Stop()
             
-        elif not chamber.Full() and feeder.ready():
+        elif not chamber.IsFull() and feeder.IsReady():
             self.feeder.FeedOveride()
             #chamber.Feed()
             
-        elif not feeder.Full():
+        elif not feeder.IsFull():
             self.feeder.Feed()
             
         self.shooter.Update()

@@ -71,17 +71,15 @@ class MyRobot(wpilib.SimpleRobot):
             if stick1.GetTrigger(): #this is to fire the ball
                 RobotManager.ShootIfReady()
             
-            if stick1.GetRawButton(4)
+            if stick1.GetRawButton(4):
                 RobotManager.FeedOverride()
             
-            ''' 
-            this is for the manuel override for the aiming, its sets a state when a button is pressed to initiate it.
-            
-            if stick2.GetRawButton(7) 
-                state = manual 
-               
-            else state = automatic
-            '''
+            if stick1.GetRawButton(5):
+                RobotManager.ChamberOverride()
+                
+            if stick1.GetRawButton(6):
+                RobotManager.ShooterOverride()
+         
                
                #this prints values so we know what's going on
             if timer.HasPeriodPassed( 1.0 ):

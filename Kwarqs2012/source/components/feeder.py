@@ -42,9 +42,10 @@ class Feeder(Object, relayChannel):
     #def IsFull(self):
     #    if limitswitch == True 
     #    
-    
+   
+
+'''   
     def Update(self):
-        self.feederMotor.set(self.direction)
-        
-        
-        
+        if FeedOveride() != 1 
+            self.feederMotor.set(self.direction)
+'''     

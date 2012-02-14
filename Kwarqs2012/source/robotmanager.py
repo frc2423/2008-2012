@@ -1,3 +1,8 @@
+try:
+    import wpilib
+except ImportError:
+    import fake_wpilib as wpilib
+
 '''
 Calls certain functions based on the current states of each component
 '''
@@ -51,8 +56,8 @@ class RobotManager(Object):
         elif not feeder.IsFull():
             self.feeder.Feed()
             
-        self.shooter.Update()
+        self.Shooter.Update()
         self.chamber.Update()
         self.feeder.Update()
-        self.ramp_arm.Update()
+        self.Ramp Arm.Update()
         

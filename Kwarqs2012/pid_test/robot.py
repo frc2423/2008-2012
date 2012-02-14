@@ -103,6 +103,6 @@ def run():
     robot = MyRobot()
     robot.StartCompetition()
 
-
+    return robot
 
 

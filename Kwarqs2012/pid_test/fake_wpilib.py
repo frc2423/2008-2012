@@ -2,11 +2,11 @@
     fake_wpilib.py
     
     This is a library designed to emulate parts of WPILib so you can
-    more easily do
+    more easily do unit testing of your robot code. 
     
     Robot Code Assumptions:
     
-        - robot code is in robot.py
+        - robot code is in robot.py, and 'import robot' works. 
         - the 'run' function is the first thing that is called,
         and returns an object that derives from SimpleRobot
         - fake_wpilib is placed next to robot.py
@@ -45,6 +45,7 @@
             ... etc
 '''
 
+import math
 
 
 # This variable is incremented by the Wait function
@@ -60,6 +61,12 @@ def initialize_robot():
     import robot
     return robot.run()
 
+
+#################################################
+#
+# Core engine of robot code
+#
+#################################################    
 
 class SimpleRobot(object):
     
@@ -93,43 +100,119 @@ class SimpleRobot(object):
     def GetWatchdog(self):
         return Watchdog()
     
+#################################################
+#
+# WPILib Functionality
+#
+#################################################
+    
+    
+class Accelerometer(object):
+
+    def __init__(self, channel):
+        self.value = 0
+        
+    def GetAcceleration(self):
+        return self.value
+        
+    def SetSensitivity(self, sensitivity):
+        pass
+        
+    def SetZero(self, zero):
+        pass
+    
+
+class AnalogChannel(object):
+
+    kAccumulatorModuleNumber = 1
+    kAccumulatorNumChannels = 2
+    kAccumulatorChannels = [1, 2]
+    
+    def __init__(self, channel):
+        pass
+        
+    def GetValue(self):
+        return self.value
+        
+    def GetAverageValue(self):
+        return self.average_value
+        
+    def GetVoltage(self):
+        return self.voltage
+        
+    def GetAverageVoltage(self):
+        return self.average_voltage
+        
+    # TODO: Implement a sensible implementation for this
+
+
+
+    
 class CANJaguar(object):
 
-    # control mode
+    # ControlMode
     kPercentVbus = 1
     kCurrent = 2
     kSpeed = 3
     kPosition = 4
     kVoltage = 5
     
-    # position mode
+    # Limits
+    kForwardLimit = 1
+    kReverseLimit = 2
+    
+    # PositionReference
     kPosRef_QuadEncoder = 0
     kPosRef_Potentiometer = 1
+    kPosRef_None = 0xFF
     
-    # neutral mode
+    # SpeedReference
+    kSpeedRef_Encoder = 0
+    kSpeedRef_InvEncoder = 2
+    kSpeedRef_QuadEncoder = 3
+    kSpeedRef_None = 0xFF
+    
+    # NeutralMode
     kNeutralMode_Brake = 1
     kNeutralMode_Coast = 2
     
-    def __init__(self, deviceNumber):
-        self.control_mode = CANJaguar.kPercentVbus
-        self.forward_ok = True
-        self.reverse_ok = True
+    # LimitMode
+    kLimitMode_SwitchInputsOnly = 0
+    kLimitMode_SoftPositionLimits = 1
+    
+    def __init__(self, deviceNumber, controlMode=kPercentVbus):
+        self.control_mode = controlMode
+        self.forward_ok = True              # forward limit switch
+        self.reverse_ok = True              # reverse limit switch
         self.position = 0
+        self.speed = 0
         self.value = 0
-        
+    
+    def ChangeControlMode(self, mode):
+        self.control_mode = mode
+    
     def ConfigEncoderCodesPerRev(self, codes):
         pass
         
+    def ConfigFaultTime(self, faultTime):
+        pass
+        
+    def ConfigMaxOutputVoltage(self, voltage):
+        pass
+    
+    def ConfigNeutralMode(self, mode):
+        pass
+    
     def ConfigPotentiometerTurns(self, turns):
         pass
         
-    def ChangeControlMode(self, mode):
-        self.control_mode = mode
-        
-    def ConfigNeutralMode(self, mode):
+    def ConfigSoftPositiionLimits(self, forward, reverse):
         pass
         
     def DisableControl(self):
+        pass
+        
+    def DisableSoftPositionLimits(self):
         pass
         
     def EnableControl(self, encoder_position=0):
@@ -150,36 +233,98 @@ class CANJaguar(object):
     def GetOutputVoltage(self):
         return 0.0
         
+    def GetP(self):
+        return self.p
+        
+    def GetI(self):
+        return self.i
+        
+    def GetD(self):
+        return self.d
+        
     def GetReverseLimitOK(self):
         return self.reverse_ok
         
-    def GetPosition(self):            
+    def GetPosition(self):
+        if self.control_mode != kPosition:
+            raise RuntimeError("Invalid control mode")
         return self.position
         
-    def Set(self, value):
+    def GetSpeedReference(self):
+        return self.speed_reference
+        
+    def GetSpeed(self):
+        if self.control_mode != kSpeed:
+            raise RuntimeError("Invalid control mode")
+        return self.speed
+        
+    def Set(self, value, syncGroup=0):
         self.value = value
         
     def SetPID(self, p, i, d):
-        pass
+        self.p = p
+        self.i = i
+        self.d = d
         
-    def SetPositionReference(self, ref):
+    def SetPositionReference(self, positionReference):
+        self.position_reference = positionReference
+        
+    def SetSpeedReference(self, speedReference):
+        self.speed_reference = speedReference
+        
+    def SetVoltageRampRate(self, rampRate):
         pass
         
     
+class Compressor(object):
+    
+    def __init__(self, pressureSwitchChannel, compressorRelayChannel):
+        self.enabled = False
+        self.value = 0
+        
+    def Enabled(self):
+        return self.enabled
+    
+    def Start(self):
+        self.enabled = True
+        
+    def Stop(self):
+        self.enabled = False
+        
+    def GetPressureSwitchValue(self):
+        return self.value
+
     
 class DigitalInput(object):
 
-    def __init__(self, port):
+    def __init__(self, channel):
         self.value = False
-        
+        self.channel = channel
+    
     def Get(self):
         return self.value
+        
+    def GetChannel(self):
+        return self.channel
         
     def Set(self, value):
         if value:
             self.value = True
         else:
             self.value = False
+     
+     
+class DigitalOutput(object):
+    
+    def __init__(self, channel):
+        self.value = False
+        self.channel = channel
+
+    def Get(self):
+        return self.value
+       
+    def Set(self, value):
+        self.value = value
 
 class DriverStation(object):
     
@@ -213,16 +358,35 @@ class Encoder(object):
         return self.value
 
         
+class Gyro(object):
+    
+    kSamplesPerSecond = 50.0
+    kCalibrationSampleTime = 5.0
+    kDefaultVoltsPerDegreePerSecond = 0.007
+    
+    def __init__(self, channel):
+        pass
+        
+    def GetAngle(self):
+        return self.value
+    
+    def Reset(self):
+        self.value = 0
+    
+    def SetSensitivity(self, voltsPerDegreePerSecond):
+        pass
+        
+        
 class Jaguar(object):
 
-    def __init__(self, port):
+    def __init__(self, channel):
         self.value = 0
-        
-    def Set(self, value):
-        self.value = value
         
     def Get(self):
         return self.value
+        
+    def Set(self, value):
+        self.value = value
         
         
 class Joystick(object):
@@ -231,9 +395,11 @@ class Joystick(object):
     kTopButton = 1
     
     def __init__(self, port):
-        self.x = 0
-        self.y = 0
-        self.z = 0
+        self.x = 0.0
+        self.y = 0.0
+        self.z = 0.0
+        self.twist = 0.0
+        self.throttle = 0.0
         
         # trigger, top, 3... 
         self.buttons = [ False, False, False, False, False, False, False, False, False, False, False ]
@@ -245,15 +411,30 @@ class Joystick(object):
             return self.GetTop()
             
         raise RuntimeError( 'Invalid button type specified' )
+    
+    def GetDirectionDegrees(self):
+        return (180.0/math.acos(-1.0)) * self.GetDirectionRadians()
+    
+    def GetDirectionRadians(self):
+        return math.atan2( self.x, -self.y )
+        
+    def GetMagnitude(self):
+        return math.sqrt( math.pow( self.x, 2) + math.pow( self.y, 2 ) )
         
     def GetRawButton(self, number):
         return self.buttons[number-1]
+        
+    def GetThrottle(self):
+        return self.throttle
         
     def GetTop(self):
         return self.buttons[1]
         
     def GetTrigger(self):
         return self.buttons[0]
+        
+    def GetTwist(self):
+        return self.twist
         
     def GetX(self):
         return self.x
@@ -276,7 +457,7 @@ class RobotDrive(object):
     kRearLeftMotor = 2
     kRearRightMotor = 3 
     
-    def __init__(self, l_motor, r_motor):
+    def __init__(self, lf_motor, rf_motor):
         self.x = 0.0
         self.y = 0.0
         
@@ -289,24 +470,88 @@ class RobotDrive(object):
         
     def SetInvertedMotor(self, motor, isInverted):
         pass
-        
-        
-        
-        
-    
+
+
 class Relay(object):
     
+    # Value
     kOff = 0
     kOn = 1
     kForward = 2
     kReverse = 3
     
-    def __init__(self, port):
+    # Direction
+    kBothDirections = 0
+    kForwardOnly = 1
+    kReverseOnly = 2
+    
+    def __init__(self, channel, direction=kBothDirections):
+        self.on = False
+        self.forward = False
         self.value = Relay.kOff
         
     def Set(self, value):
+        
         self.value = value
         
+        if value == Relay.kOff or value == Relay.kReverse:
+            self.forward = False
+            self.on = False
+            
+        elif value == Relay.kOn or value == Relay.kForward:
+            self.forward = True
+            self.on = True
+            
+        else:
+            raise RuntimeError( 'Invalid value %s passed to Relay.Set' % str(value) )
+            
+            
+class Servo(object):
+
+    kMaxServoAngle = 170.0
+    kMinServoAngle = 0.0
+
+    def __init__(self, channel):
+        self.value = None
+        
+    def Get(self):
+        return self.value
+    
+    def GetAngle(self):
+        return self.value * self.__GetServoAngleRange() + Servo.kMinServoAngle
+    
+    def GetMaxAngle(self):
+        return Servo.kMaxAngle
+        
+    def GetMinAngle(self):
+        return Servo.kMinAngle
+    
+    def Set(self, value):
+        self.value = value
+        
+    def SetAngle(self, degrees):
+        if degrees < Servo.kMinServoAngle:
+            degrees = Servo.kMinServoAngle
+        elif degrees > Servo.kMaxServoAngle:
+            degrees = Servo.kMaxServoAngle
+            
+        self.Set( (degrees - Servo.kMinServoAngle) / self.__GetServoAngleRange() )
+    
+    def __GetServoAngleRange(self):
+        return Servo.kMaxServoAngle - Servo.kMinServoAngle
+        
+
+class Solenoid(object):
+    
+    def __init__(self, channel):
+        self.value = False
+        
+    def Get(self):
+        return self.value
+        
+    def Set(self, value):
+        self.value = value
+
         
 class Timer(object):
     
@@ -345,6 +590,7 @@ class Timer(object):
             self.start_time += period
             return True
         return False
+    
         
 class Ultrasonic(object):
 
@@ -353,19 +599,46 @@ class Ultrasonic(object):
         pass
 
     def __init__(self, pingChannel, echoChannel):
-        self.distance = 240
-    
+        self.distance = 0
+        self.enabled = True
+        self.range_valid = True
+        
     def GetRangeInches(self):
         return self.distance
         
+    def GetRangeMM(self):
+        return self.GetRangeInches() * 25.4
+        
+    def IsEnabled(self):
+        return self.enabled
+        
     def IsRangeValid(self):
-        return True
+        return self.enabled and self.range_valid
+        
+    def Ping(self):
+        pass
+        
+    def SetEnabled(self, enable):
+        self.enabled = enable
+    
+    
+class Victor(object):
+    
+    def __init__(self, channel):
+        self.value = 0
+        
+    def Get(self):
+        return self.value
+        
+    def Set(self, value):
+        self.value = value
     
         
 def Wait(time):
     global global_time
     global_time += time
 
+    
 class Watchdog(object):
     
     def Feed(self):

@@ -14,6 +14,8 @@ struct TrackingData {
     
     double x;
     double y;
+	double angularVelocity;
+	bool validData;
 };
 
 

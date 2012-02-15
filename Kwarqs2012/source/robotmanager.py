@@ -37,6 +37,8 @@ class RobotManager(Object):
         self.shooter = Shooter()
         self.rampArm = RampArm(rampArmMotorNum)
     
+    #def SetState(): (manual or auto)
+    
     '''
     Calls the shoot function if the bot is ready to shoot
     '''

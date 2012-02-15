@@ -10,22 +10,20 @@ except ImportError:
 class Chamber ( Object ):
 
     def __Init__ ( self, chamberCANJagNum, limitSwitchNum ):
-        chambermotor = CANJaguar(chamberCANJagNum)
-        limitswitch3 = LimitSwitch(limitSwitchNum)
+        chamberMotor = CANJaguar(chamberCANJagNum)
+        limitSwitch3 = DigitalInput(limitSwitchNum)
+        switchState = False
         
     def Release( self ):
-        chambermotor.Set(1)
-        
-    def IsFull( self ):
-        return( limitswitch3 ==  True )
-        
-    def Empty( self ):
-        return( limitswitch3 == False )
+        chamberMotorState = 1.0      
         
     def IsReady( self ):  
-        return( IsFull == True )    
+        return switchState
+        
+    def Stop( self ):
+        chamberMotorState = 0.0
         
     def Update( self ):
+        chamberMotor.Set( chamberMotorState ) # so the update is changing if the motor is running
+        switchState = limitSwitch3.Get()
         
-        
-    

@@ -78,7 +78,7 @@ class MyRobot(wpilib.SimpleRobot):
                 RobotManager.ChamberOverride()
                 
             if stick1.GetRawButton(6):
-                RobotManager.ShooterOverride()
+                RobotManager.ShootOverride()
          
                
                #this prints values so we know what's going on

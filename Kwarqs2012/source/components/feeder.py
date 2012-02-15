@@ -1,5 +1,6 @@
 '''
-The feeder is meant to move balls from the ground to the chamber, where the ball will then be fired 
+The feeder is meant to move balls from the ground to the chamber, where the
+ball will then be fired 
 
 '''
 try:
@@ -8,20 +9,36 @@ except ImportError:
     import fake_wpilib as wpilib
 
 
-class Feeder(Object, relayChannel): 
+class Feeder(Object): 
     
     '''
     description: initializes an instance of Feeder
     Variables: 
-    relayChannel- The channel that the relay is connected to at the digital I/O
-    direction- alters the relay state, which in turn changes the direction the feedermotor rotates   
+    relayChannel- The channel that the relay is connected to at the digital 
+    I/O
+    
+    direction- alters the relay state, which in turn changes the direction the
+    feedermotor rotates   
+    
+    limSwitchChannel1 and limSwitchChannel2- The channels on the digital
+    sidecar that the limitswitches correspond to
+    
+    proxchannel- The channel on the digital sidecar that the proximity
+    sensor is connected to
+    
+    switch1- state of limit switch 1
+    switch2- state of limit switch 2
     '''
     
-    def __init__(self,feedmotor1):
+    def __init__(self, relayChannel, limSwitch1Channel, limSwitch2Channel, proxchannel):
         self.feederMotor = Relay(relayChannel)
         self.Full = 0
         self.direction = kOff
-    
+        limSwitch1 = DigitalInput( limSwitch1Channel )
+        limSwitch2 = DigitalInput( limSwitch2Channel )
+        switch1 = False
+        switch2 = False
+        
     #Starts feederMotor if needed
     def FeedOveride(self):
         self.direction = kForward
@@ -30,22 +47,35 @@ class Feeder(Object, relayChannel):
     def Stop(self):
         self.direction = kOff    
     
-    
+    """
     def Feed(self):
+        if (
         self.direction = kForward
-    
+        # ^ Need a proximity sensor to register for this to work- change
+    """
     
     #Allows the feeder to run backwards if giving balls to teamates is desired
     def Expel(self):
         self.direction = kReverse
     
-    #def IsFull(self):
-    #    if limitswitch == True 
-    #    
+    #Returns 1 if the feeder is full and 0 if not
+    def IsFull(self):
+        if switch1 == 1 and switch2 == 1:
+            return( 1 )
+        
    
 
-'''   
+    '''
+    Sets the feeder motor's direction (as well as whether it is on)
+    Also updates the state of the limit switches
+    '''
     def Update(self):
-        if FeedOveride() != 1 
-            self.feederMotor.set(self.direction)
-'''     
+        self.feederMotor.Set(self.direction)
+        switch1 = limSwitch1.Get()
+        switch2 = limSwitch2.Get()
+        
+        
+        
+        
+        
+    

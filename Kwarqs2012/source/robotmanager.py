@@ -7,6 +7,11 @@ except ImportError:
 Calls certain functions based on the current states of each component
 '''
 
+
+'''
+Imported components so that instances of each can be made 
+'''
+
 from components import chamber
 from components import feeder
 from components import shooter
@@ -15,6 +20,10 @@ from components import rampArm
 
 
 class RobotManager(Object):
+    #Not sure if this is the right track
+    #self.chamberOveride = 0
+    
+    
     
     '''
     description: initializes an instance of RobotManager
@@ -41,23 +50,30 @@ class RobotManager(Object):
     def ShootOverride(self):
         self.chamber.Release()
         
+        
     '''
     Calls functions within the components based on every possible state
     '''    
     def Update(self):
-        if chamber.IsFull() and feeder.IsFull():
+        self.Shooter.Update()
+        self.chamber.Update()
+        self.feeder.Update()
+        self.Ramp Arm.Update()
+    
+    
+        if chamber.IsReady() and feeder.IsFull():
             self.feeder.Stop()
             #chamber.Stop()
             
-        elif not chamber.IsFull() and feeder.IsReady():
+        elif not chamber.IsReady() and feeder.IsReady():
             self.feeder.FeedOveride()
             #chamber.Feed()
             
         elif not feeder.IsFull():
             self.feeder.Feed()
-            
-        self.Shooter.Update()
-        self.chamber.Update()
-        self.feeder.Update()
-        self.Ramp Arm.Update()
+       
+        
+
+        
+        
         

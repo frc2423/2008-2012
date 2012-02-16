@@ -328,9 +328,13 @@ class DigitalOutput(object):
 
 class DriverStation(object):
     
+    instance = None
+    
     @staticmethod
     def GetInstance():
-        return DriverStation()
+        if DriverStation.instance is None:
+            DriverStation.instance = DriverStation()
+        return DriverStation.instance
     
     def __init__(self):
         self.digital_in = [ False, False, False, False, False, False, False, False ]

@@ -24,6 +24,8 @@
 
 '''
 
+# print something out so we know what code is running
+print( "Loading: Kwarqs2012 electrical testing program" )
 
 try:
     import wpilib

@@ -35,6 +35,7 @@ server.delete_remote(           '/py/components/__pycache__' )
 files = [
     'robot.py',
     'robot_manager.py',
+    'util.py',
     'components/chamber.py',
     'components/feeder.py',
     'components/ramp_arm.py',

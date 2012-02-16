@@ -20,4 +20,5 @@ class VerticalAngle(object):
     
     #update current and goal angles
     def Update()
-        self.motor.set
+        self.motor.Set(verticalCurrentAngle)
+        currentAngle = self.currentAngle.GetPosition()

@@ -4,10 +4,37 @@
     
     How it works:
     
-        In the 'tests' directory, add your own .py file, and then run
-        test.py [testname], where your file is testname.py
+        This base test program doesn't really have any intelligence, it
+        just loads robot code from a specified location and then runs
+        code in a separately defined test module. 
         
-        In the module, there should be a 
+    Implementing your own tests:
+        
+        In the 'tests' directory, add your own testname.py file
+        
+        In the module, there should be two things:
+            - a variable called 'robot_path', which has the path of your
+            robot code, relative to the directory your tests are located
+            - A function called 'run_tests', which takes two arguments:
+                - module:   The module for your robot code
+                - myrobot:  The robot class returned by your run() function
+        
+    Running your tests:
+    
+        test.bat testname
+        test.sh testname
+        
+        .. or some variation thereof. Don't run test.py directly, otherwise
+        the pycache will be generated, which we don't want.
+        
+    TODO:
+    
+        - Need to make creating tests easier, add a template, base class,
+        or something that makes the logic a lot easier. 
+        
+        - Fake wpilib needs a better way to access the raw objects, instead
+        of traversing through the robot module to get at them. 
+        
     
 '''
 

@@ -14,6 +14,7 @@ def Susan(object):
         self.GoalAngle = 0
         self.gyro = Gyro
     
+    '''override function when called turn'''
     def turn(self,mNumber):
         forwards = 1
         off = 0
@@ -21,14 +22,16 @@ def Susan(object):
     
         motor.set(forwards)
         
+        
+    '''set goal angle variable'''
     def SetGoal(degrees):
         self.GoalAngle = degrees
     
-    
+    '''checks if Goal angle is = to the current angle'''
     def IsReady(self):
         if self.GoalAngle == self.CurrentAngle:
             return True
-    
+    '''updates variables'''
     def Update(self):
         self.mNumber.Set
         self.gryo.SetAngle(self.GoalAngle)

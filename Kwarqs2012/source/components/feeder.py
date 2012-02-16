@@ -27,7 +27,7 @@ class Feeder(Object):
     sensor is connected to
     
     switch1- state of limit switch 1
-    switch2- state of limit switch 2
+    switch2- state of limit switch 2 (higher one)
     '''
     
     def __init__(self, relayChannel, limSwitch1Channel, limSwitch2Channel, proxchannel):
@@ -62,8 +62,19 @@ class Feeder(Object):
     def IsFull(self):
         if switch1 == 1 and switch2 == 1:
             return( 1 )
-        
-   
+    '''
+    This function is meant to return the states of switches in the feeder (when more info. than IsFull is needed)
+    The last elif statement may be redundant (due to IsFull)
+    '''
+    def BallStates(self):
+        if switch1 == 0 and switch2 == 0:
+            return( 0 )
+        elif switch1 == 1 and switch2 == 0:
+            return( 1 )
+        elif switch1 == 0 and switch2 == 1:
+            return( 2 )
+        elif switch1 == 1 and switch2 == 1:
+            return( 3 )
 
     '''
     Sets the feeder motor's direction (as well as whether it is on)
@@ -73,6 +84,7 @@ class Feeder(Object):
         self.feederMotor.Set(self.direction)
         switch1 = limSwitch1.Get()
         switch2 = limSwitch2.Get()
+        
         
         
         

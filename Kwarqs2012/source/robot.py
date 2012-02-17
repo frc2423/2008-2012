@@ -5,7 +5,7 @@ try:
     import wpilib
 except ImportError:
     import fake_wpilib as wpilib
-import robotmanager
+import robot_manager
 
 #Hardware Initilization Values
 rampArmMotorNum = 3

@@ -67,7 +67,7 @@ class RobotManager(Object):
         self.Shooter.Update()
         self.chamber.Update()
         self.feeder.Update()
-        self.Ramp Arm.Update()
+        self.ramp_arm.Update()
     
     
     '''
@@ -78,19 +78,19 @@ class RobotManager(Object):
     '''
     
     
-        if chamber.IsReady() and feeder.IsFull():
-            self.feeder.Stop()
-            #self.chamber.Stop()
+    if chamber.IsReady() and feeder.IsFull():
+        self.feeder.Stop()
+        #self.chamber.Stop()
             
-        elif not chamber.IsReady() and feeder.IsReady():
-            self.feeder.FeedOveride()
-            #self.chamber.Feed()
+    elif not chamber.IsReady() and feeder.IsReady():
+        self.feeder.FeedOveride()
+        #self.chamber.Feed()
             
-        elif not feeder.IsFull():
-            self.feeder.Feed()
+    elif not feeder.IsFull():
+        self.feeder.Feed()
         
-        elif not chamber.IsFull() and ((Feeder.BallStates() == 1 or Feeder.BallStates() == 2) or feeder.IsFull() ):
-            if chamber.IsReady != 1:
-                self.chamber.Feed()
-                self.feeder.Feed()
+    elif not chamber.IsFull() and ((Feeder.BallStates() == 1 or Feeder.BallStates() == 2) or feeder.IsFull() ):
+        if chamber.IsReady != 1:
+            self.chamber.Feed()
+            self.feeder.Feed()
             

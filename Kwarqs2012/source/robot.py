@@ -1,18 +1,23 @@
 
 #import rpdb2
+import robot_manager
 
 try:
     import wpilib
 except ImportError:
     import fake_wpilib as wpilib
-import robot_manager
+
+
+
+
+
 
 #Hardware Initilization Values
 rampArmMotorNum = 3
 chamberRelayNum = 2
 limitSwitchNum = 1
 
-robotManager = robotmanager( rampArmMotorNum)
+robotManager = RobotManager(rampArmMotorNum)
 
 stick1 = wpilib.Joystick(1)
 stick2 = wpilib.Joystick(2)

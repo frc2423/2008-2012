@@ -64,33 +64,33 @@ class RobotManager(object):
     Calls functions within the components based on every possible state
     '''    
     def Update(self):
-        self.Shooter.Update()
+        self.shooter.Update()
         self.chamber.Update()
         self.feeder.Update()
         self.ramp_arm.Update()
     
     
-    '''
-    I need to update the states here in the If statements; or to add them as requirements to the if statements
-    ^This is meant to take interstates into consideration    
-    I'm having trouble figuring out where interstates are needed- since a lot of things only work if a button is being HELD
+        '''
+        I need to update the states here in the If statements; or to add them as requirements to the if statements
+        ^This is meant to take interstates into consideration    
+        I'm having trouble figuring out where interstates are needed- since a lot of things only work if a button is being HELD
         on a joystick
-    '''
+        '''
     
     
-    if chamber.IsReady() and feeder.IsFull():
-        self.feeder.Stop()
-        #self.chamber.Stop()
-            
-    elif not chamber.IsReady() and feeder.IsReady():
-        self.feeder.FeedOveride()
-        #self.chamber.Feed()
-            
-    elif not feeder.IsFull():
-        self.feeder.Feed()
-        
-    elif not chamber.IsFull() and ((Feeder.BallStates() == 1 or Feeder.BallStates() == 2) or feeder.IsFull() ):
-        if chamber.IsReady != 1:
-            self.chamber.Feed()
+        if self.chamber.IsReady() and self.feeder.IsFull():
+            self.feeder.Stop()
+            #self.chamber.Stop()
+                
+        elif not self.chamber.IsReady() and self.feeder.IsReady():
+            self.feeder.FeedOveride()
+            #self.chamber.Feed()
+                
+        elif not self.feeder.IsFull():
             self.feeder.Feed()
             
+        elif not self.chamber.IsFull() and ((self.Feeder.BallStates() == 1 or self.Feeder.BallStates() == 2) or self.Feeder.IsFull() ):
+            if self.chamber.IsReady != 1:
+                self.chamber.Feed()
+                self.feeder.Feed()
+                

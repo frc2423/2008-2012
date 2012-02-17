@@ -28,3 +28,4 @@ class Shooter(object):
         return ready 
     def Update(self):
         angle.Update() and susan.Update() and wheel.Update()
+        #SetGoal(      )

@@ -71,8 +71,15 @@ relay2 = wpilib.Relay(2)
 relay3 = wpilib.Relay(3)
 relay4 = wpilib.Relay(4)
 
+# switches
+switch1 = wpilib.DigitalInput(1)
+switch2 = wpilib.DigitalInput(2)
+switch3 = wpilib.DigitalInput(3)
+
 # vision basket tracking code
 #tracker = BasketTracker()
+
+# Angle motor related stuff
 
 ANGLE_MOTOR_MIN_POSITION = 0.0
 ANGLE_MOTOR_MAX_POSITION = 1.0
@@ -82,7 +89,7 @@ ANGLE_MOTOR_D = 0.0
 
 ENABLE_ANGLE_MOTOR = False
 
-def _translate_z_to_angle_motor_position(self, z):
+def _translate_z_to_angle_motor_position( z ):
 
     # P = Xmax - (Ymax - Y)( (Xmax - Xmin) / (Ymax - Ymin) )
     value = ANGLE_MOTOR_MAX_POSITION - ((1 - z)*( (ANGLE_MOTOR_MAX_POSITION - ANGLE_MOTOR_MIN_POSITION) / (1.0-0) ) )
@@ -94,7 +101,27 @@ def _translate_z_to_angle_motor_position(self, z):
     return value
         
 
+# shooter wheel stuff
+ENCODER_TURNS_PER_REVOLUTION = 360
+        
+SHOOTER_MOTOR_P = 100.0
+SHOOTER_MOTOR_I = 0.0
+SHOOTER_MOTOR_D = 0.0
 
+
+def _configure_shooter_motor( motor ):
+
+    motor.SetPositionReference( wpilib.CANJaguar.kPosRef_QuadEncoder )
+    motor.ConfigEncoderCodesPerRev( ENCODER_TURNS_PER_REVOLUTION )
+    motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Coast )
+    
+    # enable PID based speed control of the motor.. 
+    # motor.ChangeControlMode( wpilib.CANJaguar.kSpeed )
+    # motor.SetPID( SHOOTER_MOTOR_P, SHOOTER_MOTOR_I, SHOOTER_MOTOR_D )
+    # motor.EnableControl()
+
+    
+    
 class MyRobot(wpilib.SimpleRobot):
 
     def __init__(self):
@@ -111,6 +138,9 @@ class MyRobot(wpilib.SimpleRobot):
             angle_motor.ChangeControlMode( wpilib.CANJaguar.kPosition )
             angle_motor.SetPID( ANGLE_MOTOR_P, ANGLE_MOTOR_I, ANGLE_MOTOR_D )
             angle_motor.EnableControl()
+            
+        _configure_shooter_motor( shooter_motor1 )
+        _configure_shooter_motor( shooter_motor2 )
             
     def RobotInit(self):
         '''Called only once during robot initialization'''
@@ -234,8 +264,11 @@ class MyRobot(wpilib.SimpleRobot):
             
             if timer.HasPeriodPassed( 1.0 ):
                 # TODO: Print out something useful here to help us diagnose problems with the robot
-                print( "  Angle Motor:" )
-                print( "    Motor: %f; Encoder: %f" % ( angle_motor.Get(), angle_motor.GetPosition() ) )
+                print( "Status: " )
+                print( "  Shooter Motor1: %f; Encoder: %f" % ( shooter_motor1.Get(), shooter_motor1.GetSpeed() ) )
+                print( "  Shooter Motor2: %f; Encoder: %f" % ( shooter_motor2.Get(), shooter_motor2.GetSpeed() ) )
+                print( "  Angle Motor   : %f; Encoder: %f" % ( angle_motor.Get(), angle_motor.GetPosition() ) )
+                print( "  Feeder switches: 1: %s, 2: %s, 3: %s" % (switch1.Get(), switch2.Get(), switch3.Get() ) )
                 print( "" )
                 
                 

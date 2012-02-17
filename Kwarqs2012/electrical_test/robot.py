@@ -56,6 +56,15 @@ angle_motor = wpilib.CANJaguar(4)
 ramp_motor = wpilib.CANJaguar(5)
 susan_motor = wpilib.CANJaguar(6)
 
+# print firmware versions
+print( "CANJaguar Firmware: \n" +
+       ("   Shooter1 (CAN2): %d\n" % shooter_motor1.GetFirmwareVersion() ) +
+       ("   Shooter2 (CAN3): %d\n" % shooter_motor2.GetFirmwareVersion() ) +
+       ("   Angle    (CAN4): %d\n" % angle_motor.GetFirmwareVersion() ) +
+       ("   Ramp     (CAN5): %d\n" % ramp_motor.GetFirmwareVersion() ) +
+       ("   Susan    (CAN6): %d\n" % susan_motor.GetFirmwareVersion() )
+    )
+
 # relays
 relay1 = wpilib.Relay(1)
 relay2 = wpilib.Relay(2)
@@ -65,18 +74,50 @@ relay4 = wpilib.Relay(4)
 # vision basket tracking code
 #tracker = BasketTracker()
 
+ANGLE_MOTOR_MIN_POSITION = 0.0
+ANGLE_MOTOR_MAX_POSITION = 1.0
+ANGLE_MOTOR_P = 100.0
+ANGLE_MOTOR_I = 0.0
+ANGLE_MOTOR_D = 0.0
+
+ENABLE_ANGLE_MOTOR = False
+
+def _translate_z_to_angle_motor_position(self, z):
+
+    # P = Xmax - (Ymax - Y)( (Xmax - Xmin) / (Ymax - Ymin) )
+    value = ANGLE_MOTOR_MAX_POSITION - ((1 - z)*( (ANGLE_MOTOR_MAX_POSITION - ANGLE_MOTOR_MIN_POSITION) / (1.0-0) ) )
+    
+    if value > ANGLE_MOTOR_MAX_POSITION:
+        return ANGLE_MOTOR_MAX_POSITION
+    elif value < ANGLE_MOTOR_MIN_POSITION:
+        return ANGLE_MOTOR_MIN_POSITION
+    return value
+        
+
 
 class MyRobot(wpilib.SimpleRobot):
 
     def __init__(self):
+        '''Constructor'''
+        
         wpilib.SimpleRobot.__init__(self)
         self.drive = wpilib.RobotDrive( l_motor, r_motor )
         
         angle_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Brake )
         angle_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_Potentiometer )
         angle_motor.ConfigPotentiometerTurns( 1 )
+        
+        if ENABLE_ANGLE_MOTOR:
+            angle_motor.ChangeControlMode( wpilib.CANJaguar.kPosition )
+            angle_motor.SetPID( ANGLE_MOTOR_P, ANGLE_MOTOR_I, ANGLE_MOTOR_D )
+            angle_motor.EnableControl()
+            
+    def RobotInit(self):
+        '''Called only once during robot initialization'''
+        pass
 
     def Disabled(self):
+        '''Called when the robot is disabled'''
         
         print("MyRobot::Disabled()")
     
@@ -84,6 +125,7 @@ class MyRobot(wpilib.SimpleRobot):
             wpilib.Wait(0.01)
 
     def Autonomous(self):
+        '''Called during autonomous mode'''
         
         print("MyRobot::Autonomous()")
     
@@ -93,6 +135,7 @@ class MyRobot(wpilib.SimpleRobot):
             
             
     def OperatorControl(self):
+        '''Called during Teleoperated Mode'''
     
         print("MyRobot::OperatorControl()")
     
@@ -136,6 +179,13 @@ class MyRobot(wpilib.SimpleRobot):
             else:
                 shooter_motor1.Set( 0.0 )
                 shooter_motor2.Set( 0.0 )
+                
+            #
+            # Angle motor
+            #
+            
+            if ENABLE_ANGLE_MOTOR:
+                angle_motor.Set( _translate_z_to_angle_motor_position( stick1.GetZ() ) )
             
             #
             # Feeder
@@ -184,8 +234,10 @@ class MyRobot(wpilib.SimpleRobot):
             
             if timer.HasPeriodPassed( 1.0 ):
                 # TODO: Print out something useful here to help us diagnose problems with the robot
-                print( "Motor: %f; Encoder: %f" % ( angle_motor.Get(), angle_motor.GetPosition() ) )
-                pass
+                print( "  Angle Motor:" )
+                print( "    Motor: %f; Encoder: %f" % ( angle_motor.Get(), angle_motor.GetPosition() ) )
+                print( "" )
+                
                 
             
             wpilib.Wait(0.04)
@@ -195,6 +247,8 @@ def run():
     '''This function must be present for the robot to start'''
     robot = MyRobot()
     robot.StartCompetition()
+    
+    # must return a value to work with the tester program
     return robot
 
 

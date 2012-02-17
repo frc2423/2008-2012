@@ -224,6 +224,9 @@ class CANJaguar(object):
     def GetControlMode(self):
         return self.control_mode
         
+    def GetFirmwareVersion(self):
+        return 0
+        
     def GetForwardLimitOK(self):
         return self.forward_ok
         

@@ -1,4 +1,4 @@
 #!/bin/bash
 
-python3 -B test.py $@
+python3 -B `dirname $0`/test.py $@
 

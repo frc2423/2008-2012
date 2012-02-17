@@ -7,7 +7,7 @@ try:
 except ImportError:
     import fake_wpilib as wpilib
 
-class Chamber ( Object ):
+class Chamber (object):
 
     def __Init__ ( self, chamberRelayNum, limitSwitchNum ):
         chamberMotor = Relay(chamberRelayNum)

@@ -9,7 +9,7 @@ except ImportError:
     import fake_wpilib as wpilib
 
 
-class Feeder(Object): 
+class Feeder(object): 
     
     '''
     description: initializes an instance of Feeder

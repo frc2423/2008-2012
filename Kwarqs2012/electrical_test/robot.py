@@ -71,6 +71,10 @@ class MyRobot(wpilib.SimpleRobot):
     def __init__(self):
         wpilib.SimpleRobot.__init__(self)
         self.drive = wpilib.RobotDrive( l_motor, r_motor )
+        
+        angle_motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Brake )
+        angle_motor.SetPositionReference( wpilib.CANJaguar.kPosRef_Potentiometer )
+        angle_motor.ConfigPotentiometerTurns( 1 )
 
     def Disabled(self):
         
@@ -114,10 +118,12 @@ class MyRobot(wpilib.SimpleRobot):
             # Ramp motor
             #
             
-            if stick1.GetTrigger():
-                angle_motor.Set( 1.0 )
+            if stick1.GetRawButton(4):
+                ramp_motor.Set( 1.0 )
+            elif stick1.GetRawButton(5):
+                ramp_motor.Set( -1.0 )
             else:
-                angle_motor.Set( -1.0 )
+                ramp_motor.Set( 0.0 )
             
             #
             # Shooter motor
@@ -136,9 +142,9 @@ class MyRobot(wpilib.SimpleRobot):
             #
              
             if stick2.GetRawButton(3):      # up
-                feeder_motor.Set( 1.0 )
-            elif stick2.GetRawButton(2):    # down
                 feeder_motor.Set( -1.0 )
+            elif stick2.GetRawButton(2):    # down
+                feeder_motor.Set( 1.0 )
             else:
                 feeder_motor.Set( 0 )
                 
@@ -178,7 +184,7 @@ class MyRobot(wpilib.SimpleRobot):
             
             if timer.HasPeriodPassed( 1.0 ):
                 # TODO: Print out something useful here to help us diagnose problems with the robot
-                #print( "Motor: %f; Encoder: %d" % ( motor.Get(), encoder.Get() ) )
+                print( "Motor: %f; Encoder: %f" % ( angle_motor.Get(), angle_motor.GetPosition() ) )
                 pass
                 
             

@@ -31,7 +31,7 @@ class RampArm(object):
         if self.armSpeed == forwardSpeed:
             self.arm.Set(forwardSpeed)
             self.armSpeed = reverseSpeed
-        else
+        else:
             self.arm.Set(reverseSpeed)
             
             

@@ -1,6 +1,11 @@
-import basket_tracker
+try:
+    import basket_tracker
+except ImportError:
+    import fake_basket_tracker as basket_tracker
 
-class Shooter(Object):
+
+
+class Shooter(object):
     
     
     def __init__(self, AngleCAN, SusanCAN, WheelCAN) :

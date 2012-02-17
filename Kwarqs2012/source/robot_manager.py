@@ -15,11 +15,11 @@ Imported components so that instances of each can be made
 from components import chamber
 from components import feeder
 from components import shooter
-from components import rampArm
+from components import ramp_arm
 
 
 
-class RobotManager(Object):
+class RobotManager(object):
     
     
     

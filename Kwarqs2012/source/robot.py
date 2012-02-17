@@ -9,6 +9,8 @@ import robot_manager
 
 #Hardware Initilization Values
 rampArmMotorNum = 3
+chamberRelayNum = 2
+limitSwitchNum = 1
 
 robotManager = robotmanager( rampArmMotorNum)
 
@@ -17,8 +19,6 @@ stick2 = wpilib.Joystick(2)
 
 driveMotor1 = Jaguar(1)
 driveMotor2 = Jaguar(2)
-
-# this is the motor attached to the encoder
 
 
 drive = wpilib.RobotDrive( driveMotor1, driveMotor2)

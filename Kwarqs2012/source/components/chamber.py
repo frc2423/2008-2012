@@ -9,19 +9,19 @@ except ImportError:
 
 class Chamber ( Object ):
 
-    def __Init__ ( self, chamberCANJagNum, limitSwitchNum ):
-        chamberMotor = CANJaguar(chamberCANJagNum)
+    def __Init__ ( self, chamberRelayNum, limitSwitchNum ):
+        chamberMotor = Relay(chamberRelayNum)
         limitSwitch3 = DigitalInput(limitSwitchNum)
         switchState = False
         
     def Release( self ):
-        chamberMotorState = 1.0      
+        chamberMotorState = kOn   
         
     def IsReady( self ):  
         return switchState
         
     def Stop( self ):
-        chamberMotorState = 0.0
+        chamberMotorState = kOff
         
     def Update( self ):
         chamberMotor.Set( chamberMotorState ) # so the update is changing if the motor is running

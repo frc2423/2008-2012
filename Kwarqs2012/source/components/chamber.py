@@ -15,7 +15,7 @@ class Chamber (object):
         switchState = False
         
     def Release( self ):
-        chamberMotorState = kOn   
+        chamberMotorState = kOn
         
     def IsReady( self ):  
         return switchState

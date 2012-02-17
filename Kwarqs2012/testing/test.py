@@ -89,6 +89,8 @@ if __name__ == '__main__':
         sys.stderr.write( "ERROR: the test module '%s' does not have a 'robot_path' global variable\n" % test_module_name )
         exit(1)
     
+    # convert \ to / or whatever, depending on the platform
+    test_module.robot_path = os.path.normpath( test_module.robot_path )
     sys.path.append( os.path.join( modules_path, test_module.robot_path ) )
     
     # setup the robot code

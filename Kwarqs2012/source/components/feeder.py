@@ -41,11 +41,11 @@ class Feeder(object):
         
     #Starts feederMotor if needed
     def FeedOveride(self):
-        self.direction = kForward
+        self.direction = wpilib.Relay.kForward
     
     #Stops the feedermotor if the feeder should not be on
     def Stop(self):
-        self.direction = kOff    
+        self.direction = wpiilib.Relay.kOff    
     
     """
     def Feed(self):

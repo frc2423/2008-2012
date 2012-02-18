@@ -22,11 +22,11 @@ robotManager = RobotManager(rampArmMotorNum)
 stick1 = wpilib.Joystick(1)
 stick2 = wpilib.Joystick(2)
 
-driveMotor1 = Jaguar(1)
-driveMotor2 = Jaguar(2)
+driveMotor1 = wpilib.Jaguar(1)
+driveMotor2 = wpilib.Jaguar(2)
 
-susanMotor = CanJaguar(6)
-angleMotor = CanJaguar(4)
+susanMotor = wpilib.CANJaguar(6)
+angleMotor = wpilib.CANJaguar(4)
 
 drive = wpilib.RobotDrive( driveMotor1, driveMotor2)
 

@@ -14,12 +14,12 @@ class Shooter(object):
     
     def __init__(self, AngleCAN, SusanCAN, WheelCAN) :
 
-        angle = wpilib.Angle(AngleCAN)
-        susan = wpilib.Susan(SusanCAN)
-        wheel = wpilib.Wheel(WheelCAN)
+        angle = wpilib.CANJaguar(AngleCAN)
+        susan = wpilib.CANJaguar(SusanCAN)
+        wheel = wpilib.CANJaguar(WheelCAN)
         
         #new
-        cameraData = BasketTracker()
+        cameraData = basket_tracker.BasketTracker()
     
     #cameraData.Get() - Not sure what exactly do do with this since I'm not familiar with how 
     #    the data returns

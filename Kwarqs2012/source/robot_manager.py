@@ -29,7 +29,10 @@ class RobotManager(object):
     description: initializes an instance of RobotManager
     Variables: 
     rampArmMotorNum- PWM connection value of Ramparm motor
-
+    
+    self.chamberOveride and self.chamberAuto control the state of the chamber
+    self.feederOveride and self.feederAuto control the state of the feeder
+    
     '''
     def __init__(self, rampArmMotorNum):
         self.chamber = Chamber()
@@ -39,8 +42,12 @@ class RobotManager(object):
         
         self.shooter = Shooter(4,5,6)
         self.rampArm = RampArm(rampArmMotorNum)
+        
         self.chamberOveride = 0
+        self.chamberAuto = 1
         self.feederOveride = 0
+        self.feederAuto = 1
+        
     #def SetState(): (manual or auto)
     
     '''
@@ -64,6 +71,10 @@ class RobotManager(object):
         
     def FeedOverride(self):
         self.feeder.FeedOveride()
+    '''    
+    def StateChange(self):
+        state = manual
+    '''
     '''
     Calls functions within the components based on every possible state
     '''    
@@ -80,7 +91,7 @@ class RobotManager(object):
         I'm having trouble figuring out where interstates are needed- since a lot of things only work if a button is being HELD
         on a joystick
         '''
-    if State == Automatic:
+    
     
         if self.chamber.IsReady() and self.feeder.IsFull():
             self.feeder.Stop()

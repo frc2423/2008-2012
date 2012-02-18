@@ -1,3 +1,9 @@
+try:
+    import wpilib
+except ImportError:
+    import fake_wpilib as wpilib
+
+
 #arm = Jaguar(3)
 
 #needs to be both directions
@@ -17,7 +23,7 @@ class RampArm(object):
     #   Variables:
     #   int mNumber: PWM connection number for motor
     def __init__(self, mNumber):
-        self.arm = Jaguar(mNumber)
+        self.arm = wpilib.Jaguar(mNumber)
         self.armSpeed = 0
     
     def LowerRamp(self):

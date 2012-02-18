@@ -68,7 +68,13 @@ class RobotManager(object):
             self.chamber.Release()
             if self.timer.HasPeriodPassed(.5) :
                 self.chamber.Stop()
+                
     '''
+    lowers ramp arm
+    '''
+    def LowerRampArm(self):
+        self.rampArm.LowerRamp()
+    '''    
     Releases chamber no matter the state, only to be used when things malfunction
     '''
     def ShootOverride(self):
@@ -84,10 +90,10 @@ class RobotManager(object):
         self.feeder.FeedOveride()
        
     def AngleStateChange(self):
-        if self.angleState == ManualAngle:
-            self.angleState = AutomaticAngle
+        if self.angleState == self.ManualAngle:
+            self.angleState = self.AutomaticAngle
         else:
-            self.angleState = ManualAngle
+            self.angleState = self.ManualAngle
    
 
     '''

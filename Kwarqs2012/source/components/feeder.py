@@ -32,15 +32,15 @@ class Feeder(object):
     
     def __init__(self, relayChannel, limSwitch1Channel, limSwitch2Channel, proxchannel):
         self.feederMotor = wpilib.Relay(relayChannel)
-        self.Full = 0
+        self.Full = False
         self.direction = wpilib.Relay.kOff
-        limSwitch1 = wpilib.DigitalInput( limSwitch1Channel )
-        limSwitch2 = wpilib.DigitalInput( limSwitch2Channel )
-        switch1 = False
-        switch2 = False
+        self.limSwitch1 = wpilib.DigitalInput( limSwitch1Channel )
+        self.limSwitch2 = wpilib.DigitalInput( limSwitch2Channel )
+        self.switch1 = False
+        self.switch2 = False
         
     #Starts feederMotor if needed
-    def FeedOveride(self):
+    def Feed(self):
         self.direction = wpilib.Relay.kForward
     
     #Stops the feedermotor if the feeder should not be on
@@ -56,24 +56,24 @@ class Feeder(object):
     
     #Allows the feeder to run backwards if giving balls to teamates is desired
     def Expel(self):
-        self.direction = kReverse
+        self.direction = wpilib.Relay.kReverse
     
     #Returns 1 if the feeder is full and 0 if not
     def IsFull(self):
-        if switch1 == 1 and switch2 == 1:
-            return( 1 )
+        if self.switch1 == True and self.switch2 == True:
+            return( True )
     '''
     This function is meant to return the states of switches in the feeder (when more info. than IsFull is needed)
     The last elif statement may be redundant (due to IsFull)
     '''
     def BallStates(self):
-        if switch1 == 0 and switch2 == 0:
+        if self.switch1 == 0 and self.switch2 == 0:
             return( 0 )
-        elif switch1 == 1 and switch2 == 0:
+        elif self.switch1 == 1 and self.switch2 == 0:
             return( 1 )
-        elif switch1 == 0 and switch2 == 1:
+        elif self.switch1 == 0 and self.switch2 == 1:
             return( 2 )
-        elif switch1 == 1 and switch2 == 1:
+        elif self.switch1 == 1 and self.switch2 == 1:
             return( 3 )
 
     '''
@@ -82,8 +82,8 @@ class Feeder(object):
     '''
     def Update(self):
         self.feederMotor.Set(self.direction)
-        switch1 = limSwitch1.Get()
-        switch2 = limSwitch2.Get()
+        self.switch1 = self.limSwitch1.Get()
+        self.switch2 = self.limSwitch2.Get()
         
         
         

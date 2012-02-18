@@ -37,7 +37,7 @@ class MyRobot(wpilib.SimpleRobot):
 
     def __init__(self):
         wpilib.SimpleRobot.__init__(self)
-        encoder.Start()
+       
     
     def Disabled(self):
         

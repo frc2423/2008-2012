@@ -5,7 +5,7 @@ except ImportError:
     import fake_wpilib as wpilib
 
 
-def Wheel(object):
+class Wheel(object):
     
     
     def __init__(self,mNumber):
@@ -26,7 +26,7 @@ def Wheel(object):
         
     #checks if current speed = goal speed
     def IsReady(self):
-        if self.currentSpeed == self.goalSpeed:
+       if self.currentSpeed == self.goalSpeed:
             return True
     
     

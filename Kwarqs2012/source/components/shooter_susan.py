@@ -5,7 +5,7 @@ except ImportError:
 
 
 
-def Susan(object):
+class Susan(object):
     
     '''mNumber is CANJaguar ID'''
     def __init__(self,mNumber,gyro):

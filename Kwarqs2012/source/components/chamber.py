@@ -9,9 +9,9 @@ except ImportError:
 
 class Chamber (object):
 
-    def __Init__ ( self, chamberRelayNum, limitSwitchNum ):
-        chamberMotor = Relay(chamberRelayNum)
-        limitSwitch3 = DigitalInput(limitSwitchNum)
+    def __init__ ( self, chamberRelayNum, limitSwitchNum ):
+        chamberMotor = wpilib.Relay(chamberRelayNum)
+        limitSwitch3 = wpilib.DigitalInput(limitSwitchNum)
         switchState = False
         
     def Release( self ):

@@ -35,12 +35,16 @@ class RobotManager(object):
     
     '''
     def __init__(self, rampArmMotorNum):
-        self.chamber = Chamber()
+        #
+        self.chamber = Chamber(2,1)
         
         #relayChannel, limSwitch1Channel, limSwitch2Channel, proxchannel 
         self.feeder = Feeder(1,2,3,6)
         
-        self.shooter = Shooter(4,5,6)
+        #AngleCAN, SusanCAN, WheelCAN 
+        self.shooter = Shooter(4,6,2,3)
+        
+        #
         self.rampArm = RampArm(rampArmMotorNum)
         
         self.chamberOveride = 0

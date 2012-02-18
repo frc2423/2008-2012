@@ -12,10 +12,11 @@ Calls certain functions based on the current states of each component
 Imported components so that instances of each can be made 
 '''
 
-from components import chamber
-from components import feeder
-from components import shooter
-from components import ramp_arm
+from components.chamber import Chamber
+from components.feeder import Feeder
+from components.shooter import Shooter
+from components.ramp_arm import RampArm
+
 
 
 

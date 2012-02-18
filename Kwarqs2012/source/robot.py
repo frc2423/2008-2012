@@ -1,6 +1,6 @@
 
 #import rpdb2
-import robot_manager
+from robot_manager import RobotManager
 
 try:
     import wpilib

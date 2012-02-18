@@ -16,11 +16,11 @@ except ImportError:
 class Shooter(object):
     
     
-    def __init__( self, angleCAN, anglePot, susanCAN, susanGyro, wheelCAN1, wheelCAN2, wEncoder1, wEncoder2 ):
+    def __init__( self, angleCAN, anglePot, susanCAN, susanGyro, wheelCAN1, wheelCAN2):
 
         self.vAngle = VerticalAngle(angleCAN, anglePot)
         self.susan = Susan(susanCAN, susanGyro)
-        self.wheel = Wheel(wheelCAN1, wheelCAN2, wEncoder1, wEncoder2)
+        self.wheel = Wheel(wheelCAN1, wheelCAN2)
         #new
         self.cameraData = basket_tracker.BasketTracker()
     
@@ -30,7 +30,7 @@ class Shooter(object):
     #check if Angle is ready, Susan is ready, Wheel is read
     def IsReady(self):
         self.ready = False
-        if self.angle.IsReady() and self.susan.IsReady() and self.wheel.IsReady():
+        if self.vAngle.IsReady() and self.susan.IsReady() and self.wheel.IsReady():
             self.ready = True
         return True 
         

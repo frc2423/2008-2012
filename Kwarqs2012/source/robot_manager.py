@@ -46,11 +46,9 @@ class RobotManager(object):
         susanGyro = 2
         wheelCAN1 = 2
         wheelCAN2 = 3
-        wEncoder1 = 1
-        wEncoder2 = 2
         chamberRelayNum = 2
         limitSwitchNum = 1
-        
+        rampArmMotorNum = 3
 
        
         self.chamber = Chamber( chamberRelayNum, limitSwitchNum)
@@ -59,7 +57,7 @@ class RobotManager(object):
         self.feeder = Feeder(relayChannel,limSwitch1Channel,limSwitch2Channel,proxchannel)
         
         #AngleCAN, SusanCAN, WheelCAN 
-        self.shooter = Shooter(angleCAN, anglePot, susanCAN, susanGyro, wheelCAN1, wheelCAN2, wEncoder1, wEncoder2 )
+        self.shooter = Shooter(angleCAN, anglePot, susanCAN, susanGyro, wheelCAN1, wheelCAN2)
         
         #
         self.rampArm = RampArm(rampArmMotorNum)
@@ -104,7 +102,7 @@ class RobotManager(object):
         #need a state here so I can turn this motor off
         
     def FeedOverride(self):
-        self.feeder.FeedOveride()
+        self.feeder.Feed()
        
     def AngleStateChange(self):
         if self.angleState == self.ManualAngle:

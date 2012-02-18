@@ -8,11 +8,13 @@ except ImportError:
 class Wheel(object):
     
     
-    def __init__(self,wheelCAN1, wheelCAN2, wEncoder1, wEncoder2):
+    def __init__(self,wheelCAN1, wheelCAN2):
         self.currentSpeed = 0
         self.goalSpeed = 0
         self.wheelMotor1 = wpilib.CANJaguar(wheelCAN1)
         self.wheelMotor2 = wpilib.CANJaguar(wheelCAN2)
+        self.wheelMotor1.SetPositionReference( wpilib.CANJaguar.kPosRef_QuadEncoder )
+        self.wheelMotor2.SetPositionReference( wpilib.CANJaguar.kPosRef_QuadEncoder )
     '''   
         Description: sets variable that tells update to set the speed
 

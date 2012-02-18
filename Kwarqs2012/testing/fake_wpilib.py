@@ -468,7 +468,7 @@ class RobotDrive(object):
         self.x = 0.0
         self.y = 0.0
         
-    def ArcadeDrive(self, y, x, tight):
+    def ArcadeDrive(self, y, x, tight=False):
         self.x = x
         self.y = y
         

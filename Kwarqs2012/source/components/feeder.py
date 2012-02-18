@@ -49,7 +49,7 @@ class Feeder(object):
     
     """
     def Feed(self):
-        if (
+        if 
         self.direction = kForward
         # ^ Need a proximity sensor to register for this to work- change
     """

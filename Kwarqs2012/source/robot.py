@@ -25,6 +25,8 @@ stick2 = wpilib.Joystick(2)
 driveMotor1 = Jaguar(1)
 driveMotor2 = Jaguar(2)
 
+susanMotor = CanJaguar(6)
+angleMotor = CanJaguar(4)
 
 drive = wpilib.RobotDrive( driveMotor1, driveMotor2)
 
@@ -70,6 +72,11 @@ class MyRobot(wpilib.SimpleRobot):
             
             drive.ArcadeDrive(stick1)
             
+            if state == ManualAngle: # my way of manually controlling angle and 
+                
+                susanMotor.Set( stick2.GetX() )
+                angleMotor.Set( stick2.GetY() )
+            
             if stick1.GetTop(): # makes the arm go down --- when button not pressed, the arm makes its ascent back up
                 RobotManager.LowerRamp()
           
@@ -86,7 +93,7 @@ class MyRobot(wpilib.SimpleRobot):
                 RobotManager.ShootOverride()
             
             if stick2.GetRawButton(3): #to manually aim both the angle and the position of the lazy susan
-                RobotManager.ManualAngle()
+                RobotManager.StateChange()
             
                #this prints values so we know what's going on
             if timer.HasPeriodPassed( 1.0 ):

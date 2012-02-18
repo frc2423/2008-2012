@@ -80,7 +80,7 @@ class RobotManager(object):
         I'm having trouble figuring out where interstates are needed- since a lot of things only work if a button is being HELD
         on a joystick
         '''
-    
+    if State == Automatic
     
         if self.chamber.IsReady() and self.feeder.IsFull():
             self.feeder.Stop()
@@ -95,6 +95,6 @@ class RobotManager(object):
             
         elif not self.chamber.IsFull() and ((self.Feeder.BallStates() == 1 or self.Feeder.BallStates() == 2) or self.Feeder.IsFull() ):
             if self.chamber.IsReady != 1:
-                self.chamber.Feed()
+                self.chamber.Release()
                 self.feeder.Feed()
                 

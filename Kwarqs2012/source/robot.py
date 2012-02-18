@@ -103,13 +103,13 @@ class MyRobot(wpilib.SimpleRobot):
             wpilib.Wait(0.04)
                 
         
-def run():
+def run(): 
     #rpdb2.start_embedded_debugger()
 
     '''This function must be present for the robot to start'''
     robot = MyRobot()
     robot.StartCompetition()
-
+    return robot
 
 
 

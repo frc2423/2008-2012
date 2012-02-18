@@ -31,7 +31,7 @@ class Feeder(object):
     '''
     
     def __init__(self, relayChannel, limSwitch1Channel, limSwitch2Channel, proxchannel):
-        self.feederMotor = Relay(relayChannel)
+        self.feederMotor = wpilib.Relay(relayChannel)
         self.Full = 0
         self.direction = kOff
         limSwitch1 = DigitalInput( limSwitch1Channel )

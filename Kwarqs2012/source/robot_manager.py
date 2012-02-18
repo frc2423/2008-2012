@@ -21,9 +21,7 @@ from components.ramp_arm import RampArm
 
 
 class RobotManager(object):
-    
-    
-    
+
     
     '''
     description: initializes an instance of RobotManager
@@ -35,14 +33,33 @@ class RobotManager(object):
     
     '''
     def __init__(self, rampArmMotorNum):
-        #
-        self.chamber = Chamber(2,1)
+       
+                #These are all the numbers that correspond to the specific values for the different motors and other hardware
+        
+        relayChannel = 1
+        limSwitch1Channel = 2
+        limSwitch2Channel = 3
+        proxchannel = 6
+        angleCAN = 4
+        anglePot = 4
+        susanCAN = 6
+        susanGyro = 2
+        wheelCAN1 = 2
+        wheelCAN2 = 3
+        wEncoder1 = 1
+        wEncoder2 = 2
+        chamberRelayNum = 2
+        limitSwitchNum = 1
+        
+
+       
+        self.chamber = Chamber( chamberRelayNum, limitSwitchNum)
         
         #relayChannel, limSwitch1Channel, limSwitch2Channel, proxchannel 
-        self.feeder = Feeder(1,2,3,6)
+        self.feeder = Feeder(relayChannel,limSwitch1Channel,limSwitch2Channel,proxchannel)
         
         #AngleCAN, SusanCAN, WheelCAN 
-        self.shooter = Shooter(4,6,2,3)
+        self.shooter = Shooter(angleCAN, anglePot, susanCAN, susanGyro, wheelCAN1, wheelCAN2, wEncoder1, wEncoder2 )
         
         #
         self.rampArm = RampArm(rampArmMotorNum)

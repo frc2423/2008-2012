@@ -1,6 +1,6 @@
-from shooter_angle import VerticalAngle
-from shooter_susan import Susan
-from shooter_wheel import Wheel 
+from components.shooter.shooter_angle import VerticalAngle
+from components.shooter.shooter_susan import Susan
+from components.shooter.shooter_wheel import Wheel 
 
 try:
     import basket_tracker 
@@ -16,12 +16,11 @@ except ImportError:
 class Shooter(object):
     
     
-    def __init__(self, angleCAN, anglePot, susanCAN, susanGyro, wheelCAN1, wheelCAN2, wEncoder ) :
+    def __init__( self, angleCAN, anglePot, susanCAN, susanGyro, wheelCAN1, wheelCAN2, wEncoder1, wEncoder2 ):
 
         self.vAngle = VerticalAngle(angleCAN, anglePot)
         self.susan = Susan(susanCAN, susanGyro)
-        self.wheel = Wheel(wheelCAN1, wheelCAN2, wEncoder)
-        
+        self.wheel = Wheel(wheelCAN1, wheelCAN2, wEncoder1, wEncoder2)
         #new
         self.cameraData = basket_tracker.BasketTracker()
     

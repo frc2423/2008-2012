@@ -2,6 +2,10 @@ try:
     import basket_tracker
 except ImportError:
     import fake_basket_tracker as basket_tracker
+try:
+    import wpilib
+except ImportError:
+    import fake_wpilib as wpilib
 
 
 
@@ -10,9 +14,9 @@ class Shooter(object):
     
     def __init__(self, AngleCAN, SusanCAN, WheelCAN) :
 
-        angle = Angle(AngleCAN)
-        susan = Susan(SusanCAN)
-        wheel = Wheel(WheelCAN)
+        angle = wpilib.Angle(AngleCAN)
+        susan = wpilib.Susan(SusanCAN)
+        wheel = wpilib.Wheel(WheelCAN)
         
         #new
         cameraData = BasketTracker()

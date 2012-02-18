@@ -37,7 +37,7 @@ class RobotManager(object):
         #relayChannel, limSwitch1Channel, limSwitch2Channel, proxchannel 
         self.feeder = Feeder(1,2,3,6)
         
-        self.shooter = Shooter()
+        self.shooter = Shooter(4,5,6)
         self.rampArm = RampArm(rampArmMotorNum)
         self.chamberOveride = 0
         self.feederOveride = 0

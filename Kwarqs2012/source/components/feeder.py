@@ -33,9 +33,9 @@ class Feeder(object):
     def __init__(self, relayChannel, limSwitch1Channel, limSwitch2Channel, proxchannel):
         self.feederMotor = wpilib.Relay(relayChannel)
         self.Full = 0
-        self.direction = kOff
-        limSwitch1 = DigitalInput( limSwitch1Channel )
-        limSwitch2 = DigitalInput( limSwitch2Channel )
+        self.direction = wpilib.Relay.kOff
+        limSwitch1 = wpilib.DigitalInput( limSwitch1Channel )
+        limSwitch2 = wpilib.DigitalInput( limSwitch2Channel )
         switch1 = False
         switch2 = False
         
@@ -45,7 +45,7 @@ class Feeder(object):
     
     #Stops the feedermotor if the feeder should not be on
     def Stop(self):
-        self.direction = wpiilib.Relay.kOff    
+        self.direction = wpilib.Relay.kOff    
     
     """
     def Feed(self):

@@ -72,7 +72,7 @@ class MyRobot(wpilib.SimpleRobot):
             
             drive.ArcadeDrive(stick1)
             
-            if state == ManualAngle: # my way of manually controlling angle and 
+            if robotManager.angleState == robotManager.ManualAngle: # my way of manually controlling the ball angle and  the susan
                 
                 susanMotor.Set( stick2.GetX() )
                 angleMotor.Set( stick2.GetY() )
@@ -82,7 +82,7 @@ class MyRobot(wpilib.SimpleRobot):
           
             if stick1.GetTrigger(): #this is to fire the ball
                 RobotManager.ShootIfReady()
-            
+              
             if stick1.GetRawButton(4): #to manually run the feeder
                 RobotManager.FeedOverride()
             
@@ -93,7 +93,7 @@ class MyRobot(wpilib.SimpleRobot):
                 RobotManager.ShootOverride()
             
             if stick2.GetRawButton(3): #to manually aim both the angle and the position of the lazy susan
-                RobotManager.StateChange()
+                RobotManager.AngleStateChange()
             
                #this prints values so we know what's going on
             if timer.HasPeriodPassed( 1.0 ):

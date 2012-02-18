@@ -47,8 +47,14 @@ class RobotManager(object):
         self.chamberAuto = 1
         self.feederOveride = 0
         self.feederAuto = 1
-        
-    #def SetState(): (manual or auto)
+        self.AutomaticAngle = 1
+        self.ManualAngle = 0
+        self.angleState = self.AutomaticAngle
+ 
+        self.timer = wpilib.Timer()
+        self.timer.Start()
+
+ #def SetState(): (manual or auto)
     
     '''
     Calls the shoot function if the bot is ready to shoot
@@ -56,7 +62,8 @@ class RobotManager(object):
     def ShootIfReady(self):
         if shooter.IsReady() and chamber.IsReady():
             self.chamber.Release()
-    
+            if timer.HasPeriodPassed(.5) :
+                self.chamber.Stop
     '''
     Releases chamber no matter the state, only to be used when things malfunction
     '''
@@ -71,13 +78,18 @@ class RobotManager(object):
         
     def FeedOverride(self):
         self.feeder.FeedOveride()
-    '''    
-    def StateChange(self):
-        state = manual
-    '''
+       
+    def AngleStateChange(self):
+        if self.angleState == ManualAngle:
+            self.angleState = AutomaticAngle
+        else:
+            self.angleState = ManualAngle
+   
+
     '''
     Calls functions within the components based on every possible state
     '''    
+    
     def Update(self):
         self.shooter.Update()
         self.chamber.Update()
@@ -94,6 +106,7 @@ class RobotManager(object):
     
     
         if self.chamber.IsReady() and self.feeder.IsFull():
+            #if feeder.state == 1:
             self.feeder.Stop()
             #self.chamber.Stop()
                 

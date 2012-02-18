@@ -64,9 +64,9 @@ class RobotManager(object):
     Calls the shoot function if the bot is ready to shoot
     '''
     def ShootIfReady(self):
-        if shooter.IsReady() and chamber.IsReady():
+        if self.shooter.IsReady() and self.chamber.IsReady():
             self.chamber.Release()
-            if timer.HasPeriodPassed(.5) :
+            if self.timer.HasPeriodPassed(.5) :
                 self.chamber.Stop()
     '''
     Releases chamber no matter the state, only to be used when things malfunction

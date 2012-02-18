@@ -8,25 +8,26 @@ except ImportError:
     import fake_wpilib as wpilib
 
 class Chamber (object):
-
+    
     def __init__ ( self, chamberRelayNum, limitSwitchNum ):
-        chamberMotor = wpilib.Relay(chamberRelayNum)
-        limitSwitch3 = wpilib.DigitalInput(limitSwitchNum)
-        switchState = False
+        self.chamberMotor = wpilib.Relay(chamberRelayNum)
+        self.limitSwitch3 = wpilib.DigitalInput(limitSwitchNum)
+        self.switchState = False
+        self.chamberMotorState = wpilib.Relay.kOff
         
     def Release( self ):
-        chamberMotorState = wpilib.Relay.kOn 
+        self.chamberMotorState = wpilib.Relay.kOn 
         
     def IsReady( self ):
-        return switchState
+        return self.switchState
         
     def Stop( self ):
-        chamberMotorState = wpilib.Relay.kOff
+        self.chamberMotorState = wpilib.Relay.kOff
     
     def Print( self ):
-        print( chamberMotorState, switchState )
+        print( self.chamberMotorState, self.switchState )
     
     def Update( self ):
-        chamberMotor.Set( chamberMotorState ) # so the update is changing if the motor is running
-        switchState = limitSwitch3.Get()
+        self.chamberMotor.Set( self.chamberMotorState ) # so the update is changing if the motor is running
+        self.switchState = self.limitSwitch3.Get()
         

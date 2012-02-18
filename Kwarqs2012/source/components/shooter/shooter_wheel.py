@@ -11,7 +11,7 @@ class Wheel(object):
     def __init__(self,mNumber):
         self.currentSpeed = 0
         self.goalSpeed = 0
-        self.wheel = CANJaguar(mNumber)
+        self.wheel = wpilib.CANJaguar(mNumber)
                
         
     '''   
@@ -26,18 +26,19 @@ class Wheel(object):
         
     #checks if current speed = goal speed
     def IsReady(self):
-       if self.currentSpeed == self.goalSpeed:
+        if self.currentSpeed == self.goalSpeed:
             return True
     
     
     #update the current speed and goal speed
     def Update(self):
-        self.wheel.Set(goalSpeed)
+        self.wheel.Set(self.goalSpeed)
         currentSpeed = self.wheel.GetSpeed()
         
             
             
-    '''RM gives # of goalSpeed,mNumber
-    mNumber never changes within an instance
-    goalSpeed gets updated in update
-    
+    '''
+        RM gives # of goalSpeed,mNumber
+        mNumber never changes within an instance
+        goalSpeed gets updated in update
+    '''

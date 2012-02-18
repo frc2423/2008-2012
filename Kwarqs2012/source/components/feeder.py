@@ -48,7 +48,7 @@ class Feeder(object):
         self.direction = wpilib.Relay.kOff    
     
     """
-    def Feed(self):
+    def FeedIfBallNear(self):
         if 
         self.direction = kForward
         # ^ Need a proximity sensor to register for this to work- change

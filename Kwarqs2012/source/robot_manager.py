@@ -80,7 +80,7 @@ class RobotManager(object):
         I'm having trouble figuring out where interstates are needed- since a lot of things only work if a button is being HELD
         on a joystick
         '''
-    if State == Automatic
+    if State == Automatic:
     
         if self.chamber.IsReady() and self.feeder.IsFull():
             self.feeder.Stop()

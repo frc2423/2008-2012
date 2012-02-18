@@ -15,13 +15,13 @@ class Chamber (object):
         switchState = False
         
     def Release( self ):
-        chamberMotorState = kOn
+        chamberMotorState = wpilib.Relay.kOn
         
     def IsReady( self ):
         return switchState
         
     def Stop( self ):
-        chamberMotorState = kOff
+        chamberMotorState = wpilib.Relay.kOff
     
     def Print( self ):
         print( chamberMotorState, switchState )

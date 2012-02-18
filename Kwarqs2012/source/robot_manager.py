@@ -56,7 +56,7 @@ class RobotManager(object):
 
     #Feed balls INTO the chamber manually with this function
     def ChamberOverride(self):
-        self.chamber.Feed()
+        self.chamber.Release()
         #need a state here so I can turn this motor off
         
     def FeedOverride(self):

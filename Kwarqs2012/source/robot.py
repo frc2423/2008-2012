@@ -76,16 +76,18 @@ class MyRobot(wpilib.SimpleRobot):
             if stick1.GetTrigger(): #this is to fire the ball
                 RobotManager.ShootIfReady()
             
-            if stick1.GetRawButton(4):
+            if stick1.GetRawButton(4): #to manually run the feeder
                 RobotManager.FeedOverride()
             
-            if stick1.GetRawButton(5):
+            if stick1.GetRawButton(5): # to manually run the chamber
                 RobotManager.ChamberOverride()
                 
-            if stick1.GetRawButton(6):
+            if stick1.GetRawButton(6): #to manually shoot the ball
                 RobotManager.ShootOverride()
-         
-               
+            
+            if stick2.GetRawButton(3): #to manually aim both the angle and the position of the lazy susan
+                RobotManager.ManualAngle()
+            
                #this prints values so we know what's going on
             if timer.HasPeriodPassed( 1.0 ):
                 print( "Motor: %f,%f" % ( driveMotor1.Get(), driveMotor2.Get()  ) )

@@ -22,7 +22,10 @@ class Chamber (object):
         
     def Stop( self ):
         chamberMotorState = kOff
-        
+    
+    def Print( self ):
+        print( chamberMotorState, switchState )
+    
     def Update( self ):
         chamberMotor.Set( chamberMotorState ) # so the update is changing if the motor is running
         switchState = limitSwitch3.Get()

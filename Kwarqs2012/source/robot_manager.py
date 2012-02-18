@@ -63,7 +63,7 @@ class RobotManager(object):
         if shooter.IsReady() and chamber.IsReady():
             self.chamber.Release()
             if timer.HasPeriodPassed(.5) :
-                self.chamber.Stop
+                self.chamber.Stop()
     '''
     Releases chamber no matter the state, only to be used when things malfunction
     '''

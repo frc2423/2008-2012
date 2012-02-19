@@ -1,6 +1,8 @@
 from components.shooter.shooter_angle import VerticalAngle
 from components.shooter.shooter_susan import Susan
 from components.shooter.shooter_wheel import Wheel 
+from components.shooter.pidsusan import SusanSource
+from components.shooter.pidsusan import SusanOutputVoltage
 
 try:
     import basket_tracker 
@@ -15,6 +17,9 @@ except ImportError:
 
 class Shooter(object):
     
+    SUSAN_P = 1.0
+    SUSAN_I = 0.0
+    SUSAN_D = 0.0
     
     def __init__(self,vAngle,susan,wheel):
                  
@@ -25,7 +30,13 @@ class Shooter(object):
         self.wheel = wheel
         #new
         self.cameraData = basket_tracker.BasketTracker()
+        self.autoSusan = True
+        self.autoAngle = True
+        self.autoShooter = True
         
+        self.susanSource = SusanSource()
+        self.susa
+        pidControl = wpilib.PIDController(SUSAN_P, SUSAN_I,SUSAN_D, )
     
     
     #cameraData.Get() - Not sure what exactly do do with this since I'm not familiar with how 
@@ -33,11 +44,24 @@ class Shooter(object):
     
     #check if Angle is ready, Susan is ready, Wheel is read
     def IsReady(self):
-        self.ready = False
+        self.ready = False  
         if self.vAngle.IsReady() and self.susan.IsReady() and self.wheel.IsReady():
             self.ready = True
         return True 
+    
+    #toggles manual modes true/false  
+    def toggleManualSusan(self):
+        self.manualSusan = not self.manualSusan
+        
+    def toggleManualAngle(self):
+        self.manualAngle = not self.manualAngle
+        
+    def toggleManualShooter(self):
+        self.manualShooter = not self.manualShooter
         
     def Update(self):
+        if self.autoSusan :
+            self.susan.se
         self.angle.Update() and self.susan.Update() and self.wheel.Update()
         #SetGoal(      )
+        

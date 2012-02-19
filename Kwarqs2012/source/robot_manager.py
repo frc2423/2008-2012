@@ -87,7 +87,6 @@ class RobotManager(object):
     
         
     def RunFeederMotor(self):
-        print( 'hi' )
         self.feeder.Feed()
        
     def SetShooterSpeedManual(self, speed):

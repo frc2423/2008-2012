@@ -117,29 +117,36 @@ class MyRobot(wpilib.SimpleRobot):
             
             if stick1.GetTop(): # makes the arm go down --- when button not pressed, the arm makes its ascent back up
                 robotManager.LowerRampArm()
-            
+            '''
             if stick1.GetTrigger(): #this is to fire the ball
                 robotManager.ShootIfReady()
-                          
+            '''              
             if driveStation.GetDigitalIn(1): #to manually run the feeder
                 robotManager.RunFeederMotor()
             
             if driveStation.GetDigitalIn(2): # to manually run the chamber
                 robotManager.RunChamberMotor()
             
+            '''
             if driveStation.GetDigitalIn(3): #to manually shoot the ball
                 robotManager.SetShooterSpeedManual()
-                
+            
+            
+            
             if driveStation.GetDigitalIn(4): #to manually aim both the angle and the position of the lazy susan
                 robotManager.SetAngleManual()
             #run chamber motor
             if driveStation.GetDigitalIn(5):
                 robotManager.SetSusanManual()
+            '''
+            
             
             #if stick
             #this prints values so we know what's going on
             if stick1.GetRawButton(7):
                 print( "Motor: %f,%f" % ( driveMotor1.Get(), driveMotor2.Get()  ) )
+            
+            robotManager.Update()
             
             
             wpilib.Wait(0.04)

@@ -28,7 +28,7 @@ class RampArm(object):
 
     def LowerRamp(self):
         self.armSpeed = self.forwardSpeed #sets full power forward
-  
+        print('test')
 #if lowerRamp is called the self.armSpeed is fowardSpeed and the motor is set to full power
 #then sets self.armspeed is -.5
 #then when LowerRamp is not needed then the motor is set to -.5
@@ -39,5 +39,5 @@ class RampArm(object):
             self.armSpeed = self.reverseSpeed
         else:
             self.arm.Set(self.reverseSpeed)
-            
+        print('owls')
             

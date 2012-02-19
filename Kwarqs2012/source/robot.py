@@ -79,22 +79,22 @@ class MyRobot(wpilib.SimpleRobot):
             
             if stick1.GetTop(): # makes the arm go down --- when button not pressed, the arm makes its ascent back up
                 robotManager.LowerRampArm()
-                print("owls")
+            
             if stick1.GetTrigger(): #this is to fire the ball
                 robotManager.ShootIfReady()
-                print("not actually owls")
+            
             if stick1.GetRawButton(4): #to manually run the feeder
                 robotManager.FeedOverride()
-                print("this is pressure, Dylan")
+            
             if stick1.GetRawButton(5): # to manually run the chamber
                 robotManager.ChamberOverride()
-                print("just stay silent, and see what he does for the last variable")
+            
             if stick1.GetRawButton(6): #to manually shoot the ball
                 robotManager.ShootOverride()
-                print("i need to finish up with this")
+                
             if stick2.GetRawButton(3): #to manually aim both the angle and the position of the lazy susan
                 robotManager.AngleStateChange()
-                print("sam is wierd")
+            
                #this prints values so we know what's going on
             if timer.HasPeriodPassed( 1.0 ):
                 print( "Motor: %f,%f" % ( driveMotor1.Get(), driveMotor2.Get()  ) )

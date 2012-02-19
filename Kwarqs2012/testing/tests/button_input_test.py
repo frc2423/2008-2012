@@ -41,7 +41,7 @@ class Test(object):
         
         if self.loop_count == 6:
             self.robot_module.stick1.buttons[5] = False    
-            self.robot_module.stick1.buttons[6] = True  
+            self.robot_module.stick2.buttons[2] = True  
             
         if self.loop_count == 7:
             self.robot_module.stick1.buttons[6] = False    

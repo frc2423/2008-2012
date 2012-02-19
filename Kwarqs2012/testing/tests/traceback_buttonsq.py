@@ -39,6 +39,8 @@ class Test(object):
             self.robot_module.driveStation.digital_in[2] = False  
             self.robot_module.driveStation.digital_in[3] = True 
         
+        
+        
         if self.loop_count == 5:
             self.robot_module.driveStation.digital_in[3] = False   
             self.robot_module.driveStation.digital_in[4] = True  
@@ -60,7 +62,7 @@ class Test(object):
             self.robot_module.stick1.buttons[1] = True        
                 
             
-        '''   
+        '''  
         if self.loop_count == 2:
             self.robot_module.stick1.buttons[1] = False
             self.robot_module.stick1.buttons[2] = True

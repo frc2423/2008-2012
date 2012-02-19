@@ -456,7 +456,15 @@ class Joystick(object):
 class KinectStick(Joystick):
     pass
 
+class PIDController(object):
+    pass
 
+class PIDOutput(object):
+    pass
+    
+class PIDSource(object):
+    pass    
+    
 class RobotDrive(object):
 
     kFrontLeftMotor = 0

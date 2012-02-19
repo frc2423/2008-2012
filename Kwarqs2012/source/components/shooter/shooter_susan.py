@@ -7,6 +7,7 @@ except ImportError:
 
 class Susan(object):
     
+    global forwards
     forwards = 1
     off = 0
     backwards = -1
@@ -19,7 +20,7 @@ class Susan(object):
     
     '''override function when called turn'''
     def turn(self,mNumber):
-        self.susanMotor.set(forwards)    
+        self.susanMotor.set( forwards)    
         
     '''set goal angle variable'''
     def SetGoal(self,degrees):

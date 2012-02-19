@@ -24,7 +24,7 @@ def _translate_z_to_angle_motor_position( z ):
 class VerticalAngle(object):
     
 
-    def __init__(self, angleCAN, anglePot):
+    def __init__(self, angleCAN):
         self.verticalGoalAngle = 0
         self.verticalCurrentAngle = 0 
         

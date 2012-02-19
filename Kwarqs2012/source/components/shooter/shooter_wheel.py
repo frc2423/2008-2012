@@ -6,7 +6,7 @@ except ImportError:
 
 ENCODER_TURNS_PER_REVOLUTION = 360
 
-def _configure_shooter_motor( self, motor ):
+def _configure_shooter_motor( motor ):
 
     motor.SetPositionReference( wpilib.CANJaguar.kPosRef_QuadEncoder )
     motor.ConfigEncoderCodesPerRev( ENCODER_TURNS_PER_REVOLUTION )

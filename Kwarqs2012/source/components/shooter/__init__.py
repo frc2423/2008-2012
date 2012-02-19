@@ -16,13 +16,17 @@ except ImportError:
 class Shooter(object):
     
     
-    def __init__( self, angleCAN, anglePot, susanCAN, susanGyro, wheelCAN1, wheelCAN2):
+    def __init__(self,vAngle,susan,wheel):
+                 
+        #self, angleCAN, anglePot, susanCAN, susanGyro, wheelCAN1, wheelCAN2):
 
-        self.vAngle = VerticalAngle(angleCAN, anglePot)
-        self.susan = Susan(susanCAN, susanGyro)
-        self.wheel = Wheel(wheelCAN1, wheelCAN2)
+        self.vAngle = vAngle
+        self.susan = susan
+        self.wheel = wheel
         #new
         self.cameraData = basket_tracker.BasketTracker()
+        
+    
     
     #cameraData.Get() - Not sure what exactly do do with this since I'm not familiar with how 
     #    the data returns

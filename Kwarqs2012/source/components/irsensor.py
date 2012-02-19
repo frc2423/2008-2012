@@ -10,7 +10,7 @@ class IRSensor(object):
     
     '''
         values refers to distance based on schmatic of
-        sharp GP2D12 and size of ball being ~10cm,
+        sharp GP2D120 and size of ball being ~10cm,
         should be verified imperically, sensors offset by
         5cm from ball
     '''

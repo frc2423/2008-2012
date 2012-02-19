@@ -15,6 +15,9 @@ Imported components so that instances of each can be made
 from components.chamber import Chamber
 from components.feeder import Feeder
 from components.shooter import Shooter
+from components.shooter.shooter_angle import VerticalAngle
+from components.shooter.shooter_susan import Susan
+from components.shooter.shooter_wheel import Wheel 
 from components.ramp_arm import RampArm
 
 
@@ -32,42 +35,37 @@ class RobotManager(object):
     self.feederOveride and self.feederAuto control the state of the feeder
     
     '''
-    def __init__(self):
-       
-        #These are all the numbers that correspond to the specific values for the different motors and other hardware
+    def __init__(self, chamber, feeder, wheel, susan, vAngle, shooter, rampArm):
         
-        #Relay Inputs
-        feederRelay = 1
-        chamberRelay = 2
         
-        #Digital Channel Inputs
-        chamberSwitch = 1
-        topFeedSwitch = 2
-        botFeedSwitch = 3
+        self.chamber = chamber
+     
+        self.feeder = feeder
         
-        #Analog Channel Inputs
-        susanGyro = 2
-        topFeedIRSens = 3
-        chambIRSens = 4
-
-        #CAN Bus IDs
-        shootWheelCAN1 = 2
-        shootwheelCAN2 = 3
-        angleCAN = 4
-        rampArmCAN = 5
-        susanCAN = 6
+        self.wheel = wheel
+        self.susan = susan
+        self.vAngle = vAngle
+        self.shooter = shooter
+        # self.shooter = Shooter(angleCAN, susanCAN, susanGyro, shootWheelCAN1, shootwheelCAN2)
         
+        self.rampArm = rampArm
+        
+        '''
         #initialize instances 
         self.chamber = Chamber( chamberRelay, chamberSwitch, chambIRSens)
      
         self.feeder = Feeder(feederRelay,topFeedSwitch,botFeedSwitch,topFeedIRSens)
         
-        self.shooter = Shooter(angleCAN, susanCAN, susanGyro, shootWheelCAN1, shootwheelCAN2)
+        self.wheel = Wheel( shootWheelCAN1, shootWheelCAN2 )
+        self.susan = Susan( susanCAN, susanGyro )
+        self.vAngle = VerticalAngle(angleCAN)
+        self.shooter = Shooter(self.vAngle,self.susan,self.wheel)
+        # self.shooter = Shooter(angleCAN, susanCAN, susanGyro, shootWheelCAN1, shootwheelCAN2)
         
         self.rampArm = RampArm(rampArmCAN)
-        
+        '''
 
- #def SetState(): (manual or auto)
+    #def SetState(): (manual or auto)
     
     '''
     Calls the shoot function if the bot is ready to shoot

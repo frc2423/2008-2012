@@ -1,12 +1,14 @@
 
 import os
 import imp
+import msvcrt
 
 try:
     installer = imp.load_source( 'install', 'C:\\WindRiver\\workspace\\robotpy\\utilities\\installer\\install.py' )
 except IOError, e:
     print( "Error loading the RobotPy installer library. (%s)\n\n" % e +
            "-- Is RobotPy source installed at 'C:\\WindRiver\\workspace\\robotpy'?" )
+    msvcrt.getch()
     exit(1)
     
 robot_host = '10.24.23.2'
@@ -17,6 +19,7 @@ try:
     server = installer.RobotCodeInstaller( robot_host )
 except Exception as e:
     print( "Error connecting to remote host: %s" % e )
+    msvcrt.getch()
     exit(1)
 
 local_root = os.path.dirname(__file__)
@@ -36,3 +39,4 @@ print( 'Upload complete' )
 
 # close the installer
 server.close()
+msvcrt.getch()

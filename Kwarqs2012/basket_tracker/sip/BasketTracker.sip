@@ -12,10 +12,28 @@ struct TrackingData {
     #include "TrackingData.h"
     %End
     
-    double x;
-    double y;
-	double angularVelocity;
-	bool validData;
+    // this is incremented each time a frame is processed by the
+    // basket tracking code
+    int frame_number;
+    
+    // number of frames that a target has been found
+    int valid_frames;
+    
+    // if this is not true, there is NOT valid data here and it
+    // should be ignored
+    bool target_data_valid;
+    
+    // coordinate of target (x,y)
+    int x;
+    int y;
+    
+    // distance to target (in inches)
+    double distance;
+    
+    // distance to target according to the sonar (in inches)
+    // -> this is always valid, but might not actually be the 
+    // distance to the target
+    double sonar_distance;
 };
 
 
@@ -38,6 +56,10 @@ class BasketTracker {
         
         // retrieves current vision tracking data
         TrackingData GetData();
+        
+        // if verbose is true, the vision code will print 
+        // out various information as frames are processed
+        void SetVerbose( bool verbose = true );
         
     private:
     

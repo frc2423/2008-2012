@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>2010ImageDemo</name>
+	<name>StandaloneBasketTracker</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -17,4 +17,21 @@
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>BasketTracker.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/BasketTracker.cpp</locationURI>
+		</link>
+		<link>
+			<name>BasketTracker.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/BasketTracker.h</locationURI>
+		</link>
+		<link>
+			<name>TrackingData.h</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/TrackingData.h</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

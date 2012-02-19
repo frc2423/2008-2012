@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <wrxml>
     <properties platform="VxWorks" platform_name="vxworks-6.3" root="1" type="DownloadableKernelModuleProject"/>
     <attributes>
@@ -244,9 +244,9 @@
         </mapAttribute>
     </attributes>
     <buildtargets>
-        <buildtarget buildtool="Linker" name="2010ImageDemo" passed="false" targetname="2010ImageDemo">
+        <buildtarget buildtool="Linker" name="StandaloneBasketTracker" passed="false" targetname="StandaloneBasketTracker">
             <contents>
-                <folder name="/2010ImageDemo" recursive="true"/>
+                <folder name="/StandaloneBasketTracker" recursive="true"/>
             </contents>
         </buildtarget>
     </buildtargets>

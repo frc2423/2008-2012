@@ -15,7 +15,7 @@ class Chamber (object):
         self.switchState = False
         self.chamberMotorState = wpilib.Relay.kOff
         
-    def Release( self ):
+    def Run( self ):
         self.chamberMotorState = wpilib.Relay.kOn 
         
     def IsReady( self ):

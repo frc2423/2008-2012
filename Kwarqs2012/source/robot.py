@@ -12,23 +12,19 @@ except ImportError:
 
 
 
-#Hardware Initilization Values
-rampArmMotorNum = 3
-chamberRelayNum = 2
-limitSwitchNum = 1
 
-robotManager = RobotManager(rampArmMotorNum)
+robotManager = RobotManager()
 
 stick1 = wpilib.Joystick(1)
 stick2 = wpilib.Joystick(2)
+stick3 = wpilib.Joystick(3)
 
 driveMotor1 = wpilib.Jaguar(1)
 driveMotor2 = wpilib.Jaguar(2)
 
-susanMotor = wpilib.CANJaguar(6)
-angleMotor = wpilib.CANJaguar(4)
-
 drive = wpilib.RobotDrive( driveMotor1, driveMotor2)
+
+driveStation = wpilib.DriveStation.GetInstance()
 
 '''spike1 = wpilib.Relay(1) 
 spike2 = wpilib.Relay(3)'''
@@ -71,35 +67,40 @@ class MyRobot(wpilib.SimpleRobot):
             dog.Feed()            
             
             drive.ArcadeDrive(stick1.GetY(), stick1.GetX())
-            
+'''            
             if robotManager.angleState == robotManager.ManualAngle: # my way of manually controlling the ball angle and  the susan
                 
                 susanMotor.Set( stick2.GetX() )
                 angleMotor.Set( stick2.GetY() )
+'''           
             
             if stick1.GetTop(): # makes the arm go down --- when button not pressed, the arm makes its ascent back up
                 robotManager.LowerRampArm()
             
             if stick1.GetTrigger(): #this is to fire the ball
                 robotManager.ShootIfReady()
+                          
+            if driveStation.getDigitalIn(1): #to manually run the feeder
+                robotManager.RunFeederMotor()
             
-            if stick1.GetRawButton(4): #to manually run the feeder
-                robotManager.FeedOverride()
+            if driveStation.getDigitalIn(2): # to manually run the chamber
+                robotManager.RunChamberMotor()
             
-            if stick1.GetRawButton(5): # to manually run the chamber
-                robotManager.ChamberOverride()
-            
-            if stick1.GetRawButton(6): #to manually shoot the ball
-                robotManager.ShootOverride()
+            if driveStation.getDigitalIn(3): #to manually shoot the ball
+                robotManager.SetShooterSpeedManual()
                 
-            if stick2.GetRawButton(3): #to manually aim both the angle and the position of the lazy susan
-                robotManager.AngleStateChange()
+            if driveStation.GetDigitalIn(4): #to manually aim both the angle and the position of the lazy susan
+                robotManager.SetAngleManual()
+            #run chamber motor
+            if driveStation.GetDigitalIn(5):
+                robotManager.SetSusanManual()
             
+            if stick
                #this prints values so we know what's going on
-            if timer.HasPeriodPassed( 1.0 ):
+            if stick1.GetRawButton(7):
                 print( "Motor: %f,%f" % ( driveMotor1.Get(), driveMotor2.Get()  ) )
             
-            
+'''            
             wpilib.Wait(0.04)
                 
         

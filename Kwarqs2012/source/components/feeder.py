@@ -3,6 +3,8 @@ The feeder is meant to move balls from the ground to the chamber, where the
 ball will then be fired 
 
 '''
+
+from components.irsensor import IRSensor
 try:
     import wpilib
 except ImportError:
@@ -26,19 +28,25 @@ class Feeder(object):
     proxchannel- The channel on the digital sidecar that the proximity
     sensor is connected to
     
-    switch1- state of limit switch 1
-    switch2- state of limit switch 2 (higher one)
+    lowSwitch1- state of limit switch 1
+    topSwitch2- state of limit switch 2 (higher one)
     '''
     
-    def __init__(self, relayChannel, limSwitch1Channel, limSwitch2Channel, proxchannel):
-        self.feederMotor = wpilib.Relay(relayChannel)
-        self.Full = False
-        self.direction = wpilib.Relay.kOff
-        self.limSwitch1 = wpilib.DigitalInput( limSwitch1Channel )
-        self.limSwitch2 = wpilib.DigitalInput( limSwitch2Channel )
-        self.switch1 = False
-        self.switch2 = False
+    def __init__(self, feederRelay, topFeedSwitch, botFeedSwitch, topFeedIRSens):
         
+        self.feederMotor = wpilib.Relay(feederRelay)
+
+        self.direction = wpilib.Relay.kOff
+        self.botFeedSwitch = wpilib.DigitalInput( botFeedSwitch )
+        self.topFeedSwitch = wpilib.DigitalInput( topFeedSwitch )
+        
+        #not sure switches will be used
+        self.botSwitchVal = False
+        self.topSwitchVal = False
+        
+        self.topFeedIRSens = IRSensor(topFeedIRSens)
+        
+        self.Full = False
     #Starts feederMotor if needed
     def Feed(self):
         self.direction = wpilib.Relay.kForward
@@ -60,33 +68,26 @@ class Feeder(object):
     
     #Returns 1 if the feeder is full and 0 if not
     def IsFull(self):
-        if self.switch1 == True and self.switch2 == True:
+        if self.limSwitch1.Get() == True and self.topFeedIRSens.isBallSet() == True:
             return( True )
-    '''
-    This function is meant to return the states of switches in the feeder (when more info. than IsFull is needed)
-    The last elif statement may be redundant (due to IsFull)
-    '''
-    def BallStates(self):
-        if self.switch1 == 0 and self.switch2 == 0:
-            return( 0 )
-        elif self.switch1 == 1 and self.switch2 == 0:
-            return( 1 )
-        elif self.switch1 == 0 and self.switch2 == 1:
-            return( 2 )
-        elif self.switch1 == 1 and self.switch2 == 1:
-            return( 3 )
-
+        
+    def IsReady(self):
+        if self.topFeedIRSens.isBallSet() == True:
+            return( True )
     '''
     Sets the feeder motor's direction (as well as whether it is on)
     Also updates the state of the limit switches
     '''
     def Update(self):
         self.feederMotor.Set(self.direction)
+        '''
+        going to do this with the actuall values
+        
         self.switch1 = self.limSwitch1.Get()
         self.switch2 = self.limSwitch2.Get()
+        '''
         
-        
-        
+      
         
         
         

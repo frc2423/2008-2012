@@ -32,46 +32,40 @@ class RobotManager(object):
     self.feederOveride and self.feederAuto control the state of the feeder
     
     '''
-    def __init__(self, rampArmMotorNum):
+    def __init__(self):
        
-                #These are all the numbers that correspond to the specific values for the different motors and other hardware
+        #These are all the numbers that correspond to the specific values for the different motors and other hardware
         
-        relayChannel = 1
-        limSwitch1Channel = 2
-        limSwitch2Channel = 3
-        proxchannel = 6
-        angleCAN = 4
-        anglePot = 4
-        susanCAN = 6
+        #Relay Inputs
+        feederRelay = 1
+        chamberRelay = 2
+        
+        #Digital Channel Inputs
+        chamberSwitch = 1
+        topFeedSwitch = 2
+        botFeedSwitch = 3
+        
+        #Analog Channel Inputs
         susanGyro = 2
-        wheelCAN1 = 2
-        wheelCAN2 = 3
-        chamberRelayNum = 2
-        limitSwitchNum = 1
-        rampArmMotorNum = 3
+        topFeedIRSens = 3
+        chambIRSens = 4
 
-       
-        self.chamber = Chamber( chamberRelayNum, limitSwitchNum)
+        #CAN Bus IDs
+        shootWheelCAN1 = 2
+        shootwheelCAN2 = 3
+        angleCAN = 4
+        rampArmCAN = 5
+        susanCAN = 6
         
-        #relayChannel, limSwitch1Channel, limSwitch2Channel, proxchannel 
-        self.feeder = Feeder(relayChannel,limSwitch1Channel,limSwitch2Channel,proxchannel)
+        #initialize instances 
+        self.chamber = Chamber( chamberRelay, chamberSwitch, chambIRSens)
+     
+        self.feeder = Feeder(feederRelay,topFeedSwitch,botFeedSwitch,topFeedIRSens)
         
-        #AngleCAN, SusanCAN, WheelCAN 
-        self.shooter = Shooter(angleCAN, anglePot, susanCAN, susanGyro, wheelCAN1, wheelCAN2)
+        self.shooter = Shooter(angleCAN, susanCAN, susanGyro, shootWheelCAN1, shootwheelCAN2)
         
-        #
-        self.rampArm = RampArm(rampArmMotorNum)
+        self.rampArm = RampArm(rampArmCAN)
         
-        self.chamberOveride = 0
-        self.chamberAuto = 1
-        self.feederOveride = 0
-        self.feederAuto = 1
-        self.AutomaticAngle = 1
-        self.ManualAngle = 0
-        self.angleState = self.AutomaticAngle
- 
-        self.timer = wpilib.Timer()
-        self.timer.Start()
 
  #def SetState(): (manual or auto)
     
@@ -80,9 +74,7 @@ class RobotManager(object):
     '''
     def ShootIfReady(self):
         if self.shooter.IsReady() and self.chamber.IsReady():
-            self.chamber.Release()
-            if self.timer.HasPeriodPassed(.5) :
-                self.chamber.Stop()
+            self.chamber.Run()
                 
     '''
     lowers ramp arm
@@ -92,25 +84,21 @@ class RobotManager(object):
     '''    
     Releases chamber no matter the state, only to be used when things malfunction
     '''
-    def ShootOverride(self):
-        self.chamber.Release()
+    def RunChamberMotor(self):
+        self.chamber.Run()
     
-
-    #Feed balls INTO the chamber manually with this function
-    def ChamberOverride(self):
-        self.chamber.Release()
-        #need a state here so I can turn this motor off
         
-    def FeedOverride(self):
+    def RunFeederMotor(self):
         self.feeder.Feed()
        
-    def AngleStateChange(self):
-        if self.angleState == self.ManualAngle:
-            self.angleState = self.AutomaticAngle
-        else:
-            self.angleState = self.ManualAngle
-   
-
+    def SetShooterSpeedManual(self, speed):
+        self.shooter.SetSpeed(speed)
+    
+    def SetAngleManual(self, angle):
+        self.shooter.SetGoal(angle)
+        
+    def SetSusanManual(self, speed):
+        self.shooter.SetSusanSpeed(speed)
     '''
     Calls functions within the components based on every possible state
     '''    

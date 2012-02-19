@@ -35,8 +35,8 @@ class Shooter(object):
         self.autoShooter = True
         
         self.susanSource = SusanSource()
-        self.susa
-        pidControl = wpilib.PIDController(SUSAN_P, SUSAN_I,SUSAN_D, )
+        self.SusanOutputVoltage = SusanOutputVoltage()
+        pidControl = wpilib.PIDController(Shooter.SUSAN_P, Shooter.SUSAN_I, Shooter.SUSAN_D, self.susanSource, self.SusanOutputVoltage)
     
     
     #cameraData.Get() - Not sure what exactly do do with this since I'm not familiar with how 

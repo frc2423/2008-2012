@@ -13,7 +13,7 @@
         
             X/Y: drive motors
             Trigger: ramp motor
-            
+            Z: angle
             Buttons 10,11: relays
             
         Stick2:
@@ -83,11 +83,11 @@ switch3 = wpilib.DigitalInput(3)
 
 ANGLE_MOTOR_MIN_POSITION = 0.0
 ANGLE_MOTOR_MAX_POSITION = 1.0
-ANGLE_MOTOR_P = 100.0
+ANGLE_MOTOR_P = 250.0
 ANGLE_MOTOR_I = 0.0
 ANGLE_MOTOR_D = 0.0
 
-ENABLE_ANGLE_MOTOR = False
+ENABLE_ANGLE_MOTOR = True
 
 def _translate_z_to_angle_motor_position( z ):
 

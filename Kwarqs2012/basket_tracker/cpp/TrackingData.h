@@ -29,6 +29,8 @@ struct TrackingData
     // distance to the target
     double sonar_distance;
     
+    double angle_susan;
+    
 };
 
 

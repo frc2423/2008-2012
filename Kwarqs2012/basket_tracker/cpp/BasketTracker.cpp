@@ -68,7 +68,8 @@ void BasketTracker::Main()
     Wait(3.0);
     
     // Color thresholds in the HSL color space (bright Green)
-    Threshold targetThreshold(96,131,136,255,145,179);
+    //Threshold targetThreshold(96,131,136,255,145,179); --> green in my appartment's light conditions
+    Threshold targetThreshold(112,143,16,57,219,255);
     
     // Rectangle dimensions to filter
     ParticleFilterCriteria2 criteria[] = {
@@ -77,7 +78,8 @@ void BasketTracker::Main()
     };
     
     // Camera angle in radians 
-    double theta = 0.6691;
+    double theta_radians = 0.6691;
+    double theta_degrees = 180*theta_radians / 3.1415;
     
     // Get the analog input from the Sonar module
     AnalogChannel sonar(4);
@@ -96,8 +98,9 @@ void BasketTracker::Main()
     // run in an infinite loop doing basket tracking stuff until
     // signaled to exit
     
+    
     // while ( true )
-    while ( data.frame_number == 0 )
+    while ( data.frame_number >= 0 )
     {
         // Getting images from the camera and color segmenting the reflective tape 
         HSLImage  *hslImage  = camera.GetImage();
@@ -139,10 +142,12 @@ void BasketTracker::Main()
             
             data.x = i->center_mass_x;
             data.y = i->center_mass_y;
-        
+            // offset x coordinate 
+            int x  = data.x - 320;
             double bw = i->boundingRect.width;
-            double temp2 = 2.0 * bw * tan(theta/2.0);
+            double temp2 = 2.0 * bw * tan(theta_radians/2.0);
             data.distance  = (double) 640*22 / temp2;
+            data.angle_susan = (double) x * theta_degrees / 640.0;
             
             if (m_verbose)
             {
@@ -150,6 +155,7 @@ void BasketTracker::Main()
                 printf("distance to target (in inches) %f \n", data.distance);
                 printf("distance to target (SONAR based in inches): %f \n", data.sonar_distance);    
                 printf("difference between the distance estimated from Sonar and vision system: %f \n", data.sonar_distance - data.distance );
+                printf("angle_susan %f \n", data.angle_susan);
             }
         }
         

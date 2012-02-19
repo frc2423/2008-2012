@@ -29,6 +29,7 @@ struct TrackingData
     // distance to the target
     double sonar_distance;
     
+    // angle in degrees that lazy susan must turn to make the target in the image center
     double angle_susan;
     
 };

@@ -147,7 +147,8 @@ void BasketTracker::Main()
             double bw = i->boundingRect.width;
             double temp2 = 2.0 * bw * tan(theta_radians/2.0);
             data.distance  = (double) 640*22 / temp2;
-            data.angle_susan = (double) x * theta_degrees / 640.0;
+            data.angle_susan = (double) - x * theta_degrees / 640.0;
+            
             
             if (m_verbose)
             {

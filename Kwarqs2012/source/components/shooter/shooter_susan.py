@@ -12,7 +12,7 @@ class Susan(object):
     def __init__(self,susanCAN,susanGyro):
         self.susanMotor = wpilib.CANJaguar(susanCAN)
         self.gyro = wpilib.Gyro(susanGyro)
-        self.goalSpeed
+        self.goalSpeed = 0
     '''override function when called turn'''
     def turn(self,mNumber):
         self.susanMotor.set(Susan.forwards)    

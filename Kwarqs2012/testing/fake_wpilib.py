@@ -457,7 +457,9 @@ class KinectStick(Joystick):
     pass
 
 class PIDController(object):
-    pass
+    def __init__(self, Kp,Ki,Kd,source,output,period = 0.05):
+        pass
+        
 
 class PIDOutput(object):
     pass

@@ -21,7 +21,8 @@ class Susan(object):
         self.gyro = wpilib.Gyro(susanGyro)
         self.bodyGyro = wpilib.Gyro(bodyGyro)
         
-        self.bodyGyroInitPos = bodyGyro.GetAngle()
+        #It seems that you forgot to put a self to the right
+        self.bodyGyroInitPos = self.bodyGyro.GetAngle()
         self.susanSource = SusanSource()
         
         pidControl = wpilib.PIDController(Susan.SUSAN_P, Susan.SUSAN_I, Susan.SUSAN_D, self.susanSource, self.susanMotor)

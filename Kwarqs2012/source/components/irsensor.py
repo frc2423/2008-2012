@@ -30,7 +30,7 @@ class IRSensor(object):
         not passed then do not change the state
     '''
     def isBallSet(self):
-        voltage = self.irSensor.getVoltage()
+        voltage = self.irSensor.GetVoltage()
         if voltage < IRSensor.inditThresh:
             self.state = False
         elif  voltage > IRSensor.ballSet:

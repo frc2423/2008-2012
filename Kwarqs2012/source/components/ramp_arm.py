@@ -20,15 +20,15 @@ class RampArm(object):
     #   
     #   Variables:
     #   int mNumber: PWM connection number for motor
-    def __init__(self, mNumber):
-        self.arm = wpilib.Jaguar(mNumber)
+    def __init__(self, rampArmCAN):
+        self.arm = wpilib.Jaguar(rampArmCAN)
         self.armSpeed = 0
         self.forwardSpeed = 1
         self.reverseSpeed = -0.5
-
+    
     def LowerRamp(self):
         self.armSpeed = self.forwardSpeed #sets full power forward
-        print('test')
+        
 #if lowerRamp is called the self.armSpeed is fowardSpeed and the motor is set to full power
 #then sets self.armspeed is -.5
 #then when LowerRamp is not needed then the motor is set to -.5
@@ -39,5 +39,5 @@ class RampArm(object):
             self.armSpeed = self.reverseSpeed
         else:
             self.arm.Set(self.reverseSpeed)
-        print('owls')
+        
             

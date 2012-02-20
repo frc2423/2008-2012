@@ -123,10 +123,12 @@ class MyRobot(wpilib.SimpleRobot):
             '''              
             if driveStation.GetDigitalIn(1): #to manually run the feeder
                 robotManager.RunFeederMotor()
+                
+                
             
             if driveStation.GetDigitalIn(2): # to manually run the chamber
                 robotManager.RunChamberMotor()
-            
+               
             '''
             if driveStation.GetDigitalIn(3): #to manually shoot the ball
                 robotManager.SetShooterSpeedManual()

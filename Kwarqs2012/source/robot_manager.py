@@ -84,7 +84,6 @@ class RobotManager(object):
     '''
     def RunChamberMotor(self):
         self.chamber.Run()
-    
         
     def RunFeederMotor(self):
         self.feeder.Feed()
@@ -102,10 +101,12 @@ class RobotManager(object):
     '''    
     
     def Update(self):
+        '''
         self.shooter.Update()
+        '''
         self.chamber.Update()
         self.feeder.Update()
-        self.ramp_arm.Update()
+        self.rampArm.Update()
     
     
         '''

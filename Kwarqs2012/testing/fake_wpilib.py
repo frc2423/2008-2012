@@ -129,7 +129,9 @@ class AnalogChannel(object):
     kAccumulatorChannels = [1, 2]
     
     def __init__(self, channel):
+        self.voltage = 0
         pass
+        
         
     def GetValue(self):
         return self.value

@@ -50,7 +50,8 @@ class Feeder(object):
     #Starts feederMotor if needed
     def Feed(self):
         self.direction = wpilib.Relay.kForward
-    
+        
+        
     #Stops the feedermotor if the feeder should not be on
     def Stop(self):
         self.direction = wpilib.Relay.kOff    
@@ -68,11 +69,13 @@ class Feeder(object):
     
     #Returns 1 if the feeder is full and 0 if not
     def IsFull(self):
-        if self.limSwitch1.Get() == True and self.topFeedIRSens.isBallSet() == True:
+        if self.botFeedSwitch.Get() == True and self.topFeedIRSens.isBallSet() == True:
             return( True )
         
     def IsReady(self):
+        print('does this')
         if self.topFeedIRSens.isBallSet() == True:
+            print('work')
             return( True )
     '''
     Sets the feeder motor's direction (as well as whether it is on)

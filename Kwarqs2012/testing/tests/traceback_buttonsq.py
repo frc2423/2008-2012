@@ -4,7 +4,6 @@ except ImportError:
     import fake_wpilib as wpilib
 # directory of robot.py, relative to this file
 
-
 robot_path = '../../source'
 
 
@@ -19,12 +18,13 @@ class Test(object):
         #global loop_count
         self.loop_count = self.loop_count + 1
         print(self.loop_count)
+        print(self.robot_module.chamber.chamberMotorState)
         
-        
+        '''
         if self.loop_count == 1:
             self.robot_module.driveStation.digital_in[0] = True
         
-        
+        '''
         if self.loop_count == 2:
             self.robot_module.driveStation.digital_in[0] = False
             self.robot_module.driveStation.digital_in[1] = True

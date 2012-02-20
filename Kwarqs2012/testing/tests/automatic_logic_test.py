@@ -35,11 +35,19 @@ class Test(object):
         self.botFeedIRSens = self.feeder.botFeedIRSens.irSensor
         self.chambIRSens = self.chamber.chambIRSens.irSensor
         
-
+        #feeder limitswitch
+        self.botFeedSwitch = self.feeder.botFeedSwitch 
+        
+        
+        #self.chamber.chamberMotorState  gives chamber relay's state
+        #self.feeder.direction  gives feeder's relay's state
+        #self.feeder.botSwitchVal   lets you change/check the state of the bottom feeder limit switch
+        
     def IsOperatorControl(self):
         #global loop_count
         self.loop_count = self.loop_count + 1
         print(self.loop_count)
+        print(self.chamber.chamberMotorState , self.feeder.direction, self.feeder.topFeedIRSens.IsBallSet, self.chamber.chambIRSens.IsBallSet )
         #print( self.robot_module.feeder.IsReady() )
         
         # Template to check if a ball is there - 
@@ -51,54 +59,38 @@ class Test(object):
         #expect the motor to continue running
         if self.loop_count <= 5:
         
-            self.botFeedIRSens.voltage = 2.5
-            print (self.topFeedIRSens.IsBallSet)
-            #self.irSensor.GetVoltage()
-        
+            self.feeder.botSwitchVal = True       
         
         #1 ball at top of feeder
         #expect the motor to stop running and for the feeder to be ready
         if self.loop_count > 5 and self.loop_count <= 10:
         
-            self.botFeedIRSens.voltage = 0.3
+            self.feeder.botSwitchVal = False
             self.topFeedIRSens.voltage = 2.5
-            feeder.IsReady
-            print (self.topFeedIRSens.IsBallSet)
-            #self.irSensor.GetVoltage()
-        
-        
+               
         #1 ball at top and bottom of feeder
         #expect the motor to stop running and for the feeder to be ready
         if self.loop_count > 10 and self.loop_count <= 15:
         
-            self.botFeedIRSens.voltage = 2.5
-            self.topFeedIRSens.voltage = 2.5
-            feeder.IsReady
-            print (self.topFeedIRSens.IsBallSet)
-            #self.irSensor.GetVoltage()
-        
+            self.feeder.botSwitchVal = True
+            self.topFeedIRSens.voltage = 2.5     
         
         #1 ball at top of feeder and 1 in chamber
         #expect the motor to stop running and for the feeder AND chamber to be ready
         if self.loop_count > 15 and self.loop_count <= 20:
         
-            self.botFeedIRSens.voltage = 0.3
+            self.feeder.botSwitchVal = False
             self.chambIRSens.voltage = 2.5
             self.topFeedIRSens.voltage = 2.5
-            feeder.IsReady
-            print (self.topFeedIRSens.IsBallSet)
-            #self.irSensor.GetVoltage()
         
         #both feeder and chamber full
         #expect both feeder and chamber motors to be off. I feeder is on we could have 4 balls.
         if self.loop_count > 20 and self.loop_count <= 25:
         
-            self.botFeedIRSens.voltage = 2.5
+            self.feeder.botSwitchVal = True
             self.chambIRSens.voltage = 2.5
             self.topFeedIRSens.voltage = 2.5
-            feeder.IsReady
-            print (self.topFeedIRSens.IsBallSet)
-            #self.irSensor.GetVoltage()
+
         
         
         '''

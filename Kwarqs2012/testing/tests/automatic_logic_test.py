@@ -47,7 +47,9 @@ class Test(object):
         #global loop_count
         self.loop_count = self.loop_count + 1
         print(self.loop_count)
-        print(self.chamber.chamberMotorState , self.feeder.direction, self.feeder.topFeedIRSens.IsBallSet, self.chamber.chambIRSens.IsBallSet )
+        print(self.chamber.chamberMotorState , self.feeder.direction,
+              self.feeder.botSwitchVal, self.feeder.topFeedIRSens.IsBallSet,
+              self.chamber.chambIRSens.IsBallSet )
         #print( self.robot_module.feeder.IsReady() )
         
         # Template to check if a ball is there - 

@@ -6,6 +6,7 @@ except ImportError:
 #source for the PID controller
 class SusanSource(wpilib.PIDSource):
     
+    
     def __init__(self):
         wpilib.PIDSource.__init__(self)
         self.val = 0

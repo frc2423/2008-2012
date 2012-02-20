@@ -19,12 +19,19 @@ class Wheel(object):
     def __init__(self,wheelCAN1, wheelCAN2):
         self.currentSpeed = 0
         self.goalSpeed = 0
+        self.distance = 0
         self.wheelMotor1 = wpilib.CANJaguar(wheelCAN1)
         self.wheelMotor2 = wpilib.CANJaguar(wheelCAN2)
         _configure_shooter_motor(self.wheelMotor1)
         _configure_shooter_motor(self.wheelMotor2)
     
-        
+    '''
+        converts distance into speed
+        TODO: conversion to distance
+    '''
+    def SetDistance(self, distance):
+        self.goalSpeed = distance
+            
     '''   
         Description: sets variable that tells update to set the speed
 
@@ -35,7 +42,7 @@ class Wheel(object):
         self.goalSpeed = goalSpeed
         
         
-    #checks if current speed = goal speed
+    #checks if current speed = goal speed if true shooter is ready
     def IsReady(self):
         if self.currentSpeed == self.goalSpeed:
             return True

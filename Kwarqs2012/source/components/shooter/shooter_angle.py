@@ -1,9 +1,11 @@
+from ez_can_jaguar import EzCANJaguar
+
 try:
     import wpilib
 except ImportError:
     import fake_wpilib as wpilib
 
-ANGLE_MOTOR_MIN_POSITION = 0.0
+ANGLE_MOTOR_MIN_POSITION = 0
 ANGLE_MOTOR_MAX_POSITION = 1.0
 ANGLE_MOTOR_P = 100.0
 ANGLE_MOTOR_I = 0.0
@@ -28,7 +30,7 @@ class VerticalAngle(object):
         self.verticalGoalAngle = 0
         self.verticalCurrentAngle = 0 
         
-        self.motor = wpilib.CANJaguar(angleCAN)
+        self.motor = wpilib.EzCANJaguar(angleCAN)
         self.motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Brake )
         self.motor.SetPositionReference(wpilib.CANJaguar.kPosRef_Potentiometer)
         self.motor.ConfigPotentiometerTurns( 1 )

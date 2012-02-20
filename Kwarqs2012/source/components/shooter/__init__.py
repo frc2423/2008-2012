@@ -1,8 +1,7 @@
 from components.shooter.shooter_angle import VerticalAngle
 from components.shooter.shooter_susan import Susan
 from components.shooter.shooter_wheel import Wheel 
-from components.shooter.pidsusan import SusanSource
-from components.shooter.pidsusan import SusanOutputVoltage
+
 
 try:
     import basket_tracker 
@@ -17,9 +16,7 @@ except ImportError:
 
 class Shooter(object):
     
-    SUSAN_P = 1.0
-    SUSAN_I = 0.0
-    SUSAN_D = 0.0
+
     
     def __init__(self,vAngle,susan,wheel):
                  
@@ -32,13 +29,10 @@ class Shooter(object):
         self.cameraData = basket_tracker.BasketTracker()
         self.autoSusan = True
         self.autoAngle = True
-        self.autoShooter = True
+        self.autoWheel = True
         
-        self.susanSource = SusanSource()
-        self.SusanOutputVoltage = SusanOutputVoltage()
-        pidControl = wpilib.PIDController(Shooter.SUSAN_P, Shooter.SUSAN_I, Shooter.SUSAN_D, self.susanSource, self.SusanOutputVoltage)
-    
-    
+
+        
     #cameraData.Get() - Not sure what exactly do do with this since I'm not familiar with how 
     #    the data returns
     
@@ -50,18 +44,38 @@ class Shooter(object):
         return True 
     
     #toggles manual modes true/false  
-    def toggleManualSusan(self):
-        self.manualSusan = not self.manualSusan
+    def ToggleManualSusan(self):
+        self.autoSusan = not self.manualSusan
         
-    def toggleManualAngle(self):
-        self.manualAngle = not self.manualAngle
+    def ToggleManualAngle(self):
+        self.autoAngle = not self.manualAngle
         
-    def toggleManualShooter(self):
-        self.manualShooter = not self.manualShooter
+    def ToggleManualShooter(self):
+        self.autoWheel = not self.manualShooter
         
+    def AutoAndValidSusan(self):
+        valid = True
+        if not self.autoSusan:
+            valid = False
+        if not self.susan.PointingCorrectly():
+            valid = False
+        if not self.cameraData.target_data_valid:
+            valid = False
+        return valid
     def Update(self):
-        if self.autoSusan :
-            self.susan.se
-        self.angle.Update() and self.susan.Update() and self.wheel.Update()
+        trackingData = self.cameraData.GetData()
+        if Shooter.AutoAndValidSusan() :
+            self.susan.SetGoalAngle(trackingData.angle_susan)
+        
+        if self.autoWheel():
+            self.wheel.setDistance(trackingData.distance)
+            
+        
+        
+        self.vAngle.Update()
+        self.Susan.Update()
+        self.wheel.Update()
+        
+        
         #SetGoal(      )
         

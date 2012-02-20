@@ -27,13 +27,18 @@ class VerticalAngle(object):
     
 
     def __init__(self, angleCAN):
-        self.verticalGoalAngle = 0
-        self.verticalCurrentAngle = 0 
+        self.goalVeticalAngle = 0
+        self.currentVerticalAngle = 0 
         
-        self.motor = wpilib.EzCANJaguar(angleCAN)
+        self.motor = EzCANJaguar(angleCAN, wpilib.CANJaguar.kPosition)
         self.motor.ConfigNeutralMode( wpilib.CANJaguar.kNeutralMode_Brake )
         self.motor.SetPositionReference(wpilib.CANJaguar.kPosRef_Potentiometer)
         self.motor.ConfigPotentiometerTurns( 1 )
+        self.motor.SetPID( ANGLE_MOTOR_P, ANGLE_MOTOR_I, ANGLE_MOTOR_D )
+        
+        self.AutoMode = True
+        
+    
     #set angle to angle given in goalAngle
     def SetGoal(self,degrees):
         self.goalVeticalAngle = degrees
@@ -41,11 +46,15 @@ class VerticalAngle(object):
     
     #check if GoalAngle = CurrentAngle
     def IsReady(self):
-        if self.verticalGoalAngle == self.verticalCurrentAngle:
+        if self.goalVeticalAngle == self.motor.GetPosition():
             return True
             
-    
+    #Changes the mode 
+    # Does this do anything
+    def SetMode(self, AutoMode):
+        return True
+
     #update current and goal angles
     def Update(self):
-        self.motor.Set(self.verticalCurrentAngle)
-        self.currentAngle = self.currentAngle.GetPosition()
+        self.motor.Set(self.goalVeticalAngle)
+        

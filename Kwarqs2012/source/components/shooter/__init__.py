@@ -44,33 +44,39 @@ class Shooter(object):
         return True 
     
     #toggles manual modes true/false  
-    def ToggleManualSusan(self):
-        self.autoSusan = not self.manualSusan
+    def ToggleAutoSusan(self):
+        self.autoSusan = not self.autoSusan
+        self.susan.SetMode(self.autoSusan)
         
-    def ToggleManualAngle(self):
-        self.autoAngle = not self.manualAngle
+    def ToggleAutoAngle(self):
+        self.autoAngle = not self.autoAngle
+        self.vAngle.SetMode(self.autoAngle)
         
-    def ToggleManualShooter(self):
-        self.autoWheel = not self.manualShooter
+    def ToggleAutoWheel(self):
+        self.autoWheel = not self.autoWheel
+        self.wheel.SetMode(self.autoWheel)
         
-    def AutoAndValidSusan(self):
+    ''' Checks if component is in auto mode and if we are validaly shooting'''
+    def AutoAndValid(self, component):
         valid = True
-        if not self.autoSusan:
+        if not component:
             valid = False
         if not self.susan.PointingCorrectly():
             valid = False
         if not self.cameraData.target_data_valid:
             valid = False
         return valid
+    
     def Update(self):
         trackingData = self.cameraData.GetData()
-        if Shooter.AutoAndValidSusan() :
+        if self.AutoAndValid(self.autoSusan) :
             self.susan.SetGoalAngle(trackingData.angle_susan)
         
-        if self.autoWheel():
+        if self.AutoAndValid(self.autoWheel):
             self.wheel.setDistance(trackingData.distance)
             
-        
+        if self.AutoAndValid(self.autoAngle):
+            self.wheel.setDistance(trackingData.verticalAngle)
         
         self.vAngle.Update()
         self.Susan.Update()

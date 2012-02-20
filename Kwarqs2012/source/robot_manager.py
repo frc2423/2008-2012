@@ -50,21 +50,7 @@ class RobotManager(object):
         
         self.rampArm = rampArm
         
-        '''
-        #initialize instances 
-        self.chamber = Chamber( chamberRelay, chamberSwitch, chambIRSens)
-     
-        self.feeder = Feeder(feederRelay,topFeedSwitch,botFeedSwitch,topFeedIRSens)
-        
-        self.wheel = Wheel( shootWheelCAN1, shootWheelCAN2 )
-        self.susan = Susan( susanCAN, susanGyro )
-        self.vAngle = VerticalAngle(angleCAN)
-        self.shooter = Shooter(self.vAngle,self.susan,self.wheel)
-        # self.shooter = Shooter(angleCAN, susanCAN, susanGyro, shootWheelCAN1, shootwheelCAN2)
-        
-        self.rampArm = RampArm(rampArmCAN)
-        '''
-
+    
     #def SetState(): (manual or auto)
     
     '''
@@ -118,19 +104,20 @@ class RobotManager(object):
     
     
         if self.chamber.IsReady() and self.feeder.IsFull():
-            #if feeder.state == 1:
             self.feeder.Stop()
-            #self.chamber.Stop()
+            self.chamber.Stop()
                 
         elif not self.chamber.IsReady() and self.feeder.IsReady():
             self.feeder.FeedOveride()
-            #self.chamber.Feed()
+            self.chamber.Run()
                 
         elif not self.feeder.IsFull():
             self.feeder.Feed()
-            
+        
+
+        '''    
         elif not self.chamber.IsFull() and ((self.Feeder.BallStates() == 1 or self.Feeder.BallStates() == 2) or self.Feeder.IsFull() ):
             if self.chamber.IsReady != 1:
-                self.chamber.Release()
+                self.chamber.Run()
                 self.feeder.Feed()
-                
+        '''        

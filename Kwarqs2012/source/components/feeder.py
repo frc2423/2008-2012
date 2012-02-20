@@ -45,6 +45,8 @@ class Feeder(object):
         self.topSwitchVal = False
         
         self.topFeedIRSens = IRSensor(topFeedIRSens)
+        #If implementing another IR
+        #self.botFeedIRSens = IRSensor(botFeedIRSens)
         
         self.Full = False
     #Starts feederMotor if needed

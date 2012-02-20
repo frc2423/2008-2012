@@ -374,6 +374,7 @@ class Gyro(object):
     kDefaultVoltsPerDegreePerSecond = 0.007
     
     def __init__(self, channel):
+        self.value = 0
         pass
         
     def GetAngle(self):

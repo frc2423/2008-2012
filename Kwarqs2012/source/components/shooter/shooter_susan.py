@@ -33,22 +33,19 @@ class Susan(object):
         self.pidControl.SetTolerance(Susan.ANGLETOLERANCE)
         
         self.goalAngle = 0
-        self.goalPVBus = 0
-        self.AutoMode = True
+        self.vBus = 0
+        self.autoMode = True
                     
     '''set goal Angle variable'''
     def SetGoalAngle(self,angle):
         self.goalAngle = angle
         
-    def SetPVbus(self, PVBus):
-        self.goalPVBus = PVBus
+    def SetVbus(self, vBus):
+        self.vBus = vBus
         
     def SetMode(self, Auto):
-        self.AutoMode = Auto
-        if self.AutoMode == False:
-            self.pidControl.Enable()
-        else:
-            self.pidControl.Disable()
+        pass
+    
     '''
         start pointing at wall temporary return true 
     '''
@@ -64,14 +61,43 @@ class Susan(object):
     
     def Print(self):
         print("ShooterSusan: ")
-        print("    Susan Speed:  "+ str(self.pidControl.Get()) + "  Susan GoalAngle: " + str(self.goalAngle) + "  Pointing Correctly: " + str(self.PointingCorrectly()) +
-              "  AutoMode: " + str(self.AutoMode()))
+        print("    Susan Speed:  "+ str(self.pidControl.Get()) + "  Susan GoalAngle: " + str(self.goalAngle) + "  Pointing Correctly: " + str(self.PointingCorrectly()))
+        print("    AutoMode: " + str(self.AutoMode()))
     
     '''updates variables'''
     def Update(self):
-        if(self.AutoMode):
-            self.susanSource.setValue(self.goalAngle)
-            ''' we always try to get the goalAngle to zero '''
-            self.pidControl.SetSetpoint(0)
+        
+        enable_automode = False
+        
+        #if you set PVBus go into manual
+        if self.vBus is not None:
+            autoMode = False
+        if self.SetGoalAngle is not None:
+            autoMode = True
         else:
-            self.susanMotor.Set(self.goalPVBuss)
+            autoMode = False
+       
+        #detect transitions 
+        if autoMode != self.autoMode:
+            if not autoMode:
+                self.pidControl.Disable()
+            else:
+                enable_automode = True
+            self.autoMode = autoMode
+            
+            if self.autoMode:
+                ''' we always try to get the goalAngle to zero '''
+                self.pidControl.SetSetpoint(0)
+            
+            self.susanSource.setValue(self.goalAngle)
+
+        else:
+            self.susanMotor.Set(self.vBus)
+            
+        if enable_automode:
+            self.pidControl.Enable 
+        
+        #reset Variables   
+        self.goalAngle = None
+        self.vBus = None
+        

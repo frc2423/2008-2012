@@ -162,7 +162,7 @@ class MyRobot(wpilib.SimpleRobot):
                     # shooter.ToggleAutoAngle()
                     
             if driveStation.GetDigitalIn(5): #manually run susan
-                susan.SetPVbus(stick2.GetX())
+                susan.vBus(stick2.getX())
             
                     
             # if not shooter.autoAngle:

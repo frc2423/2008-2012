@@ -137,12 +137,13 @@ class MyRobot(wpilib.SimpleRobot):
             # if stick1.GetTrigger(): #this is to fire the ball
                 # robotManager.ShootIfReady()
                                     
-            #if driveStation.GetDigitalIn(2): # to manually run the chamber/feeder
-                # if robotManager.chamberFeederAuto:
-                    # robotManager.ToggelChamberFeederAuto()
-            # else: 
-                # if not robotManager.chamberFeederAuto:
-                    # robotManager.ToggelChamberFeederAuto()
+            if driveStation.GetDigitalIn(2): # to manually run the chamber/feeder
+                robotManager.DisableAutoFeeder()
+                
+                if stick2.GetRawButton(6):
+                    feeder.Feed()
+                elif stick2.GetRawButton(7):
+                    feeder.Stop()
                     
             # if driveStation.GetDigitalIn(3): #to manually shoot the ball
                 # if shooter.autoWheel:

@@ -47,7 +47,7 @@ class VerticalAngle(object):
 
     def Print(self):
         print("VerticalAngle:")
-        print("    Current Angle: " + self.motor.GetPosition() + "  Goal Angle: " + self.goalVerticalAngle() + "  AutoMode: " + self.AutoMode)
+        print("    Current Angle: " + str(self.motor.GetPosition()) + "  Goal Angle: " + str(self.goalVerticalAngle()) + "  AutoMode: " + str(self.AutoMode))
         
     #update current and goal angles
     def Update(self):

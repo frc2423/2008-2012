@@ -121,7 +121,7 @@ class Wheel(object):
             wpilib.CANJaguar.UpdateSyncGroup(ShooterWheelOutput.SYNCGROUP)
             
         if enable_automode:
-             self.pidControl.Enable()
+            self.pidControl.Enable()
             
         # reset vars at the end
         self.goalRPM = None

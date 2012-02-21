@@ -12,22 +12,13 @@ ANGLE_MOTOR_I = 0.0
 ANGLE_MOTOR_D = 0.0
 
 
-def _translate_z_to_angle_motor_position( z ):
 
-    # P = Xmax - (Ymax - Y)( (Xmax - Xmin) / (Ymax - Ymin) )
-    value = ANGLE_MOTOR_MAX_POSITION - ((1 - z)*( (ANGLE_MOTOR_MAX_POSITION - ANGLE_MOTOR_MIN_POSITION) / (1.0-0) ) )
-    
-    if value > ANGLE_MOTOR_MAX_POSITION:
-        return ANGLE_MOTOR_MAX_POSITION
-    elif value < ANGLE_MOTOR_MIN_POSITION:
-        return ANGLE_MOTOR_MIN_POSITION
-    return value
 
 class VerticalAngle(object):
     
 
     def __init__(self, angleCAN):
-        self.goalVeticalAngle = 0
+        self.goalVerticalAngle = 0
         self.currentVerticalAngle = 0 
         
         self.motor = EzCANJaguar(angleCAN, wpilib.CANJaguar.kPosition)
@@ -41,20 +32,24 @@ class VerticalAngle(object):
     
     #set angle to angle given in goalAngle
     def SetGoal(self,degrees):
-        self.goalVeticalAngle = degrees
+        self.goalVerticalAngle = degrees
       
     
     #check if GoalAngle = CurrentAngle
     def IsReady(self):
-        if self.goalVeticalAngle == self.motor.GetPosition():
+        if self.goalVerticalAngle == self.motor.GetPosition():
             return True
             
     #Changes the mode 
     # Does this do anything
     def SetMode(self, AutoMode):
-        return True
+        self.AutoMode = AutoMode
 
+    def Print(self):
+        print("VerticalAngle:")
+        print("    Current Angle: " + self.motor.GetPosition() + "  Goal Angle: " + self.goalVerticalAngle() + "  AutoMode: " + self.AutoMode)
+        
     #update current and goal angles
     def Update(self):
-        self.motor.Set(self.goalVeticalAngle)
+        self.motor.Set(self.goalVerticalAngle)
         

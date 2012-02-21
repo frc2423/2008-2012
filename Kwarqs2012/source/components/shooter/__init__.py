@@ -55,7 +55,7 @@ class Shooter(object):
     def ToggleAutoWheel(self):
         self.autoWheel = not self.autoWheel
         self.wheel.SetMode(self.autoWheel)
-        
+            
     ''' Checks if component is in auto mode and if we are validaly shooting'''
     def AutoAndValid(self, component):
         valid = True
@@ -76,7 +76,7 @@ class Shooter(object):
             self.wheel.setDistance(trackingData.distance)
             
         if self.AutoAndValid(self.autoAngle):
-            self.wheel.setDistance(trackingData.verticalAngle)
+            self.vAngle.SetGoal(trackingData.verticalAngle)
         
         self.vAngle.Update()
         self.Susan.Update()

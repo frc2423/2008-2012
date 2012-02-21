@@ -32,6 +32,13 @@ class ShooterWheelOutput(wpilib.PIDOutput):
         self.print_timer = PrintTimer()
         self.desiredPVBus = 0
         
+    ''' 
+        To control PID via velocity we must add
+        the PID equation output to the value of
+        the current wheelMotor pVbus but it must
+        be between (-1,1)
+    '''
+    
     def PIDWrite(self, output):
         # self.desiredPVBus =  self.wheelMotor1.Get() + output
         # if self.desiredPVBus > 1:

@@ -64,7 +64,8 @@ class Susan(object):
     
     def Print(self):
         print("ShooterSusan: ")
-        print("    Susan Speed =  "+ self.pidControl.Get() + "  Susan GoalAngle = " + self.goalAngle + "  Pointing Correctly = " + self.PointingCorrectly() )
+        print("    Susan Speed:  "+ self.pidControl.Get() + "  Susan GoalAngle: " + self.goalAngle + "  Pointing Correctly: " + self.PointingCorrectly() +
+              "  AutoMode: " + self.AutoMode())
     
     '''updates variables'''
     def Update(self):

@@ -19,17 +19,13 @@ from components.ramp_arm import RampArm
 #These are all the numbers that correspond to the specific values for the different motors and other hardware
         
 #Relay Inputs
-feederRelay = 1
 chamberRelay = 2
 
 #jaguar Inputs
-
 feederJag = 3
         
 #Digital Channel Inputs
-chamberSwitch = 1
-topFeedSwitch = 2
-botFeedSwitch = 3
+botFeedSwitch = 1
 wheelEncoder = (10,11)
 
 #Analog Channel Inputs
@@ -46,9 +42,9 @@ rampArmCAN = 5
 susanCAN = 6
 
 #initialize instances 
-chamber = Chamber( chamberRelay, chamberSwitch, chambIRSens)
+chamber = Chamber( chamberRelay, chambIRSens)
 
-feeder = Feeder(feederJag,topFeedSwitch,botFeedSwitch,topFeedIRSens)
+feeder = Feeder(feederJag, botFeedSwitch, topFeedIRSens)
 
 
 wheel = Wheel( shootWheelCAN1, shootWheelCAN2, wheelEncoder )
@@ -61,16 +57,17 @@ rampArm = RampArm(rampArmCAN)
 
 
 '''chamber,feeder, rampArm,wheel,susan,vAngle,shooter,'''
-robotManager = RobotManager(chamber,feeder,rampArm, wheel, susan, vAngle, shooter)
+robotManager = RobotManager(chamber, feeder, wheel, susan, vAngle, shooter)
 
 stick1 = wpilib.Joystick(1)
 stick2 = wpilib.Joystick(2)
 stick3 = wpilib.Joystick(3)
 
-driveMotor1 = wpilib.Jaguar(1)
-driveMotor2 = wpilib.Jaguar(2)
+r_driveMotor = wpilib.Jaguar(1)
+l_driveMotor = wpilib.Jaguar(2)
 
-drive = wpilib.RobotDrive( driveMotor1, driveMotor2)
+drive = wpilib.RobotDrive( l_driveMotor, r_driveMotor )
+drive.SetSafetyEnabled( False )
 
 driveStation = wpilib.DriverStation.GetInstance()
 
@@ -135,62 +132,63 @@ class MyRobot(wpilib.SimpleRobot):
             '''           
             
             if stick1.GetTop(): # makes the arm go down --- when button not pressed, the arm makes its ascent back up
-                robotManager.LowerRampArm()
+                rampArm.Lower()
             
-            if stick1.GetTrigger(): #this is to fire the ball
-                robotManager.ShootIfReady()
+            # if stick1.GetTrigger(): #this is to fire the ball
+                # robotManager.ShootIfReady()
                                     
-            if driveStation.GetDigitalIn(2): # to manually run the chamber/feeder
-                if robotManager.chamberFeederAuto:
-                    robotManager.ToggelChamberFeederAuto()
-            else: 
-                if not robotManager.chamberFeederAuto:
-                    robotManager.ToggelChamberFeederAuto()
+            #if driveStation.GetDigitalIn(2): # to manually run the chamber/feeder
+                # if robotManager.chamberFeederAuto:
+                    # robotManager.ToggelChamberFeederAuto()
+            # else: 
+                # if not robotManager.chamberFeederAuto:
+                    # robotManager.ToggelChamberFeederAuto()
                     
-            if driveStation.GetDigitalIn(3): #to manually shoot the ball
-                if shooter.autoWheel:
-                    shooter.ToggleAutoWheel()
-            else:
-                if not shooter.autoWheel:
-                    shooter.ToggleAutoWheel()
+            # if driveStation.GetDigitalIn(3): #to manually shoot the ball
+                # if shooter.autoWheel:
+                    # shooter.ToggleAutoWheel()
+            # else:
+                # if not shooter.autoWheel:
+                    # shooter.ToggleAutoWheel()
                     
-            if driveStation.GetDigitalIn(4): #to manually aim both the angle 
-                if shooter.autoAngle:
-                    shooter.ToggleAutoAngle()
-            else:
-                if not shooter.autoAngle:
-                    shooter.ToggleAutoAngle()
+            # if driveStation.GetDigitalIn(4): #to manually aim both the angle 
+                # if shooter.autoAngle:
+                    # shooter.ToggleAutoAngle()
+            # else:
+                # if not shooter.autoAngle:
+                    # shooter.ToggleAutoAngle()
                     
-            if driveStation.GetDigitalIn(5): #manual run susan
-                if shooter.autoSusan:
-                    shooter.ToggleAutoSusan()
-            else:
-                if not shooter.autoSusan:
-                    shooter.ToggleAutoSusan()
-                    
-            if not shooter.autoAngle:
-                vAngle.Set(_translate_z_to_angle_motor_position(stick2).getZ())
-                
-            if not shooter.autoSusan:
+            if driveStation.GetDigitalIn(5): #manually run susan
                 susan.SetPVbus(stick2.getX())
+            
+                    
+            # if not shooter.autoAngle:
+                # vAngle.Set(_translate_z_to_angle_motor_position(stick2).getZ())
                 
-            if not shooter.autoWheel:
-                if stick1.getTrigger():
-                    ''' makes sure to only spin forwards'''
-                    pvBus = (stick1.getZ() + 1)/2 
-                    wheel.SetPVBus(pvBus)
+            # if not shooter.autoWheel:
+                # if stick1.getTrigger():
+                    # ''' makes sure to only spin forwards'''
+                    # pvBus = (stick1.getZ() + 1)/2 
+                    # wheel.SetPVBus(pvBus)
                 
-            if not RobotManager.chamberFeederAuto:
-                if stick2.GetRawButton(6):
-                    chamber.Run()
-                if stick2.GetRawButton(7):
-                    feeder.Feed()
+            # if not RobotManager.chamberFeederAuto:
+                # if stick2.GetRawButton(6):
+                    # chamber.Run()
+                # if stick2.GetRawButton(7):
+                    # feeder.Feed()
             #if stick
             #this prints values so we know what's going on
             if stick1.GetRawButton(8):
                 feeder.Print()
                 print("")
                 chamber.Print()
+    
+    
+            # update phase
+            
+            rampArm.Update()
+            robotManager.Update()
+            
     
             wpilib.Wait(0.04)
                 

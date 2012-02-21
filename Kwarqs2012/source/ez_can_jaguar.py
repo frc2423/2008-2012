@@ -22,9 +22,11 @@ class EzCANJaguar(CANJaguar):
         
     '''
 
-    def __init__(self, deviceNumber, controlMode=CANJaguar.kPercentVbus):
+    def __init__(self, deviceNumber, controlMode=CANJaguar.kPercentVbus, cacheSetOps=True):
         CANJaguar.__init__(self, deviceNumber, controlMode)
         self.control_mode = controlMode
+        self.cache_set_operations = cacheSetOps
+        self.last_set = 0
     
     def ChangeControlMode(self, controlMode):
         
@@ -80,6 +82,15 @@ class EzCANJaguar(CANJaguar):
     
     def EnableControl(self, encoderValue):
         raise AttributeError( "EzCANJaguar does not allow use of this function" )
+        
+    def Get(self):
+        if self.cache_set_operations:
+            return self.last_set
+        return CANJaguar.Get(self)
+        
+    def Set(self, value, syncGroup=0):
+        self.last_set = value
+        CANJaguar.Set(self, value, syncGroup)
         
     def SetPID(self, p, i, d):
         CANJaguar.SetPID( self, p, i, d )

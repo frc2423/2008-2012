@@ -26,6 +26,7 @@ chamberRelay = 2
 chamberSwitch = 1
 topFeedSwitch = 2
 botFeedSwitch = 3
+wheelEncoder = (10,11)
 
 #Analog Channel Inputs
 bodyGyro = 1
@@ -46,7 +47,7 @@ chamber = Chamber( chamberRelay, chamberSwitch, chambIRSens)
 feeder = Feeder(feederRelay,topFeedSwitch,botFeedSwitch,topFeedIRSens)
 
 
-wheel = Wheel( shootWheelCAN1, shootWheelCAN2 )
+wheel = Wheel( shootWheelCAN1, shootWheelCAN2, wheelEncoder )
 susan = Susan( susanCAN, susanGyro, bodyGyro )
 vAngle = VerticalAngle(angleCAN)
 shooter = Shooter(vAngle,susan,wheel)

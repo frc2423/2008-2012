@@ -14,13 +14,13 @@
             X/Y: drive motors
             Trigger: ramp motor
             Z: angle
-            Buttons 10,11: relays
             
         Stick2:
         
             Trigger: shooter (z axis)
             Buttons 8,9: lazy susan
-            Buttons 2,3: feeder
+            Buttons 6,7: feeder
+            Buttons 10,11: feeder
 
 '''
 
@@ -47,7 +47,9 @@ stick2 = wpilib.Joystick(2)
 l_motor = wpilib.Jaguar(2)
 r_motor = wpilib.Jaguar(1)
 feeder_motor = wpilib.Jaguar(3)
-#camera_servo = wpilib.Jaguar(5)
+camera_servo = wpilib.Servo(5)
+camera_relay = wpilib.Relay(3)
+
 
 # CAN motor controllers
 shooter_motor1 = wpilib.CANJaguar(2)
@@ -55,6 +57,14 @@ shooter_motor2 = wpilib.CANJaguar(3)
 angle_motor = wpilib.CANJaguar(4)
 ramp_motor = wpilib.CANJaguar(5)
 susan_motor = wpilib.CANJaguar(6)
+
+shooter_encoder = wpilib.Encoder(10,11)
+
+chamber_sensor = wpilib.AnalogChannel( 3 )
+feeder_sensor = wpilib.AnalogChannel( 5 )
+
+gyro1 = wpilib.Gyro(1)
+gyro2 = wpilib.Gyro(2)
 
 # print firmware versions
 print( "CANJaguar Firmware: \n" +
@@ -67,8 +77,7 @@ print( "CANJaguar Firmware: \n" +
 
 # relays
 relay1 = wpilib.Relay(1)
-relay2 = wpilib.Relay(2)
-relay3 = wpilib.Relay(3)
+chamber_relay = wpilib.Relay(2)
 relay4 = wpilib.Relay(4)
 
 # switches
@@ -141,6 +150,10 @@ class MyRobot(wpilib.SimpleRobot):
             
         _configure_shooter_motor( shooter_motor1 )
         _configure_shooter_motor( shooter_motor2 )
+        
+        #shooter_encoder.SetDistancePerPulse( 1.0 )
+        shooter_encoder.Start()
+        camera_relay.Set( wpilib.Relay.kForward )
             
     def RobotInit(self):
         '''Called only once during robot initialization'''
@@ -191,10 +204,10 @@ class MyRobot(wpilib.SimpleRobot):
             # Ramp motor
             #
             
-            if stick1.GetRawButton(4):
-                ramp_motor.Set( 1.0 )
-            elif stick1.GetRawButton(5):
-                ramp_motor.Set( -1.0 )
+            if stick1.GetRawButton(11):
+                ramp_motor.Set( 1.0 ) # down
+            elif stick1.GetRawButton(10):
+                ramp_motor.Set( -.45 ) #up
             else:
                 ramp_motor.Set( 0.0 )
             
@@ -221,12 +234,23 @@ class MyRobot(wpilib.SimpleRobot):
             # Feeder
             #
              
-            if stick2.GetRawButton(3):      # up
+            if stick2.GetRawButton(6):      # up
                 feeder_motor.Set( -1.0 )
-            elif stick2.GetRawButton(2):    # down
+            elif stick2.GetRawButton(7):    # down
                 feeder_motor.Set( 1.0 )
             else:
                 feeder_motor.Set( 0 )
+                
+            #
+            # Chamber
+            #
+                
+            if stick2.GetRawButton(10):      # up
+                chamber_relay.Set( wpilib.Relay.kForward )
+            elif stick2.GetRawButton(11):    # down
+                chamber_relay.Set( wpilib.Relay.kReverse )
+            else:
+                chamber_relay.Set( wpilib.Relay.kOff )
                 
             #
             # Lazy susan
@@ -239,36 +263,18 @@ class MyRobot(wpilib.SimpleRobot):
             else:
                 susan_motor.Set( 0.0 )
             
-            #
-            # Relays
-            #
-            
-            if stick1.GetRawButton(10):
-                relay1.Set( wpilib.Relay.kForward )
-                relay2.Set( wpilib.Relay.kForward )
-                relay3.Set( wpilib.Relay.kForward )
-                relay4.Set( wpilib.Relay.kForward )
-            
-            elif stick1.GetRawButton(11):
-                relay1.Set( wpilib.Relay.kReverse )
-                relay2.Set( wpilib.Relay.kReverse )
-                relay3.Set( wpilib.Relay.kReverse )
-                relay4.Set( wpilib.Relay.kReverse )
-            
-            else:
-                relay1.Set( wpilib.Relay.kOff )
-                relay2.Set( wpilib.Relay.kOff )
-                relay3.Set( wpilib.Relay.kOff )
-                relay4.Set( wpilib.Relay.kOff )
+           
             
             
             if timer.HasPeriodPassed( 1.0 ):
                 # TODO: Print out something useful here to help us diagnose problems with the robot
                 print( "Status: " )
-                print( "  Shooter Motor1: %f; Encoder: %f" % ( shooter_motor1.Get(), shooter_motor1.GetSpeed() ) )
-                print( "  Shooter Motor2: %f; Encoder: %f" % ( shooter_motor2.Get(), shooter_motor2.GetSpeed() ) )
+                print( "  Shooter Motor1: %f; Encoder: %f" % ( shooter_motor1.Get(), shooter_encoder.Get() ) )
+                print( "  Shooter Motor2: %f" % ( shooter_motor2.Get() ) )
                 print( "  Angle Motor   : %f; Encoder: %f" % ( angle_motor.Get(), angle_motor.GetPosition() ) )
                 print( "  Feeder switches: 1: %s, 2: %s, 3: %s" % (switch1.Get(), switch2.Get(), switch3.Get() ) )
+                print( "  Chamber: %f; Feeder: %f" % (chamber_sensor.GetVoltage(), feeder_sensor.GetVoltage() ))
+                print( "  Gyro1: %f, Gyro2: %f" % (gyro1.GetAngle(), gyro2.GetAngle()) )
                 print( "" )
                 
                 

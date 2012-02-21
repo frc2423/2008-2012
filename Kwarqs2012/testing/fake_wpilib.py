@@ -360,6 +360,13 @@ class Encoder(object):
     def __init__(self, port1, port2 ):
         self.value = None
         
+    def SetPIDSourceParameter(self, thing):
+        pass
+        
+    def kRate(self, rate):
+        pass
+    def SetDistancePerPulse(self, distance):
+        pass
     def Start(self):
         self.value = 0
         
@@ -462,7 +469,14 @@ class KinectStick(Joystick):
 class PIDController(object):
     def __init__(self, Kp,Ki,Kd,source,output,period = 0.05):
         pass
-        
+    def SetOutputRange(self, range1, range2):
+        pass
+    def SetInputRange(self, range1, range2):
+        pass
+    def SetTolerance(self, tolerance):
+        pass
+    def Enable(self):
+        pass
 
 class PIDOutput(object):
     pass

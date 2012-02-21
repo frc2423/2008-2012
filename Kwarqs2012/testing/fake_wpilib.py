@@ -280,6 +280,9 @@ class CANJaguar(object):
     def SetVoltageRampRate(self, rampRate):
         pass
         
+    @staticmethod
+    def UpdateSyncGroup(group):
+        pass
     
 class Compressor(object):
     
@@ -468,6 +471,8 @@ class KinectStick(Joystick):
 
 class PIDController(object):
     def __init__(self, Kp,Ki,Kd,source,output,period = 0.05):
+        pass
+    def SetSetpoint(self, point):
         pass
     def SetOutputRange(self, range1, range2):
         pass

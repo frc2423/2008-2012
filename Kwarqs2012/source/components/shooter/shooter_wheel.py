@@ -1,5 +1,5 @@
 
-from pidshooter import ShooterWheelOutput
+from components.shooter.pidshooter import ShooterWheelOutput
 from ez_can_jaguar import EzCANJaguar
 
 try:

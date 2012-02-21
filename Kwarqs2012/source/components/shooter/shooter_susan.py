@@ -27,10 +27,10 @@ class Susan(object):
         #self.bodyGyroInitPos = self.bodyGyro.GetAngle()
         self.susanSource = SusanSource()
         
-        pidControl = wpilib.PIDController(Susan.SUSAN_P, Susan.SUSAN_I, Susan.SUSAN_D, self.susanSource, self.susanMotor)
-        pidControl.SetInputRange(-(Susan.SUSAN_CAMERA_MAX),Susan.SUSAN_CAMERA_MAX)
-        pidControl.SetOutputRange(-(Susan.SUSAN_MAX_SPEED), Susan.SUSAN_MAX_SPEED)
-        pidControl.SetTolerance(Susan.ANGLETOLERANCE)
+        self.pidControl = wpilib.PIDController(Susan.SUSAN_P, Susan.SUSAN_I, Susan.SUSAN_D, self.susanSource, self.susanMotor)
+        self.pidControl.SetInputRange(-(Susan.SUSAN_CAMERA_MAX),Susan.SUSAN_CAMERA_MAX)
+        self.pidControl.SetOutputRange(-(Susan.SUSAN_MAX_SPEED), Susan.SUSAN_MAX_SPEED)
+        self.pidControl.SetTolerance(Susan.ANGLETOLERANCE)
         
         self.goalAngle = 0
         self.goalPVBus = 0

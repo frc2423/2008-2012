@@ -5,10 +5,19 @@
 
 
 class TrackingData(object):
-    x = 0
-    y = 0
-    angularVelocity = 0
-    validData = False
+   
+   frame_number = 0
+   
+   valid_frames = 0
+   
+   target_data_valid = False
+   
+   x = 0
+   y = 0
+   
+   distance = 0.0
+   
+   sonar_distance = 0.0
 
 
 class BasketTracker(object):

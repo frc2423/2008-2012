@@ -26,7 +26,7 @@ class Shooter(object):
         self.susan = susan
         self.wheel = wheel
         #new
-        self.cameraData = basket_tracker.BasketTracker()
+        self.basket_tracker = basket_tracker.BasketTracker()
         self.autoSusan = True
         self.autoAngle = True
         self.autoWheel = True
@@ -62,29 +62,29 @@ class Shooter(object):
         self.wheel.SetMode(self.autoWheel)
             
     ''' Checks if component is in auto mode and if we are validaly shooting'''
-    def AutoAndValid(self, component):
+    def AutoAndValid(self, component, trackingData):
         valid = True
         if not component:
             valid = False
         if not self.susan.PointingCorrectly():
             valid = False
-        if not self.cameraData.target_data_valid:
+        if not trackingData.target_data_valid:
             valid = False
         return valid
     
     def Update(self):
-        trackingData = self.cameraData.GetData()
-        if self.AutoAndValid(self.autoSusan) :
+        trackingData = self.basket_tracker.GetData()
+        if self.AutoAndValid(self.autoSusan, trackingData) :
             self.susan.SetGoalAngle(trackingData.angle_susan)
         
-        if self.AutoAndValid(self.autoWheel):
+        if self.AutoAndValid(self.autoWheel, trackingData):
             self.wheel.setDistance(trackingData.distance)
             
-        if self.AutoAndValid(self.autoAngle):
+        if self.AutoAndValid(self.autoAngle, trackingData):
             self.vAngle.SetGoal(trackingData.verticalAngle)
         
         self.vAngle.Update()
-        self.Susan.Update()
+        self.susan.Update()
         self.wheel.Update()
         
         

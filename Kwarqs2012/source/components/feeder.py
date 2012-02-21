@@ -35,14 +35,13 @@ class Feeder(object):
     BACKWARD = -1
     STOP = 0
     
-    def __init__(self, feederJag, topFeedSwitch, botFeedSwitch, topFeedIRSens):
+    def __init__(self, feederJag, botFeedSwitch, topFeedIRSens):
         
         self.feederMotor = wpilib.Jaguar(feederJag)
 
         #set so that feeder is naturally on. May change
         self.direction = Feeder.FORWARD
         self.botFeedSwitch = wpilib.DigitalInput( botFeedSwitch )
-        self.topFeedSwitch = wpilib.DigitalInput( topFeedSwitch )
         
         #not sure switches will be used
         self.botSwitchVal = False
@@ -69,7 +68,7 @@ class Feeder(object):
             return True
         return False
         
-    def IsReady(self):
+    def HasTopBall(self):
         if self.topFeedIRSens.IsBallSet() == True:
             return True
         return False
@@ -77,10 +76,12 @@ class Feeder(object):
     def Print(self):
             print("Feeder:")
             print("    IRSensor Value: %s; Is Ball Set: %s" % ( self.topFeedIRSens.GetVoltage(), self.topFeedIRSens.IsBallSet() ))
-            print("    Is full: %s; IsReady: %s" % ( self.IsFull(), self.IsReady() ))
+            print("    Is full: %s; HasTopBall: %s" % ( self.IsFull(), self.HasTopBall() ))
 
     def Update(self):
+    
         self.feederMotor.Set(self.direction)
+        self.direction = Feeder.STOP
         
       
         

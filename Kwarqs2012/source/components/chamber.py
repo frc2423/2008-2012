@@ -9,36 +9,27 @@ except ImportError:
 
 class Chamber (object):
     
-    def __init__ ( self, chamberRelay, chamberSwitch, chambIRSens ):
+    def __init__ ( self, chamberRelay, chambIRSens ):
+    
         self.chamberMotor = wpilib.Relay(chamberRelay)
-        self.limitSwitch3 = wpilib.DigitalInput(chamberSwitch)
-        self.switchState = False
         self.chamberMotorState = wpilib.Relay.kOff
-        
-        '''
-        not actually used yet, but added in case it will be in place of a limit
-        switch
-        '''
         self.chambIRSens = IRSensor(chambIRSens)
         
     def Run( self ):
         self.chamberMotorState = wpilib.Relay.kOn 
         
-    def IsReady( self ):
-        #return self.switchState
-        #if using IR sens- 
-        return self.chambIRSens.isBallSet()
-        
+    def IsFull( self ):
+        return self.chambIRSens.IsBallSet()
         
     def Stop( self ):
         self.chamberMotorState = wpilib.Relay.kOff
     
     def Print( self ):
-        print( self.chamberMotorState, self.switchState )
+        print( "Chamber: %s; Full: %s" % (self.chamberMotorState, self.IsFull()))
     
     def Update( self ):
-        self.chamberMotor.Set( self.chamberMotorState ) # so the update is changing if the motor is running
-        #self.switchState = self.limitSwitch3.Get()
-        #if using IR sens- 
-        self.switchState = self.chambIRSens.isBallSet()
+    
+        self.chamberMotor.Set( self.chamberMotorState )
+        self.chamberMotorState = wpilib.Relay.kOff
+
         

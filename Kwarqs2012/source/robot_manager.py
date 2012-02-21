@@ -37,7 +37,7 @@ class RobotManager(object):
     '''
     
     #self, chamber, feeder, wheel, susan, vAngle, shooter, rampArm
-    def __init__(self, chamber, feeder,rampArm, wheel, susan, vAngle, shooter):
+    def __init__(self, chamber, feeder, wheel, susan, vAngle, shooter):
         
         
         self.chamber = chamber
@@ -49,27 +49,18 @@ class RobotManager(object):
         self.vAngle = vAngle
         self.shooter = shooter
         
-        self.rampArm = rampArm
-        
-        self.chamberFeederAuto = True 
+        self.disableAuto = True 
     
-    #def SetState(): (manual or auto)
-    
+
     '''
     Calls the shoot function if the bot is ready to shoot
     '''
     def ShootIfReady(self):
         if self.shooter.IsReady() and self.chamber.IsReady():
             self.chamber.Run()
-                
-    '''
-    lowers ramp arm
-    '''
-    def LowerRampArm(self):
-        self.rampArm.LowerRamp()
         
-    def ToggelChamberFeederAuto(self):
-        self.chamberFeederAuto = not self.chamberFeederAuto
+    def DisableAutoFeeder(self):
+        self.disableAuto = True
 
 
     '''
@@ -77,36 +68,60 @@ class RobotManager(object):
     '''    
     
     def Update(self):
+
+        # automated feeding
+    
+        if not self.disableAuto:
+        
+            #
+            # set it up
+            #
+        
+            feeder_has_top_ball = self.feeder.HasTopBall()
+            feeder_full = self.feeder.IsFull()
+            chamber_full = self.chamber.IsFull()
+            is_shooting = self.shooter.IsShooting()
+            
+            
+            feed = False
+            run_chamber = False
+            
+            
+            if not feeder_full:
+                # always do this when we're in auto mode
+                feed = True
+            
+            
+            if feeder_has_top_ball and not chamber_full:
+                feed = True
+                run_chamber = True
+            
+            if is_shooting:
+                run_chamber = True
+            elif chamber_full:
+                run_chamber = False
+            
+            #
+            # Do it
+            #
+            
+            if feed:
+                self.feeder.Feed()
+            else:
+                self.feeder.Stop()
+                
+            if run_chamber:
+                self.chamber.Run()
+            else:
+                self.chamber.Stop()
+            
+
+        self.disableAuto = False
+        
+        #
+        # Update phase
+        #
         
         self.shooter.Update()
         self.chamber.Update()
         self.feeder.Update()
-        self.rampArm.Update()
-    
-    
-        '''
-        I need to update the states here in the If statements; or to add them as requirements to the if statements
-        ^This is meant to take interstates into consideration    
-        I'm having trouble figuring out where interstates are needed- since a lot of things only work if a button is being HELD
-        on a joystick
-        '''
-    
-        if self.chamberFeederAuto:
-            if self.chamber.IsReady() and self.feeder.IsFull():
-                self.feeder.Stop()
-                self.chamber.Stop()
-                    
-            elif not self.chamber.IsReady() and self.feeder.IsReady():
-                self.feeder.FeedOveride()
-                self.chamber.Run()
-                    
-            elif not self.feeder.IsFull():
-                self.feeder.Feed()
-            
-
-        '''    
-        elif not self.chamber.IsFull() and ((self.Feeder.BallStates() == 1 or self.Feeder.BallStates() == 2) or self.Feeder.IsFull() ):
-            if self.chamber.IsReady != 1:
-                self.chamber.Run()
-                self.feeder.Feed()
-        '''        

@@ -36,6 +36,11 @@ class Shooter(object):
     #cameraData.Get() - Not sure what exactly do do with this since I'm not familiar with how 
     #    the data returns
     
+    
+    def IsShooting(self):
+        # TODO
+        return False
+    
     #check if Angle is ready, Susan is ready, Wheel is read
     def IsReady(self):
         self.ready = False  

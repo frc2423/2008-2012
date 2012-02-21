@@ -2,6 +2,8 @@ try:
     import wpilib
 except ImportError:
     import fake_wpilib as wpilib
+    
+from util import PrintTimer
 
 #source for the PID controller
 class SusanSource(wpilib.PIDSource):
@@ -27,19 +29,24 @@ class ShooterWheelOutput(wpilib.PIDOutput):
         self.outputVoltage = 0.0
         self.wheelMotor1 = wheelMotor1
         self.wheelMotor2 = wheelMotor2
+        self.print_timer = PrintTimer()
         self.desiredPVBus = 0
         
     def PIDWrite(self, output):
-        self.desiredPVBus =  self.wheelMotor1.Get() + output
-        if self.desiredPVBus > 1:
-            setPVBus = 1
-        elif self.desiredPVBus < 1:
-            setPVBus = -1
-        else:
-            setPVBus = self.desiredPVBus
+        # self.desiredPVBus =  self.wheelMotor1.Get() + output
+        # if self.desiredPVBus > 1:
+            # setPVBus = 1
+        # elif self.desiredPVBus < -1:
+            # setPVBus = -1
+        # else:
+            # setPVBus = self.desiredPVBus
         
-        self.wheelMotor1.Set(setPVBus, ShooterWheelOutput.SYNCGROUP)
-        self.wheelMotor2.Set(setPVBus, ShooterWheelOutput.SYNCGROUP)
+        self.wheelMotor1.Set(output, ShooterWheelOutput.SYNCGROUP)
+        self.wheelMotor2.Set(-output, ShooterWheelOutput.SYNCGROUP)
+        wpilib.CANJaguar.UpdateSyncGroup(ShooterWheelOutput.SYNCGROUP)
+        
+        if self.print_timer.should_print():
+            print("PIDWrite: %f" % (output)) 
            
     def UpdateMotors(self):
         wpilib.UpdateSyncGroup(ShooterWheelOutput.SYNCGROUP)

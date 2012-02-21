@@ -20,11 +20,11 @@ class Susan(object):
     def __init__(self,susanCAN,susanGyro, bodyGyro):
         
         self.susanMotor = EzCANJaguar(susanCAN)
-        self.gyro = wpilib.Gyro(susanGyro)
-        self.bodyGyro = wpilib.Gyro(bodyGyro)
+        #self.gyro = wpilib.Gyro(susanGyro)
+        #self.bodyGyro = wpilib.Gyro(bodyGyro)
         
         #It seems that you forgot to put a self to the right
-        self.bodyGyroInitPos = self.bodyGyro.GetAngle()
+        #self.bodyGyroInitPos = self.bodyGyro.GetAngle()
         self.susanSource = SusanSource()
         
         pidControl = wpilib.PIDController(Susan.SUSAN_P, Susan.SUSAN_I, Susan.SUSAN_D, self.susanSource, self.susanMotor)

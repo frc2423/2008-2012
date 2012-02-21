@@ -35,17 +35,20 @@ class RobotManager(object):
     self.feederOveride and self.feederAuto control the state of the feeder
     
     '''
-    def __init__(self, chamber, feeder, wheel, susan, vAngle, shooter, rampArm):
+    
+    #self, chamber, feeder, wheel, susan, vAngle, shooter, rampArm
+    def __init__(self, chamber, feeder,rampArm):
         
         
         self.chamber = chamber
      
         self.feeder = feeder
-        
+        '''
         self.wheel = wheel
         self.susan = susan
         self.vAngle = vAngle
         self.shooter = shooter
+        '''
         # self.shooter = Shooter(angleCAN, susanCAN, susanGyro, shootWheelCAN1, shootwheelCAN2)
         
         self.rampArm = rampArm
@@ -108,7 +111,7 @@ class RobotManager(object):
             self.chamber.Stop()
                 
         elif not self.chamber.IsReady() and self.feeder.IsReady():
-            self.feeder.FeedOveride()
+            self.feeder.Feed()
             self.chamber.Run()
                 
         elif not self.feeder.IsFull():

@@ -32,12 +32,14 @@ class Test(object):
         To test what happens when IRsensors register balls
         '''
         self.topFeedIRSens = self.feeder.topFeedIRSens.irSensor
-        self.botFeedIRSens = self.feeder.botFeedIRSens.irSensor
+        #self.botFeedIRSens = self.feeder.botFeedIRSens.irSensor
         self.chambIRSens = self.chamber.chambIRSens.irSensor
         
         #feeder limitswitch
         self.botFeedSwitch = self.feeder.botFeedSwitch 
         
+        
+        self.topFeedIRSens.voltage = 2.5
         
         #self.chamber.chamberMotorState  gives chamber relay's state
         #self.feeder.direction  gives feeder's relay's state
@@ -46,63 +48,86 @@ class Test(object):
     def IsOperatorControl(self):
         #global loop_count
         self.loop_count = self.loop_count + 1
-        print(self.loop_count)
-        print(self.chamber.chamberMotorState , self.feeder.direction,
-              self.feeder.botSwitchVal, self.feeder.topFeedIRSens.IsBallSet,
-              self.chamber.chambIRSens.IsBallSet )
+        #print(self.loop_count)
+        print(self.chamber.chamberMotorState , self.feeder.direction)
+        print(self.feeder.botFeedSwitch.Get(), self.feeder.topFeedIRSens.isBallSet(),self.chamber.chambIRSens.isBallSet())
         #print( self.robot_module.feeder.IsReady() )
+        
+        #TODO simulate a ball slowly moving away from an IR?
+        #^^ Done. Appears to do what it is supposed to
+        
+        
+        
+        
         
         # Template to check if a ball is there - 
         #self.topFeedIRSens.IsBallSet
         
         
+        if self.loop_count <= 20:
+            print('test')
+            self.feeder.botFeedSwitch.value = True 
+            self.chambIRSens.voltage = 2.5
+            self.topFeedIRSens.voltage = self.topFeedIRSens.voltage - .1
         
+        '''
+        #appears to work
         #1 ball at bottom of feeder
         #expect the motor to continue running
         if self.loop_count <= 5:
+            print('test1')
+            self.feeder.botFeedSwitch.value = True     
+        '''
         
-            self.feeder.botSwitchVal = True       
-        
+        '''
+        appears to work
         #1 ball at top of feeder
-        #expect the motor to stop running and for the feeder to be ready
+        #expect the motors to be on and for the feeder to be ready
         if self.loop_count > 5 and self.loop_count <= 10:
-        
-            self.feeder.botSwitchVal = False
+            print('test2')
+            self.feeder.botFeedSwitch.value = False
             self.topFeedIRSens.voltage = 2.5
+        '''       
                
+        '''     
+        seems to work
         #1 ball at top and bottom of feeder
         #expect the motor to stop running and for the feeder to be ready
         if self.loop_count > 10 and self.loop_count <= 15:
-        
-            self.feeder.botSwitchVal = True
+            print('test3')
+            self.feeder.botFeedSwitch.value = True   
             self.topFeedIRSens.voltage = 2.5     
-        
+        '''
+        '''
+        seems to work
         #1 ball at top of feeder and 1 in chamber
         #expect the motor to stop running and for the feeder AND chamber to be ready
         if self.loop_count > 15 and self.loop_count <= 20:
-        
-            self.feeder.botSwitchVal = False
+            print('test4')
+            self.feeder.botFeedSwitch.value = False
             self.chambIRSens.voltage = 2.5
             self.topFeedIRSens.voltage = 2.5
-        
+        '''
+        '''
+        #Appears to work
         #both feeder and chamber full
         #expect both feeder and chamber motors to be off. I feeder is on we could have 4 balls.
         if self.loop_count > 20 and self.loop_count <= 25:
-        
-            self.feeder.botSwitchVal = True
+            print('test5')
+            self.feeder.botFeedSwitch.value = True   
             self.chambIRSens.voltage = 2.5
             self.topFeedIRSens.voltage = 2.5
-
+        '''
         
         
         '''
         if self.loop_count == 1:
-            
-        
-        
-        
-            
         '''
+        
+        
+        
+            
+        
 
         '''    
         if self.loop_count == 2:

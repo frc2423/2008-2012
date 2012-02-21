@@ -45,16 +45,20 @@ chamber = Chamber( chamberRelay, chamberSwitch, chambIRSens)
 
 feeder = Feeder(feederRelay,topFeedSwitch,botFeedSwitch,topFeedIRSens)
 
+'''
 wheel = Wheel( shootWheelCAN1, shootWheelCAN2 )
 susan = Susan( susanCAN, susanGyro, bodyGyro )
 vAngle = VerticalAngle(angleCAN)
 shooter = Shooter(vAngle,susan,wheel)
+'''
+
 # self.shooter = Shooter(angleCAN, susanCAN, susanGyro, shootWheelCAN1, shootwheelCAN2)
 
 rampArm = RampArm(rampArmCAN)
 
 
-robotManager = RobotManager(chamber,feeder,wheel,susan,vAngle,shooter,rampArm)
+'''chamber,feeder,wheel,susan,vAngle,shooter,rampArm'''
+robotManager = RobotManager(chamber,feeder,rampArm)
 
 stick1 = wpilib.Joystick(1)
 stick2 = wpilib.Joystick(2)
@@ -143,6 +147,8 @@ class MyRobot(wpilib.SimpleRobot):
             #this prints values so we know what's going on
             if stick1.GetRawButton(7):
                 print( "Motor: %f,%f" % ( driveMotor1.Get(), driveMotor2.Get()  ) )
+                
+            robotManager.Update()
             
             
             wpilib.Wait(0.04)

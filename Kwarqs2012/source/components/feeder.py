@@ -36,7 +36,8 @@ class Feeder(object):
         
         self.feederMotor = wpilib.Relay(feederRelay)
 
-        self.direction = wpilib.Relay.kOff
+        #set so that feeder is naturally on. May change
+        self.direction = wpilib.Relay.kForward
         self.botFeedSwitch = wpilib.DigitalInput( botFeedSwitch )
         self.topFeedSwitch = wpilib.DigitalInput( topFeedSwitch )
         
@@ -75,9 +76,7 @@ class Feeder(object):
             return( True )
         
     def IsReady(self):
-        print('does this')
         if self.topFeedIRSens.isBallSet() == True:
-            print('work')
             return( True )
     '''
     Sets the feeder motor's direction (as well as whether it is on)

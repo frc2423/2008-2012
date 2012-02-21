@@ -60,8 +60,8 @@ susan_motor = wpilib.CANJaguar(6)
 
 shooter_encoder = wpilib.Encoder(10,11)
 
-chamber_sensor = wpilib.AnalogChannel( 3 )
-feeder_sensor = wpilib.AnalogChannel( 5 )
+chamber_sensor = wpilib.AnalogChannel( 5 )
+feeder_sensor = wpilib.AnalogChannel( 6 )
 
 gyro1 = wpilib.Gyro(1)
 gyro2 = wpilib.Gyro(2)
@@ -151,7 +151,7 @@ class MyRobot(wpilib.SimpleRobot):
         _configure_shooter_motor( shooter_motor1 )
         _configure_shooter_motor( shooter_motor2 )
         
-        #shooter_encoder.SetDistancePerPulse( 1.0 )
+        shooter_encoder.SetDistancePerPulse( 1.0 / 16.0 )
         shooter_encoder.Start()
         camera_relay.Set( wpilib.Relay.kForward )
             
@@ -194,6 +194,8 @@ class MyRobot(wpilib.SimpleRobot):
    
             dog.Feed()
             
+            translated_z =  _translate_z_to_angle_motor_position( stick1.GetZ() )
+            
             #
             # Drive motors
             #
@@ -227,8 +229,10 @@ class MyRobot(wpilib.SimpleRobot):
             # Angle motor
             #
             
-            if ENABLE_ANGLE_MOTOR:
-                angle_motor.Set( _translate_z_to_angle_motor_position( stick1.GetZ() ) )
+            #if ENABLE_ANGLE_MOTOR:
+            #    angle_motor.Set( _translate_z_to_angle_motor_position( stick1.GetZ() ) )
+            
+            camera_servo.Set( translated_z )
             
             #
             # Feeder
@@ -269,7 +273,7 @@ class MyRobot(wpilib.SimpleRobot):
             if timer.HasPeriodPassed( 1.0 ):
                 # TODO: Print out something useful here to help us diagnose problems with the robot
                 print( "Status: " )
-                print( "  Shooter Motor1: %f; Encoder: %f" % ( shooter_motor1.Get(), shooter_encoder.Get() ) )
+                print( "  Shooter Motor1: %f; Encoder: %f" % ( shooter_motor1.Get(), shooter_encoder.GetRate() ) )
                 print( "  Shooter Motor2: %f" % ( shooter_motor2.Get() ) )
                 print( "  Angle Motor   : %f; Encoder: %f" % ( angle_motor.Get(), angle_motor.GetPosition() ) )
                 print( "  Feeder switches: 1: %s, 2: %s, 3: %s" % (switch1.Get(), switch2.Get(), switch3.Get() ) )

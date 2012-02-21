@@ -53,6 +53,7 @@ class RobotManager(object):
         
         self.rampArm = rampArm
         
+        self.chamberFeederAuto = True 
     
     #def SetState(): (manual or auto)
     
@@ -68,31 +69,18 @@ class RobotManager(object):
     '''
     def LowerRampArm(self):
         self.rampArm.LowerRamp()
-    '''    
-    Releases chamber no matter the state, only to be used when things malfunction
-    '''
-    def RunChamberMotor(self):
-        self.chamber.Run()
         
-    def RunFeederMotor(self):
-        self.feeder.Feed()
-       
-    def SetShooterSpeedManual(self, speed):
-        self.shooter.SetSpeed(speed)
-    
-    def SetAngleManual(self, angle):
-        self.shooter.SetGoal(angle)
-        
-    def SetSusanManual(self, speed):
-        self.shooter.SetSusanSpeed(speed)
+    def ToggelChamberFeederAuto(self):
+        self.chamberFeederAuto = not self.chamberFeederAuto
+
+
     '''
     Calls functions within the components based on every possible state
     '''    
     
     def Update(self):
-        '''
+        
         self.shooter.Update()
-        '''
         self.chamber.Update()
         self.feeder.Update()
         self.rampArm.Update()
@@ -105,18 +93,18 @@ class RobotManager(object):
         on a joystick
         '''
     
-    
-        if self.chamber.IsReady() and self.feeder.IsFull():
-            self.feeder.Stop()
-            self.chamber.Stop()
-                
-        elif not self.chamber.IsReady() and self.feeder.IsReady():
-            self.feeder.Feed()
-            self.chamber.Run()
-                
-        elif not self.feeder.IsFull():
-            self.feeder.Feed()
-        
+        if self.chamberFeederAuto:
+            if self.chamber.IsReady() and self.feeder.IsFull():
+                self.feeder.Stop()
+                self.chamber.Stop()
+                    
+            elif not self.chamber.IsReady() and self.feeder.IsReady():
+                self.feeder.FeedOveride()
+                self.chamber.Run()
+                    
+            elif not self.feeder.IsFull():
+                self.feeder.Feed()
+            
 
         '''    
         elif not self.chamber.IsFull() and ((self.Feeder.BallStates() == 1 or self.Feeder.BallStates() == 2) or self.Feeder.IsFull() ):

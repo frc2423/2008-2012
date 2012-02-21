@@ -71,8 +71,19 @@ drive = wpilib.RobotDrive( driveMotor1, driveMotor2)
 
 driveStation = wpilib.DriverStation.GetInstance()
 
-'''spike1 = wpilib.Relay(1) 
-spike2 = wpilib.Relay(3)'''
+ANGLE_MOTOR_MIN_POSITION = 0
+ANGLE_MOTOR_MAX_POSITION = 1.0
+
+def _translate_z_to_angle_motor_position( z ):
+
+    # P = Xmax - (Ymax - Y)( (Xmax - Xmin) / (Ymax - Ymin) )
+    value = ANGLE_MOTOR_MAX_POSITION - ((1 - z)*( (ANGLE_MOTOR_MAX_POSITION - ANGLE_MOTOR_MIN_POSITION) / (1.0-0) ) )
+    
+    if value > ANGLE_MOTOR_MAX_POSITION:
+        return ANGLE_MOTOR_MAX_POSITION
+    elif value < ANGLE_MOTOR_MIN_POSITION:
+        return ANGLE_MOTOR_MIN_POSITION
+    return value
 
 class MyRobot(wpilib.SimpleRobot):
 
@@ -125,24 +136,36 @@ class MyRobot(wpilib.SimpleRobot):
             
             if stick1.GetTrigger(): #this is to fire the ball
                 robotManager.ShootIfReady()
-                          
-            if driveStation.GetDigitalIn(1): #to manually run the feeder
-                robotManager.RunFeederMotor()
-                
-                
-            
-            if driveStation.GetDigitalIn(2): # to manually run the chamber
-                robotManager.RunChamberMotor()
+                                    
+            if driveStation.GetDigitalIn(2): # to manually run the chamber/feeder
+                robotManager.ToggelChamberFeederAuto()
                
             if driveStation.GetDigitalIn(3): #to manually shoot the ball
-                robotManager.SetShooterSpeedManual()
+                shooter.ToggleAutoWheel()
                 
-            if driveStation.GetDigitalIn(4): #to manually aim both the angle and the position of the lazy susan
-                robotManager.SetAngleManual()
-            #run chamber motor
-            if driveStation.GetDigitalIn(5):
-                robotManager.SetSusanManual()
+            if driveStation.GetDigitalIn(4): #to manually aim both the angle 
+                shooter.ToggleAutoAngle()
+
+            if driveStation.GetDigitalIn(5): #manual run susan
+                shooter.ToggleAutoSusan()
             
+            if not shooter.autoAngle:
+                vAngle.Set(_translate_z_to_angle_motor_position(stick2).getZ())
+                
+            if not shooter.autoSusan:
+                susan.SetPVbus(stick2.getX())
+                
+            if not shooter.autoWheel:
+                if stick1.getTrigger():
+                    ''' makes sure to only spin forwards'''
+                    pvBus = (stick1.getZ() + 1)/2 
+                    wheel.SetPVBus(pvBus)
+                
+            if not RobotManager.chamberFeederAuto:
+                if stick2.GetRawButton(6):
+                    chamber.Run()
+                if stick2.GetRawButton(7):
+                    feeder.Feed()
             #if stick
             #this prints values so we know what's going on
             if stick1.GetRawButton(7):

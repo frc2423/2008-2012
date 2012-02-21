@@ -49,55 +49,38 @@ class Feeder(object):
         self.topSwitchVal = False
         
         self.topFeedIRSens = IRSensor(topFeedIRSens)
-        #If implementing another IR
-        #self.botFeedIRSens = IRSensor(botFeedIRSens)
-        
         self.Full = False
+        
     #Starts feederMotor if needed
     def Feed(self):
         self.direction = Feeder.FORWARD
         
-        
     #Stops the feedermotor if the feeder should not be on
     def Stop(self):
-        self.direction = Feeder.BACKWARD    
-    
-    """
-    def FeedIfBallNear(self):
-        if 
-        self.direction = kForward
-        # ^ Need a proximity sensor to register for this to work- change
-    """
+        self.direction = Feeder.STOP
     
     #Allows the feeder to run backwards if giving balls to teamates is desired
     def Expel(self):
-        self.direction = Feeder.STOP
+        self.direction = Feeder.BACKWARD
     
     #Returns 1 if the feeder is full and 0 if not
     def IsFull(self):
-        if self.botFeedSwitch.Get() == True and self.topFeedIRSens.isBallSet() == True:
-            return( True )
+        if self.botFeedSwitch.Get() == True and self.topFeedIRSens.IsBallSet() == True:
+            return True
+        return False
         
     def IsReady(self):
-        if self.topFeedIRSens.isBallSet() == True:
-            return( True )
+        if self.topFeedIRSens.IsBallSet() == True:
+            return True
+        return False
         
     def Print(self):
             print("Feeder:")
-            print("    IRSensor Value: " + str(self.topFeedIRSens.irSensor.GetVoltage()) + "  Is Ball Set: " + str(self.topFeedIRSens.isBallSet()))
-            print("    Is full: " + str(self.IsFull()) + "  IsReady: " +str(self.IsReady()) + "    Motor State")
-    '''
-    Sets the feeder motor's direction (as well as whether it is on)
-    Also updates the state of the limit switches
-    '''
+            print("    IRSensor Value: %s; Is Ball Set: %s" % ( self.topFeedIRSens.GetVoltage(), self.topFeedIRSens.IsBallSet() ))
+            print("    Is full: %s; IsReady: %s" % ( self.IsFull(), self.IsReady() ))
+
     def Update(self):
         self.feederMotor.Set(self.direction)
-        '''
-        going to do this with the actuall values
-        
-        self.switch1 = self.limSwitch1.Get()
-        self.switch2 = self.limSwitch2.Get()
-        '''
         
       
         

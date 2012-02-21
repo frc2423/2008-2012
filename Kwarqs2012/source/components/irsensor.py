@@ -27,11 +27,14 @@ class IRSensor(object):
         returns the current state of the ball, if a threshold is
         not passed then do not change the state
     '''
-    def isBallSet(self):
-        voltage = self.irSensor.GetVoltage()
+    def IsBallSet(self):
+        voltage = self.GetVoltage()
         if voltage < IRSensor.inditThresh:
             self.state = False
         elif  voltage > IRSensor.ballSet:
             self.state = True
         return self.state    
         
+        
+    def GetVoltage(self):
+        return self.irSensor.GetVoltage()

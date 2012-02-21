@@ -13,31 +13,31 @@ except ImportError:
 
 class RampArm(object):
 
-    
 
     #
-    #   Descrition: Initilize a RampArm Instance
+    #   Description: Initilize a RampArm Instance
     #   
     #   Variables:
     #   int mNumber: PWM connection number for motor
     def __init__(self, rampArmCAN):
         self.arm = wpilib.Jaguar(rampArmCAN)
-        self.armSpeed = 0
-        self.forwardSpeed = 1
+        self.lower = False
+        self.forwardSpeed = 1.0
         self.reverseSpeed = -0.5
     
-    def LowerRamp(self):
-        self.armSpeed = self.forwardSpeed #sets full power forward
+    def Lower(self):
+        self.lower = True
         
 #if lowerRamp is called the self.armSpeed is fowardSpeed and the motor is set to full power
 #then sets self.armspeed is -.5
 #then when LowerRamp is not needed then the motor is set to -.5
   
     def Update(self):
-        if self.armSpeed == self.forwardSpeed:
-            self.arm.Set(self.forwardSpeed)
-            self.armSpeed = self.reverseSpeed
+    
+        if self.lower:
+            self.arm.Set( self.reverseSpeed )
         else:
-            self.arm.Set(self.reverseSpeed)
-        
+            self.arm.Set( self.forwardSpeed )
+            
+        self.lower = False
             

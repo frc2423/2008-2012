@@ -45,12 +45,12 @@ chamber = Chamber( chamberRelay, chamberSwitch, chambIRSens)
 
 feeder = Feeder(feederRelay,topFeedSwitch,botFeedSwitch,topFeedIRSens)
 
-'''
+
 wheel = Wheel( shootWheelCAN1, shootWheelCAN2 )
 susan = Susan( susanCAN, susanGyro, bodyGyro )
 vAngle = VerticalAngle(angleCAN)
 shooter = Shooter(vAngle,susan,wheel)
-'''
+
 
 # self.shooter = Shooter(angleCAN, susanCAN, susanGyro, shootWheelCAN1, shootwheelCAN2)
 

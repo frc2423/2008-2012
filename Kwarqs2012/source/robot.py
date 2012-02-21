@@ -6,6 +6,8 @@ try:
     import wpilib
 except ImportError:
     import fake_wpilib as wpilib
+    
+from util import PrintTimer
 
 
 from components.chamber import Chamber
@@ -31,8 +33,8 @@ wheelEncoder = (10,11)
 #Analog Channel Inputs
 bodyGyro = 1
 susanGyro = 2
-topFeedIRSens = 3
-chambIRSens = 4
+topFeedIRSens = 5
+chambIRSens = 6
 
 #CAN Bus IDs
 shootWheelCAN1 = 2
@@ -89,7 +91,7 @@ class MyRobot(wpilib.SimpleRobot):
 
     def __init__(self):
         wpilib.SimpleRobot.__init__(self)
-        
+        self.print_timer = PrintTimer()
                 
     
     def Disabled(self):
@@ -160,7 +162,7 @@ class MyRobot(wpilib.SimpleRobot):
                     # shooter.ToggleAutoAngle()
                     
             if driveStation.GetDigitalIn(5): #manually run susan
-                susan.SetPVbus(stick2.getX())
+                susan.SetPVbus(stick2.GetX())
             
                     
             # if not shooter.autoAngle:
@@ -179,7 +181,7 @@ class MyRobot(wpilib.SimpleRobot):
                     # feeder.Feed()
             #if stick
             #this prints values so we know what's going on
-            if stick1.GetRawButton(8):
+            if stick1.GetRawButton(8) and self.print_timer.should_print():
                 feeder.Print()
                 print("")
                 chamber.Print()

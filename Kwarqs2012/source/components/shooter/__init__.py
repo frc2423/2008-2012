@@ -3,10 +3,10 @@ from components.shooter.shooter_susan import Susan
 from components.shooter.shooter_wheel import Wheel 
 
 
-try:
-    import basket_tracker 
-except ImportError:
-    import fake_basket_tracker as basket_tracker
+#try:
+#    import basket_tracker 
+#except ImportError:
+#    import fake_basket_tracker as basket_tracker
 try:
     import wpilib
 except ImportError:
@@ -26,10 +26,11 @@ class Shooter(object):
         self.susan = susan
         self.wheel = wheel
         #new
-        self.basket_tracker = basket_tracker.BasketTracker()
-        self.autoSusan = True
-        self.autoAngle = True
-        self.autoWheel = True
+        
+        #self.basket_tracker = basket_tracker.BasketTracker()
+        self.autoSusan = False
+        self.autoAngle = False
+        self.autoWheel = False
         
 
         
@@ -47,19 +48,7 @@ class Shooter(object):
         if self.vAngle.IsReady() and self.susan.IsReady() and self.wheel.IsReady():
             self.ready = True
         return True 
-    
-    #toggles manual modes true/false  
-    def ToggleAutoSusan(self):
-        self.autoSusan = not self.autoSusan
-        self.susan.SetMode(self.autoSusan)
-        
-    def ToggleAutoAngle(self):
-        self.autoAngle = not self.autoAngle
-        self.vAngle.SetMode(self.autoAngle)
-        
-    def ToggleAutoWheel(self):
-        self.autoWheel = not self.autoWheel
-        self.wheel.SetMode(self.autoWheel)
+
             
     ''' Checks if component is in auto mode and if we are validaly shooting'''
     def AutoAndValid(self, component, trackingData):
@@ -73,15 +62,15 @@ class Shooter(object):
         return valid
     
     def Update(self):
-        trackingData = self.basket_tracker.GetData()
-        if self.AutoAndValid(self.autoSusan, trackingData) :
-            self.susan.SetGoalAngle(trackingData.angle_susan)
+        # trackingData = self.basket_tracker.GetData()
+        # if self.AutoAndValid(self.autoSusan, trackingData) :
+            # self.susan.SetGoalAngle(trackingData.angle_susan)
         
-        if self.AutoAndValid(self.autoWheel, trackingData):
-            self.wheel.setDistance(trackingData.distance)
+        # if self.AutoAndValid(self.autoWheel, trackingData):
+            # self.wheel.setDistance(trackingData.distance)
             
-        if self.AutoAndValid(self.autoAngle, trackingData):
-            self.vAngle.SetGoal(trackingData.verticalAngle)
+        # if self.AutoAndValid(self.autoAngle, trackingData):
+            # self.vAngle.SetGoal(trackingData.verticalAngle)
         
         self.vAngle.Update()
         self.susan.Update()

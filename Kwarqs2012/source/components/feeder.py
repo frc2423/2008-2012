@@ -31,8 +31,8 @@ class Feeder(object):
     lowSwitch1- state of limit switch 1
     topSwitch2- state of limit switch 2 (higher one)
     '''
-    FORWARD = 1
-    BACKWARD = -1
+    FORWARD = -1.0
+    BACKWARD = 1.0
     STOP = 0
     
     def __init__(self, feederJag, botFeedSwitch, topFeedIRSens):
@@ -47,7 +47,7 @@ class Feeder(object):
         self.botSwitchVal = False
         self.topSwitchVal = False
         
-        self.topFeedIRSens = IRSensor(topFeedIRSens)
+        self.topFeedIRSens = IRSensor(topFeedIRSens, 1.2)
         self.Full = False
         
     #Starts feederMotor if needed
@@ -75,8 +75,8 @@ class Feeder(object):
         
     def Print(self):
             print("Feeder:")
-            print("    IRSensor Value: %s; Is Ball Set: %s" % ( self.topFeedIRSens.GetVoltage(), self.topFeedIRSens.IsBallSet() ))
-            print("    Is full: %s; HasTopBall: %s" % ( self.IsFull(), self.HasTopBall() ))
+            print("  IRSensor: %s; Is Ball Set: %s" % ( self.topFeedIRSens.GetVoltage(), self.topFeedIRSens.IsBallSet() ))
+            print("  Is full:  %s; HasTopBall: %s" % ( self.IsFull(), self.HasTopBall() ))
 
     def Update(self):
     

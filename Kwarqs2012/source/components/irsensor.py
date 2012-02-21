@@ -17,11 +17,12 @@ class IRSensor(object):
     #by schematic, refers to sensor reporting ~14cm distance
     inditThresh = .9 
     #by schematic, refers to sensor reporting ~6cm distance
-    ballSet = 2 
+    #ballSet = 2
     
-    def __init__(self, irSensor):
+    def __init__(self, irSensor, threshold):
         self.irSensor = wpilib.AnalogChannel(irSensor)
         self.state = False
+        self.ball_present_threshold = threshold
             
     '''
         returns the current state of the ball, if a threshold is
@@ -31,7 +32,7 @@ class IRSensor(object):
         voltage = self.GetVoltage()
         if voltage < IRSensor.inditThresh:
             self.state = False
-        elif  voltage > IRSensor.ballSet:
+        elif voltage > self.ball_present_threshold:
             self.state = True
         return self.state    
         

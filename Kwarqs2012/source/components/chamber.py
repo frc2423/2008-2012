@@ -13,10 +13,13 @@ class Chamber (object):
     
         self.chamberMotor = wpilib.Relay(chamberRelay)
         self.chamberMotorState = wpilib.Relay.kOff
-        self.chambIRSens = IRSensor(chambIRSens)
+        self.chambIRSens = IRSensor(chambIRSens, 2.0)
         
     def Run( self ):
-        self.chamberMotorState = wpilib.Relay.kOn 
+        self.chamberMotorState = wpilib.Relay.kReverse 
+        
+    def Remove(self):
+        self.chamberMotorState = wpilib.Relay.kForward
         
     def IsFull( self ):
         return self.chambIRSens.IsBallSet()
@@ -25,7 +28,8 @@ class Chamber (object):
         self.chamberMotorState = wpilib.Relay.kOff
     
     def Print( self ):
-        print( "Chamber: %s; Full: %s" % (self.chamberMotorState, self.IsFull()))
+        print("Chamber:")
+        print("  IRSensor: %s; Is Ball Set: %s" % (self.chambIRSens.GetVoltage(), self.IsFull()))
     
     def Update( self ):
     

@@ -22,9 +22,7 @@ class IRSensor(object):
     def __init__(self, irSensor):
         self.irSensor = wpilib.AnalogChannel(irSensor)
         self.state = False
-        
-
-        
+            
     '''
         returns the current state of the ball, if a threshold is
         not passed then do not change the state

@@ -40,5 +40,5 @@ class Chamber (object):
         self.chamberMotor.Set( self.chamberMotorState ) # so the update is changing if the motor is running
         #self.switchState = self.limitSwitch3.Get()
         #if using IR sens- 
-        self.switchState = self.chambIRSens.isBallSet
+        self.switchState = self.chambIRSens.isBallSet()
         

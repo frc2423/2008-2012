@@ -37,19 +37,17 @@ class RobotManager(object):
     '''
     
     #self, chamber, feeder, wheel, susan, vAngle, shooter, rampArm
-    def __init__(self, chamber, feeder,rampArm):
+    def __init__(self, chamber, feeder,rampArm, wheel, susan, vAngle, shooter):
         
         
         self.chamber = chamber
      
         self.feeder = feeder
-        '''
+        
         self.wheel = wheel
         self.susan = susan
         self.vAngle = vAngle
         self.shooter = shooter
-        '''
-        # self.shooter = Shooter(angleCAN, susanCAN, susanGyro, shootWheelCAN1, shootwheelCAN2)
         
         self.rampArm = rampArm
         

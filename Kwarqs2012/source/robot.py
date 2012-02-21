@@ -21,6 +21,10 @@ from components.ramp_arm import RampArm
 #Relay Inputs
 feederRelay = 1
 chamberRelay = 2
+
+#jaguar Inputs
+
+feederJag = 3
         
 #Digital Channel Inputs
 chamberSwitch = 1
@@ -44,7 +48,7 @@ susanCAN = 6
 #initialize instances 
 chamber = Chamber( chamberRelay, chamberSwitch, chambIRSens)
 
-feeder = Feeder(feederRelay,topFeedSwitch,botFeedSwitch,topFeedIRSens)
+feeder = Feeder(feederJag,topFeedSwitch,botFeedSwitch,topFeedIRSens)
 
 
 wheel = Wheel( shootWheelCAN1, shootWheelCAN2, wheelEncoder )
@@ -53,13 +57,11 @@ vAngle = VerticalAngle(angleCAN)
 shooter = Shooter(vAngle,susan,wheel)
 
 
-# self.shooter = Shooter(angleCAN, susanCAN, susanGyro, shootWheelCAN1, shootwheelCAN2)
-
 rampArm = RampArm(rampArmCAN)
 
 
-'''chamber,feeder,wheel,susan,vAngle,shooter,rampArm'''
-robotManager = RobotManager(chamber,feeder,rampArm)
+'''chamber,feeder, rampArm,wheel,susan,vAngle,shooter,'''
+robotManager = RobotManager(chamber,feeder,rampArm, wheel, susan, vAngle, shooter)
 
 stick1 = wpilib.Joystick(1)
 stick2 = wpilib.Joystick(2)
@@ -139,17 +141,33 @@ class MyRobot(wpilib.SimpleRobot):
                 robotManager.ShootIfReady()
                                     
             if driveStation.GetDigitalIn(2): # to manually run the chamber/feeder
-                robotManager.ToggelChamberFeederAuto()
-               
+                if robotManager.chamberFeederAuto:
+                    robotManager.ToggelChamberFeederAuto()
+            else: 
+                if not robotManager.chamberFeederAuto:
+                    robotManager.ToggelChamberFeederAuto()
+                    
             if driveStation.GetDigitalIn(3): #to manually shoot the ball
-                shooter.ToggleAutoWheel()
-                
+                if shooter.autoWheel:
+                    shooter.ToggleAutoWheel()
+            else:
+                if not shooter.autoWheel:
+                    shooter.ToggleAutoWheel()
+                    
             if driveStation.GetDigitalIn(4): #to manually aim both the angle 
-                shooter.ToggleAutoAngle()
-
+                if shooter.autoAngle:
+                    shooter.ToggleAutoAngle()
+            else:
+                if not shooter.autoAngle:
+                    shooter.ToggleAutoAngle()
+                    
             if driveStation.GetDigitalIn(5): #manual run susan
-                shooter.ToggleAutoSusan()
-            
+                if shooter.autoSusan:
+                    shooter.ToggleAutoSusan()
+            else:
+                if not shooter.autoSusan:
+                    shooter.ToggleAutoSusan()
+                    
             if not shooter.autoAngle:
                 vAngle.Set(_translate_z_to_angle_motor_position(stick2).getZ())
                 
@@ -169,12 +187,11 @@ class MyRobot(wpilib.SimpleRobot):
                     feeder.Feed()
             #if stick
             #this prints values so we know what's going on
-            if stick1.GetRawButton(7):
-                print( "Motor: %f,%f" % ( driveMotor1.Get(), driveMotor2.Get()  ) )
-                
-            robotManager.Update()
-            
-            
+            if stick1.GetRawButton(8):
+                feeder.Print()
+                print("")
+                chamber.Print()
+    
             wpilib.Wait(0.04)
                 
         

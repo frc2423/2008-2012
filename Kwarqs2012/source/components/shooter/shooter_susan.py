@@ -45,7 +45,7 @@ class Susan(object):
         
     def SetMode(self, Auto):
         self.AutoMode = Auto
-        if self.AutoMode == True:
+        if self.AutoMode == False:
             self.pidControl.Enable()
         else:
             self.pidControl.Disable()

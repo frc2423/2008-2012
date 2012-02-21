@@ -31,13 +31,16 @@ class Feeder(object):
     lowSwitch1- state of limit switch 1
     topSwitch2- state of limit switch 2 (higher one)
     '''
+    FORWARD = 1
+    BACKWARD = -1
+    STOP = 0
     
-    def __init__(self, feederRelay, topFeedSwitch, botFeedSwitch, topFeedIRSens):
+    def __init__(self, feederJag, topFeedSwitch, botFeedSwitch, topFeedIRSens):
         
-        self.feederMotor = wpilib.Relay(feederRelay)
+        self.feederMotor = wpilib.Jaguar(feederJag)
 
         #set so that feeder is naturally on. May change
-        self.direction = wpilib.Relay.kForward
+        self.direction = Feeder.FORWARD
         self.botFeedSwitch = wpilib.DigitalInput( botFeedSwitch )
         self.topFeedSwitch = wpilib.DigitalInput( topFeedSwitch )
         
@@ -52,12 +55,12 @@ class Feeder(object):
         self.Full = False
     #Starts feederMotor if needed
     def Feed(self):
-        self.direction = wpilib.Relay.kForward
+        self.direction = Feeder.FORWARD
         
         
     #Stops the feedermotor if the feeder should not be on
     def Stop(self):
-        self.direction = wpilib.Relay.kOff    
+        self.direction = Feeder.BACKWARD    
     
     """
     def FeedIfBallNear(self):
@@ -68,7 +71,7 @@ class Feeder(object):
     
     #Allows the feeder to run backwards if giving balls to teamates is desired
     def Expel(self):
-        self.direction = wpilib.Relay.kReverse
+        self.direction = Feeder.STOP
     
     #Returns 1 if the feeder is full and 0 if not
     def IsFull(self):
@@ -78,6 +81,11 @@ class Feeder(object):
     def IsReady(self):
         if self.topFeedIRSens.isBallSet() == True:
             return( True )
+        
+    def Print(self):
+            print("Feeder:")
+            print("    IRSensor Value: " + str(self.topFeedIRSens.irSensor.GetVoltage()) + "  Is Ball Set: " + str(self.topFeedIRSens.isBallSet()))
+            print("    Is full: " + str(self.IsFull()) + "  IsReady: " +str(self.IsReady()) + "    Motor State")
     '''
     Sets the feeder motor's direction (as well as whether it is on)
     Also updates the state of the limit switches

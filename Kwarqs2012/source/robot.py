@@ -162,17 +162,18 @@ class MyRobot(wpilib.SimpleRobot):
                     # shooter.ToggleAutoAngle()
                     
             if driveStation.GetDigitalIn(5): #manually run susan
-                susan.vBus(stick2.getX())
+                susan.SetVBus(stick2.GetX())
+ 
             
                     
             # if not shooter.autoAngle:
-                # vAngle.Set(_translate_z_to_angle_motor_position(stick2).getZ())
+                # vAngle.Set(_translate_z_to_angle_motor_position(stick2.GetZ())
                 
             # if not shooter.autoWheel:
-                # if stick1.getTrigger():
+                # if stick1.GetTrigger():
                     # ''' makes sure to only spin forwards'''
-                    # pvBus = (stick1.getZ() + 1)/2 
-                    # wheel.SetPVBus(pvBus)
+                    # vBus = (stick1.GetZ() + 1)/2 
+                    # wheel.SetVBus(vBus)
                 
             # if not RobotManager.chamberFeederAuto:
                 # if stick2.GetRawButton(6):

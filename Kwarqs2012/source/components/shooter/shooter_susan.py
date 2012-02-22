@@ -40,7 +40,7 @@ class Susan(object):
     def SetGoalAngle(self,angle):
         self.goalAngle = angle
         
-    def SetVbus(self, vBus):
+    def SetVBus(self, vBus):
         self.vBus = vBus
         
     def SetMode(self, Auto):
@@ -61,8 +61,8 @@ class Susan(object):
     
     def Print(self):
         print("ShooterSusan: ")
-        print("    Susan Speed:  "+ str(self.pidControl.Get()) + "  Susan GoalAngle: " + str(self.goalAngle) + "  Pointing Correctly: " + str(self.PointingCorrectly()))
-        print("    AutoMode: " + str(self.AutoMode()))
+        print("    Susan pVoltage:  "+ str(self.pidControl.Get()) + "  Susan GoalAngle: " + str(self.goalAngle) + "  Pointing Correctly: " + str(self.PointingCorrectly()))
+        print("    AutoMode: " + str(self.autoMode) + "  Susan vBus: " + str(self.vBus))
     
     '''updates variables'''
     def Update(self):

@@ -1,3 +1,13 @@
+'''
+when digital input (2) is pressed button 6 is feeder on and 7 feeder off
+digital input (5) is pressed X axis of joystick 2 sets susan
+if button 8 on stick 1 is pressed and held print the chamber values
+button (2) on stick 1 ---> Lowers ramp arm 
+
+** Overides needed ** (May be included already)
+-Susan position adjustment
+-Wheel speed
+'''
 
 #import rpdb2
 from robot_manager import RobotManager

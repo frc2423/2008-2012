@@ -1,5 +1,5 @@
 '''
-    fake_wpilib.py
+    fake_wpilib    
     
     This is a library designed to emulate parts of WPILib so you can
     more easily do unit testing of your robot code. 
@@ -45,11 +45,13 @@
             ... etc
 '''
 
+__all__ = ['fake_time','pid_controller']
+
 import math
+from fake_wpilib.pid_controller import PIDSource, PIDOutput, PIDController
+from fake_wpilib.fake_time import Notifier, Timer, Wait, GetClock
 
 
-# This variable is incremented by the Wait function
-global_time = 0
 
 
 def initialize_robot():
@@ -465,29 +467,8 @@ class Joystick(object):
     def GetZ(self):
         return self.z
     
-
 class KinectStick(Joystick):
     pass
-
-class PIDController(object):
-    def __init__(self, Kp,Ki,Kd,source,output,period = 0.05):
-        pass
-    def SetSetpoint(self, point):
-        pass
-    def SetOutputRange(self, range1, range2):
-        pass
-    def SetInputRange(self, range1, range2):
-        pass
-    def SetTolerance(self, tolerance):
-        pass
-    def Enable(self):
-        pass
-
-class PIDOutput(object):
-    pass
-    
-class PIDSource(object):
-    pass    
     
 class RobotDrive(object):
 
@@ -592,45 +573,6 @@ class Solenoid(object):
         self.value = value
 
         
-class Timer(object):
-    
-    def __init__(self):
-        self.start_time = 0
-        self.accumulated_time = 0
-        self.running = False
-        self.Reset()
-        
-    def Get(self):
-        global global_time
-        if self.running:
-            return (global_time - self.start_time) + self.accumulated_time
-        else:
-            return self.accumulated_time
-        
-    def Reset(self):
-        global global_time
-        self.accumulated_time = 0
-        self.start_time = global_time
-        
-    def Start(self):
-        global global_time
-        if not self.running:
-            self.start_time = global_time
-            self.running = True
-        
-    def Stop(self):
-        if self.running:
-            self.accumulated_time += self.Get()
-            self.running = False
-        
-    def HasPeriodPassed(self, period):
-        global global_time
-        if self.Get() > period:
-            self.start_time += period
-            return True
-        return False
-    
-        
 class Ultrasonic(object):
 
     @staticmethod
@@ -672,11 +614,6 @@ class Victor(object):
     def Set(self, value):
         self.value = value
     
-        
-def Wait(time):
-    global global_time
-    global_time += time
-
     
 class Watchdog(object):
     

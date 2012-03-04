@@ -7,26 +7,42 @@ print( "Loading: Kwarqs2012 wheel testing program" )
 import wpilib
 import wpilib.SmartDashboard
 import math
+import threading
+
 
 
 class PidEncoder(wpilib.PIDSource):
     def __init__(self, encoder):
         wpilib.PIDSource.__init__(self)
+        self._lock = threading.RLock()
         self.encoder = encoder
+        self.value = 0.0
+        
+    def Get(self):
+        with self._lock:
+            return self.value
         
     def PIDGet(self):
-        return self.encoder.PIDGet()
+        with self._lock:
+            self.value = self.encoder.PIDGet()
+            return self.value
 
 
 class PidMotor(wpilib.PIDOutput):
     def __init__(self, jaguar):
         wpilib.PIDOutput.__init__(self)
+        self._lock = threading.RLock()
         self.jaguar = jaguar
         self.value = 0.0
         
+    def Get(self):
+        with self._lock:
+            return self.value
+        
     def PIDWrite(self, value):
-        self.value += value
-        self.jaguar.Set( self.value )
+        with self._lock:
+            self.value += value
+            self.jaguar.Set( self.value )
 
 
 stick1 = wpilib.Joystick(1)
@@ -53,6 +69,8 @@ class MyRobot(wpilib.SimpleRobot):
         encoder.SetDistancePerPulse( 1/300.0 )      # this is for the small wheel we have
         encoder.Start()
         
+        self.errors = []
+        
             
     def RobotInit(self):
         '''Called only once during robot initialization'''
@@ -75,6 +93,35 @@ class MyRobot(wpilib.SimpleRobot):
         while self.IsAutonomous() and self.IsEnabled():
             wpilib.Wait(0.01)
             
+    
+    def Print(self):
+    
+        rate = p_encoder.Get()
+        motor = p_motor.Get()
+        setpoint = pid.GetSetpoint()
+    
+        diff = None
+        avg_diff = None
+        
+        if rate > setpoint:
+            diff = rate - setpoint
+        else:
+            diff = setpoint - rate
+        
+        self.errors.insert(0, diff)
+        
+        if len(self.errors) > 2:
+            self.errors.pop()
+            
+        avg_diff = sum( self.errors ) / len(self.errors)
+        
+        print( "    WR: %s; GR: %s; D: %s; M: %s" % (rate, setpoint, avg_diff, motor))
+
+        sd.PutDouble( 'WR', rate )
+        sd.PutDouble( 'GR', setpoint )
+        sd.PutDouble( 'D', avg_diff )
+        sd.PutDouble( 'M', motor )
+    
             
     def OperatorControl(self):
         '''Called during Teleoperated Mode'''
@@ -111,10 +158,7 @@ class MyRobot(wpilib.SimpleRobot):
             
             
             if timer.HasPeriodPassed( .5 ):
-                print( "Encoder: %s; SP: %s: Motor: %s" % (encoder.GetRate(), pid.GetSetpoint(), p_motor.value ) )
-                sd.PutDouble( 'Encoder', encoder.GetRate() )
-                sd.PutDouble( 'PID', pid.GetSetpoint() )
-                sd.PutDouble( 'Motor', p_motor.value )
+                self.Print()
             
             wpilib.Wait(0.04)
 

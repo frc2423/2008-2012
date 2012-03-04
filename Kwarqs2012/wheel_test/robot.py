@@ -6,6 +6,7 @@ print( "Loading: Kwarqs2012 wheel testing program" )
 
 import wpilib
 import wpilib.SmartDashboard
+import math
 
 
 class PidEncoder(wpilib.PIDSource):
@@ -111,6 +112,9 @@ class MyRobot(wpilib.SimpleRobot):
             
             if timer.HasPeriodPassed( .5 ):
                 print( "Encoder: %s; SP: %s: Motor: %s" % (encoder.GetRate(), pid.GetSetpoint(), p_motor.value ) )
+                sd.PutDouble( 'Encoder', encoder.GetRate() )
+                sd.PutDouble( 'PID', pid.GetSetpoint() )
+                sd.PutDouble( 'Motor', p_motor.value )
             
             wpilib.Wait(0.04)
 

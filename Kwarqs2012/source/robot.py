@@ -143,8 +143,10 @@ class MyRobot(wpilib.SimpleRobot):
                 angleMotor.Set( stick2.GetY() )
             '''           
             
-            if stick1.GetTop(): # makes the arm go down --- when button not pressed, the arm makes its ascent back up
-                rampArm.Lower()
+            
+            # makes the arm go down --- when button not pressed, the arm makes its ascent back up
+            if stick1.GetTop(): 
+                rampArm.Extend()
             
             # if stick1.GetTrigger(): #this is to fire the ball
                 # robotManager.ShootIfReady()

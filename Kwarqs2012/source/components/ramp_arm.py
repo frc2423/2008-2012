@@ -1,43 +1,43 @@
+
 try:
     import wpilib
 except ImportError:
     import fake_wpilib as wpilib
 
 
-#arm = Jaguar(3)
-
-#needs to be both directions
-#go down as long button is pressed
-#if button not pressed off
-#if different button pressed reverse
-
 class RampArm(object):
+    '''
+        The RampArm is a big weight attached to a motor that we can use
+        to lower the ramp so we can go over it. Or do something along 
+        those lines. 
+        
+        Currently, the way the arm works is it is always trying to go
+        in one direction or the other. Ideally, we connect this to a
+        button, and when the operator presses a button the arm goes down, 
+        and when they release it the arm goes back up.
+        
+        There is a limit switch attached to the jaguar which prevents the 
+        motor from retracting past its hard stop.
+    '''
 
 
-    #
-    #   Description: Initilize a RampArm Instance
-    #   
-    #   Variables:
-    #   int mNumber: PWM connection number for motor
+    EXTEND_ARM = -0.5
+    RETRACT_ARM = 1.0
+
     def __init__(self, rampArmCAN):
         self.arm = wpilib.Jaguar(rampArmCAN)
-        self.lower = False
-        self.forwardSpeed = 1.0
-        self.reverseSpeed = -0.5
+        self.extend = False
     
-    def Lower(self):
-        self.lower = True
-        
-#if lowerRamp is called the self.armSpeed is fowardSpeed and the motor is set to full power
-#then sets self.armspeed is -.5
-#then when LowerRamp is not needed then the motor is set to -.5
+    def Extend(self):
+        '''Extends the arm to move the ramp'''
+        self.extend = True
   
     def Update(self):
     
-        if self.lower:
-            self.arm.Set( self.reverseSpeed )
+        if self.extend:
+            self.arm.Set( RampArm.EXTEND_ARM )
         else:
-            self.arm.Set( self.forwardSpeed )
+            self.arm.Set( RampArm.RETRACT_ARM )
             
-        self.lower = False
+        self.extend = False
             

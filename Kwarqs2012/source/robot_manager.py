@@ -3,40 +3,19 @@ try:
 except ImportError:
     import fake_wpilib as wpilib
 
-'''
-Calls certain functions based on the current states of each component
-'''
-
-
-'''
-Imported components so that instances of each can be made 
-'''
-
-from components.chamber import Chamber
-from components.feeder import Feeder
-from components.shooter import Shooter
-from components.shooter.shooter_angle import VerticalAngle
-from components.shooter.shooter_susan import Susan
-from components.shooter.shooter_wheel import Wheel 
-from components.ramp_arm import RampArm
-
-
-
 
 class RobotManager(object):
+    '''
+        This currently implements automated feeding functionality
+        for the robot, and possibly will implement automated
+        shooting as well. Probably.
+        
+        TODO: Perhaps we need a hybrid mode? Where the human tells the 
+        thing when to feed, but once a ball is detected it automatically
+        puts the ball into the chamber? Or something similar.
+    '''
 
-    
-    '''
-    description: initializes an instance of RobotManager
-    Variables: 
-    rampArmMotorNum- PWM connection value of Ramparm motor
-    
-    self.chamberOveride and self.chamberAuto control the state of the chamber
-    self.feederOveride and self.feederAuto control the state of the feeder
-    
-    '''
-    
-    #self, chamber, feeder, wheel, susan, vAngle, shooter, rampArm
+  
     def __init__(self, chamber, feeder, wheel, susan, vAngle, shooter):
         
         

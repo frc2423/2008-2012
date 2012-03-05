@@ -1,90 +1,69 @@
-'''
-The feeder is meant to move balls from the ground to the chamber, where the
-ball will then be fired 
 
-'''
-
-from components.irsensor import IRSensor
 try:
     import wpilib
 except ImportError:
     import fake_wpilib as wpilib
 
+from .irsensor import IRSensor
 
-class Feeder(object): 
-    
-    '''
-    description: initializes an instance of Feeder
-    Variables: 
-    relayChannel- The channel that the relay is connected to at the digital 
-    I/O
-    
-    direction- alters the relay state, which in turn changes the direction the
-    feedermotor rotates   
-    
-    limSwitchChannel1 and limSwitchChannel2- The channels on the digital
-    sidecar that the limitswitches correspond to
-    
-    proxchannel- The channel on the digital sidecar that the proximity
-    sensor is connected to
-    
-    lowSwitch1- state of limit switch 1
-    topSwitch2- state of limit switch 2 (higher one)
-    '''
-    FORWARD = -1.0
-    BACKWARD = 1.0
-    STOP = 0
-    
-    def __init__(self, feederJag, botFeedSwitch, topFeedIRSens):
-        
-        self.feederMotor = wpilib.Jaguar(feederJag)
 
-        #set so that feeder is naturally on. May change
-        self.direction = Feeder.FORWARD
-        self.botFeedSwitch = wpilib.DigitalInput( botFeedSwitch )
+class Feeder(object):
+    '''
+        The feeder is the belt and sensors present on the bottom of the
+        robot. This part of the robot moves balls from outside the robot up 
+        into the chamber.
+    '''
+
+    # feeder belt motor values
+    BELT_UP     = -1.0  # bring ball into the robot
+    BELT_DOWN   = 1.0   # expel ball from robot
+    BELT_STOP   = 0     # stop feeder belt
+    
+    def __init__(self, feederJag, low_ball_sensor, top_ball_sensor):
         
-        #not sure switches will be used
-        self.botSwitchVal = False
-        self.topSwitchVal = False
+        # belt motor
+        self.belt_motor = wpilib.Jaguar(feederJag)
+
+        # sensors
+        self.top_ball_sensor = IRSensor(top_ball_sensor, 1.2)
+        self.low_ball_sensor = wpilib.DigitalInput( low_ball_sensor )
         
-        self.topFeedIRSens = IRSensor(topFeedIRSens, 1.2)
-        self.Full = False
+        self.direction = Feeder.BELT_STOP
         
-    #Starts feederMotor if needed
+    
     def Feed(self):
-        self.direction = Feeder.FORWARD
+        '''Pull balls into the robot and up to the shooter'''
         
-    #Stops the feedermotor if the feeder should not be on
+        self.direction = Feeder.BELT_UP
+        
     def Stop(self):
-        self.direction = Feeder.STOP
+        '''Stops the feeder'''
+        self.direction = Feeder.BELT_STOP
     
-    #Allows the feeder to run backwards if giving balls to teamates is desired
     def Expel(self):
-        self.direction = Feeder.BACKWARD
-    
-    #Returns 1 if the feeder is full and 0 if not
+        '''Pushes balls out of the feeder'''
+        self.direction = Feeder.BELT_DOWN
+        
     def IsFull(self):
-        if self.botFeedSwitch.Get() == True and self.topFeedIRSens.IsBallSet() == True:
+        '''Returns True if two balls are detected in the feeder'''
+        
+        if self.low_ball_sensor.Get() == True and self.top_ball_sensor.IsBallPresent() == True:
             return True
         return False
         
     def HasTopBall(self):
-        if self.topFeedIRSens.IsBallSet() == True:
-            return True
-        return False
+        '''Returns True if the top ball is present'''
+    
+        return self.top_ball_sensor.IsBallPresent()
         
     def Print(self):
             print("Feeder:")
-            print("  IRSensor: %s; Is Ball Set: %s" % ( self.topFeedIRSens.GetVoltage(), self.topFeedIRSens.IsBallSet() ))
+            print("  IRSensor: %s; Is Ball Set: %s" % ( self.top_ball_sensor.GetVoltage(), self.top_ball_sensor.IsBallPresent() ))
             print("  Is full:  %s; HasTopBall: %s" % ( self.IsFull(), self.HasTopBall() ))
 
     def Update(self):
     
-        self.feederMotor.Set(self.direction)
-        self.direction = Feeder.STOP
-        
-      
-        
-        
+        self.belt_motor.Set(self.direction)
+        self.direction = Feeder.BELT_STOP
         
     

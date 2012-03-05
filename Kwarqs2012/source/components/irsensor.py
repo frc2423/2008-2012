@@ -1,34 +1,41 @@
-'''
-    Defines the functionality of the analog irsensors used to detect
-'''
+
 try:
     import wpilib
 except ImportError:
     import fake_wpilib as wpilib
     
+
 class IRSensor(object):
+    '''
+        Encapsulates the functionality of the Sharp GP2D120 IR sensors 
+        used to detect balls on the robot
+    '''
+
     
-    '''
-        values refers to distance based on schmatic of
-        sharp GP2D120 and size of ball being ~10cm,
-        should be verified imperically, sensors offset by
-        5cm from ball
-    '''
     #by schematic, refers to sensor reporting ~14cm distance
     inditThresh = .9 
     #by schematic, refers to sensor reporting ~6cm distance
     #ballSet = 2
     
-    def __init__(self, irSensor, threshold):
-        self.irSensor = wpilib.AnalogChannel(irSensor)
-        self.state = False
+    def __init__(self, sensor_port, threshold):
+        '''
+            sensor_port     - analog channel number for sensor
+            threshold       - Threshold used to determine when the ball 
+                              is present. Value is usually 2.0, can be 
+                              less depending on needs and positioning.
+        '''
+    
+        self.irSensor = wpilib.AnalogChannel(sensor_port)
         self.ball_present_threshold = threshold
+        
+        self.state = False
             
-    '''
-        returns the current state of the ball, if a threshold is
-        not passed then do not change the state
-    '''
-    def IsBallSet(self):
+
+    def IsBallPresent(self):
+        '''
+            Returns True if the sensor claims the ball is present
+        '''
+    
         voltage = self.GetVoltage()
         if voltage < IRSensor.inditThresh:
             self.state = False
@@ -38,4 +45,5 @@ class IRSensor(object):
         
         
     def GetVoltage(self):
+        '''Used for diagnostic purposes'''
         return self.irSensor.GetVoltage()

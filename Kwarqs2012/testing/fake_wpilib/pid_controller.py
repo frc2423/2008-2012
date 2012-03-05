@@ -7,7 +7,7 @@
 '''
 
 import math
-from fake_wpilib.fake_time import Notifier
+from .fake_time import Notifier
 
 class PIDOutput(object):
     pass

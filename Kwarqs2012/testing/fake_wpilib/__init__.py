@@ -48,8 +48,10 @@
 __all__ = ['fake_time','pid_controller']
 
 import math
-from fake_wpilib.pid_controller import PIDSource, PIDOutput, PIDController
-from fake_wpilib.fake_time import Notifier, Timer, Wait, GetClock
+
+# move these into the global namespace
+from .pid_controller import PIDSource, PIDOutput, PIDController
+from .fake_time import Notifier, Timer, Wait, GetClock
 
 
 

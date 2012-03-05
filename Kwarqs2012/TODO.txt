@@ -1,0 +1,73 @@
+Things we *need* to get done before the Boston Regional:
+
+    - Need to develop a checklist of things to do when we get to the regional
+        - Tuning tasks, electrical tasks, program verification tasks, etc
+
+    - Autotune PID Control for shooter wheel
+        - This is what the wheel_test program is for!
+        - Youssef is working on this
+        
+    - Integrate Vision processing into driver station
+        - No more basket tracker python module, so use the network tables instead
+        - Sam is working on this
+        
+    - Non-classmate operator computer
+        - Someone needs to set this up with Win7 and the right software
+        - Need to install the vision stuff on it too
+        
+    - Operator console
+        - Need to finish design for this, implement it
+        - Need to add code that does the right thing here
+        
+    - Operator Controls
+        - We still haven't specified how this works yet, need to finalize it
+        - Document controls, implement controls that make sense
+        
+    - Autonomous modes
+        - We need to figure out which ones we're going to do
+        - Implement a test for each so we know they work before we get there
+
+        - Potential modes needed:
+            - Shoot balls while pulling in more balls from teammates
+                - Need to be able to adjust frequency of shooting interval, just in case
+            - Feed balls back to teammates
+                - Need to do this at a particular frequency, how does the sensing work?
+    
+    - Verify robot logic
+        - We probably need to state precisely how these work, and create
+        tests that make sure that they do that
+        
+    - Verify shooter operation
+        - Figure out how this even works, with manual and automated shooting mechanisms
+        
+    - Verify susan operation
+        - Not even clear if we really know how this is supposed to work automatically
+            - How do we deal with the vibration/slippage?
+        - The latency is really going to kill us since we don't know where it is
+            - We need options with/without the gyro, just in case
+        
+    - Wrapper around PID Controller and jaguars?
+        - enable/disable/manual modes need to be simplified so we don't screw it up
+        
+    - Add SmartDashboard functionalities
+        - Chooser to pick the autonomous mode!
+            - This is important
+        - PID Tuning?
+        - Feedback for all robot systems
+        - Neat idea: custom widget to display status on the robot in real time?
+            - Even without a custom widget, we probably should feed all the sensors
+            and states and stuff back to the SmartDashboard!
+            
+    - Investigate SmartDashboard/NetworkTables
+        - What latency does this introduce?
+        - What other kinds of cool things does this allow you to do?
+        
+
+    - Test framework improvements
+        - Need to add SmartDashboard stuff to it, even if it doesn't actually work
+        - Needs to be a way to automatically verify that things are working! Otherwise
+        the tests are useful... but not really all that useful
+        - Verify that motors are only set once per loop?
+        
+
+ 

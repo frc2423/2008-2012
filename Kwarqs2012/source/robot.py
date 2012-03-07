@@ -114,9 +114,28 @@ class MyRobot(wpilib.SimpleRobot):
     def Autonomous(self):
         self.GetWatchdog().SetEnabled(False)
         while self.IsAutonomous() and self.IsEnabled():
+        
+            '''
+            *if in expel to team mate(s) mode*
+            --> expel balls. Once all balls are shot, head over to ramp and knock balls off
+            
+            *CODE*
+            feeder.Expel
+                if 
+            '''
+            
+            
+            '''
+            if in autoshoot mode
+            --> aim and shoot balls. Once all balls are expelled (+ a time 
+            interval passes) head over to ramp and knock balls off
+            
+            *CODE*
+            robotManager.ShootIfReady()
+            '''
             wpilib.Wait(0.01)
             
-    
+            
      
     def OperatorControl(self):
     

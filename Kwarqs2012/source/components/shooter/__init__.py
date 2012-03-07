@@ -47,7 +47,7 @@ class Shooter(object):
         self.ready = False  
         if self.vAngle.IsReady() and self.susan.IsReady() and self.wheel.IsReady():
             self.ready = True
-        return True 
+        return self.ready
 
             
     ''' Checks if component is in auto mode and if we are validaly shooting'''

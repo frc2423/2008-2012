@@ -32,6 +32,27 @@ Things we *need* to get done before the Boston Regional:
                 - Need to be able to adjust frequency of shooting interval, just in case
             - Feed balls back to teammates
                 - Need to do this at a particular frequency, how does the sensing work?
+                
+        Student code ideas:
+        
+            *if in expel to team mate(s) mode*
+            --> expel balls. Once all balls are shot, head over to ramp and knock balls off
+            
+            *CODE*
+            feeder.Expel
+                if 
+            '''
+            
+            
+            '''
+            if in autoshoot mode
+            --> aim and shoot balls. Once all balls are expelled (+ a time 
+            interval passes) head over to ramp and knock balls off
+            
+            *CODE*
+            robotManager.ShootIfReady()
+            
+            
     
     - Verify robot logic
         - We probably need to state precisely how these work, and create

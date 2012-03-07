@@ -1,0 +1,68 @@
+
+ 
+Stick1:
+
+    X/Y axis drives robot
+    Trigger: smoother turning
+    
+    6/11: Ramp arm down
+    
+    Z axis: manual camera angle
+    Top button: enable manual camera pointing
+    
+Stick2:
+
+    Shooter:
+        Automated:
+            Trigger: fire ball (move ball from chamber)
+            
+        Manual:
+            Trigger: activate wheel
+            Z axis: manual wheel speed
+        
+            6: move ball from chamber into shooter
+            
+    
+    Susan:
+        Automated:
+            None
+    
+        Manual:
+            Top button: activate manual lazy susan
+            X axis: turn lazy susan
+                
+            
+    Ball Handling:
+        Continuous feeding:
+            None
+    
+        Automated:
+            10/11: activate feeding
+        
+        Manual:
+            6/7: manual chamber 
+            10/11: manual feeder
+    
+        
+Digital inputs (switches):
+    
+    Auto distance enable/disable
+    Auto susan enable/disable
+    Auto shoot enable/disable
+    Auto ball handling enable/disable
+    Continuous feeding enable/disable
+        -> perhaps this should be on the dashboard?
+
+Outputs: 
+    Green LED: 
+        If off, nothing
+        If blinking quickly, then shooter is running
+        If solid, then ready to shoot
+        
+        
+    Left digits:
+        Current target for shooter speed (automated or manual, doesn't matter)
+        
+    Right digits:
+        Current measured shooter speed
+        

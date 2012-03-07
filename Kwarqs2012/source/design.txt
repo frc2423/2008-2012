@@ -1,0 +1,82 @@
+
+    robot
+        OperatorControl()
+    
+    operator_leds
+    util
+
+    RobotManager?
+    
+        EnableAutoSusan
+        EnableAutoDistance
+        DisableAutoSusan
+        DisableAutoDistance
+        
+        if auto... blah blah blah?
+
+    autonomous:
+        
+        -> setup shiny autonomous framework, easy integration
+        with SmartDashboard chooser
+        
+        FeedTeammates
+        AutoShoot
+        Nothing
+        
+        
+    components:
+        
+        RampArm:
+            Extend()
+            
+        BallHandler:
+        
+            IsReadyToShoot()
+                -> Chamber.IsFull()
+        
+            CollectBalls()
+            ShootBall()
+                -> needs to continue until ball was shot, can't stop
+        
+            NumberOfBalls()
+                -- use sensors and tracking to detect number of balls
+                   currently in the robot
+        
+            Feeder:
+                Feed()
+                Stop()
+                Expel()
+                IsFull()
+                HasTopBall()
+            
+            Chamber:
+                IsFull()
+                Run()
+                Remove()
+                Stop()
+                
+        
+        Shooter:
+        
+            Camera:
+                IsReady()
+                
+                PointCameraDown()
+                -> this part does the network tables bit
+        
+            Susan:
+                IsReady()
+                    - always returns true in manual mode
+                SetAngle() -- this is only valid relative to the robot
+                Turn( ) -- this is manual, left/right or none?
+            
+                - Need gyro based and non-gyro based automated solutions
+            
+            ShootingWheel:
+                
+                IsReady()
+                SetSpeed()
+                Enable()
+                Disable()
+
+                -> detect ball being shot by sudden decrease in speed

@@ -17,15 +17,24 @@ class OperatorLEDs(object):
         powered by 4 bcd-to-seven-segment decoders, with built-in latches.
         The LEDs are setup in two groups of two digits, so to save time we
         tie the latch enables together. 
+        
+        Because of the latency problems talking to the DS, we need to do 
+        each digit in two-phase stages:
+        
+            1: enable x, set digits
+            2: disable x
+            3: enable y, set digits
+            4: disable y
+        
     '''
     
     # latch channels -- True latches the current output, False allows change
-    G_EN = [ 0, 1 ]
+    G_EN = [ 1, 3 ]
  
     # the least significant digit channels
     # -> lsb to msb
-    D0 = [ 2, 3, 4, 5 ]     # lower digit
-    D1 = [ 6, 7, 8, 9 ]     # higher digit
+    D0 = [ 16, 10, 12, 14 ]     # higher digit
+    D1 = [ 8, 2, 4, 6 ]     # lower digit
     
     
     class DigitGroup(object):
@@ -49,6 +58,10 @@ class OperatorLEDs(object):
             # do the first digit display
             self._update(True)
             
+        def _reset(self):
+            self.last_value = -1
+            
+            
         def Set(self, value):
             '''value is either None or an integer between 0 and 99. If None,
                then the display is blanked'''
@@ -69,28 +82,28 @@ class OperatorLEDs(object):
             
         def _update_digit(self, value, chs):
             
+            #print( "Update: %s %s" % (value, chs) )
+            
             if value is None:
                 value = 0xf     # this blanks the input
                 
-            for i in range(0,3):
-                if value & (1 << i):
-                    self.eio.SetDigitalOut( chs[i], True )
+            for i in range(0,4):
+                if int(value) & (1 << i):
+                    self.eio.SetDigitalOutput( chs[i], True )
                 else:
-                    self.eio.SetDigitalOut( chs[i], False )
+                    self.eio.SetDigitalOutput( chs[i], False )
+                    
+        def _wants_update(self):
+            return self.value == self.last_value
             
         def _update(self, enable):
             '''Returns True if it set digits'''
  
             if not enable:
-                self.eio.SetDigitalOut( self.enable_ch, True )
+                self.eio.SetDigitalOutput( self.enable_ch, True )
                 return False
                 
-            # don't bother changing the display if it hasn't changed
-            if self.value == self.last_value:
-                return False
-                
-            
-            self.eio.SetDigitalOut( self.enable_ch, False )
+            self.eio.SetDigitalOutput( self.enable_ch, False )
             
             if self.value is None:
                 digit0 = None
@@ -111,6 +124,8 @@ class OperatorLEDs(object):
     
         # initialize the io
         eio = wpilib.DriverStation.GetInstance().GetEnhancedIO()
+        self.current = 0
+        self.current_enabled = False
     
         for ch in OperatorLEDs.D0:
             eio.SetDigitalConfig( ch, wpilib.DriverStationEnhancedIO.kOutput )
@@ -119,14 +134,18 @@ class OperatorLEDs(object):
             eio.SetDigitalConfig( ch, wpilib.DriverStationEnhancedIO.kOutput )
     
         self.groups = []
-        self.groups.append( DigitGroup(eio, OperatorLEDs.G_EN[0]) )
-        self.groups.append( DigitGroup(eio, OperatorLEDs.G_EN[1]) )
+        self.groups.append( OperatorLEDs.DigitGroup(eio, OperatorLEDs.G_EN[0]) )
+        self.groups.append( OperatorLEDs.DigitGroup(eio, OperatorLEDs.G_EN[1]) )
         
         
     def GetDigitGroup(self, group):
         '''group is a value between 1 and 2'''
         return self.groups[group-1]
     
+    def Reset(self):
+        '''Call this when you enter OperatorControl mode'''
+        for i in self.groups:
+            i._reset()
     
     def Update(self):
         '''
@@ -136,26 +155,47 @@ class OperatorLEDs(object):
             to depend on that data.
         '''
         
-        if self.last_group == 0:
-            first = 1
-            second = 0
+        # if self.current == 0:
+            # first = 0
+            # second = 1
+        # else:
+            # first = 1
+            # second = 0
+        
+        # can only switch groups if it is not enabled
+        # if not self.current_enabled:
+
+            # self.groups[second]._update(True)
+            # self.current = second
+            # self.current_enabled = True
+            
+        # else:
+        
+            # if it doesn't want to switch, then don't bother
+            # if not self.groups[second]._wants_update():
+                # self.groups[first]._update(True)
+            # else:
+                # self.groups[first]._update(False)
+                # self.current_enabled = False
+                
+        
+        if self.stage == 0:
+            self.groups[0]._update(True)
+            self.groups[1]._update(False)
+            
+        elif self.stage == 1:
+            self.groups[0]._update(False)
+            self.groups[1]._update(False)
+        
+        elif self.stage == 2:
+            self.groups[0]._update(False)
+            self.groups[1]._update(True)
+        
+        elif self.stage == 3:
+            self.groups[0]._update(False)
+            self.groups[1]._update(False)
+        
+        if self.stage == 3:
+            self.stage = 0
         else:
-            first = 0
-            second = 1
-        
-        # if the first group declines to update, then
-        # try to update the second group. But if it
-        # does the update, then the enable line definitely
-        # should be switched
-        
-        # TODO: There has to be race conditions here... oh
-        # well, let's see how well it works, not much we can
-        # do without rewriting WPILib
-        
-        if self.groups[first]._update(True):
-            self.groups[second]._update(False)
-            self.last_group = first
-        else:    
-            self.groups[second]._update(True)
-        
-        
+            self.stage += 1

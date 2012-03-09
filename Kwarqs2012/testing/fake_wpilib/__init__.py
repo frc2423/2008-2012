@@ -351,16 +351,53 @@ class DriverStation(object):
     def __init__(self):
         self.digital_in = [ False, False, False, False, False, False, False, False ]
         self.fms_attached = False
+        self.enhanced_io = DriverStationEnhancedIO()
     
     def GetDigitalIn(self, number):
         return self.digital_in[number-1]
+        
+    def GetEnhancedIO(self):
+        return self.enhanced_io
     
     def IsFMSAttached(self):
         return self.fms_attached 
+        
+    def IsNewControlData(self):
+        return True
     
     def SetDigitalOut(self, number, value):
         pass
         
+class DriverStationEnhancedIO(object):
+    
+    kUnknown = 1
+    kInputFloating = 2 
+    kInputPullUp = 3
+    kInputPullDown = 4
+    kOutput = 5
+    kPWM = 6
+    kAnalogComparator = 7
+
+    # don't call this directly
+    def __init__(self):
+        self.digital = [ False, False, False, False, 
+                         False, False, False, False,
+                         False, False, False, False,
+                         False, False, False, False ]
+                        
+        self.digital_config = [ None, None, None, None,
+                                None, None, None, None,
+                                None, None, None, None,
+                                None, None, None, None ]
+        
+    def SetDigitalConfig( self, channel, config ):
+        self.digital_config[channel-1] = config
+    
+    def SetDigitalOutput( self, channel, value ):
+        print( "DOUT: %s %s" % (channel, value) )
+        self.digital[channel-1] = bool(value)
+        
+    
         
 class Encoder(object):
 
@@ -561,7 +598,7 @@ class Servo(object):
     
     def __GetServoAngleRange(self):
         return Servo.kMaxServoAngle - Servo.kMinServoAngle
-        
+
 
 class Solenoid(object):
     

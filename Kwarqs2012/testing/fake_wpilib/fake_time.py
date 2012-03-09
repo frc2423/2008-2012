@@ -20,15 +20,17 @@ class FakeTime(object):
     def IncrementTimeBy(self, time):
     
         final_time = self.time + time
-        qitem = min(self.notifiers)
-    
-        while qitem.run_time <= final_time:
         
-            self.time = qitem.run_time
-            if not qitem._run():
-                self.notifiers.remove(qitem)
-                
+        if len(self.notifiers) > 0:
             qitem = min(self.notifiers)
+        
+            while qitem.run_time <= final_time:
+            
+                self.time = qitem.run_time
+                if not qitem._run():
+                    self.notifiers.remove(qitem)
+                    
+                qitem = min(self.notifiers)
     
         self.time = final_time
     

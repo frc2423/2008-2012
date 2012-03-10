@@ -47,6 +47,7 @@
                 Stop()
                 Expel()
                 IsFull()
+				IsEmpty()
                 HasTopBall()
             
             Chamber:

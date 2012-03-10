@@ -29,12 +29,12 @@ class OperatorLEDs(object):
     '''
     
     # latch channels -- True latches the current output, False allows change
-    G_EN = [ 1, 3 ]
+    G_EN = [ 3, 12 ]
  
     # the least significant digit channels
     # -> lsb to msb
-    D0 = [ 16, 10, 12, 14 ]     # higher digit
-    D1 = [ 8, 2, 4, 6 ]     # lower digit
+    D0 = [ 9, 1, 5, 7 ]     # higher digit
+    D1 = [ 15, 6, 11, 13 ]     # lower digit
     
     
     class DigitGroup(object):
@@ -126,6 +126,7 @@ class OperatorLEDs(object):
         eio = wpilib.DriverStation.GetInstance().GetEnhancedIO()
         self.current = 0
         self.current_enabled = False
+        self.stage = 0
     
         for ch in OperatorLEDs.D0:
             eio.SetDigitalConfig( ch, wpilib.DriverStationEnhancedIO.kOutput )

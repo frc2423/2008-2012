@@ -138,6 +138,19 @@ class OperatorLEDs(object):
         self.groups.append( OperatorLEDs.DigitGroup(eio, OperatorLEDs.G_EN[0]) )
         self.groups.append( OperatorLEDs.DigitGroup(eio, OperatorLEDs.G_EN[1]) )
         
+    def InDisabled(self):
+        '''Easter egg: Call in disabled mode when there is new data from the DS'''
+    
+        tm = wpilib.Timer.GetPPCTimestamp()
+    
+        if tm % 1.0 > 0.5:
+            self.groups[0].Set(None)
+            self.groups[1].Set(None)
+        else:
+            self.groups[0].Set( (12 + tm/3600.0) % 24.0 )
+            self.groups[1].Set( (tm / 60.0) % 60.0 )
+    
+        self.Update()
         
     def GetDigitGroup(self, group):
         '''group is a value between 1 and 2'''

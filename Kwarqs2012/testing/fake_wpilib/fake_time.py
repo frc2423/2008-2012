@@ -209,6 +209,10 @@ class Timer(object):
         return False
         
     
+    @staticmethod
+    def GetPPCTimestamp():
+        return FAKETIME.Get()
+    
         
 def Wait(time):
     '''

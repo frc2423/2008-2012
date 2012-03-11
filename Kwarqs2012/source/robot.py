@@ -139,6 +139,9 @@ class MyRobot(wpilib.SimpleRobot):
         print("MyRobot::Disabled()")
     
         while self.IsDisabled():
+            if self.ds.IsNewControlData():
+                operator_leds.InDisabled()
+                
             wpilib.Wait(0.01)
 
     def Autonomous(self):

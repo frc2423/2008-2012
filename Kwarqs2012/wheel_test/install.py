@@ -2,6 +2,7 @@
 import os
 import imp
 import msvcrt
+import subprocess
 
 #
 # simple test before sending it out, in case of simple errors
@@ -9,9 +10,15 @@ import msvcrt
 
 print( 'Importing robot.py...' )
 
-test_path = os.path.normpath( os.path.dirname(__file__) + '/../testing/test.py' ) 
-tester = imp.load_source( 'test', test_path )
-tester.import_robot( os.path.normpath( os.path.dirname(__file__) + 'robot.py' ) )
+if os.name == 'nt':
+    ret = subprocess.call( os.path.normpath( os.path.dirname(__file__) + '/../testing/test.bat --import .' ), shell=True )
+else:
+    ret = subprocess.call( os.path.normpath( os.path.dirname(__file__) + '/../testing/test.sh --import .' ), shell=True )
+    
+if ret != 0:
+    print( "Failure detected, aborting import" )
+    exit(1)
+    
 
 print( 'Import successful!' )
 
@@ -19,6 +26,7 @@ print( 'Import successful!' )
 #
 # Ok, load the installer now
 #
+
 
 try:
     installer = imp.load_source( 'install', 'C:\\WindRiver\\workspace\\robotpy\\utilities\\installer\\install.py' )

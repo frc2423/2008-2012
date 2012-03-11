@@ -3,9 +3,13 @@
 # print something out so we know what code is running
 print( "Loading: Kwarqs2012 wheel testing program" )
 
+try:
+    import wpilib
+    import wpilib.SmartDashboard
+except ImportError:
+    import fake_wpilib as wpilib
+    import fake_wpilib.SmartDashboard
 
-import wpilib
-import wpilib.SmartDashboard
 import math
 import threading
 

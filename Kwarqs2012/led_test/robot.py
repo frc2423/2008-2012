@@ -3,12 +3,20 @@
 try:
     import wpilib
     import wpilib.SmartDashboard
+    from operator_leds import OperatorLEDs
 except ImportError:
+
     import fake_wpilib as wpilib
     import fake_wpilib.SmartDashboard
-    
 
-from operator_leds import OperatorLEDs
+    import imp
+    import os
+    
+    fname = os.path.normpath( os.path.dirname(os.path.abspath(__file__)) + '/../source/operator_leds.py' )
+    operator_leds = imp.load_source( 'operator_leds', fname )
+    OperatorLEDs = operator_leds.OperatorLEDs
+
+
 
 MANUAL_LEDS = True
 

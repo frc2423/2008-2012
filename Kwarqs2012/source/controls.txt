@@ -1,4 +1,29 @@
 
+Due to the complexity of our robot, for this year's controls we want to
+have automated and manual systems mesh together with little thought 
+required for the drivers to make this work. 
+
+In particular, enabling or disabling automated behaviors must never 
+cause the controls to change in a surprising way.
+
+These can be expressed by these rules:
+
+- When a enable switch is on, automated behaviors occur
+- If a button is pressed, then a specific behavior is forced to occur
+- The action that occurs is identical whether an enable switch is
+on or off
+
+
+Digital inputs (switches):
+    
+    Auto distance enable/disable
+    Wheel enable/disable
+    Continuous Feed enable/disable
+    Auto ball handler enable/disable
+    Auto susan enable/disable
+    
+    
+TODO: Fix these
  
 Stick1:
 
@@ -44,14 +69,7 @@ Stick2:
             10/11: manual feeder
     
         
-Digital inputs (switches):
-    
-    Auto distance enable/disable
-    Auto susan enable/disable
-    Auto shoot enable/disable
-    Auto ball handling enable/disable
-    Continuous feeding enable/disable
-        -> perhaps this should be on the dashboard?
+
 
 Outputs: 
     Green LED: 

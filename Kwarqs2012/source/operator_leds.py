@@ -143,7 +143,7 @@ class OperatorLEDs(object):
     
         tm = wpilib.Timer.GetPPCTimestamp()
     
-        if tm % 1.0 > 0.5:
+        if int(tm % 2.0) != 0:
             self.groups[0].Set(None)
             self.groups[1].Set(None)
         else:

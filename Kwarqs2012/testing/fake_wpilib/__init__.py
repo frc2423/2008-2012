@@ -401,21 +401,46 @@ class DriverStationEnhancedIO(object):
         
 class Encoder(object):
 
-    def __init__(self, port1, port2 ):
+    # encoding_type
+    k1X = 1
+    k2X = 2
+    k4X = 3
+
+    # pid_source
+    kDistance = 1
+    kRate = 2
+
+    def __init__(self, port1, port2, reverseDirection=False, encoding_type=k1X ):
         self.value = None
-        
-    def SetPIDSourceParameter(self, thing):
-        pass
-        
-    def kRate(self, rate):
-        pass
-    def SetDistancePerPulse(self, distance):
-        pass
-    def Start(self):
-        self.value = 0
+        self.pid_mode = Encoder.kDistance
+        self.rate = 0 # TODO: calculate this
         
     def Get(self):
         return self.value
+        
+    def GetPeriod(self):
+        return self.period
+        
+    def PIDGet(self):
+        if self.pid_mode == Encoder.kDistance:
+            return self.value
+        else:
+            return self.rate
+            
+    def Reset(self):
+        self.value = 0
+    
+    def SetDistancePerPulse(self, distance):
+        pass
+        
+    def SetPIDSourceParameter(self, pid_source):
+        self.pid_mode = pid_source
+        
+    def Start(self):
+        self.value = 0
+        
+    def Stop(self):
+        pass
 
         
 class Gyro(object):

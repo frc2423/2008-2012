@@ -44,32 +44,33 @@ import os
 from optparse import OptionParser
 import sys
 
-import fake_wpilib as wpilib
 
 testdir_path = os.path.dirname(os.path.abspath(__file__))
 modules_path = os.path.join( testdir_path, 'tests' )
 modules = [ os.path.basename(module[:-3]) for module in glob( os.path.join( modules_path, '*.py' ) ) ]
 
+try:
+    import fake_wpilib as wpilib
+except ImportError:
+    sys.path.append( testdir_path )
+    import fake_wpilib as wpilib
 
-if __name__ == '__main__':
 
-    parser = OptionParser()
+def import_robot( robot_path ):
+
+    # convert \ to / or whatever, depending on the platform
+    robot_path = os.path.abspath( robot_path )
+    sys.path.append( os.path.join( modules_path, robot_path ) )
     
-    parser.add_option(  '--fms',
-                        action='store_true', dest='fms_attached', default=False,
-                        help='Pretend that the robot is on the field' )
-                        
-    (options, args) = parser.parse_args()
-    
-    if len(args) != 1:
-        sys.stderr.write( "You must specify a test module to run. Available test modules:\n" )
-        
-        for module in modules:
-            sys.stderr.write( "  %s\n" % module )
-            
-        sys.stderr.write( '\n' )
+    # setup the robot code
+    import robot
 
-        exit(1)
+    myrobot = wpilib.initialize_robot()
+
+    return (robot, myrobot)
+    
+    
+def run_test( test_module_name ):
     
     test_module_name = args[0]
     
@@ -89,14 +90,8 @@ if __name__ == '__main__':
         sys.stderr.write( "ERROR: the test module '%s' does not have a 'robot_path' global variable\n" % test_module_name )
         exit(1)
     
-    # convert \ to / or whatever, depending on the platform
-    test_module.robot_path = os.path.normpath( test_module.robot_path )
-    sys.path.append( os.path.join( modules_path, test_module.robot_path ) )
+    (robot, myrobot) = import_robot( test_module.robot_path )
     
-    # setup the robot code
-    import robot
-
-    myrobot = wpilib.initialize_robot()
     if myrobot is None:
         sys.stderr.write( "ERROR: the run() function in robot.py MUST return an instance of your robot class\n" )
         exit(1)
@@ -110,7 +105,36 @@ if __name__ == '__main__':
     print( "Test complete." )
     
     
+
+if __name__ == '__main__':
+
+    parser = OptionParser()
     
+    parser.add_option(  '--fms',
+                        action='store_true', dest='fms_attached', default=False,
+                        help='Pretend that the robot is on the field' )
+                        
+    parser.add_option(  '--import',
+                        dest='import_dir', default=None,
+                        help='Import robot.py from a test directory without running' )
+                        
+    (options, args) = parser.parse_args()
+    
+    if len(args) == 1:
+        run_test( args[0] )
+        exit(0)
+        
+    if options.import_dir is not None:
+        import_robot( options.import_dir )
+        print( "Import successful" )
+        exit(0)
+    
+    err = "You must specify a test module to run. Available test modules:\n" 
+    
+    for module in modules:
+        err += "  %s\n" % module
+        
+    parser.error(err)
     
     
 

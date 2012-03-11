@@ -16,6 +16,10 @@ tester.import_robot( os.path.normpath( os.path.dirname(__file__) + 'robot.py' ) 
 print( 'Import successful!' )
 
 
+#
+# Ok, load the installer now
+#
+
 try:
     installer = imp.load_source( 'install', 'C:\\WindRiver\\workspace\\robotpy\\utilities\\installer\\install.py' )
 except IOError, e:

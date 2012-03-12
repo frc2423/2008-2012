@@ -1,53 +1,31 @@
-try:
-    import wpilib
-except ImportError:
-    import fake_wpilib as wpilib
 
 
-class RobotManager(object):
+class BallHandler(object):
     '''
-        This currently implements automated feeding functionality
-        for the robot, and possibly will implement automated
-        shooting as well. Probably.
-        
-        TODO: Perhaps we need a hybrid mode? Where the human tells the 
-        thing when to feed, but once a ball is detected it automatically
-        puts the ball into the chamber? Or something similar.
+        This implements functions to automatically handle the balls on the
+        robot. 
     '''
 
   
-    def __init__(self, chamber, feeder, wheel, susan, vAngle, shooter):
-        
+    def __init__(self, chamber, feeder):
         
         self.chamber = chamber
-     
         self.feeder = feeder
-        
-        self.wheel = wheel
-        self.susan = susan
-        self.vAngle = vAngle
-        self.shooter = shooter
         
         self.disableAuto = True 
     
 
-    '''
-    Calls the shoot function if the bot is ready to shoot
-    '''
-    def ShootIfReady(self):
-        if self.shooter.IsReady() and self.chamber.IsReady():
-            self.chamber.Run()
-        
-    def DisableAutoFeeder(self):
-        self.disableAuto = True
+    
 
 
-    '''
-    Calls functions within the components based on every possible state
-    '''    
+    
     
     def Update(self):
-
+        '''
+            Depending on where balls are, 
+        '''    
+    
+    
         # automated feeding
     
         if not self.disableAuto:
@@ -101,6 +79,5 @@ class RobotManager(object):
         # Update phase
         #
         
-        self.shooter.Update()
         self.chamber.Update()
         self.feeder.Update()

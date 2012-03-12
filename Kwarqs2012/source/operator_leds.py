@@ -141,15 +141,51 @@ class OperatorLEDs(object):
     def InDisabled(self):
         '''Easter egg: Call in disabled mode when there is new data from the DS'''
     
-        tm = wpilib.Timer.GetPPCTimestamp()
+        d0 = None
+        d1 = None
     
-        if (tm % 2.0) < .75:
-            self.groups[0].Set(None)
-            self.groups[1].Set(None)
+        if not hasattr(self, 'timer'):
+            self.timer = wpilib.Timer()
+            self.timer.Start()
+            
+        if self.timer is not None:
+            
+            # hi hi
+            
+            tm = self.timer.Get()
+            
+            if tm > 6.0:
+                self.timer = None
+            elif tm > 5.5:
+                pass
+            elif tm > 4.0:
+                d0 = 14
+                d1 = 14
+            elif tm > 3.0:
+                d0 = None
+                d1 = None
+            elif tm > 2.0:
+                d0 = 14
+                d1 = None
+            elif tm > 1.0:
+                d0 = 14
+                d1 = None
+            else:
+                d0 = None
+                d1 = 14
+            
         else:
-            self.groups[0].Set( (12 + tm/3600.0) % 24.0 )
-            self.groups[1].Set( (tm / 60.0) % 60.0 )
-    
+            # broken clock
+            
+            tm = wpilib.Timer.GetPPCTimestamp()
+        
+            if (tm % 2.0) > .75:
+                d0 = (12 + tm/3600.0) % 24.0 )
+                d1 = (tm / 60.0) % 60.0
+        
+        self.groups[0].Set( d0 )
+        self.groups[0].Set( d1 )
+        
         self.Update()
         
     def GetDigitGroup(self, group):

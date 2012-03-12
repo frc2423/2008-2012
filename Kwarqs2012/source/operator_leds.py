@@ -6,7 +6,7 @@ try:
 except ImportError:
     import fake_wpilib as wpilib
 
-
+import random
     
 
     
@@ -154,25 +154,61 @@ class OperatorLEDs(object):
             
             tm = self.timer.Get()
             
-            if tm > 6.0:
+            # if tm > 6.0:
+                # self.timer = None
+            # elif tm > 5.5:
+                # pass
+            # elif tm > 4.0:
+                # d0 = 14
+                # d1 = 14
+            # elif tm > 3.0:
+                # d0 = None
+                # d1 = None
+            # elif tm > 2.0:
+                # d0 = 14
+                # d1 = None
+            # elif tm > 1.0:
+                # d0 = 14
+                # d1 = None
+            # else:
+                # d0 = None
+                # d1 = 14
+                
+            # 2423 power
+            n = random.randint(0,9999)
+            
+            d0 = n / 100
+            d1 = n % 100
+            
+            if tm > 10.0:
                 self.timer = None
-            elif tm > 5.5:
-                pass
-            elif tm > 4.0:
-                d0 = 14
-                d1 = 14
+            
+            elif tm > 8.5:
+                d0 = 24
+                d1 = 23
+            
+            elif tm > 6.5:
+            
+                if tm % 0.5 > 0.25:
+                    d0 = 24
+                    d1 = 23
+                else:
+                    d0 = None
+                    d1 = None
+            
+            elif tm > 6.0:
+                d0 = 24
+                d1 = 23
+            
+            elif tm > 4.5:
+                d0 = 24
+                d1 = 20 + d1 % 10
+            
             elif tm > 3.0:
-                d0 = None
-                d1 = None
-            elif tm > 2.0:
-                d0 = 14
-                d1 = None
-            elif tm > 1.0:
-                d0 = 14
-                d1 = None
-            else:
-                d0 = None
-                d1 = 14
+                d0 = 24
+            
+            elif tm > 1.5:
+                d0 = 20 + d0 % 10
             
         else:
             # broken clock
@@ -184,7 +220,7 @@ class OperatorLEDs(object):
                 d1 = (tm / 60.0) % 60.0
         
         self.groups[0].Set( d0 )
-        self.groups[0].Set( d1 )
+        self.groups[1].Set( d1 )
         
         self.Update()
         

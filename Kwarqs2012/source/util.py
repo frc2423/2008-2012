@@ -38,3 +38,62 @@ class PrintTimer(object):
             
         return False
         
+
+class ConsoleLED(object):
+    '''
+        This implements primitives to control an LED on the driver
+        station. 
+        
+        At the end of every control loop, you must call Update() to actually
+        set the LED on the driver station
+    '''
+        
+    def __init__(self, port, enhanced_io=True):
+        '''
+            port is the port on the driver station to set
+            if enhanced_io is True then it will used enhanced I/O
+        '''
+        
+        self.port = port
+        self.value = False
+        
+        # none if no blink, otherwise its the blink period
+        self.blink = None       
+        self.blink_timer = wpilib.Timer()
+        
+        ds = wpilib.DriverStation.GetInstance()
+        
+        if enhanced_io:
+            eio = ds.GetEnhancedIO()
+            eio.SetDigitalConfig( self.port, wpilib.DriverStationEnhancedIO.kOutput )
+            self.set_fn = eio.SetDigitalOutput
+        else:
+            self.set_fn = ds.SetDigitalOut
+        
+        
+    def Blink(self, period=0.25):
+        '''Blinks an LED with the specified period in seconds'''
+        if self.blink is not None:
+            self.blink_timer.Reset()
+            
+        self.blink = period / 2.0
+        self.value = not self.value
+        
+    def TurnOn(self):
+        self.Set(True)
+        
+    def TurnOff(self):
+        self.Set(False)
+        
+    def Set(self, value):
+        self.blink = None
+        self.value = True
+        
+    def Update(self):
+    
+        if self.blink is not None:
+            if self.blink_timer.HasPeriodPassed( self.blink ):
+                self.value = not self.value
+        
+        self.set_fn( self.port, self.value )
+        

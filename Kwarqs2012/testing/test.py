@@ -60,7 +60,7 @@ def import_robot( robot_path ):
 
     # convert \ to / or whatever, depending on the platform
     robot_path = os.path.abspath( robot_path )
-    sys.path.append( os.path.join( modules_path, robot_path ) )
+    sys.path.append( robot_path )
     
     # setup the robot code
     import robot
@@ -90,7 +90,7 @@ def run_test( test_module_name ):
         sys.stderr.write( "ERROR: the test module '%s' does not have a 'robot_path' global variable\n" % test_module_name )
         exit(1)
     
-    (robot, myrobot) = import_robot( test_module.robot_path )
+    (robot, myrobot) = import_robot( os.path.join( modules_path, test_module.robot_path ) )
     
     if myrobot is None:
         sys.stderr.write( "ERROR: the run() function in robot.py MUST return an instance of your robot class\n" )

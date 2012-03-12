@@ -16,11 +16,15 @@ on or off
 
 Digital inputs (switches):
     
-    Auto distance enable/disable
+    Camera:
+    
+        Auto distance enable/disable
+        Auto susan enable/disable
+        
     Wheel enable/disable
     Continuous Feed enable/disable
     Auto ball handler enable/disable
-    Auto susan enable/disable
+    
     
     
 TODO: Fix these
@@ -38,35 +42,24 @@ Stick1:
 Stick2:
 
     Shooter:
-        Automated:
-            Trigger: fire ball (move ball from chamber)
+        Trigger: fire ball (move ball from chamber)
+            if auto ball handler or wheel is on:
+            wait until wheel is correct speed before moving
             
-        Manual:
-            Trigger: activate wheel
-            Z axis: manual wheel speed
-        
-            6: move ball from chamber into shooter
+        if wheel enabled:
+            Z axis: set manual wheel speed
             
-    
     Susan:
-        Automated:
-            None
-    
-        Manual:
-            Top button: activate manual lazy susan
+        if Top button:
             X axis: turn lazy susan
                 
             
     Ball Handling:
-        Continuous feeding:
-            None
-    
-        Automated:
-            10/11: activate feeding
         
-        Manual:
-            6/7: manual chamber 
-            10/11: manual feeder
+        6/7: manual chamber 
+        10/11: manual feeder
+            -- continues for 1 second if auto ball handler is on, to catch
+            any balls that might have been collected
     
         
 

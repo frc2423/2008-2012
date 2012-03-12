@@ -64,13 +64,13 @@ server.delete_remote(           '/py/components/shooter/__pycache__' )
 
 
 # upload the files
+# -> local root, remote file name
 files = [
-    'robot.py',
-    'util.py'
+    ( local_root, 'robot.py' )
 ]
 
 for file in files:
-    server.upload_file( remote_root, local_root, file )
+    server.upload_file( remote_root, file[0], file[1] )
 
 print( 'Upload complete' )
 

@@ -18,7 +18,7 @@ except ImportError:
 
 
 
-MANUAL_LEDS = True
+MANUAL_LEDS = False
 
 stick1 = wpilib.Joystick(1)
     
@@ -32,6 +32,9 @@ class MyRobot(wpilib.SimpleRobot):
         self.ds = wpilib.DriverStation.GetInstance()
         
         self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
+        self.eio = wpilib.DriverStation.GetInstance().GetEnhancedIO()
+        
+        self.eio.SetDigitalConfig( 10, wpilib.DriverStationEnhancedIO.kOutput )
         
         if MANUAL_LEDS:
             self.sd.PutBoolean( "Enable 1", False ) 
@@ -47,7 +50,7 @@ class MyRobot(wpilib.SimpleRobot):
             self.sd.PutBoolean( "D1 - 2", False )
             self.sd.PutBoolean( "D1 - 3", False )
             
-            self.eio = wpilib.DriverStation.GetInstance().GetEnhancedIO()
+            
             
             self.eio.SetDigitalConfig( OperatorLEDs.G_EN[0], wpilib.DriverStationEnhancedIO.kOutput )
             self.eio.SetDigitalConfig( OperatorLEDs.G_EN[1], wpilib.DriverStationEnhancedIO.kOutput )
@@ -63,10 +66,21 @@ class MyRobot(wpilib.SimpleRobot):
             self.eio.SetDigitalConfig( OperatorLEDs.D1[3], wpilib.DriverStationEnhancedIO.kOutput )
         
         else:
+            self.operator_leds = OperatorLEDs()
             self.sd.PutInt( "Digit1", 0 )
             self.sd.PutInt( "Digit2", 99 )
             
+        self.sd.PutBoolean( "LED", False )
+            
+    def Disabled(self):
         
+        print("MyRobot::Disabled()")
+    
+        while self.IsDisabled():
+            if MANUAL_LEDS == False and self.ds.IsNewControlData():
+                self.operator_leds.InDisabled()
+                
+            wpilib.Wait(0.01)
         
     
     def OperatorControl(self):
@@ -78,9 +92,8 @@ class MyRobot(wpilib.SimpleRobot):
         timer.Start()
         
         if not MANUAL_LEDS:
-            leds = OperatorLEDs()
-            digit1 = leds.GetDigitGroup(1)
-            digit2 = leds.GetDigitGroup(2)
+            digit1 = self.operator_leds.GetDigitGroup(1)
+            digit2 = self.operator_leds.GetDigitGroup(2)
         
         while self.IsOperatorControl() and self.IsEnabled():
 
@@ -106,7 +119,9 @@ class MyRobot(wpilib.SimpleRobot):
                 digit2.Set( d2 )
                 
                 if self.ds.IsNewControlData():
-                    leds.Update()
+                    self.operator_leds.Update()
+            
+            self.eio.SetDigitalOutput( 10, self.sd.GetBoolean( "LED" ) )
             
             wpilib.Wait( 0.05 )
     

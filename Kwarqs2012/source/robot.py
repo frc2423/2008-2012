@@ -26,6 +26,9 @@ except ImportError:
 from robot_manager import RobotManager   
 from util import PrintTimer
 
+from controls import *
+
+
 #
 # Import all components here
 #
@@ -67,11 +70,6 @@ angleCAN        = 4
 rampArmCAN      = 5
 susanCAN        = 6
 
-# driver station inputs
-
-# driver station outputs
-
-
 #
 # Create instances of all components here
 #
@@ -97,9 +95,6 @@ drive = wpilib.RobotDrive(l_driveMotor, r_driveMotor)
 # TODO: Figure out why this thing is broken.. 
 drive.SetSafetyEnabled( False )
 
-# joysticks
-stick1 = wpilib.Joystick(1)
-stick2 = wpilib.Joystick(2)
 
 
 
@@ -237,77 +232,140 @@ class MyRobot(wpilib.SimpleRobot):
             
             dog.Feed()
             
-            #
-            # TODO: Fix controls to match descriptions in controls.txt ...
-            #
+            # get the joystick buttons and axis here, so
+            # that we have a consistent state the entire time
+            
+            j1_x
+            j1_y
+            j1_z
+            j1_b
+            
+            j2_x
+            j2_y
+            j2_z = self.ds.
+            j2_b
+            
+            
             
             
             drive.ArcadeDrive(stick1.GetY(), stick1.GetX())
-            '''            
-            if robotManager.angleState == robotManager.ManualAngle: # my way of manually controlling the ball angle and  the susan
-                
-                susanMotor.Set( stick2.GetX() )
-                angleMotor.Set( stick2.GetY() )
-            '''           
+           
+            ###############################################
+            # state 
+            ###############################################
+           
+            auto_shooter = SwitchOn( AUTOSHOOTER_ENABLE_SWITCH )
             
             
-            # makes the arm go down --- when button not pressed, the arm makes its ascent back up
-            if stick1.GetTop(): 
-                rampArm.Extend()
+            ###############################################
+            # RampArm
+            ###############################################
             
-            # if stick1.GetTrigger(): #this is to fire the ball
-                # robotManager.ShootIfReady()
-                                    
-            if driveStation.GetDigitalIn(2): # to manually run the chamber/feeder
-                robotManager.DisableAutoFeeder()
+           
+            ###############################################
+            # Shooter
+            ###############################################
+           
+            try:
+                if auto_shooter:
+                    
+                    # notional, not sure if this is how to do this
+                    shooter.AutoShoot()
                 
-                if stick2.GetRawButton(6):
-                    feeder.Feed()
-                elif stick2.GetRawButton(7):
-                    feeder.Stop()
+                    if StickButtonPressed( AUTOSHOOTER_FIRE_BUTTON ):
+                        shooter.Fire()
                     
-            # if driveStation.GetDigitalIn(3): #to manually shoot the ball
-                # if shooter.autoWheel:
-                    # shooter.ToggleAutoWheel()
-            # else:
-                # if not shooter.autoWheel:
-                    # shooter.ToggleAutoWheel()
+                else:
                     
-            # if driveStation.GetDigitalIn(4): #to manually aim both the angle 
-                # if shooter.autoAngle:
-                    # shooter.ToggleAutoAngle()
-            # else:
-                # if not shooter.autoAngle:
-                    # shooter.ToggleAutoAngle()
+                    # manual shooter operation
                     
-            if driveStation.GetDigitalIn(5): #manually run susan
-                susan.SetVBus(stick2.GetX())
- 
+                    if StickButtonPressed( SHOOTER_WHEEL_BUTTON ):
+                    
+                        z = GetJoystickAxis( SHOOTER_WHEEL_AXIS )
+                        z = ((z * -1.0) + 1.0) / 2.0
+                    
+                        shooter.SpinWheel( z )
+                        
+                        
+                    if StickButtonPressed( BALL_HANDLER_
+                        
+                        ball_handler.FeedShooter()
+                    
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
+           
+           
+            ###############################################
+            # Susan
+            ###############################################
+           
+            try:
             
+                if StickButtonPressed( SUSAN_TURN_BUTTON ):
+                    susan.Turn( GetJoystickAxis( SUSAN_TURN_AXIS ) )
+                
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
+            
+            
+            ###############################################
+            # Ball handler
+            ###############################################
+           
+            #
+            # TODO: this is a bit disjoint, there is some overlap
+            # here that this model is missing... 
+            #
+           
+            try:
+                if SwitchOn( BALL_HANDLER_CONTINUOUS ):
                     
-            # if not shooter.autoAngle:
-                # vAngle.Set(_translate_z_to_angle_motor_position(stick2.GetZ())
-                
-            # if not shooter.autoWheel:
-                # if stick1.GetTrigger():
-                    # ''' makes sure to only spin forwards'''
-                    # vBus = (stick1.GetZ() + 1)/2 
-                    # wheel.SetVBus(vBus)
-                
-            # if not RobotManager.chamberFeederAuto:
-                # if stick2.GetRawButton(6):
-                    # chamber.Run()
-                # if stick2.GetRawButton(7):
-                    # feeder.Feed()
-            #if stick
-            #this prints values so we know what's going on
-            if stick1.GetRawButton(8) and self.print_timer.should_print():
-                feeder.Print()
-                print("")
-                chamber.Print()
+                if SwitchOn( BALL_HANDLER_AUTOMATED ):
+                    
+                    if 
+                    
+                else:
+                    # complete manual control over ball handling
+                    
+                    if StickButtonsPressed( BALL_HANDLER_MANUAL_CHAMBER_UP_BUTTONS ):
+                        chamber.RunBeltUp()
+                        
+                    elif StickButtonsPressed( BALL_HANDLER_MANUAL_CHAMBER_DOWN_BUTTONS ):
+                        chamber.RunBeltDown()
+                    
+                    
+                    if StickButtonsPressed( BALL_HANDLER_MANUAL_FEEDER_FEED_BUTTONS ):
+                        feeder.Feed()
+                        
+                    elif StickButtonsPressed( BALL_HANDLER_MANUAL_FEEDER_EXPEL_BUTTONS ):
+                        feeder.Expel()
+                    
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
+           
+           
+            ###############################################
+            # Debug support
+            ###############################################
+           
+            
+            # don't enable debug output on the field, you can't
+            # see it there anyways
+            if not self.ds.IsFMSAttached():
+            
+                if StickButtonPressed( DEBUG_BUTTON ) and self.print_timer.should_print():
+                    feeder.Print()
+                    print("")
+                    chamber.Print()
+            
     
+            ###############################################
+            # Update phase
+            ###############################################
     
-            # update phase
             self._Update()
             
             # wait for more user input

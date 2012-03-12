@@ -35,7 +35,7 @@
                 -> Chamber.IsFull()
         
             CollectBalls()
-            ShootBall()
+            FeedShooter()
                 -> needs to continue until ball was shot, can't stop
         
             NumberOfBalls()

@@ -180,7 +180,7 @@ class OperatorLEDs(object):
             tm = wpilib.Timer.GetPPCTimestamp()
         
             if (tm % 2.0) > .75:
-                d0 = (12 + tm/3600.0) % 24.0 )
+                d0 = (12 + tm/3600.0) % 24.0
                 d1 = (tm / 60.0) % 60.0
         
         self.groups[0].Set( d0 )

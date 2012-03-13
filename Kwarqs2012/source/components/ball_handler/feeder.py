@@ -4,7 +4,7 @@ try:
 except ImportError:
     import fake_wpilib as wpilib
 
-from .irsensor import IRSensor
+from components.ir_sensor import IRSensor
 
 
 class Feeder(object):

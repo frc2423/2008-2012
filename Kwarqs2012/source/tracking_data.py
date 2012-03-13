@@ -28,36 +28,32 @@ trackingDataTable = NetworkTable.GetTable(kTableName)
 
 class TrackingData(object):
     
-    def __init__(self):
-        ''' Constructor '''
-        ''' Initialize all variables used by robot from the vision system '''
-        
-        ''' doubles '''   
-        self.distance = 0.0
-        self.sonar_distance = 0.0
-        self.angle_susan = 0.0
-        
-        ''' ints '''  
-        self.x = 0
-        self.y = 0
-        self.valid_frames = 0
-        
-        ''' booleans '''
-        self.target_data_valid = False
+    ''' doubles '''   
+    distance = 0.0
+    sonar_distance = 0.0
+    angle_susan = 0.0
+    
+    ''' ints '''  
+    x = 0
+    y = 0
+    valid_frames = 0
+    
+    ''' booleans '''
+    target_data_valid = False
         
     def Update(self):
         ''' Updates Values from the Network Table '''
         
         ''' doubles '''  
-        self.distance = trackingDataTable.GetDouble(kDistance)
-        self.sonar_distance = trackingDataTable.GetDouble(kSonarDistance)
-        self.angle_susan = trackingDataTable.GetDouble(kAngleSusan)
+        TrackingData.distance = trackingDataTable.GetDouble(kDistance)
+        TrackingData.sonar_distance = trackingDataTable.GetDouble(kSonarDistance)
+        TrackingData.angle_susan = trackingDataTable.GetDouble(kAngleSusan)
         
         ''' ints '''
-        self.x = trackingDataTable.GetInt(kX)
-        self.y = trackingDataTable.GetInt(kY)
-        self.valid_frames = trackingDataTable.GetInt(kValidFrames)
+        TrackingData.x = trackingDataTable.GetInt(kX)
+        TrackingData.y = trackingDataTable.GetInt(kY)
+        TrackingData.valid_frames = trackingDataTable.GetInt(kValidFrames)
         
         ''' booleans '''
-        self.target_data_valid = trackingDataTable.GetBoolean(kTargetDataValid)
+        TrackingData.target_data_valid = trackingDataTable.GetBoolean(kTargetDataValid)
         

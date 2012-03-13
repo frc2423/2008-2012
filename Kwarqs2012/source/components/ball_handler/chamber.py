@@ -5,10 +5,10 @@ try:
 except ImportError:
     import fake_wpilib as wpilib
 
-from .irsensor import IRSensor
+from components.ir_sensor import IRSensor
 
 
-class Chamber (object):
+class Chamber(object):
     '''
         The chamber is located on the top part of the robot. It has a belt
         and an IR sensor. 

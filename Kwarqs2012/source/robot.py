@@ -33,11 +33,11 @@ from controls import *
 # Import all components here
 #
 
-from components.chamber import Chamber
-from components.feeder import Feeder
+from components.ball_handler.chamber import Chamber
+from components.ball_handler.feeder import Feeder
 from components.shooter import Shooter
-from components.shooter.shooter_susan import Susan
-from components.shooter.shooter_wheel import Wheel 
+from components.shooter.susan import Susan
+from components.shooter.wheel import Wheel 
 from components.ramp_arm import RampArm
 
 #
@@ -80,7 +80,7 @@ feeder = Feeder(feeder_pwm_ch, botFeedSwitch, topFeedIRSens)
 
 wheel = Wheel(shootWheelCAN1, shootWheelCAN2, wheelEncoder)
 susan = Susan(susanCAN, susanGyro, bodyGyro)
-shooter = Shooter(vAngle, susan, wheel)
+shooter = Shooter(susan, wheel)
 
 rampArm = RampArm(rampArmCAN)
 

@@ -38,12 +38,19 @@ class AutonomousModeManager(object):
         
         # load all modules in the current directory
         modules_path = os.path.dirname(os.path.abspath(__file__))
-        modules = glob( os.path.join( modules_path, '*.py' ) )
+        #modules = glob( os.path.join( modules_path, '*.py' ) )
+        modules = []
         
         for module_filename in modules:
+            
+            module_name = os.path.basename(module_filename[:-3])
+            
+            if module_name == '__init__':
+                continue
+        
             try:
-                module_name = os.path.basename(module_filename[:-3])
-                module = imp.load_source( module_name, module_filename )
+                __import__( module_name )
+                #module = imp.load_source( module_name, module_filename )
             except:
                 if not self.ds.IsFMSAttached():
                     raise

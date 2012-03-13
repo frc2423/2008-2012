@@ -21,13 +21,10 @@ Digital inputs (switches):
         Auto distance enable/disable
         Auto susan enable/disable
         
-    Wheel enable/disable
+    Manual Wheel enable/disable
     Continuous Feed enable/disable
     Auto ball handler enable/disable
     
-    
-    
-TODO: Fix these
  
 Stick1:
 
@@ -43,7 +40,6 @@ Stick2:
 
     Shooter:
         Trigger: fire ball (move ball from chamber)
-            if auto ball handler or wheel is on:
             wait until wheel is correct speed before moving
             
         if wheel enabled:

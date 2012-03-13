@@ -29,15 +29,6 @@ Class Hiearchy:
     operator_leds
     util
 
-    RobotManager?
-    
-        EnableAutoSusan
-        EnableAutoDistance
-        DisableAutoSusan
-        DisableAutoDistance
-        
-        if auto... blah blah blah?
-
     autonomous:
         
         -> setup shiny autonomous framework, easy integration
@@ -78,7 +69,7 @@ Class Hiearchy:
                 Stop()
                 Expel()
                 IsFull()
-				IsEmpty()
+                IsEmpty()
                 HasTopBall()
             
             Chamber:

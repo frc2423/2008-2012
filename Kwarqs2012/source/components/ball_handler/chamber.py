@@ -5,7 +5,7 @@ try:
 except ImportError:
     import fake_wpilib as wpilib
 
-from ..irsensor import IRSensor
+from ..ir_sensor import IRSensor
 
 
 

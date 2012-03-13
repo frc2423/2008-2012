@@ -4,7 +4,7 @@ try:
 except ImportError:
     import fake_wpilib as wpilib
 
-from ..irsensor import IRSensor
+from ..ir_sensor import IRSensor
 
 
 
@@ -54,7 +54,7 @@ class Feeder(object):
     def HasBottomBall(self):
         '''Returns True if the bottom ball is present'''
     
-        return self.bottom_ball_sensor.IsBallPresent()
+        return self.bottom_ball_sensor.Get()
       
     def IsFull(self):
         '''Returns True if two balls are detected in the feeder'''

@@ -35,6 +35,11 @@ class BallHandler(object):
         '''Returns True if there is a ball in position ready to shoot'''
         return self.chamber.IsFull()
         
+    def ShootBall(self):
+        '''Call this to cause the ball to be shot'''
+        self.chamber.Run()
+        
+        
     def Update(self):
         '''
             Depending on where balls are, 
@@ -100,9 +105,3 @@ class BallHandler(object):
         self.auto_feed = False
         self.continuous_feed = False
         
-        #
-        # Update phase
-        #
-        
-        self.chamber.Update()
-        self.feeder.Update()

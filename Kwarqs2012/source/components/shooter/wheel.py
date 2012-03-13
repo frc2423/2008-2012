@@ -127,6 +127,9 @@ class Wheel(object):
         
         return self.pid_controller.OnTarget()
         
+    def IsSet(self):
+        return self.auto_speed is not None or self.vBus is not None
+        
     
     def SetAutoSpeed(self, speed):
         '''This is a value between 0.0 and 99.0 indicating the desired speed

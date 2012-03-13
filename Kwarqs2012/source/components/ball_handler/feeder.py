@@ -4,7 +4,8 @@ try:
 except ImportError:
     import fake_wpilib as wpilib
 
-from components.ir_sensor import IRSensor
+from ..irsensor import IRSensor
+
 
 
 class Feeder(object):
@@ -19,16 +20,16 @@ class Feeder(object):
     BELT_DOWN   = 1.0   # expel ball from robot
     BELT_STOP   = 0     # stop feeder belt
     
-    def __init__(self, feederJag, low_ball_sensor, top_ball_sensor):
+    def __init__(self, feederJag, bottom_ball_sensor, top_ball_sensor):
         
         # belt motor
         self.belt_motor = wpilib.Jaguar(feederJag)
 
         # sensors
         self.top_ball_sensor = IRSensor(top_ball_sensor, 1.2)
-        self.low_ball_sensor = wpilib.DigitalInput( low_ball_sensor )
+        self.bottom_ball_sensor = wpilib.DigitalInput( bottom_ball_sensor )
         
-        self.direction = Feeder.BELT_STOP
+        self.direction = None
         
     
     def Feed(self):
@@ -43,27 +44,46 @@ class Feeder(object):
     def Expel(self):
         '''Pushes balls out of the feeder'''
         self.direction = Feeder.BELT_DOWN
-        
-    def IsFull(self):
-        '''Returns True if two balls are detected in the feeder'''
-        
-        if self.low_ball_sensor.Get() == True and self.top_ball_sensor.IsBallPresent() == True:
-            return True
-        return False
-        
+    
+    
     def HasTopBall(self):
         '''Returns True if the top ball is present'''
     
         return self.top_ball_sensor.IsBallPresent()
         
+    def HasBottomBall(self):
+        '''Returns True if the bottom ball is present'''
+    
+        return self.bottom_ball_sensor.IsBallPresent()
+      
+    def IsFull(self):
+        '''Returns True if two balls are detected in the feeder'''
+        
+        if self.bottom_ball_sensor.Get() == True and self.top_ball_sensor.IsBallPresent() == True:
+            return True
+        return False
+      
+    def IsSet(self):
+        '''Returns True if someone has called Feed/Stop/Expel since the
+           last time that Update() was called'''
+        return self.direction is not None
+    
+        
     def Print(self):
-            print("Feeder:")
-            print("  IRSensor: %s; Is Ball Set: %s" % ( self.top_ball_sensor.GetVoltage(), self.top_ball_sensor.IsBallPresent() ))
-            print("  Is full:  %s; HasTopBall: %s" % ( self.IsFull(), self.HasTopBall() ))
+        print("Feeder:")
+        print("  IRSensor: %s; Is Ball Set: %s" % ( self.top_ball_sensor.GetVoltage(), self.top_ball_sensor.IsBallPresent() ))
+        print("  Is full:  %s; HasTopBall: %s" % ( self.IsFull(), self.HasTopBall() ))
 
     def Update(self):
     
-        self.belt_motor.Set(self.direction)
-        self.direction = Feeder.BELT_STOP
+        direction = self.direction
+    
+        if direction is None:
+            direction = Feeder.BELT_STOP
+        
+        self.belt_motor.Set(direction)
+        
+        # reset state
+        self.direction = None
         
     

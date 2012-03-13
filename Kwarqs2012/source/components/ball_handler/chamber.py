@@ -5,7 +5,8 @@ try:
 except ImportError:
     import fake_wpilib as wpilib
 
-from components.ir_sensor import IRSensor
+from ..irsensor import IRSensor
+
 
 
 class Chamber(object):
@@ -31,8 +32,12 @@ class Chamber(object):
         self.belt_motor = wpilib.Relay(chamberRelay)
         self.ball_sensor = IRSensor(chambIRSens, 2.0)
         
-        self.belt_state = Chamber.BELT_OFF
+        self.direction = None
     
+    def IsSet(self):
+        '''Returns True if someone has called Run/Remove since the
+           last time that Update() was called'''
+        return self.direction is not None
     
     def IsFull( self ):
         '''Returns True if there is a ball present in the chamber'''
@@ -41,16 +46,16 @@ class Chamber(object):
     def Run( self ):
         '''Runs the belt motor to either bring balls into the chamber
            or expel them and move them into the shooter.'''
-        self.belt_state = Chamber.BELT_UP
+        self.direction = Chamber.BELT_UP
         
     def Remove(self):
         '''Runs the belt motor to remove balls from the chamber
            back into the feeder'''
-        self.belt_state = Chamber.BELT_DOWN
+        self.direction = Chamber.BELT_DOWN
     
     def Stop( self ):
         '''Stops the belt motor'''
-        self.belt_state = Chamber.BELT_OFF
+        self.direction = Chamber.BELT_OFF
         
     def Print( self ):
         print("Chamber:")
@@ -58,7 +63,13 @@ class Chamber(object):
     
     def Update( self ):
         
-        self.belt_motor.Set( self.belt_state )
-        self.belt_state = Chamber.BELT_OFF
+        direction = self.direction
+        if direction is None:
+            direction = Chamber.BELT_OFF
+        
+        self.belt_motor.Set( direction )
+        
+        # reset state
+        self.direction = None
 
         

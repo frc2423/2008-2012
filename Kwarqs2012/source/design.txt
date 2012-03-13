@@ -1,4 +1,28 @@
 
+General Design Interface for each class:
+
+    Setter functions:
+        These must be called every time around the main control loop,
+        otherwise the default action for the class will be taken. Which
+        should mean it turns motors off, etc. 
+
+    IsSet():
+        -> only low level classes support this!
+    
+        returns True if an operator manually set the thing already. This is
+        so that automated processes don't step on what the user wants to do
+        unless they have to do it.
+
+    Update():
+        Sets motor values and makes complex decisions
+        After done, resets the various setter variables to nothing,
+        so that the default action is taken if the user doesn't do
+        anything.
+        
+
+Class Hiearchy: 
+
+
     robot
         OperatorControl()
     
@@ -25,11 +49,18 @@
         
         
     components:
+    
+        RobotManager:
+        
+            FireWhenReady()
+            TrackTarget()
+    
         
         RampArm:
             Extend()
             
         BallHandler:
+            -> Owns feeder, chamber
         
             IsReadyToShoot()
                 -> Chamber.IsFull()
@@ -73,7 +104,7 @@
             
                 - Need gyro based and non-gyro based automated solutions
             
-            ShootingWheel:
+            Wheel:
                 
                 IsReady()
                 SetSpeed()

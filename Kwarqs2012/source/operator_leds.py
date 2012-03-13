@@ -25,6 +25,10 @@ class OperatorLEDs(object):
             2: disable x
             3: enable y, set digits
             4: disable y
+            
+        Our implementation optimizes this by detecting if a digit
+        requires an update, and if it does not require an update then
+        no update is performed.
         
     '''
     

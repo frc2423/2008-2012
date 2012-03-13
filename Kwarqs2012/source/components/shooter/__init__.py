@@ -1,12 +1,6 @@
-from components.shooter.shooter_angle import VerticalAngle
-from components.shooter.shooter_susan import Susan
-from components.shooter.shooter_wheel import Wheel 
+from components.shooter.susan import Susan
+from components.shooter.wheel import Wheel  
 
-
-#try:
-#    import basket_tracker 
-#except ImportError:
-#    import fake_basket_tracker as basket_tracker
 try:
     import wpilib
 except ImportError:
@@ -27,16 +21,10 @@ class Shooter(object):
         self.wheel = wheel
         #new
         
-        #self.basket_tracker = basket_tracker.BasketTracker()
         self.autoSusan = False
         self.autoAngle = False
         self.autoWheel = False
         
-
-        
-    #cameraData.Get() - Not sure what exactly do do with this since I'm not familiar with how 
-    #    the data returns
-    
     
     def IsShooting(self):
         # TODO
@@ -51,9 +39,9 @@ class Shooter(object):
 
             
     ''' Checks if component is in auto mode and if we are validaly shooting'''
-    def AutoAndValid(self, component, trackingData):
+    def AutoAndValid(self, componentAuto, trackingData):
         valid = True
-        if not component:
+        if not componentAuto:
             valid = False
         if not self.susan.PointingCorrectly():
             valid = False

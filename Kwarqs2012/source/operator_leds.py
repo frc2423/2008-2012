@@ -180,14 +180,18 @@ class OperatorLEDs(object):
             d0 = n / 100
             d1 = n % 100
             
-            if tm > 10.0:
+            if tm > 12.0:
                 self.timer = None
+                
+            elif tm > 11.0:
+                d0 = None
+                d1 = None
             
-            elif tm > 8.5:
+            elif tm > 9.0:
                 d0 = 24
                 d1 = 23
             
-            elif tm > 6.5:
+            elif tm > 7.0:
             
                 if tm % 0.5 > 0.25:
                     d0 = 24
@@ -196,18 +200,18 @@ class OperatorLEDs(object):
                     d0 = None
                     d1 = None
             
-            elif tm > 6.0:
+            elif tm > 6.5:
                 d0 = 24
                 d1 = 23
             
-            elif tm > 4.5:
+            elif tm > 5.0:
                 d0 = 24
                 d1 = 20 + d1 % 10
             
-            elif tm > 3.0:
+            elif tm > 3.5:
                 d0 = 24
             
-            elif tm > 1.5:
+            elif tm > 2.0:
                 d0 = 20 + d0 % 10
             
         else:

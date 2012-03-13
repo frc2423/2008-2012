@@ -359,6 +359,12 @@ class DriverStation(object):
     def GetEnhancedIO(self):
         return self.enhanced_io
     
+    def GetStickAxis(self, stick, axis):
+        return 0
+        
+    def GetStickButtons(self, stick):
+        return 0xff
+    
     def IsFMSAttached(self):
         return self.fms_attached 
         
@@ -479,6 +485,14 @@ class Joystick(object):
     
     kTriggerButton = 0
     kTopButton = 1
+    
+    kDefaultXAxis = 1
+    kDefaultYAxis = 2
+    kDefaultZAxis = 3
+    kDefaultTwistAxis = 4
+    kDefaultThrottleAxis = 3
+    kDefaultTriggerButton = 1
+    kDefaultTopButton = 2
     
     def __init__(self, port):
         self.x = 0.0

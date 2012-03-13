@@ -1,24 +1,30 @@
-'''
-    Vision System Tests
 
-'''
-
-# print something out so we know what code is running
-print( "Loading: Kwarqs2012 Vision program" )
 
 try:
     import wpilib
-except ImportError:
-    import fake_wpilib as wpilib
-
+    from wpilib.NetworkTables import NetworkTable
+    from wpilib.NetworkTables import NetworkTableChangeListener
     
-class MyRobot(wpilib.SimpleRobot):
+except ImportError:
 
+    import fake_wpilib as wpilib
+   
+class MyRobot(wpilib.SimpleRobot):
+    
+    kTableName = "TrackingData"
+    kDistance = "distance"
+    kSonarDistance = "sonar_distance"
+    kAngleSusan = "angle_susan"
+    
     def __init__(self):
         '''Constructor'''
         
-
-            
+        wpilib.SimpleRobot.__init__(self)
+        self.table = NetworkTable.GetTable(MyRobot.kTableName)
+        self.distance = 0.0
+        self.sonar = 0.0
+        self.angle = 0.0
+     
     def RobotInit(self):
         '''Called only once during robot initialization'''
         pass
@@ -40,31 +46,28 @@ class MyRobot(wpilib.SimpleRobot):
         while self.IsAutonomous() and self.IsEnabled():
             wpilib.Wait(0.01)
             
-            
+    
     def OperatorControl(self):
         '''Called during Teleoperated Mode'''
     
         print("MyRobot::OperatorControl()")
-        self.table = NetworkTable()
-        
-        self.table = self.table.GetSubTable("TrackingData")
-        
-        dog = self.GetWatchdog()
-        dog.SetEnabled(True)
-        dog.SetExpiration(0.25)
         
         timer = wpilib.Timer()
         timer.Start()
-
-        # main loop
-        while self.IsOperatorControl() and self.IsEnabled():
-            
-            dog.Feed()
         
-            distance = self.table.GetDouble("distance")
-            
-            if timer.HasPeriodPassed(1.0):
-                print("Distance is : " + str(distance))
+        while self.IsOperatorControl() and self.IsEnabled():
+            '''Begin transaction, get all data'''
+            self.table.BeginTransaction()
+            self.distance = self.table.GetDouble(MyRobot.kDistance)
+            self.sonar = self.table.GetDouble(MyRobot.kSonarDistance)
+            self.angle = self.table.GetDouble(MyRobot.kAngleSusan)
+            print("The distance is: " + str(self.distance))
+            print("The sonar distance is: " + str(self.sonar))
+            print("The angle susan is:" + str(self.angle))
+            self.table.EndTransaction()
+            wpilib.Wait( 0.05 )
+        
+        pass
 def run():
     '''This function must be present for the robot to start'''
     robot = MyRobot()
@@ -72,6 +75,3 @@ def run():
     
     # must return a value to work with the tester program
     return robot
-
-
-

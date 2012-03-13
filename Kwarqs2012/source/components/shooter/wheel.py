@@ -117,7 +117,7 @@ class Wheel(object):
         # SmartDashboard stuff
         
         sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
-        sd.PutData( "Wheel PID", self.pid )
+        sd.PutData( "Wheel PID", self.pid_controller )
 
     
     def IsReady(self):

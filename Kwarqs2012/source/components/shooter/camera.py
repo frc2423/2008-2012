@@ -45,7 +45,7 @@ class Camera(object):
         # TODO
         return True
     
-    def SetCameraAngle(self, angle):
+    def SetAngle(self, angle):
         '''Manually point the camera somewhere'''
         self.camera_angle = angle
     

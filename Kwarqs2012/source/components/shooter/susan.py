@@ -96,7 +96,11 @@ class Susan(object):
         
     def SetVBus(self, value):
         '''Manually control the susan. value is [-1,1]'''
-        self.vBus = vBus
+        self.vBus = value
+        
+    # TODO: Add a way for the user to adjust the angle, then hold it using the
+    # gyro. This allows us to avoid the susan vibrating off its setpoint.
+    # ... maybe
         
     
     def PointingCorrectly(self):

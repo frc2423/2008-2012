@@ -340,6 +340,16 @@ class DigitalOutput(object):
 
 class DriverStation(object):
     
+    kBatteryModuleNumber = 1
+    kBatteryChannel = 8
+    kJoystickPorts = 4
+    kJoystickAxes = 6
+    
+    # Alliance
+    kRed = 0
+    kBlue = 1
+    kInvalid = 2
+    
     instance = None
     
     @staticmethod
@@ -352,6 +362,24 @@ class DriverStation(object):
         self.digital_in = [ False, False, False, False, False, False, False, False ]
         self.fms_attached = False
         self.enhanced_io = DriverStationEnhancedIO()
+        self.alliance = DriverStation.kInvalid
+        
+        # arrays of [port][axis/button]
+        self.sticks = []
+        self.stick_buttons = []
+        
+        for i in range(0, DriverStation.kJoystickPorts):
+            axes = []
+            buttons = []
+            for j in range(0, DriverStation.kJoystickAxes):
+                axes.append(0.0)
+                buttons.append(False)
+                
+            self.sticks.append(axes)
+            self.stick_buttons.append(buttons)
+    
+    def GetAlliance(self):
+        return self.alliance
     
     def GetDigitalIn(self, number):
         return self.digital_in[number-1]
@@ -360,10 +388,17 @@ class DriverStation(object):
         return self.enhanced_io
     
     def GetStickAxis(self, stick, axis):
-        return 0
+        return self.sticks[stick][axis]
         
     def GetStickButtons(self, stick):
-        return 0xff
+        buttons = 0
+        i = 0
+        for button in self.stick_buttons[stick]:
+            if button:
+                buttons |= (1 << i)
+            i += 1
+    
+        return buttons
     
     def IsFMSAttached(self):
         return self.fms_attached 
@@ -491,6 +526,11 @@ class Jaguar(object):
         
         
 class Joystick(object):
+    '''
+        Note that the values for this joystick are not currently shared with
+        the driver station, so if you ask the driver station and the joystick
+        for a button or axis value, they will differ
+    '''
     
     kTriggerButton = 0
     kTopButton = 1
@@ -537,10 +577,10 @@ class Joystick(object):
         return self.throttle
         
     def GetTop(self):
-        return self.buttons[1]
+        return self.buttons[Joystick.kTopButton]
         
     def GetTrigger(self):
-        return self.buttons[0]
+        return self.buttons[Joystick.kTriggerButton]
         
     def GetTwist(self):
         return self.twist

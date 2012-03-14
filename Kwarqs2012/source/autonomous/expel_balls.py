@@ -12,7 +12,7 @@
         has a better shooting autonomous mode than us. 
 ''' 
 
-from . import AutonomousModeBase
+from manager import AutonomousModeBase
 
 
 
@@ -20,15 +20,15 @@ class MyAutonomousMode(AutonomousModeBase):
 
     # this name should be descriptive and unique. This will be shown to the user
     # on the SmartDashboard
-    NAME = "Feed Teammates"
+    MODE_NAME = "Feed Teammates"
+    DEFAULT = False
 
 
-    def __init__(self, drive, ramp_arm, ball_handler, shooter, robot_manager):
+    def __init__(self, drive, ramp_arm, ball_handler, robot_manager):
         '''Constructor: store components locally here'''
         self.drive = drive
         self.ramp_arm = ramp_arm
         self.ball_handler = ball_handler
-        self.shooter = shooter
         self.robot_manager = robot_manager
         
         #This variable will store the current time when all balls have been expelled

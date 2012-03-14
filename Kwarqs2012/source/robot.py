@@ -78,6 +78,10 @@ consoleLedPort  = 10
 #
 
 
+l_driveMotor    = wpilib.Jaguar(l_motor_pwm_ch)
+r_driveMotor    = wpilib.Jaguar(r_motor_pwm_ch)
+
+drive           = wpilib.RobotDrive(l_driveMotor, r_driveMotor)
 
 chamber         = Chamber(chamberRelay, chambIRSens)
 feeder          = Feeder(feeder_pwm_ch, botFeedSwitch, topFeedIRSens)
@@ -93,11 +97,7 @@ consoleLed      = ConsoleLED(consoleLedPort)
 operatorLeds    = OperatorLEDs()
 robotManager    = RobotManager(ballHandler, camera, wheel, susan, consoleLed)
 
-l_driveMotor    = wpilib.Jaguar(l_motor_pwm_ch)
-r_driveMotor    = wpilib.Jaguar(r_motor_pwm_ch)
 
-
-drive = wpilib.RobotDrive(l_driveMotor, r_driveMotor)
 
 # TODO: Figure out why this thing is broken.. 
 drive.SetSafetyEnabled( False )
@@ -134,9 +134,8 @@ class MyRobot(wpilib.SimpleRobot):
         self.ds = wpilib.DriverStation.GetInstance()
         self.print_timer = PrintTimer()
         
-        self.autonomous_manager = AutonomousModeManager(ds, drive, rampArm, 
-                                                        ballHandler, robotManager,
-                                                        wheel )
+        self.autonomous_manager = AutonomousModeManager(drive, rampArm, 
+                                                        ballHandler, robotManager)
     
     def Disabled(self):
         

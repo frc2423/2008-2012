@@ -6,7 +6,7 @@ except ImportError:
     import fake_wpilib as wpilib
 
 from ..ir_sensor import IRSensor
-
+from collections import deque
 
 
 class Chamber(object):
@@ -33,6 +33,16 @@ class Chamber(object):
         self.ball_sensor = IRSensor(chambIRSens, 2.0)
         
         self.direction = None
+        self.direction_history = deque()
+        self.last_direction = None
+        
+    def GetDirection(self):
+        '''Returns 1 if up, 0 if stopped, -1 if down'''
+        if self.last_direction == Chamber.BELT_UP:
+            return 1
+        elif self.last_direction == Chamber.BELT_DOWN:
+            return -1
+        return 0
     
     def IsSet(self):
         '''Returns True if someone has called Run/Remove since the
@@ -70,6 +80,34 @@ class Chamber(object):
         self.belt_motor.Set( direction )
         
         # reset state
+        self._calc_last_direction( direction )
         self.direction = None
-
+    
+    def _calc_last_direction(self, direction):
+        '''Internal function: average belt direction tracking'''
+        
+        # average the last belt runs to determine whether the balls 
+        # are probably traveling up or down
+        num = len(self.direction_history) + 1
+        
+        if num > 6:
+            self.direction_history.pop()
+        
+        d = 0
+        
+        if direction == Chamber.BELT_DOWN:
+            d = -1
+        elif direction == Chamber.BELT_UP:
+            d = 1
+        
+        self.direction_history.appendleft(d)
+        
+        avg = sum(self.direction_history)/num
+            
+        if avg > 0:
+            self.last_direction = Chamber.BELT_DOWN
+        elif avg < 0:
+            self.last_direction = Chamber.BELT_UP
+        else:
+            self.last_direction = Chamber.BELT_OFF
         

@@ -396,11 +396,20 @@ class DriverStationEnhancedIO(object):
                                 None, None, None, None,
                                 None, None, None, None ]
         
-    def SetDigitalConfig( self, channel, config ):
+    def GetDigital(self, channel, config):
+        if self.digital_config[channel-1] not in [DriverStationEnhancedIO.kInputFloating, DriverStationEnhancedIO.kInputPullUp, DriverStationEnhancedIO.kInputPullDown]:
+            raise RuntimeError( "Digital channel not configured as input, configured as %s" % self.digital_config[channel-1] )
+        return self.digital[channel-1]
+        
+    def GetDigitalConfig(self, channel):
+        return self.digital_config[channel-1]
+        
+    def SetDigitalConfig(self, channel, config):
         self.digital_config[channel-1] = config
     
-    def SetDigitalOutput( self, channel, value ):
-        print( "DOUT: %s %s" % (channel, value) )
+    def SetDigitalOutput(self, channel, value):
+        if self.digital_config[channel-1] != DriverStationEnhancedIO.kOutput:
+            raise RuntimeError( "Digital channel not configured as output, configured as %s" % self.digital_config[channel-1] )
         self.digital[channel-1] = bool(value)
         
     

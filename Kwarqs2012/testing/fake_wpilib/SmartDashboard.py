@@ -106,3 +106,74 @@ class SendablePIDController(PIDController):
 
         if self.table is not None:
             self.table[self.kEnabled] = False
+            
+            
+class SendableChooser:
+    """The {@link SendableChooser} class is a useful tool for presenting a
+    selection of options to the {@link SmartDashboard}.
+
+    For instance, you may wish to be able to select between multiple
+    autonomous modes.  You can do this by putting every possible
+    {@link Command} you want to run as an autonomous into a
+    {@link SendableChooser} and then put it into the {@link SmartDashboard}
+    to have a list of options appear on the laptop.  Once autonomous starts,
+    simply ask the {@link SendableChooser} what the selected value is.
+
+    @see SmartDashboard"""
+    kDefault = "default"
+    kCount = "count"
+    kSelected = "selected"
+
+    def __init__(self):
+        self.defaultChoice = None
+        self.choices = {}   # map from names to objects
+        self.ids = {}       # map from objects to ids
+        #self.table = NetworkTable()
+        self.table = {}
+        self.count = 0
+
+    def AddObject(self, name, obj):
+        """Adds the given object to the list of options.  On the
+        {@link SmartDashboard} on the desktop, the object will appear as the
+        given name.
+        @param name the name of the option
+        @param object the option"""
+        if name in self.choices:
+            id = self.ids[self.choices[name]]
+        else:
+            id = str(self.count)
+            self.count += 1
+            self.ids[obj] = id
+            self.table[self.kCount] = self.count
+        self.choices[name] = obj
+        self.table[id] = str(name)
+
+    def AddDefault(self, name, obj):
+        """Add the given object to the list of options and marks it as the
+        default.  Functionally, this is very close to
+        {@link SendableChooser#AddObject()} except that it will use this as
+        the default option if none other is explicitly selected.
+        @param name the name of the option
+        @param object the option"""
+        self.defaultChoice = obj
+        self.AddObject(name, obj)
+        self.table[self.kDefault] = str(name)
+
+    def GetSelected(self):
+        """Returns the selected option.  If there is none selected, it will
+        return the default.  If there is none selected and no default, then
+        it will return {@code None}.
+        @return the option selected"""
+        if kSelected in self.table:
+            return self.choices[self.table[self.kSelected]]
+        else:
+            return self.defaultChoice
+
+    #
+    # SmartDashboardData interface
+    #
+    def GetType(self):
+        return "String Chooser"
+
+    def GetTable(self):
+        return self.table

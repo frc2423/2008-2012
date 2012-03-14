@@ -49,6 +49,7 @@ public class VisionSystem extends WPICameraExtension {
         // angle in degrees that lazy susan must turn to make the target in the image center
         double angle_susan;
         int i;
+        
         public TrackingData(){
            
             frame_number = 0;
@@ -74,7 +75,7 @@ public class VisionSystem extends WPICameraExtension {
             table.putInt("x", this.x);
             table.putInt("y", this.y);
             table.putBoolean("target_data_valid", this.target_data_valid);
-            table.putDouble("angle_susan", this.angle_susan);
+            table.putDouble("angle", this.angle_susan);
             table.putDouble("distance", i);
             table.putDouble("sonar_distance", i);
             table.putDouble("angle_susan", i);
@@ -87,6 +88,7 @@ public class VisionSystem extends WPICameraExtension {
         }
     }
     
+
     @Override
     public void init() {
         super.init();
@@ -99,8 +101,11 @@ public class VisionSystem extends WPICameraExtension {
     @Override
     public WPIImage processImage(WPIColorImage rawImage) {
         //Process image and send to Network Table
-        trackingData.PutTrackingData(table);
         //TODO: process image code
+        //TODO: Set all variables from the tracking data class
+        trackingData.angle_susan = 2.65;
+        trackingData.PutTrackingData(table);
+
         return super.processImage(rawImage);
     }
 

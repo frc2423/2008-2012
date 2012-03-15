@@ -39,7 +39,7 @@ class WheelPidOutput(wpilib.PIDOutput):
         self.wheelMotor1 = wheelMotor1
         self.wheelMotor2 = wheelMotor2
         
-        self.desiredPVBus = 0
+        self.value = 0
     
     def Get(self):
         with self._lock:

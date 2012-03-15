@@ -25,7 +25,7 @@ class RampArm(object):
     RETRACT_ARM = 1.0
 
     def __init__(self, rampArmCAN):
-        self.arm = wpilib.Jaguar(rampArmCAN)
+        self.arm = wpilib.CANJaguar(rampArmCAN)
         self.extend = False
     
     def Extend(self):

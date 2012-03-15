@@ -52,11 +52,11 @@ DEBUG_BUTTON = (2, 8)
 # -> call GetSwitch() with this value to get True/False
 
 # TODO: Fix these
-MANUAL_SHOOTER_WHEEL_ENABLE_SWITCH  = 0
-AUTO_BALL_HANDLER_SWITCH            = 1
-CONTINUOUS_BALL_HANDLER_SWITCH      = 2
-AUTO_SUSAN_SWITCH                   = 3
-AUTO_DISTANCE_SWITCH                = 4
+MANUAL_SHOOTER_WHEEL_ENABLE_SWITCH  = 2
+AUTO_BALL_HANDLER_SWITCH            = 4
+CONTINUOUS_BALL_HANDLER_SWITCH      = 8
+AUTO_SUSAN_SWITCH                   = 12
+AUTO_DISTANCE_SWITCH                = 16
 
 #
 # Utility functions
@@ -64,6 +64,14 @@ AUTO_DISTANCE_SWITCH                = 4
 
 
 ds = wpilib.DriverStation.GetInstance()
+eio = ds.GetEnhancedIO()
+
+# configure the switches
+eio.SetDigitalConfig( MANUAL_SHOOTER_WHEEL_ENABLE_SWITCH, wpilib.DriverStationEnhancedIO.kInputPullUp )
+eio.SetDigitalConfig( AUTO_BALL_HANDLER_SWITCH, wpilib.DriverStationEnhancedIO.kInputPullUp )
+eio.SetDigitalConfig( CONTINUOUS_BALL_HANDLER_SWITCH, wpilib.DriverStationEnhancedIO.kInputPullUp )
+eio.SetDigitalConfig( AUTO_SUSAN_SWITCH, wpilib.DriverStationEnhancedIO.kInputPullUp )
+eio.SetDigitalConfig( AUTO_DISTANCE_SWITCH, wpilib.DriverStationEnhancedIO.kInputPullUp )
 
 
 def GetJoystickAxis( tuple ):
@@ -73,6 +81,5 @@ def StickButtonOn( tuple ):
     return ds.GetStickButtons( tuple[0] ) & (1 << tuple[1])
 
 def SwitchOn( val ):
-    # TODO
-    return True
+    return eio.GetDigital( val )
  

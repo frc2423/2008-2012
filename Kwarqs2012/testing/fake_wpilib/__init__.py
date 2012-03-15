@@ -364,6 +364,8 @@ class DriverStation(object):
         self.enhanced_io = DriverStationEnhancedIO()
         self.alliance = DriverStation.kInvalid
         
+        self.new_control_data = False
+        
         # arrays of [port][axis/button]
         self.sticks = []
         self.stick_buttons = []
@@ -404,7 +406,9 @@ class DriverStation(object):
         return self.fms_attached 
         
     def IsNewControlData(self):
-        return True
+        new_data = self.new_control_data
+        self.new_control_data = False
+        return new_data
     
     def SetDigitalOut(self, number, value):
         pass
@@ -431,7 +435,7 @@ class DriverStationEnhancedIO(object):
                                 None, None, None, None,
                                 None, None, None, None ]
         
-    def GetDigital(self, channel, config):
+    def GetDigital(self, channel):
         if self.digital_config[channel-1] not in [DriverStationEnhancedIO.kInputFloating, DriverStationEnhancedIO.kInputPullUp, DriverStationEnhancedIO.kInputPullDown]:
             raise RuntimeError( "Digital channel not configured as input, configured as %s" % self.digital_config[channel-1] )
         return self.digital[channel-1]
@@ -440,6 +444,8 @@ class DriverStationEnhancedIO(object):
         return self.digital_config[channel-1]
         
     def SetDigitalConfig(self, channel, config):
+        if self.digital_config[channel-1] is not None:
+            raise RuntimeError( "Configured digital channel twice!" )
         self.digital_config[channel-1] = config
     
     def SetDigitalOutput(self, channel, value):

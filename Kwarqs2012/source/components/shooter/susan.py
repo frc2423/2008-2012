@@ -84,7 +84,10 @@ class Susan(object):
         
         self.angle = None
         self.vBus = None
-        self.autoMode = False
+        
+        # this starts as None so that when update gets called we
+        # can immediately set the current mode regardless of the input
+        self.autoMode = None
                     
     
     def SetAutoRelativeAngle(self,angle):

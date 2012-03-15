@@ -92,7 +92,10 @@ class Wheel(object):
     
         self.vBus = None
         self.auto_speed = None
-        self.autoMode = False
+        
+        # this starts as None so that when update gets called we
+        # can immediately set the current mode regardless of the input
+        self.autoMode = None
         
         self.wheelMotor1 = wpilib.CANJaguar(wheelCAN1)
         self.wheelMotor2 = wpilib.CANJaguar(wheelCAN2)

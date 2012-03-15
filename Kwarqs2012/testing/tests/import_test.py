@@ -11,7 +11,7 @@ class Test(object):
         
     def IsOperatorControl(self):
         self.loop_count += 1
-        return not self.loop_count == 2
+        return not self.loop_count == 1000
         
 
 
@@ -19,6 +19,8 @@ def run_tests( robot_module, myrobot ):
 
     test = Test( robot_module, myrobot )
 
+    robot_module.wpilib._print_components()
+    
     myrobot.enabled = True
     myrobot.on_IsOperatorControl = test.IsOperatorControl
     

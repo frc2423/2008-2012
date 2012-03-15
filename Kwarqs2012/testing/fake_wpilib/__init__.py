@@ -64,6 +64,15 @@ def initialize_robot():
 
     import robot
     return robot.run()
+    
+def _print_components():
+    '''
+        Debugging function, prints out the components currently on the robot
+    '''
+    
+    AnalogModule._print_components()
+    CAN._print_components()
+    DigitalModule._print_components()
 
 
 #################################################
@@ -114,6 +123,7 @@ class SimpleRobot(object):
 class Accelerometer(object):
 
     def __init__(self, channel):
+        AnalogModule._add_channel(channel, self)
         self.value = 0
         
     def GetAcceleration(self):
@@ -124,7 +134,28 @@ class Accelerometer(object):
         
     def SetZero(self, zero):
         pass
+
+
+class AnalogModule(object):
+
+    _channels = [None]*8
     
+    @staticmethod
+    def _add_channel(channel, item):
+        if AnalogModule._channels[channel-1] is not None:
+            raise RuntimeError( "Error inserting %s, %s already at channel %s" % 
+                               (item, AnalogModule._channels[channel-1], channel ))
+        AnalogModule._channels[channel-1] = item
+    
+    @staticmethod
+    def _print_components():
+        '''Useful for ensuring you set your robot up the way you thought...'''
+        print("AnalogModule:")
+        
+        for i,o in enumerate(AnalogModule._channels):
+            if o is not None:
+                print( "  %2d: %s" % (i+1,o) )
+        
 
 class AnalogChannel(object):
 
@@ -132,10 +163,11 @@ class AnalogChannel(object):
     kAccumulatorNumChannels = 2
     kAccumulatorChannels = [1, 2]
     
+    _instances = [None]*8
+    
     def __init__(self, channel):
+        AnalogModule._add_channel(channel, self)
         self.voltage = 0
-        pass
-        
         
     def GetValue(self):
         return self.value
@@ -152,7 +184,25 @@ class AnalogChannel(object):
     # TODO: Implement a sensible implementation for this
 
 
+class CAN(object):
 
+    _devices = {}
+
+    @staticmethod
+    def _add_can(deviceNumber, device):
+        if deviceNumber in CAN._devices:
+            raise RuntimeError( "Error inserting %s, %s already at %s" % 
+                                (device, CAN._devices[deviceNumber], deviceNumber))
+                                
+        CAN._devices[deviceNumber] = device
+        
+    @staticmethod
+    def _print_components():
+        '''Useful for ensuring you set your robot up the way you thought...'''
+        print("CAN:")
+        
+        for i,o in CAN._devices.items():
+            print( "  %2d: %s" % (i+1,o) )
     
 class CANJaguar(object):
 
@@ -187,6 +237,7 @@ class CANJaguar(object):
     kLimitMode_SoftPositionLimits = 1
     
     def __init__(self, deviceNumber, controlMode=kPercentVbus):
+        CAN._add_can(deviceNumber, self)
         self.control_mode = controlMode
         self.forward_ok = True              # forward limit switch
         self.reverse_ok = True              # reverse limit switch
@@ -291,6 +342,8 @@ class CANJaguar(object):
 class Compressor(object):
     
     def __init__(self, pressureSwitchChannel, compressorRelayChannel):
+        DigitalModule._add_io( pressureSwitchChannel, self )
+        DigitalModule._add_relay( compressorRelayChannel, self )
         self.enabled = False
         self.value = 0
         
@@ -306,10 +359,58 @@ class Compressor(object):
     def GetPressureSwitchValue(self):
         return self.value
 
+        
+class DigitalModule:
+
+    _io = [None] * 16
+    _pwm = [None] * 10
+    _relays = [None] * 8
+    
+    @staticmethod
+    def _add_io(channel, item):
+        if DigitalModule._io[channel-1] is not None:
+            raise RuntimeError( "Error inserting %s, %s already at channel %s" % 
+                               (item, DigitalModule._io[channel-1], channel ))
+        DigitalModule._io[channel-1] = item
+        
+    @staticmethod
+    def _add_pwm(channel, item):
+        if DigitalModule._pwm[channel-1] is not None:
+            raise RuntimeError( "Error inserting %s, %s already at channel %s" % 
+                               (item, DigitalModule._pwm[channel-1], channel ))
+        DigitalModule._pwm[channel-1] = item
+        
+    @staticmethod
+    def _add_relay(channel, item):
+        if DigitalModule._relays[channel-1] is not None:
+            raise RuntimeError( "Error inserting %s, %s already at channel %s" % 
+                               (item, DigitalModule._relays[channel-1], channel ))
+        DigitalModule._relays[channel-1] = item
+    
+    @staticmethod
+    def _print_components():
+        '''Useful for ensuring you set your robot up the way you thought...'''
+        print("DigitalModule:")
+        
+        print( "  IO:")
+        for i,o in enumerate(DigitalModule._io):
+            if o is not None:
+                print( "    %2d: %s" % (i+1,o) )
+                
+        print( "  PWM:")
+        for i,o in enumerate(DigitalModule._pwm):
+            if o is not None:
+                print( "    %2d: %s" % (i+1,o) )
+        
+        print( "  Relay:")
+        for i,o in enumerate(DigitalModule._relays):
+            if o is not None:
+                print( "    %2d: %s" % (i+1,o) )
     
 class DigitalInput(object):
 
     def __init__(self, channel):
+        DigitalModule._add_io( channel, self )
         self.value = False
         self.channel = channel
     
@@ -329,6 +430,7 @@ class DigitalInput(object):
 class DigitalOutput(object):
     
     def __init__(self, channel):
+        DigitalModule._add_io( channel, self )
         self.value = False
         self.channel = channel
 
@@ -359,6 +461,9 @@ class DriverStation(object):
         return DriverStation.instance
     
     def __init__(self):
+        
+        AnalogModule._add_channel(DriverStation.kBatteryChannel, self)
+    
         self.digital_in = [ False, False, False, False, False, False, False, False ]
         self.fms_attached = False
         self.enhanced_io = DriverStationEnhancedIO()
@@ -371,12 +476,9 @@ class DriverStation(object):
         self.stick_buttons = []
         
         for i in range(0, DriverStation.kJoystickPorts):
-            axes = []
-            buttons = []
-            for j in range(0, DriverStation.kJoystickAxes):
-                axes.append(0.0)
-                buttons.append(False)
-                
+            axes = [ 0.0 ] * DriverStation.kJoystickAxes
+            buttons = [ False ] * 16
+            
             self.sticks.append(axes)
             self.stick_buttons.append(buttons)
     
@@ -394,11 +496,9 @@ class DriverStation(object):
         
     def GetStickButtons(self, stick):
         buttons = 0
-        i = 0
-        for button in self.stick_buttons[stick]:
+        for i, button in enumerate(self.stick_buttons[stick]):
             if button:
                 buttons |= (1 << i)
-            i += 1
     
         return buttons
     
@@ -422,6 +522,8 @@ class DriverStationEnhancedIO(object):
     kOutput = 5
     kPWM = 6
     kAnalogComparator = 7
+    
+    _kInputTypes = [kInputFloating, kInputPullUp, kInputPullDown]
 
     # don't call this directly
     def __init__(self):
@@ -436,7 +538,7 @@ class DriverStationEnhancedIO(object):
                                 None, None, None, None ]
         
     def GetDigital(self, channel):
-        if self.digital_config[channel-1] not in [DriverStationEnhancedIO.kInputFloating, DriverStationEnhancedIO.kInputPullUp, DriverStationEnhancedIO.kInputPullDown]:
+        if self.digital_config[channel-1] not in DriverStationEnhancedIO._kInputTypes:
             raise RuntimeError( "Digital channel not configured as input, configured as %s" % self.digital_config[channel-1] )
         return self.digital[channel-1]
         
@@ -467,6 +569,8 @@ class Encoder(object):
     kRate = 2
 
     def __init__(self, port1, port2, reverseDirection=False, encoding_type=k1X ):
+        DigitalModule._add_io( port1, self )
+        DigitalModule._add_io( port2, self )
         self.value = None
         self.pid_mode = Encoder.kDistance
         self.rate = 0 # TODO: calculate this
@@ -506,8 +610,8 @@ class Gyro(object):
     kDefaultVoltsPerDegreePerSecond = 0.007
     
     def __init__(self, channel):
+        AnalogModule._add_channel(channel, self)
         self.value = 0
-        pass
         
     def GetAngle(self):
         return self.value
@@ -522,6 +626,7 @@ class Gyro(object):
 class Jaguar(object):
 
     def __init__(self, channel):
+        DigitalModule._add_pwm( channel, self )
         self.value = 0
         
     def Get(self):
@@ -639,6 +744,7 @@ class Relay(object):
     kReverseOnly = 2
     
     def __init__(self, channel, direction=kBothDirections):
+        DigitalModule._add_relay( channel, self )
         self.on = False
         self.forward = False
         self.value = Relay.kOff
@@ -665,6 +771,7 @@ class Servo(object):
     kMinServoAngle = 0.0
 
     def __init__(self, channel):
+        DigitalModule._add_pwm( channel, self )
         self.value = None
         
     def Get(self):
@@ -713,6 +820,8 @@ class Ultrasonic(object):
         pass
 
     def __init__(self, pingChannel, echoChannel):
+        DigitalModule._add_io( pingChannel, self )
+        DigitalModule._add_io( echoChannel, self )
         self.distance = 0
         self.enabled = True
         self.range_valid = True
@@ -739,6 +848,7 @@ class Ultrasonic(object):
 class Victor(object):
     
     def __init__(self, channel):
+        DigitalModule._add_pwm( channel, self )
         self.value = 0
         
     def Get(self):

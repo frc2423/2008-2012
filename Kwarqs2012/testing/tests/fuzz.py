@@ -26,7 +26,7 @@ class Test(object):
         self.ds = self.robot_module.wpilib.DriverStation.GetInstance()
         self.eio = self.ds.GetEnhancedIO()
         
-        self.digital_eio = [ 0 for x in self.eio.digital_config ]
+        self.digital_eio = [0]*16
         
         # sticks[stick_num][ axes, buttons ]
         self.sticks = []
@@ -34,6 +34,9 @@ class Test(object):
             axes = [ 0.0 ] * self.ds.kJoystickAxes
             buttons = [ 0.0 ] * 16
             self.sticks.append( (axes, buttons) )
+            
+        self.digital_inputs = [0]*16
+        self.analog_channels = [0]*8
         
     def _fuzz_bool(self, tm, i, dst, tms):
                         
@@ -76,6 +79,23 @@ class Test(object):
                     self._fuzz_bool(tm, j, self.ds.stick_buttons[i], stick[1])
     
         # fuzz digital inputs
+        for i, d_tm in enumerate(self.digital_inputs):
+            di = self.robot_module.wpilib.DigitalModule._io[i]
+            if isinstance(di, self.robot_module.wpilib.DigitalInput):
+                if tm > d_tm:
+                    if random.randrange(0,2,1) == 0:
+                        di.value = False
+                    else:
+                        di.value = True
+                    self.digital_inputs[i] = tm + random.random()
+                    
+        # fuzz analog channels
+        for i, a_tm in enumerate(self.analog_channels):
+            ac = self.robot_module.wpilib.AnalogModule._channels[i]
+            if isinstance(ac, self.robot_module.wpilib.AnalogChannel):
+                if tm > a_tm:
+                    ac.voltage = random.uniform(0.0, 5.0)
+                    self.analog_channels[i] = tm + random.random()
     
         # run a full match
         return tm < 105.0

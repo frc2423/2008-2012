@@ -65,6 +65,7 @@ def initialize_robot():
     import robot
     return robot.run()
     
+    
 def _print_components():
     '''
         Debugging function, prints out the components currently on the robot
@@ -73,6 +74,7 @@ def _print_components():
     AnalogModule._print_components()
     CAN._print_components()
     DigitalModule._print_components()
+    DriverStation.GetInstance().GetEnhancedIO()._print_components()
 
 
 #################################################
@@ -202,7 +204,7 @@ class CAN(object):
         print("CAN:")
         
         for i,o in CAN._devices.items():
-            print( "  %2d: %s" % (i+1,o) )
+            print( "  %2d: %s" % (i,o) )
     
 class CANJaguar(object):
 
@@ -543,7 +545,10 @@ class DriverStationEnhancedIO(object):
         return self.digital[channel-1]
         
     def GetDigitalConfig(self, channel):
-        return self.digital_config[channel-1]
+        config = self.digital_config[channel-1]
+        if config is None:
+            return DriverStationEnhancedIO.kUnknown
+        return config
         
     def SetDigitalConfig(self, channel, config):
         if self.digital_config[channel-1] is not None:
@@ -555,7 +560,21 @@ class DriverStationEnhancedIO(object):
             raise RuntimeError( "Digital channel not configured as output, configured as %s" % self.digital_config[channel-1] )
         self.digital[channel-1] = bool(value)
         
-    
+
+    def _print_components(self):
+        '''Debugging use only'''
+        print( "DriverStationEnhancedIO:" )
+        for i,o in enumerate(self.digital_config):
+            if o is not None:
+                od = {
+                    DriverStationEnhancedIO.kUnknown: "kUnknown",
+                    DriverStationEnhancedIO.kInputFloating: "kInputFloating",
+                    DriverStationEnhancedIO.kInputPullUp: "kInputPullUp",
+                    DriverStationEnhancedIO.kInputPullDown: "kInputPullDown",
+                    DriverStationEnhancedIO.kOutput: "kOutput"
+                }
+                
+                print( "  %2d: %s" % (i+1, od[o]))
         
 class Encoder(object):
 

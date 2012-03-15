@@ -12,11 +12,8 @@
         has a better shooting autonomous mode than us. 
 ''' 
 
-from manager import AutonomousModeBase
 
-
-
-class MyAutonomousMode(AutonomousModeBase):
+class MyAutonomousMode(object):
 
     # this name should be descriptive and unique. This will be shown to the user
     # on the SmartDashboard

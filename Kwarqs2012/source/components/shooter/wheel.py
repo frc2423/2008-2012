@@ -32,8 +32,6 @@ class WheelPidSource(wpilib.PIDSource):
 class WheelPidOutput(wpilib.PIDOutput):
     '''Jaguar output for wheel PID'''
     
-    SYNCGROUP = 2
-    
     def __init__(self, wheelMotor1, wheelMotor2):
         wpilib.PIDOutput.__init__(self)
         
@@ -60,9 +58,9 @@ class WheelPidOutput(wpilib.PIDOutput):
             self.value += output
             value = self.value
     
-        self.wheelMotor1.Set(value, WheelPidOutput.SYNCGROUP)
-        self.wheelMotor2.Set(-value, WheelPidOutput.SYNCGROUP)
-        wpilib.CANJaguar.UpdateSyncGroup(WheelPidOutput.SYNCGROUP)
+        self.wheelMotor1.Set(value, Wheel.SYNCGROUP)
+        self.wheelMotor2.Set(-value, Wheel.SYNCGROUP)
+        wpilib.CANJaguar.UpdateSyncGroup(Wheel.SYNCGROUP)
 
         
          
@@ -83,6 +81,9 @@ class Wheel(object):
     MOTOR_P = 0.000675
     MOTOR_I = 0.000000050
     MOTOR_D = 0.01
+    
+    ''' sync group '''
+    SYNCGROUP = 2
     
     ''' percent tolerance'''
     PID_TOLERANCE = 1
@@ -174,9 +175,9 @@ class Wheel(object):
             if self.vBus is None:
                 self.vBus = 0
             
-            self.wheelMotor1.Set(self.vBus, ShooterWheelOutput.SYNCGROUP)
-            self.wheelMotor2.Set(-self.vBus, ShooterWheelOutput.SYNCGROUP)
-            wpilib.CANJaguar.UpdateSyncGroup(ShooterWheelOutput.SYNCGROUP)
+            self.wheelMotor1.Set(self.vBus, Wheel.SYNCGROUP)
+            self.wheelMotor2.Set(-self.vBus, Wheel.SYNCGROUP)
+            wpilib.CANJaguar.UpdateSyncGroup(Wheel.SYNCGROUP)
             
         # do this last otherwise the PID control might be enabled with a nonsense setpoint
         if enable_automode:

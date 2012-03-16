@@ -48,9 +48,7 @@ class Test(object):
         tms[i] = tm + random.random()
         
         
-    def IsOperatorControl(self):
-    
-        tm = self.fake_time.Get()
+    def IsOperatorControl(self, tm):
     
         # fuzz the eio switches    
         for i, d_tm in enumerate(self.digital_eio):

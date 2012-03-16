@@ -9,7 +9,7 @@ class Test(object):
         self.myrobot = myrobot
         self.loop_count = 0
         
-    def IsOperatorControl(self):
+    def IsOperatorControl(self, tm):
         self.loop_count += 1
         return not self.loop_count == 1000
         

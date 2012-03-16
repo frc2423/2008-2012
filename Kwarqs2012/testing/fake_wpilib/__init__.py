@@ -87,7 +87,8 @@ class SimpleRobot(object):
     
     # assign functions to these in test program to be called
     # when something happens in the robot code. The return value
-    # will be given to the robot code
+    # will be given to the robot code.
+    # Arguments: time elapsed
     on_IsAutonomous = None
     on_IsOperatorControl = None
     
@@ -95,7 +96,7 @@ class SimpleRobot(object):
     
     def IsAutonomous(self):
         if self.on_IsAutonomous is not None:
-            return self.on_IsAutonomous()
+            return self.on_IsAutonomous( GetClock() )
         return False
     
     def IsEnabled(self):
@@ -106,7 +107,7 @@ class SimpleRobot(object):
         
     def IsOperatorControl(self):
         if self.on_IsOperatorControl is not None:
-            return self.on_IsOperatorControl()
+            return self.on_IsOperatorControl( GetClock() )
         return False
     
     def StartCompetition(self):

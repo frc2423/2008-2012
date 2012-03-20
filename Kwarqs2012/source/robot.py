@@ -95,6 +95,8 @@ rampArm         = RampArm(rampArmCAN)
 
 consoleLed      = ConsoleLED(consoleLedPort)
 operatorLeds    = OperatorLEDs()
+left_leds       = operatorLeds.GetDigitGroup(0)
+right_leds      = operatorLeds.GetDigitGroup(1)
 robotManager    = RobotManager(ballHandler, camera, wheel, susan, consoleLed)
 
 
@@ -259,13 +261,15 @@ class MyRobot(wpilib.SimpleRobot):
             # Manual Shooter
             ###############################################
             
+            # store this, because we also pass it to robot 
+            # manager in case the user doesn't have the switch
+            # flipped when the fire button is pressed
+            shooter_z = GetJoystickAxis( SHOOTER_WHEEL_AXIS )
+            shooter_z = ((shooter_z * -1.0) + 1.0) * 50.0
+            
             try:
                 if SwitchOn( MANUAL_SHOOTER_WHEEL_ENABLE_SWITCH ):
-                
-                    z = GetJoystickAxis( SHOOTER_WHEEL_AXIS )
-                    z = ((z * -1.0) + 1.0) * 50.0
-                
-                    wheel.SetAutoSpeed( z )
+                    wheel.SetAutoSpeed( shooter_z )
             
             except:
                 if not self.ds.IsFMSAttached():
@@ -357,8 +361,12 @@ class MyRobot(wpilib.SimpleRobot):
                     raise
                     
             try:
+                # must always call either EnableAutoDistance
+                # or SetUserWheelSpeed on the robot manager
                 if SwitchOn( AUTO_DISTANCE_SWITCH ):
-                    robotManager.EnableAutoDistance()     
+                    robotManager.EnableAutoDistance()
+                else:
+                    robotManager.SetUserWheelSpeed( shooter_z )
             except:
                 if not self.ds.IsFMSAttached():
                     raise
@@ -382,10 +390,8 @@ class MyRobot(wpilib.SimpleRobot):
             
             if not self.ds.IsFMSAttached():
             
-                if StickButtonOn( DEBUG_BUTTON ) and self.print_timer.should_print():
-                    feeder.Print()
-                    print("")
-                    chamber.Print()
+                if StickButtonOn( DEBUG_BUTTON ):
+                    self._debug_print()
             
     
             ###############################################
@@ -483,6 +489,17 @@ class MyRobot(wpilib.SimpleRobot):
             except:
                 if not self.ds.IsFMSAttached():
                     raise
+                    
+    def _debug_print(self):
+        '''Note: don't call this if the FMS is attached'''
+    
+        if self.print_timer.should_print('debug'):
+            robotManager.Print()
+            ballHandler.Print()
+            camera.Print()
+            susan.Print()
+            wheel.Print()
+            print('')
         
 def run(): 
     #rpdb2.start_embedded_debugger()

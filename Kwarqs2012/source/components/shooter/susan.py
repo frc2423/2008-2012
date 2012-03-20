@@ -48,7 +48,7 @@ class Susan(object):
         TODO: Need to figure out semantics for gyro-based angle control
     '''
     
-    
+    # these values are probably too high
     SUSAN_P = 1.0
     SUSAN_I = 0.0
     SUSAN_D = 0.0
@@ -129,6 +129,10 @@ class Susan(object):
             return True
         
         return self.PointingCorrectly() and self.pidControl.OnTarget()
+        
+        
+    def IsSet(self):
+        return self.angle is not None or self.vBus is not None
         
     
     def Print(self):

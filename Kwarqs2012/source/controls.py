@@ -81,5 +81,5 @@ def StickButtonOn( tuple ):
     return ds.GetStickButtons( tuple[0] ) & (1 << tuple[1])
 
 def SwitchOn( val ):
-    return eio.GetDigital( val )
+    return not eio.GetDigital( val )
  

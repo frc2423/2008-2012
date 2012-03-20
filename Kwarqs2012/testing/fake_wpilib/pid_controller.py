@@ -58,6 +58,7 @@ class PIDController(object):
         self.m_tolerance = .05
 
         self.m_result = 0
+        self.m_error = 0
 
         self.m_pidInput = source
         self.m_pidOutput = output

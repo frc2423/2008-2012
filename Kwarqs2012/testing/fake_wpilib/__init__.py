@@ -598,6 +598,10 @@ class Encoder(object):
     def Get(self):
         return self.value
         
+    def GetRate(self):
+        # TODO: calculate this
+        return self.rate
+        
     def GetPeriod(self):
         return self.period
         

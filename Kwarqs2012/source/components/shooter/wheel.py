@@ -6,6 +6,8 @@ except ImportError:
     import fake_wpilib as wpilib
     import fake_wpilib.SmartDashboard
     
+from util import PrintTimer
+    
 import threading
 
     
@@ -82,11 +84,18 @@ class Wheel(object):
     MOTOR_I = 0.000000050
     MOTOR_D = 0.01
     
-    ''' sync group '''
+    # sync group
     SYNCGROUP = 2
     
-    ''' percent tolerance'''
-    PID_TOLERANCE = 1
+    # percent tolerance to report convergence
+    PID_TOLERANCE = 5.0
+    
+    # minimum rate for the encoder for the wheel to declare itself 'ready'
+    MIN_ENCODER_READY_RATE = 5.0
+    
+    # PID Wheel: minimum time the wheel should be at the right speed
+    # before reporting that it is ready
+    STABLE_READY_PERIOD = 0.5
     
     def __init__(self, wheelCAN1, wheelCAN2, encoder_tuple):
     
@@ -96,6 +105,13 @@ class Wheel(object):
         # this starts as None so that when update gets called we
         # can immediately set the current mode regardless of the input
         self.autoMode = None
+        
+        # timer used to determine wheel speed stability
+        self.on_target = False
+        self.is_stable_timer = wpilib.Timer()
+        self.is_stable_timer.Start()
+        
+        self.print_timer = PrintTimer()
         
         self.wheelMotor1 = wpilib.CANJaguar(wheelCAN1)
         self.wheelMotor2 = wpilib.CANJaguar(wheelCAN2)
@@ -122,16 +138,42 @@ class Wheel(object):
         
         sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
         sd.PutData( "Wheel PID", self.pid_controller )
-
+        
+        
+    def _calculate_is_ready(self):
+        '''Internal function'''
+        if self.pid_controller.OnTarget():
+            if not self.on_target:
+                self.is_stable_timer.Reset()
+                self.on_target = True
+                
+            s_tm = self.is_stable_timer.Get()
+            if s_tm > Wheel.STABLE_READY_PERIOD:
+                if self.print_timer( 'is_ready' ):
+                    print( "[Wheel PID] Wheel speed is stable (speed: %.3f)" % self.auto_speed ) 
+            
+        else:
+            self.on_target = False
     
     def IsReady(self):
         '''Returns True if the shooter is ready for a ball to be fed into it'''
+        
+        # safety feature to make sure the ball doesn't get stuck
+        if self.encoder.GetRate() < Wheel.MIN_ENCODER_READY_RATE:
+            return False
+        
+        # if we're controlling it by voltage, then it's automatically ready
         if self.autoMode == False:
             return True
         
-        return self.pid_controller.OnTarget()
+        if not self.on_target:
+            return False
+        
+        return self.is_stable_timer.Get() > Wheel.STABLE_READY_PERIOD
+        
         
     def IsSet(self):
+        '''Returns True if someone has already set the wheel speed'''
         return self.auto_speed is not None or self.vBus is not None
         
     
@@ -170,10 +212,13 @@ class Wheel(object):
                 self.pid_controller.Disable()
             else:
                 enable_automode = True
+                self.on_target = False
+                
             self.autoMode = autoMode
     
         if self.autoMode:
             self.pid_controller.SetSetpoint(self.auto_speed)
+            self._calculate_is_ready()
         else:
             if self.vBus is None:
                 self.vBus = 0

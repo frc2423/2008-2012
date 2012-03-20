@@ -6,22 +6,37 @@ Things we *need* to get done before the Boston Regional:
     - Autotune PID Control for shooter wheel
         - This is what the wheel_test program is for!
         - Youssef is working on this
+            - Decided this wasn't going to happen, manual tuning instead
         
     - Integrate Vision processing into driver station
-        - No more basket tracker python module, so use the network tables instead
-        - Sam is working on this
+        (done) - No more basket tracker python module, so use the network tables instead
+        - Need integration with robot python code
+    
+    - Verify logic for high-level automated systems
+        (done) - Ball handler
+        - Robot Manager
         
+    - Verify shooter operation
+        - Figure out how this even works, with manual and automated shooting mechanisms
+        
+    - Verify susan operation
+        - Not even clear if we really know how this is supposed to work automatically
+            - How do we deal with the vibration/slippage?
+        - The latency is really going to kill us since we don't know where it is
+            - We need options with/without the gyro, just in case
+    
     - Non-classmate operator computer
         - Someone needs to set this up with Win7 and the right software
         - Need to install the vision stuff on it too
         
     - Operator console
-        - Need to finish design for this, implement it
-        - Need to add code that does the right thing here
+        (done) - Need to finish design for this, implement it
+        (done) - Need to add code that can operate the LEDs
+            - Need to add shooter digits
         
-    - Operator Controls
-        - We still haven't specified how this works yet, need to finalize it
-        - Document controls, implement controls that make sense
+    (done) - Operator Controls
+        (done) - We still haven't specified how this works yet, need to finalize it
+        (done) - Document controls, implement controls that make sense
         
     - Autonomous modes
         - We need to figure out which ones we're going to do
@@ -53,42 +68,16 @@ Things we *need* to get done before the Boston Regional:
             robotManager.ShootIfReady()
             
             
-    
-    - Verify robot logic
-        - We probably need to state precisely how these work, and create
-        tests that make sure that they do that
-        
-    - Verify shooter operation
-        - Figure out how this even works, with manual and automated shooting mechanisms
-        
-    - Verify susan operation
-        - Not even clear if we really know how this is supposed to work automatically
-            - How do we deal with the vibration/slippage?
-        - The latency is really going to kill us since we don't know where it is
-            - We need options with/without the gyro, just in case
-        
-    - Wrapper around PID Controller and jaguars?
-        - enable/disable/manual modes need to be simplified so we don't screw it up
         
     - Add SmartDashboard functionalities
         - Chooser to pick the autonomous mode!
             - This is important
-        - PID Tuning?
+        (done) - PID Tuning?
         - Feedback for all robot systems
         - Neat idea: custom widget to display status on the robot in real time?
             - Even without a custom widget, we probably should feed all the sensors
             and states and stuff back to the SmartDashboard!
             
-    - Investigate SmartDashboard/NetworkTables
-        - What latency does this introduce?
-        - What other kinds of cool things does this allow you to do?
+    (done) - Investigate SmartDashboard/NetworkTables
         
-
-    - Test framework improvements
-        - Need to add SmartDashboard stuff to it, even if it doesn't actually work
-        - Needs to be a way to automatically verify that things are working! Otherwise
-        the tests are useful... but not really all that useful
-        - Verify that motors are only set once per loop?
-        
-
  

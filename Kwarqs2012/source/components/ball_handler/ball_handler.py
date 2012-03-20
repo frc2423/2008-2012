@@ -41,6 +41,10 @@ class BallHandler(object):
         '''Call this to cause the ball to be shot'''
         self.chamber.Run()
         
+    def Print(self):
+        print("BallHandler: FLO: %s, FV: %s, FTOP: %s, VM: %s, CFUL: %s" % 
+            (self.last_feeder_low, self.feeder_virtual_ball, self.last_feeder_top,
+             self.middle_virtual_ball, self.last_chamber_full))
         
     #
     # Internal logic for ball tracking
@@ -170,10 +174,7 @@ class BallHandler(object):
                     self.chamber.Run()
                 else:
                     self.chamber.Stop()        
-                   
-
-        # TODO: SmartDashboard sensor output here
-                   
+        
         # reset vars
         self.auto_feed = False
         self.continuous_feed = False

@@ -66,10 +66,6 @@ class Chamber(object):
     def Stop( self ):
         '''Stops the belt motor'''
         self.direction = Chamber.BELT_OFF
-        
-    def Print( self ):
-        print("Chamber:")
-        print("  IRSensor: %s; Is Ball Present: %s" % (self.ball_sensor.GetVoltage(), self.IsFull()))
     
     def Update( self ):
         

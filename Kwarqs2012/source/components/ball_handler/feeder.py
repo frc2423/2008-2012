@@ -72,10 +72,7 @@ class Feeder(object):
            last time that Update() was called'''
         return self.direction is not None
     
-        
-    def Print(self):
-        pass
-
+    
     def Update(self):
     
         direction = self.direction

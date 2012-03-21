@@ -68,6 +68,10 @@ class RobotManager(object):
     def Print(self):
         print( "RobotManager: Shooting: %s" % self.shooting )
     
+    #def Turn(self, speed):
+    #    l_driveMotor.Set( speed )
+    #    r_driveMotor.Set( -speed )
+    
     def Update(self):
     
         # problems to deal with here:

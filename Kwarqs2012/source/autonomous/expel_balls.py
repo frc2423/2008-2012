@@ -43,6 +43,8 @@ class MyAutonomousMode(object):
         '''
         self.ball_handler.Feed()
         
+        #To end turning
+        self.END = 1
         
     def OnDisable(self):
         '''
@@ -70,6 +72,21 @@ class MyAutonomousMode(object):
             self.basetime = time_elapsed
             self.x = 1
         
-        if time_elapsed == self.basetime + 1:
-            pass
+        if time_elapsed >= self.basetime + 1:
+            if bodyGyro.GetAngle() < angle_to_ramp:
+                self.robot_manager.Turn(self.speed)
+                
+            if bodyGyro.GetAngle() >= angle_to_ramp and self.turn_ended = END
+                #turnend not made yet
+                self.robot_manager.TurnEnd() 
+                #Go forward not made yet
+                self.robot_manager.GoForward(self.time_forward)
+                robot.ramparm.extend
+            
             #tell robot to move to the ramp
+            
+            
+            
+            
+            
+            

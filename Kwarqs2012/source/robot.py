@@ -25,6 +25,7 @@ except ImportError:
 from autonomous import AutonomousModeManager
 from controls import *
 from operator_leds import OperatorLEDs
+from robot_widget import RobotWidget
 from util import ConsoleLED, PrintTimer
 
 
@@ -83,9 +84,11 @@ r_driveMotor    = wpilib.Jaguar(r_motor_pwm_ch)
 
 drive           = wpilib.RobotDrive(l_driveMotor, r_driveMotor)
 
+widget          = RobotWidget('Widget')
+
 chamber         = Chamber(chamberRelay, chambIRSens)
 feeder          = Feeder(feeder_pwm_ch, botFeedSwitch, topFeedIRSens)
-ballHandler     = BallHandler(chamber, feeder)
+ballHandler     = BallHandler(chamber, feeder, widget)
 
 camera          = Camera(camera_servo_ch, cameraRelay)
 susan           = Susan(susanCAN, susanGyro, bodyGyro)

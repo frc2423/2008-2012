@@ -1,6 +1,7 @@
 
 
 try:
+    import wpilib.SmartDashboard
     from wpilib.NetworkTables import NetworkTable
 except ImportError:
     from fake_wpilib.NetworkTables import NetworkTable
@@ -13,7 +14,12 @@ class RobotWidget(object):
         when the bool is True, an image is overlaid on an image of the robot. 
     '''
 
-    def __init__(self):
+    def __init__(self, name):
+    
+        # add this to the SmartDashboard automatically
+        sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
+        sd.PutData( name, self )
+    
         self.table = NetworkTable()
 
         self.table['chamber'] = False
@@ -21,6 +27,13 @@ class RobotWidget(object):
         self.table['feeder_top'] = False
         self.table['feeder_virtual'] = False
         self.table['feeder_low'] = False
+        
+    def SetAll(self, chamber, middle_virtual, feeder_top, feeder_virtual, feeder_low):
+        self.table['chamber'] = chamber
+        self.table['middle_virtual'] = middle_virtual
+        self.table['feeder_top'] = feeder_top
+        self.table['feeder_virtual'] = feeder_virtual
+        self.table['feeder_low'] = feeder_low
         
     def SetChamber(self, value):
         self.table['chamber'] = value

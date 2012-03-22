@@ -8,10 +8,12 @@ class BallHandler(object):
         robot. 
     '''
 
-    def __init__(self, chamber, feeder):
+    def __init__(self, chamber, feeder, widget):
         
         self.chamber = chamber
         self.feeder = feeder
+        
+        self.widget = widget
         
         # ball tracking
         self.last_feeder_top = False
@@ -118,6 +120,10 @@ class BallHandler(object):
         self.last_feeder_low = feeder_low
         self.last_chamber_full = chamber_full
     
+        # tell the robot widget where the balls are
+        self.widget.SetAll( chamber_full, self.middle_virtual_ball,
+                            feeder_top, self.feeder_virtual_ball,
+                            feeder_low )
         
         
     def Update(self):

@@ -57,34 +57,30 @@ remote_root = '/py'
 # verify the directories actually exist
 server.create_remote_directory( '/py' )
 server.delete_remote(           '/py/__pycache__' )
-server.create_remote_directory( '/py/components' )
-server.delete_remote(           '/py/components/__pycache__' )
-server.create_remote_directory( '/py/components/shooter' )
-server.delete_remote(           '/py/components/shooter/__pycache__' )
 
 
 # upload the files
 files = [
-    'ez_can_jaguar.py',
+    'controls.py',
+    'operator_leds.py',
     'robot.py',
-    'robot_manager.py',
-    'util.py',
-    'components/__init__.py',
-    'components/chamber.py',
-    'components/feeder.py',
-    'components/irsensor.py',
-    'components/ramp_arm.py',
-    'components/shooter/__init__.py',
-    'components/shooter/pidshooter.py',
-    'components/shooter/shooter_angle.py',
-    'components/shooter/shooter_susan.py',
-    'components/shooter/shooter_wheel.py',
+    'robot_widget.py',
+    'tracking_data.py',
+    'util.py'
+]
+
+dirs = [
+    'autonomous',
+    'components'
 ]
 
 for file in files:
     server.upload_file( remote_root, local_root, file )
+    
+for dir in dirs:
+    server.upload_directory( remote_root + '/' + dir, local_root + '/' + dir, verbose=True )
 
-print( 'Upload complete' )
+print( 'Upload complete. Press any key to continue.' )
 
 # close the installer
 server.close()

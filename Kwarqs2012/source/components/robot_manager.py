@@ -80,9 +80,9 @@ class RobotManager(object):
         
         # make sure we don't allow bugs to happen
         if not self.ds.IsFMSAttached():
-            if self.auto_distance is None and self.user_speed is None:
+            if self.shoot_ball and self.auto_distance is None and self.user_speed is None:
                 # .. is this going to bite us during autonomous?
-                raise RuntimeError("ERROR: Must call one of these during the loop" )
+                raise RuntimeError("ERROR: Must call one of these if you call ShootBall" )
         
         
         # get the tracking data from the camera object

@@ -82,9 +82,8 @@ public class VisionSystem extends WPICameraExtension {
     
         
      public void PutTrackingData(NetworkTable table){
-            i++;
-            if (i > 1024)
-                i = 0;
+
+            synchronized(table) {
             table.beginTransaction();
       
             table.putInt("frame_number", this.frame_number);
@@ -95,58 +94,28 @@ public class VisionSystem extends WPICameraExtension {
             table.putDouble("angle_susan", this.angle_susan);
             table.putDouble("distance", this.distance);
             table.endTransaction();
+            }
+            /*
             try {
                 Thread.sleep(50);
             } catch (InterruptedException ex) {
                 Logger.getLogger(VisionSystem.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            }*/
         }
     }
     
     public void init() {
         super.init();
-        setPreferredSize(new Dimension(200, 100));
+        setPreferredSize(new Dimension(100, 100));
         trackingData = new TrackingData();
+        
         NetworkTable.setIPAddress("10.24.23.2");
         table = NetworkTable.getTable(TABLENAME);
+
     }
-    
-  /*  @Override
-    protected void paintComponent(Graphics g) {
-        if (drawnImage != null) {
-            if (!resized) {
-                setPreferredSize(new Dimension(drawnImage.getWidth(), drawnImage.getHeight()));
-                revalidate();
-            }
-            int width = getBounds().width/2;
-            int height = getBounds().height;
-            double scale = Math.min((double) width / (double) drawnImage.getWidth(), (double) height / (double) drawnImage.getHeight());
-            //draw the modified image
-            g.drawImage(drawnImage, (int) (width - (scale * drawnImage.getWidth())) / 2, (int) (height - (scale * drawnImage.getHeight())) / 2,
-                    (int) ((width + scale * drawnImage.getWidth()) / 2), (int) (height + scale * drawnImage.getHeight()) / 2,
-                    0, 0, drawnImage.getWidth(), drawnImage.getHeight(), null);
-            //draw the preprocessed image - a width away from the other image
-            g.drawImage(preProcessedImage, (int) (width - (scale * drawnImage.getWidth())) / 2, (int) (height - (scale * drawnImage.getHeight())) / 2,
-                    (int) ((width + scale * drawnImage.getWidth()) / 2), (int) (height + scale * drawnImage.getHeight()) / 2,
-                    width, 0, drawnImage.getWidth(), drawnImage.getHeight(), null);
-        } else {
-            //draw two boxes to represent the two images not being shown
-            int width = getBounds().width/2 ;
-            int height = getBounds().height ; 
-            g.setColor(Color.YELLOW);
-            g.fillRect(0, 0, width, height);
-            g.setColor(Color.BLACK);
-            g.drawString("DISCONNECTED", 5, 10);
-            g.setColor(Color.PINK);
-            g.fillRect(width, 0, width, height);
-            g.setColor(Color.BLUE);
-            g.drawString("VISION SYSTEM", width + 10, 10);
-        }
-    }*/
     
     @Override
     public WPIImage processImage(WPIColorImage rawImage) {
-        
         double IMAGE_WIDTH = 640.0;
         double AXIS_CAMERA_VIEW_ANGLE = Math.PI * 38.33 / 180.0;
 
@@ -219,7 +188,6 @@ public class VisionSystem extends WPICameraExtension {
                 }
             }
         }
-
         if(square != null){
             // x coordinate of the center
             double center_x = square.getX() + (square.getWidth()/2);
@@ -245,6 +213,8 @@ public class VisionSystem extends WPICameraExtension {
         }else{
             table.putBoolean("found", false);
             Robot.getTable().putBoolean("found", false);
+            Robot.getTable().putDouble("distance", 0.0);
+            Robot.getTable().putDouble("angle_susan", 0.0);
         }
 
         return rawImage;

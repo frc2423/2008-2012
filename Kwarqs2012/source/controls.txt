@@ -52,8 +52,8 @@ Stick2:
             
     Ball Handling:
         
-        6/7: manual chamber 
-        10/11: manual feeder
+        6/7: manual feeder
+        10/11: manual chamber
             -- continues for 1 second if auto ball handler is on, to catch
             any balls that might have been collected
     

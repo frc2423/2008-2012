@@ -68,20 +68,22 @@ class MyAutonomousMode(object):
         #This function name will need to be changed. I simply guessed as to
         #what it would be called
         
-        if ball_handler.IsEmpty() and self.x == 0:
-            self.basetime = time_elapsed
-            self.x = 1
+        pass
         
-        if time_elapsed >= self.basetime + 1:
-            if bodyGyro.GetAngle() < angle_to_ramp:
-                self.robot_manager.Turn(self.speed)
+        # if ball_handler.IsEmpty() and self.x == 0:
+            # self.basetime = time_elapsed
+            # self.x = 1
+        
+        # if time_elapsed >= self.basetime + 1:
+            # if bodyGyro.GetAngle() < angle_to_ramp:
+                # self.robot_manager.Turn(self.speed)
                 
-            if bodyGyro.GetAngle() >= angle_to_ramp and self.turn_ended = END
+            # if bodyGyro.GetAngle() >= angle_to_ramp and self.turn_ended = END
                 #turnend not made yet
-                self.robot_manager.TurnEnd() 
+                # self.robot_manager.TurnEnd() 
                 #Go forward not made yet
-                self.robot_manager.GoForward(self.time_forward)
-                robot.ramparm.extend
+                # self.robot_manager.GoForward(self.time_forward)
+                # robot.ramparm.extend
             
             #tell robot to move to the ramp
             

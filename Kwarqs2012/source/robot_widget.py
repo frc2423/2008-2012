@@ -4,6 +4,8 @@ try:
     import wpilib.SmartDashboard
     from wpilib.NetworkTables import NetworkTable
 except ImportError:
+    import fake_wpilib as wpilib
+    import fake_wpilib.SmartDashboard
     from fake_wpilib.NetworkTables import NetworkTable
 
 

@@ -67,6 +67,7 @@ server.delete_remote(           '/py/components/shooter/__pycache__' )
 # -> local root, remote file name
 files = [
     ( local_root, 'robot.py' ), 
+    ('../source/', 'robot_widget.py'),
     ('../source/', 'operator_leds.py')
 ]
 

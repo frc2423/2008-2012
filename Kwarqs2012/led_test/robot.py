@@ -4,6 +4,7 @@ try:
     import wpilib
     import wpilib.SmartDashboard
     from operator_leds import OperatorLEDs
+    from robot_widget import RobotWidget
 except ImportError:
 
     import fake_wpilib as wpilib
@@ -15,10 +16,16 @@ except ImportError:
     fname = os.path.normpath( os.path.dirname(os.path.abspath(__file__)) + '/../source/operator_leds.py' )
     operator_leds = imp.load_source( 'operator_leds', fname )
     OperatorLEDs = operator_leds.OperatorLEDs
+    
+    fname = os.path.normpath( os.path.dirname(os.path.abspath(__file__)) + '/../source/robot_widget.py' )
+    robot_widget = imp.load_source( 'robot_widget', fname )
+    RobotWidget = robot_widget.RobotWidget
 
 
 
 MANUAL_LEDS = False
+
+widget = RobotWidget('Widget')
 
 stick1 = wpilib.Joystick(1)
     
@@ -36,6 +43,12 @@ class MyRobot(wpilib.SimpleRobot):
         
         self.eio.SetDigitalConfig( 10, wpilib.DriverStationEnhancedIO.kOutput )
         
+        self.eio.SetDigitalConfig( 2, wpilib.DriverStationEnhancedIO.kInputPullUp )
+        self.eio.SetDigitalConfig( 4, wpilib.DriverStationEnhancedIO.kInputPullUp )
+        self.eio.SetDigitalConfig( 8, wpilib.DriverStationEnhancedIO.kInputPullUp )
+        self.eio.SetDigitalConfig( 12, wpilib.DriverStationEnhancedIO.kInputPullUp )
+        self.eio.SetDigitalConfig( 16, wpilib.DriverStationEnhancedIO.kInputPullUp )
+        
         if MANUAL_LEDS:
             self.sd.PutBoolean( "Enable 1", False ) 
             self.sd.PutBoolean( "Enable 2", False ) 
@@ -49,8 +62,6 @@ class MyRobot(wpilib.SimpleRobot):
             self.sd.PutBoolean( "D1 - 1", False )
             self.sd.PutBoolean( "D1 - 2", False )
             self.sd.PutBoolean( "D1 - 3", False )
-            
-            
             
             self.eio.SetDigitalConfig( OperatorLEDs.G_EN[0], wpilib.DriverStationEnhancedIO.kOutput )
             self.eio.SetDigitalConfig( OperatorLEDs.G_EN[1], wpilib.DriverStationEnhancedIO.kOutput )
@@ -120,6 +131,13 @@ class MyRobot(wpilib.SimpleRobot):
                 
                 if self.ds.IsNewControlData():
                     self.operator_leds.Update()
+                    
+                    
+            widget.SetChamber( self.eio.GetDigital(2) )
+            widget.SetMiddleVirtual( self.eio.GetDigital(4) )
+            widget.SetFeederTop( self.eio.GetDigital(8) )
+            widget.SetFeederVirtual( self.eio.GetDigital(12) )
+            widget.SetFeederLow( self.eio.GetDigital(16) )
             
             self.eio.SetDigitalOutput( 10, self.sd.GetBoolean( "LED" ) )
             

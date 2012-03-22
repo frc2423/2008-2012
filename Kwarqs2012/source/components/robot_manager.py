@@ -87,19 +87,15 @@ class RobotManager(object):
         
         # get the tracking data from the camera object
         
-        # TODO: fill this in
-        distance = 0
-        susan_angle = 0
         
         # speed the robot should be shooting according to the
         # automated system
         if self.auto_distance:
-            speed = distance
-    
+            speed = self.camera.TrackingData.distance
     
         # always maintain the current susan angle when auto is enabled
         if self.auto_susan and not self.susan.IsSet():
-            self.susan.SetAutoRelativeAngle( susan_angle )
+            self.susan.SetAutoRelativeAngle( self.camera.TrackingData.angle_susan )
             
         ball_ready = self.ball_handler.IsReadyToShoot()
         wheel_ready = self.wheel.IsReady()
@@ -149,10 +145,10 @@ class RobotManager(object):
             
             # the wheel should be able to determine once a ball gets stuck in
             # it, since the speed should lower dramatically
-            if wheel.DetectedShootEvent():
+            if self.wheel.DetectedShootEvent():
                 self.was_shot = True
             
-            if timer.Get() > RobotManager.MIN_SHOOTING_PERIOD:
+            if self.timer.Get() > RobotManager.MIN_SHOOTING_PERIOD:
                 if self.was_shot:
                     shot = True
             

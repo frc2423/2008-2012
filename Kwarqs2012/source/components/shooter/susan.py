@@ -54,7 +54,7 @@ class Susan(object):
     SUSAN_D = 0.0
     SUSAN_CAMERA_MAX = 20
     SUSAN_MAX_SPEED = 1
-    ANGLETOLERANCE = 5      # the percent tolerance of the angle to be considered ready'''
+    ANGLE_TOLERANCE = 5      # the percent tolerance of the angle to be considered ready'''
     
     def __init__(self, susanCAN, susanGyro, bodyGyro):
         
@@ -74,7 +74,7 @@ class Susan(object):
         self.pidControl = wpilib.PIDController(Susan.SUSAN_P, Susan.SUSAN_I, Susan.SUSAN_D, self.pid_source, self.pid_output)
         self.pidControl.SetInputRange(-(Susan.SUSAN_CAMERA_MAX),Susan.SUSAN_CAMERA_MAX)
         self.pidControl.SetOutputRange(-(Susan.SUSAN_MAX_SPEED), Susan.SUSAN_MAX_SPEED)
-        self.pidControl.SetTolerance(Susan.ANGLETOLERANCE)
+        self.pidControl.SetTolerance(Susan.ANGLE_TOLERANCE)
         
         # this never changes, when we're using PID control the goal is to get
         # the offset to zero

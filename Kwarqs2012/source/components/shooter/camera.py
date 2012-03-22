@@ -1,12 +1,28 @@
+import .susan
 
 try:
     import wpilib
     import wpilib.SmartDashboard
+    from   wpilib.NetworkTables import NetworkTable
+
 except ImportError:
     import fake_wpilib as wpilib
     import fake_wpilib.SmartDashboard
     
-    
+''' constants used to get data from the table '''
+TABLENAME = "TrackingData"
+DISTANCE = "distance"
+SONAR_DISTANCE = "sonar_distance"
+ANGLE_SUSAN = "angle_susan"
+X = "x"
+Y = "Y"
+TARGET_DATA_VALID = "target_data_valid"
+VALID_FRAMES = "valid_frames"
+
+trackingDataTable = NetworkTable.GetTable(TABLENAME)    
+
+''' Angle tolerance is the same with the susan and camera '''
+ANGLE_TOLERANCE = susan.ANGLE_TOLERANCE
     
 class Camera(object):
     '''
@@ -39,11 +55,15 @@ class Camera(object):
         self.led_relay.Set( Camera.LED_RELAY_ON )
         
     # TODO: NetworkTables interface from SmartDashboard
-
+        self.trackingData = TrackingData();
     
     def IsReadyToShoot(self):
         # TODO
-        return True
+        ''' angle is with in the tolerance level so we are ready to shoot'''
+        if self.trackingData.angle_susan < ANGLE_TOLERANCE or self.trackingData.angle_susan > -ANGLE_TOLERANCE
+            return True
+        else
+            return False
     
     def SetAngle(self, angle):
         '''Manually point the camera somewhere'''
@@ -57,6 +77,8 @@ class Camera(object):
     def Update(self):
     
         camera_angle = self.camera_angle
+        
+        TrackingData.Update()
     
         if camera_angle is None:
             # TODO: get the angle that the SmartDashboard software wants us to
@@ -67,3 +89,46 @@ class Camera(object):
         
         # reset
         self.camera_angle = None
+        
+class TrackingData(object):
+    
+    '''
+        This class refers to the tracking data that is processed on the driverstation
+        from the camera image. An instance is to be created inside the camera class to
+        update its variables
+    ''' 
+    
+    ''' doubles '''   
+    distance = 0.0
+    sonar_distance = 0.0
+    angle_susan = 0.0
+    
+    ''' ints '''  
+    x = 0
+    y = 0
+    valid_frames = 0
+    
+    ''' booleans '''
+    target_data_valid = False
+        
+    def Update(self):
+        ''' Updates Values from the Network Table '''
+        
+        ''' begins transaction '''
+        trackingDataTable.BeginTransaction()
+        
+        ''' doubles '''  
+        TrackingData.distance = trackingDataTable.GetDouble(DISTANCE)
+        TrackingData.sonar_distance = trackingDataTable.GetDouble(SONAR_DISTANCE)
+        TrackingData.angle_susan = trackingDataTable.GetDouble(ANGLE_SUSAN)
+        
+        ''' ints '''
+        TrackingData.x = trackingDataTable.GetInt(X)
+        TrackingData.y = trackingDataTable.GetInt(Y)
+        TrackingData.valid_frames = trackingDataTable.GetInt(VALID_FRAMES)
+        
+        ''' booleans '''
+        TrackingData.target_data_valid = trackingDataTable.GetBoolean(TARGET_DATA_VALID)
+        
+        '''Ends Transaction'''
+        trackingDataTable.EndTransaction()

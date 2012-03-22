@@ -16,6 +16,10 @@ import edu.wpi.first.wpijavacv.WPIColor;
 import edu.wpi.first.wpijavacv.WPIColorImage;
 import edu.wpi.first.wpijavacv.WPIImage;
 import edu.wpi.first.wpilibj.networking.NetworkTable;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +32,8 @@ public class VisionSystem extends WPICameraExtension {
     public static final String NAME = "Vision System";
     public static final String TABLENAME = "TrackingData";
     private TrackingData trackingData;
-    private NetworkTable table;
+    private NetworkTable table = null;
+    private BufferedImage preProcessedImage;
     
     private class TrackingData
     {
@@ -118,18 +123,52 @@ public class VisionSystem extends WPICameraExtension {
 
     public void init() {
         super.init();
+        setPreferredSize(new Dimension(200, 100));
         trackingData = new TrackingData();
         NetworkTable.setIPAddress("10.24.23.2");
         table = NetworkTable.getTable(TABLENAME);
     }
 
-
+    @Override
+    protected void paintComponent(Graphics g) {
+        if (drawnImage != null) {
+            if (!resized) {
+                setPreferredSize(new Dimension(drawnImage.getWidth(), drawnImage.getHeight()));
+                revalidate();
+            }
+            int width = getBounds().width/2;
+            int height = getBounds().height;
+            double scale = Math.min((double) width / (double) drawnImage.getWidth(), (double) height / (double) drawnImage.getHeight());
+            //draw the modified image
+            g.drawImage(drawnImage, (int) (width - (scale * drawnImage.getWidth())) / 2, (int) (height - (scale * drawnImage.getHeight())) / 2,
+                    (int) ((width + scale * drawnImage.getWidth()) / 2), (int) (height + scale * drawnImage.getHeight()) / 2,
+                    0, 0, drawnImage.getWidth(), drawnImage.getHeight(), null);
+            //draw the preprocessed image - a width away from the other image
+            g.drawImage(preProcessedImage, (int) (width - (scale * drawnImage.getWidth())) / 2, (int) (height - (scale * drawnImage.getHeight())) / 2,
+                    (int) ((width + scale * drawnImage.getWidth()) / 2), (int) (height + scale * drawnImage.getHeight()) / 2,
+                    width, 0, drawnImage.getWidth(), drawnImage.getHeight(), null);
+        } else {
+            //draw two boxes to represent the two images not being shown
+            int width = getBounds().width/2 ;
+            int height = getBounds().height ; 
+            g.setColor(Color.YELLOW);
+            g.fillRect(0, 0, width, height);
+            g.setColor(Color.BLACK);
+            g.drawString("DISCONNECTED", 5, 10);
+            g.setColor(Color.PINK);
+            g.fillRect(width, 0, width, height);
+            g.setColor(Color.BLUE);
+            g.drawString("VISION SYSTEM", width + 10, 10);
+        }
+    }
     @Override
     public WPIImage processImage(WPIColorImage rawImage) {
         //Process image and send to Network Table
         //TODO: process image code
         //TODO: Set all variables from the tracking data class
         
+        // Set the preprocessed Image to the rawImage
+        preProcessedImage = rawImage.getBufferedImage();
         // Geting the image from the camera
         IplImage rgb = IplImage.createFrom(rawImage.getBufferedImage());
         IplImage hls = cvCreateImage(cvGetSize(rgb), 8, 3);

@@ -5,13 +5,9 @@
     Description:
     
         Put a useful description of your autonomous mode here
-''' 
+'''
 
-from manager import AutonomousModeBase
-
-
-
-class MyAutonomousMode(AutonomousModeBase):
+class MyAutonomousMode(object):
 
     # this name should be descriptive and unique. This will be shown to the user
     # on the SmartDashboard

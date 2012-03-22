@@ -97,7 +97,7 @@ class Wheel(object):
     # before reporting that it is ready
     STABLE_READY_PERIOD = 0.5
     
-    def __init__(self, wheelCAN1, wheelCAN2, encoder_tuple):
+    def __init__(self, wheelCAN1, wheelCAN2, encoder_tuple, rate_leds):
     
         self.vBus = None
         self.auto_speed = None
@@ -112,6 +112,9 @@ class Wheel(object):
         self.is_stable_timer.Start()
         
         self.print_timer = PrintTimer()
+        
+        # shows the wheel rate in an LED
+        self.rate_leds = rate_leds
         
         self.wheelMotor1 = wpilib.CANJaguar(wheelCAN1)
         self.wheelMotor2 = wpilib.CANJaguar(wheelCAN2)
@@ -136,8 +139,9 @@ class Wheel(object):
 
         # SmartDashboard stuff
         
-        sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
-        sd.PutData( "Wheel PID", self.pid_controller )
+        self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
+        self.sd.PutData( "Wheel PID", self.pid_controller )
+        self.sd.PutInt( "Wheel speed", 0 )
         
         
     def _calculate_is_ready(self):
@@ -231,6 +235,11 @@ class Wheel(object):
         if enable_automode:
             self.pid_output.Reset()
             self.pid_controller.Enable()
+            
+        # tell the operator how fast the wheel is going via LEDs and SmartDashboard
+        rate = self.encoder.GetRate()
+        self.rate_leds.Set( rate )
+        self.sd.PutInt( "Wheel Speed", rate )
             
         # reset vars at the end
         self.auto_speed = None

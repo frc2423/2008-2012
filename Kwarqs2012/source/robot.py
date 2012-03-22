@@ -78,13 +78,20 @@ consoleLedPort  = 10
 # Create instances of all components here
 #
 
+# operator interface
+
+consoleLed      = ConsoleLED(consoleLedPort)
+operatorLeds    = OperatorLEDs()
+left_leds       = operatorLeds.GetDigitGroup(0)
+right_leds      = operatorLeds.GetDigitGroup(1)
+widget          = RobotWidget('Widget')
+
+# control components
 
 l_driveMotor    = wpilib.Jaguar(l_motor_pwm_ch)
 r_driveMotor    = wpilib.Jaguar(r_motor_pwm_ch)
 
 drive           = wpilib.RobotDrive(l_driveMotor, r_driveMotor)
-
-widget          = RobotWidget('Widget')
 
 chamber         = Chamber(chamberRelay, chambIRSens)
 feeder          = Feeder(feeder_pwm_ch, botFeedSwitch, topFeedIRSens)
@@ -92,14 +99,10 @@ ballHandler     = BallHandler(chamber, feeder, widget)
 
 camera          = Camera(camera_servo_ch, cameraRelay)
 susan           = Susan(susanCAN, susanGyro, bodyGyro)
-wheel           = Wheel(shootWheelCAN1, shootWheelCAN2, wheelEncoder)
+wheel           = Wheel(shootWheelCAN1, shootWheelCAN2, wheelEncoder, right_leds)
 
 rampArm         = RampArm(rampArmCAN)
 
-consoleLed      = ConsoleLED(consoleLedPort)
-operatorLeds    = OperatorLEDs()
-left_leds       = operatorLeds.GetDigitGroup(0)
-right_leds      = operatorLeds.GetDigitGroup(1)
 robotManager    = RobotManager(ballHandler, camera, wheel, susan, consoleLed)
 
 
@@ -245,6 +248,8 @@ class MyRobot(wpilib.SimpleRobot):
             
             dog.Feed()
             
+            left_led_value = None
+            
             drive.ArcadeDrive(GetJoystickAxis(DRIVE_Y_AXIS), GetJoystickAxis(DRIVE_X_AXIS))
             
             
@@ -273,7 +278,7 @@ class MyRobot(wpilib.SimpleRobot):
             try:
                 if SwitchOn( MANUAL_SHOOTER_WHEEL_ENABLE_SWITCH ):
                     wheel.SetAutoSpeed( shooter_z )
-            
+                    left_led_value = shooter_z
             except:
                 if not self.ds.IsFMSAttached():
                     raise
@@ -370,6 +375,7 @@ class MyRobot(wpilib.SimpleRobot):
                     robotManager.EnableAutoDistance()
                 else:
                     robotManager.SetUserWheelSpeed( shooter_z )
+                    left_led_value = shooter_z
             except:
                 if not self.ds.IsFMSAttached():
                     raise
@@ -380,7 +386,17 @@ class MyRobot(wpilib.SimpleRobot):
             except:
                 if not self.ds.IsFMSAttached():
                     raise
+                    
+                    
+            ###############################################
+            # LEDs
+            ###############################################
             
+            try:
+                left_leds.Set( left_led_value )
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
            
             ###############################################
             # Debug support

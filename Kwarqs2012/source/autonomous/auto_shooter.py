@@ -4,14 +4,14 @@
     
     Description:
     
-        This mode only feeds another robot, does not move or anything
+        This just keeps shooting balls until the end of autonomous mode
 '''
 
-class FeedOnlyAutonomousMode(object):
+class MyAutonomousMode(object):
 
     # this name should be descriptive and unique. This will be shown to the user
     # on the SmartDashboard
-    MODE_NAME = "Feed Only - Mentor"
+    MODE_NAME = "Auto Shooter - Mentor"
     DEFAULT = False
 
 
@@ -49,5 +49,11 @@ class FeedOnlyAutonomousMode(object):
             active, in case your mode finds that useful. 
         '''
         
-        self.ball_handler.chamber.Remove()
-        self.ball_handler.feeder.Expel()
+        self.robot_manager.EnableAutoSusan()
+        self.robot_manager.EnableAutoDistance()
+        self.robot_manager.ShootBall()
+
+        # keep feeding balls during the entire thing
+        self.ball_handler.AutoFeed()
+        self.ball_handler.ContinuousFeed()
+        

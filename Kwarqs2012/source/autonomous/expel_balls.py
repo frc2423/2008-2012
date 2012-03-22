@@ -17,7 +17,7 @@ class MyAutonomousMode(object):
 
     # this name should be descriptive and unique. This will be shown to the user
     # on the SmartDashboard
-    MODE_NAME = "Feed Teammates"
+    MODE_NAME = "Feed Teammates - Student"
     DEFAULT = False
 
 

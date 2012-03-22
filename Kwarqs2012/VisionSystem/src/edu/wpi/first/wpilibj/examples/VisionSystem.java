@@ -21,8 +21,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // TODELETE?
-import com.googlecode.javacpp.Loader;
-import com.googlecode.javacv.cpp.*;
 import edu.wpi.first.smartdashboard.camera.WPICameraExtension;
 
 public class VisionSystem extends WPICameraExtension {
@@ -66,7 +64,6 @@ public class VisionSystem extends WPICameraExtension {
         
         public TrackingData(){
             // Preload the opencv_objdetect module to work around a known bug.
-            Loader.load(opencv_objdetect.class);
     
             frame_number = 0;
             valid_frames = 0;

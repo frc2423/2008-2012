@@ -38,7 +38,7 @@ class Camera(object):
     '''
 
     # if nobody tells the camera where to point, point it here
-    DEFAULT_CAMERA_ANGLE = 180.0
+    DEFAULT_CAMERA_ANGLE = 70.0
     
     LED_RELAY_ON    = wpilib.Relay.kForward 
     LED_RELAY_OFF   = wpilib.Relay.kOff
@@ -48,6 +48,7 @@ class Camera(object):
         
         self.servo = wpilib.Servo(camera_servo_ch)
         self.camera_angle = None
+        self.current = None
         
         # this never changes, set it and forget it
         # -> TODO: Should we turn this off to conserve power when
@@ -57,6 +58,7 @@ class Camera(object):
         self.led_relay.Set( Camera.LED_RELAY_ON )
         
         self.trackingData = TrackingData();
+        
     
     def IsReadyToShoot(self):
         # TODO
@@ -72,7 +74,7 @@ class Camera(object):
     
         
     def Print(self):
-        pass
+        print("Camera: %s" % self.current)
 
         
     def Update(self):
@@ -89,6 +91,7 @@ class Camera(object):
         self.servo.SetAngle( camera_angle )
         
         # reset
+        self.current = camera_angle
         self.camera_angle = None
         
 class TrackingData(object):

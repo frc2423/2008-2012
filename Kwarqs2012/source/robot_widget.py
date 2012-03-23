@@ -19,23 +19,25 @@ class RobotWidget(object):
     def __init__(self, name):
     
         # add this to the SmartDashboard automatically
-        sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
-        sd.PutData( name, self )
-    
         self.table = NetworkTable()
-
+        
         self.table['chamber'] = False
         self.table['middle_virtual'] = False
         self.table['feeder_top'] = False
         self.table['feeder_virtual'] = False
         self.table['feeder_low'] = False
         
+        sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
+        sd.PutData( name, self )
+
+        
+        
     def SetAll(self, chamber, middle_virtual, feeder_top, feeder_virtual, feeder_low):
-        self.table['chamber'] = chamber
-        self.table['middle_virtual'] = middle_virtual
-        self.table['feeder_top'] = feeder_top
-        self.table['feeder_virtual'] = feeder_virtual
-        self.table['feeder_low'] = feeder_low
+        self.table['chamber'] = bool(chamber)
+        self.table['middle_virtual'] = bool(middle_virtual)
+        self.table['feeder_top'] = bool(feeder_top)
+        self.table['feeder_virtual'] = bool(feeder_virtual)
+        self.table['feeder_low'] = bool(feeder_low)
         
     def SetChamber(self, value):
         self.table['chamber'] = value

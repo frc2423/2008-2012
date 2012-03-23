@@ -45,7 +45,7 @@ from components.shooter import Camera, Susan, Wheel
 #
         
 #Relay Inputs
-chamberRelay    = 2
+#chamberRelay    = 2
 cameraRelay     = 3
 
 # PWM Jaguars
@@ -67,7 +67,7 @@ chambIRSens     = 6
 #CAN Bus IDs
 shootWheelCAN1  = 2
 shootWheelCAN2  = 3
-angleCAN        = 4
+chamberCAN      = 4
 rampArmCAN      = 5
 susanCAN        = 6
 
@@ -82,8 +82,8 @@ consoleLedPort  = 10
 
 consoleLed      = ConsoleLED(consoleLedPort)
 operatorLeds    = OperatorLEDs()
-left_leds       = operatorLeds.GetDigitGroup(0)
-right_leds      = operatorLeds.GetDigitGroup(1)
+left_leds       = operatorLeds.GetDigitGroup(1)
+right_leds      = operatorLeds.GetDigitGroup(0)
 widget          = RobotWidget('Widget')
 
 # control components
@@ -93,7 +93,7 @@ r_driveMotor    = wpilib.Jaguar(r_motor_pwm_ch)
 
 drive           = wpilib.RobotDrive(l_driveMotor, r_driveMotor)
 
-chamber         = Chamber(chamberRelay, chambIRSens)
+chamber         = Chamber(chamberCAN, chambIRSens)
 feeder          = Feeder(feeder_pwm_ch, botFeedSwitch, topFeedIRSens)
 ballHandler     = BallHandler(chamber, feeder, widget)
 
@@ -151,7 +151,7 @@ class MyRobot(wpilib.SimpleRobot):
     
         while self.IsDisabled():
             if self.ds.IsNewControlData():
-                operator_leds.InDisabled()
+                operatorLeds.InDisabled()
                 
             wpilib.Wait(0.01)
 
@@ -409,7 +409,7 @@ class MyRobot(wpilib.SimpleRobot):
             
             if not self.ds.IsFMSAttached():
             
-                if StickButtonOn( DEBUG_BUTTON ):
+                if StickButtonOn( DEBUG_BUTTON1 ) or StickButtonOn( DEBUG_BUTTON2 ):
                     self._debug_print()
             
     

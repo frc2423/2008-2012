@@ -22,14 +22,14 @@ class Chamber(object):
     '''
     
     # belt movement values.. 
-    BELT_UP     = wpilib.Relay.kReverse
-    BELT_DOWN   = wpilib.Relay.kForward
-    BELT_OFF    = wpilib.Relay.kOff
+    BELT_UP     = -1.0
+    BELT_DOWN   = 1.0
+    BELT_OFF    = 0.0
     
     
-    def __init__ ( self, chamberRelay, chambIRSens ):
+    def __init__ ( self, chamberCAN, chambIRSens ):
     
-        self.belt_motor = wpilib.Relay(chamberRelay)
+        self.belt_motor = wpilib.CANJaguar(chamberCAN)
         self.ball_sensor = IRSensor(chambIRSens, 2.0)
         
         self.direction = None

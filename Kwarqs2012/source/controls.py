@@ -45,7 +45,8 @@ BALL_HANDLER_MANUAL_FEEDER_EXPEL_BUTTON = (2, 7)
 
 SHOOT_BALL_BUTTON = (2, TRIGGER)
 
-DEBUG_BUTTON = (2, 8)
+DEBUG_BUTTON1 = (1, 8)
+DEBUG_BUTTON2 = (2, 8)
 
 
 # switch definitions
@@ -53,8 +54,8 @@ DEBUG_BUTTON = (2, 8)
 
 # TODO: Fix these
 MANUAL_SHOOTER_WHEEL_ENABLE_SWITCH  = 2
-AUTO_BALL_HANDLER_SWITCH            = 4
-CONTINUOUS_BALL_HANDLER_SWITCH      = 8
+CONTINUOUS_BALL_HANDLER_SWITCH      = 4
+AUTO_BALL_HANDLER_SWITCH            = 8
 AUTO_SUSAN_SWITCH                   = 12
 AUTO_DISTANCE_SWITCH                = 16
 
@@ -78,7 +79,7 @@ def GetJoystickAxis( tuple ):
     return ds.GetStickAxis( tuple[0], tuple[1] )
 
 def StickButtonOn( tuple ):
-    return ds.GetStickButtons( tuple[0] ) & (1 << tuple[1])
+    return ds.GetStickButtons( tuple[0] ) & (1 << (tuple[1]-1))
 
 def SwitchOn( val ):
     return not eio.GetDigital( val )

@@ -141,7 +141,7 @@ class Wheel(object):
         
         self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
         self.sd.PutData( "Wheel PID", self.pid_controller )
-        self.sd.PutInt( "Wheel speed", 0 )
+        self.sd.PutDouble( "Wheel speed", 0 )
         
         
     def _calculate_is_ready(self):
@@ -239,7 +239,7 @@ class Wheel(object):
         # tell the operator how fast the wheel is going via LEDs and SmartDashboard
         rate = self.encoder.GetRate()
         self.rate_leds.Set( rate )
-        self.sd.PutInt( "Wheel Speed", rate )
+        self.sd.PutDouble( "Wheel Speed", rate )
             
         # reset vars at the end
         self.auto_speed = None

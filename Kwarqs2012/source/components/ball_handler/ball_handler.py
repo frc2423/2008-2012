@@ -47,6 +47,9 @@ class BallHandler(object):
         print("BallHandler: FLO: %s, FV: %s, FTOP: %s, VM: %s, CFUL: %s" % 
             (self.last_feeder_low, self.feeder_virtual_ball, self.last_feeder_top,
              self.middle_virtual_ball, self.last_chamber_full))
+        print("Voltage: Feeder: %.3f Chamber: %.3f" % (
+            self.feeder.top_ball_sensor.irSensor.GetVoltage(),
+            self.chamber.ball_sensor.irSensor.GetVoltage() ))
         
     #
     # Internal logic for ball tracking

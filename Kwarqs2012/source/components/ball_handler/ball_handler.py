@@ -80,7 +80,6 @@ class BallHandler(object):
         feeder_dir = self.feeder.GetDirection() 
         chamber_dir = self.chamber.GetDirection()
     
-    
         # virtual feeder ball
         
         if feeder_dir == UP:
@@ -102,7 +101,7 @@ class BallHandler(object):
     
         # virtual middle ball
     
-        if chamber_dir == UP and feeder_dir >= 0:
+        if chamber_dir == UP or feeder_dir >= 0:
                 
             if chamber_full and not self.last_chamber_full:
                 self.middle_virtual_ball = False
@@ -110,7 +109,7 @@ class BallHandler(object):
             if not feeder_top and self.last_feeder_top:
                 self.middle_virtual_ball = True
         
-        elif chamber_dir == DOWN and feeder_dir <= 0:
+        elif chamber_dir == DOWN or feeder_dir <= 0:
             
             if feeder_top and not self.last_feeder_top:
                 self.middle_virtual_ball = False

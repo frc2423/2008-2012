@@ -94,16 +94,16 @@ class Feeder(object):
         # are probably traveling up or down
         num = len(self.direction_history) + 1
         
-        if num > 6:
+        if num > 2:
             self.direction_history.pop()
         
         self.direction_history.appendleft(direction)
         
         avg = sum(self.direction_history)/num
             
-        if avg > 0.0:
+        if avg < 0.0:
             self.last_direction = Feeder.BELT_DOWN
-        elif avg < 0.0:
+        elif avg > 0.0:
             self.last_direction = Feeder.BELT_UP
         else:
             self.last_direction = Feeder.BELT_STOP

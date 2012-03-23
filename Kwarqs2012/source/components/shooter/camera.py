@@ -120,13 +120,17 @@ class TrackingData(object):
         self._lock = threading.RLock()
         self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
         
-    def getDistance(self):
+    def GetDistance(self):
         with self.lock:
             return TrackingData.distance
     
-    def getAngle(self):
+    def GetAngle(self):
         with self.lock:
             return TrackingData.angle_susan
+    
+    def IsFound(self):
+        with self.lock:
+            return TrackingData.found
          
     def Update(self):
         with self._lock:
@@ -138,30 +142,26 @@ class TrackingData(object):
             ''' doubles '''  
             TrackingData.distance = trackingDataTable.GetDouble(DISTANCE)
             TrackingData.angle_susan = trackingDataTable.GetDouble(ANGLE_SUSAN)
-            #TrackingData.sonar_distance = trackingDataTable.GetDouble(SONAR_DISTANCE)
+            
 
-            
-            ''' ints '''
-            #TrackingData.x = trackingDataTable.GetInt(X)
-            #TrackingData.y = trackingDataTable.GetInt(Y)
-            #TrackingData.valid_frames = trackingDataTable.GetInt(VALID_FRAMES)
-            
             ''' booleans '''
             TrackingData.found = trackingDataTable.GetBoolean(FOUND)
-            #TrackingData.target_data_valid = trackingDataTable.GetBoolean(TARGET_DATA_VALID)
+
+            
+            '''Ends Transaction'''
+            trackingDataTable.EndTransaction()
             
             '''Put tracking data to smartdashboard'''
             #UNCOMMENT TO MAKE THIS WORK
             '''
-            if TrackingData.found:
-                sd.PutDouble("distance", TrackingData.distance)
-                sd.PutDouble("angle_susan", TrackingData.angle_susan)
-                sd.PutBoolean("found", TrackingData.found)
-            else
-                sd.PutDouble("distance", 0)
-                sd.PutDouble("angle_susan", 0)
-                sd.PutBoolean("found", false)
+            sd.table.BeginTransaction()
+                if TrackingData.found:
+                    sd.PutDouble("distance", TrackingData.distance)
+                    sd.PutDouble("angle_susan", TrackingData.angle_susan)
+                    sd.PutBoolean("found", TrackingData.found)
+                else
+                    sd.PutDouble("distance", 0)
+                    sd.PutDouble("angle_susan", 0)
+                    sd.PutBoolean("found", false)
+            sd.table.EndTransaction()
             '''
-            
-            '''Ends Transaction'''
-            trackingDataTable.EndTransaction()

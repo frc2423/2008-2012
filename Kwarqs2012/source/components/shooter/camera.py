@@ -1,11 +1,11 @@
 
 from components.shooter.susan import Susan
-
+import threading
 try:
     import wpilib
     import wpilib.SmartDashboard
     from   wpilib.NetworkTables import NetworkTable
-
+    
 except ImportError:
     import fake_wpilib as wpilib
     import fake_wpilib.SmartDashboard
@@ -115,24 +115,45 @@ class TrackingData(object):
     ''' booleans '''
     target_data_valid = False
         
+    def __init__(self):
+        self._lock = threading.RLock()
+        self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
+        
+    def getDistance(self):
+        with self.lock:
+            return TrackingData.distance
+    
+    def getAngle(self):
+        with self.lock:
+            return TrackingData.angle_susan
+         
     def Update(self):
-        ''' Updates Values from the Network Table '''
-        
-        ''' begins transaction '''
-        trackingDataTable.BeginTransaction()
-        
-        ''' doubles '''  
-        TrackingData.distance = trackingDataTable.GetDouble(DISTANCE)
-        TrackingData.sonar_distance = trackingDataTable.GetDouble(SONAR_DISTANCE)
-        TrackingData.angle_susan = trackingDataTable.GetDouble(ANGLE_SUSAN)
-        
-        ''' ints '''
-        TrackingData.x = trackingDataTable.GetInt(X)
-        TrackingData.y = trackingDataTable.GetInt(Y)
-        TrackingData.valid_frames = trackingDataTable.GetInt(VALID_FRAMES)
-        
-        ''' booleans '''
-        TrackingData.target_data_valid = trackingDataTable.GetBoolean(TARGET_DATA_VALID)
-        
-        '''Ends Transaction'''
-        trackingDataTable.EndTransaction()
+        with self._lock:
+            ''' Updates Values from the Network Table Currently only getting distance and angle_susan '''
+                   
+            ''' begins transaction '''
+            trackingDataTable.BeginTransaction()
+            
+            ''' doubles '''  
+            TrackingData.distance = trackingDataTable.GetDouble(DISTANCE)
+            TrackingData.angle_susan = trackingDataTable.GetDouble(ANGLE_SUSAN)
+            #TrackingData.sonar_distance = trackingDataTable.GetDouble(SONAR_DISTANCE)
+
+            
+            ''' ints '''
+            #TrackingData.x = trackingDataTable.GetInt(X)
+            #TrackingData.y = trackingDataTable.GetInt(Y)
+            #TrackingData.valid_frames = trackingDataTable.GetInt(VALID_FRAMES)
+            
+            ''' booleans '''
+            #TrackingData.target_data_valid = trackingDataTable.GetBoolean(TARGET_DATA_VALID)
+            
+            '''Put tracking data to smartdashboard'''
+            #UNCOMMENT TO MAKE THIS WORK
+            '''
+            sd.PutDouble("Distance: ", TrackingData.distance)
+            sd.PutDouble("Angle: ", TrackingData.angle_susan)
+            '''
+            
+            '''Ends Transaction'''
+            trackingDataTable.EndTransaction()

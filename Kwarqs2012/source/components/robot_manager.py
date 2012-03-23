@@ -91,14 +91,14 @@ class RobotManager(object):
         # speed the robot should be shooting according to the
         # automated system
         if self.auto_distance:
-            speed = self.camera.trackingData.distance
+            speed = self.camera.trackingData.getDistance()
         elif self.user_speed is not None:
             speed = self.user_speed
 
     
         # always maintain the current susan angle when auto is enabled
         if self.auto_susan and not self.susan.IsSet():
-            self.susan.SetAutoRelativeAngle( self.camera.trackingData.angle_susan )
+            self.susan.SetAutoRelativeAngle( self.camera.trackingData.getAngle() )
             
         ball_ready = self.ball_handler.IsReadyToShoot()
         wheel_ready = self.wheel.IsReady()

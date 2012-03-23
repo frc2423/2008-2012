@@ -65,7 +65,6 @@ files = [
     'operator_leds.py',
     'robot.py',
     'robot_widget.py',
-    'tracking_data.py',
     'util.py'
 ]
 

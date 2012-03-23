@@ -149,10 +149,10 @@ class RobotManager(object):
             
             # the wheel should be able to determine once a ball gets stuck in
             # it, since the speed should lower dramatically
-            if self.wheel.DetectedShootEvent():
-                self.was_shot = True
+            #if self.wheel.DetectedShootEvent():
+            #    self.was_shot = True
             
-            if self.timer.Get() > RobotManager.MIN_SHOOTING_PERIOD:
+            if self.shoot_timer.Get() > RobotManager.MIN_SHOOTING_PERIOD:
                 if self.was_shot:
                     shot = True
             

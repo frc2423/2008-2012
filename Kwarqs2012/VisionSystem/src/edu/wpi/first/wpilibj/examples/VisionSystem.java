@@ -78,7 +78,7 @@ public class VisionSystem extends WPICameraExtension {
         }
     
         
-     public void PutTrackingData(NetworkTable table){
+     /*public void PutTrackingData(NetworkTable table){
 
             synchronized(table) {
             table.beginTransaction();
@@ -92,13 +92,13 @@ public class VisionSystem extends WPICameraExtension {
             table.putDouble("distance", this.distance);
             table.endTransaction();
             }
-            /*
+            
             try {
                 Thread.sleep(50);
             } catch (InterruptedException ex) {
                 Logger.getLogger(VisionSystem.class.getName()).log(Level.SEVERE, null, ex);
-            }*/
-        }
+            }
+        } */
     }
     
     public void init() {
@@ -107,9 +107,11 @@ public class VisionSystem extends WPICameraExtension {
         trackingData = new TrackingData();
         
         NetworkTable.setIPAddress("10.24.23.2");
-        table = NetworkTable.getTable(TABLENAME);
+        //table = NetworkTable.getTable(TABLENAME);
 
     }
+    
+    
     
     @Override
     public WPIImage processImage(WPIColorImage rawImage) {
@@ -117,9 +119,13 @@ public class VisionSystem extends WPICameraExtension {
         double AXIS_CAMERA_VIEW_ANGLE = Math.PI * 38.33 / 180.0;
 
         preProcessedImage = rawImage.getBufferedImage();
+        //WPIBinaryImage blueBin = rawImage.getBlueChannel().getThresholdInverted(0);
+        //WPIBinaryImage greenBin = rawImage.getGreenChannel().getThreshold(250);
+        //WPIBinaryImage redBin = rawImage.getRedChannel().getThresholdInverted(0);
         WPIBinaryImage blueBin = rawImage.getBlueChannel().getThresholdInverted(60);
-        WPIBinaryImage greenBin = rawImage.getGreenChannel().getThresholdInverted(60);
+        WPIBinaryImage greenBin = rawImage.getGreenChannel().getThreshold(60);
         WPIBinaryImage redBin = rawImage.getRedChannel().getThresholdInverted(60);
+
 
         WPIBinaryImage finalBin = blueBin.getAnd(redBin).getAnd(greenBin);
 
@@ -132,7 +138,9 @@ public class VisionSystem extends WPICameraExtension {
 
         for(WPIContour c : contours){
             double ratio = ((double)c.getHeight()) / ((double)c.getWidth());
-            if(ratio < 1.5 && ratio> 0.75){
+            //System.err.println(ratio);
+            if(ratio < 2 && ratio> 0.60){
+                //System.err.println("found contour");
                 polygons.add(c.approxPolygon(45));
             }
         }
@@ -143,78 +151,127 @@ public class VisionSystem extends WPICameraExtension {
             if(p.isConvex() && p.getNumVertices() == 4){
                 possiblePolygons.add(p);
             }else{
-                rawImage.drawPolygon(p, WPIColor.CYAN, 5);
+                rawImage.drawPolygon(p, WPIColor.CYAN, 1);
                 
             }
         }
 
-        WPIPolygon square = null;
-        int squareArea = 0;
-
+        ArrayList<WPIPolygon> insidePolygons = new ArrayList<WPIPolygon>();
+        
+        // Filtering the inside polygons
         for(WPIPolygon p : possiblePolygons){
-            rawImage.drawPolygon(p, WPIColor.GREEN, 5);
             for(WPIPolygon q : possiblePolygons){
                 if(p == q) continue;
-
-               int pCenterX = (p.getX() + (p.getWidth()/2));
+                
+                int pCenterX = (p.getX() + (p.getWidth()/2));
+                int qCenterX = q.getX() + (q.getWidth()/2);
+                int pCenterY = (p.getY() + (p.getHeight()/2));
+                int qCenterY = q.getY() + (q.getHeight()/2);
+                
+                double distance_between_rects = Math.sqrt(Math.pow(pCenterX - qCenterX, 2) + Math.pow(pCenterY - qCenterY, 2));
                
-               int qCenterX = q.getX() + (q.getWidth()/2);
-               
-               int pCenterY = (p.getY() + (p.getHeight()/2));
-
-               int qCenterY = q.getY() + (q.getHeight()/2);
-
-               rawImage.drawPoint(new WPIPoint(pCenterX, pCenterY), targetColor, 5);
-               rawImage.drawPoint(new WPIPoint(qCenterX, qCenterY), targetColor, 5);
-               
-                // filter only the targets that have their centers not that far from each other 
-                // and get the bigest square 
-                if(Math.abs(pCenterX - qCenterX) < 20 &&
-                    Math.abs(pCenterY - qCenterY) < 20){
-                    int pArea = Math.abs(p.getArea());
-                    int qArea = Math.abs(q.getArea());
-                    // choosing the biger target (closest)
-                    if(pArea > qArea){
-                        square = p;
-                        squareArea = pArea;
-                    }else{
-                        square = q;
-                        squareArea = qArea;
+                //System.err.println(distance_between_rects);
+                
+                if(distance_between_rects < 50){
+                    if (p.getArea() > q.getArea()) {
+                        insidePolygons.add(q);
+                        }
+                    else {
+                        insidePolygons.add(p);
                     }
-                    break;
                 }
             }
         }
-        if(square != null){
+        
+        //System.err.println(possiblePolygons.size());
+        possiblePolygons.removeAll(insidePolygons);
+        //System.err.println(possiblePolygons.size());
+        //System.err.println(insidePolygons.size());
+        
+        for (WPIPolygon p : possiblePolygons) {
+            int pCenterX = (p.getX() + (p.getWidth()/2));
+            int pCenterY = (p.getY() + (p.getHeight()/2));
+            rawImage.drawPolygon(p, WPIColor.BLUE, 2);
+            rawImage.drawPoint(new WPIPoint(pCenterX, pCenterY), WPIColor.BLUE, 2);
+        }
+        
+        double maxArea = 0.0;
+        WPIPolygon biggest_rectangle = null;
+        
+        for (WPIPolygon p : possiblePolygons) {
+            if (Math.abs(p.getArea()) >= maxArea){
+                maxArea = Math.abs(p.getArea());
+                biggest_rectangle = p;
+            }
+        }
+        if (biggest_rectangle != null){
+            rawImage.drawPolygon(biggest_rectangle, WPIColor.BLUE, 2);
+            int pCenterX = (biggest_rectangle.getX() + (biggest_rectangle.getWidth()/2));
+            int pCenterY = (biggest_rectangle.getY() + (biggest_rectangle.getHeight()/2));
+
+            rawImage.drawPoint(new WPIPoint(pCenterX, pCenterY), WPIColor.BLUE, 2);
+   
+            trackingData.frame_number = trackingData.frame_number +1;
+            
             // x coordinate of the center
-            double center_x = square.getX() + (square.getWidth()/2);
-            double  square_width = square.getWidth();
+            double center_x = biggest_rectangle.getX() + (biggest_rectangle.getWidth()/2);
+            double  biggest_rectangle_width = biggest_rectangle.getWidth();
             // x in a relative coordinate system (-1, 1)
             //x = (2 * (x/rawImage.getWidth())) - 1;
             double angle_susan = (IMAGE_WIDTH / 2.0 - center_x) * AXIS_CAMERA_VIEW_ANGLE / IMAGE_WIDTH;
-            double distance = (IMAGE_WIDTH * 22.0) / (2.0 * square_width * Math.tan(AXIS_CAMERA_VIEW_ANGLE/2.0));
-            //double area = ((double)squareArea) /  ((double)(rawImage.getWidth() * rawImage.getHeight()));
+            double distance = (IMAGE_WIDTH * 22.0) / (2.0 * biggest_rectangle_width * Math.tan(AXIS_CAMERA_VIEW_ANGLE/2.0));
+            //double area = ((double)biggest_rectangleArea) /  ((double)(rawImage.getWidth() * rawImage.getHeight()));
             
-            synchronized(table) {
-            table.beginTransaction();
+            //System.err.println(distance);
+            System.err.println(angle_susan);
+            //System.err.println(trackingData.frame_number);
+            
+            /*
+            if (trackingData.frame_number % 15 == 0)  { 
+                synchronized(table) {
+                table.beginTransaction();
+
                 table.putBoolean("found", true);
                 table.putDouble("angle_susan", angle_susan);
                 table.putDouble("distance", distance);
-            table.endTransaction();
-            }
+                table.endTransaction();
+                }
+            }*/
+            //if (trackingData.frame_number % 50 == 0)  {
+                //System.err.println("--------------------------------------");
+                synchronized(table) {
+                table.beginTransaction();
+                table.putBoolean("found", true);
+                table.putDouble("angle_susan", angle_susan);
+                table.putDouble("distance", distance);
+                table.endTransaction();
+                }
+            
 
             Robot.getTable().putBoolean("found", true);
             Robot.getTable().putDouble("distance", distance);
             Robot.getTable().putDouble("angle_susan", angle_susan);
-            rawImage.drawPolygon(square, targetColor, 7);
-        }else{
+            //}
+            rawImage.drawPolygon(biggest_rectangle, targetColor, 3);
+            
+        } else{
+            System.err.println("no rectangle found");
+            /*
+            if (trackingData.frame_number % 15 == 0)  {
+            table.putBoolean("found", false);
+            table.putDouble("angle_susan", 0.0);
+            table.putDouble("distance", 0.0);
+            table.endTransaction();
+            } */
+            /*
             table.putBoolean("found", false);
             Robot.getTable().putBoolean("found", false);
             Robot.getTable().putDouble("distance", 0.0);
-            Robot.getTable().putDouble("angle_susan", 0.0);
+            Robot.getTable().putDouble("angle_susan", 0.0);*/
         }
 
         return rawImage;
+        //return finalBin;
     }
 }
 

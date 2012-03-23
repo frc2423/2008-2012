@@ -1,4 +1,5 @@
-import .susan
+
+from components.shooter.susan import Susan
 
 try:
     import wpilib
@@ -8,6 +9,7 @@ try:
 except ImportError:
     import fake_wpilib as wpilib
     import fake_wpilib.SmartDashboard
+    from fake_wpilib.NetworkTables import NetworkTable
     
 ''' constants used to get data from the table '''
 TABLENAME = "TrackingData"
@@ -22,7 +24,7 @@ VALID_FRAMES = "valid_frames"
 trackingDataTable = NetworkTable.GetTable(TABLENAME)    
 
 ''' Angle tolerance is the same with the susan and camera '''
-ANGLE_TOLERANCE = susan.ANGLE_TOLERANCE
+ANGLE_TOLERANCE = Susan.ANGLE_TOLERANCE
     
 class Camera(object):
     '''
@@ -54,15 +56,14 @@ class Camera(object):
         self.led_relay = wpilib.Relay(led_relay_ch)
         self.led_relay.Set( Camera.LED_RELAY_ON )
         
-    # TODO: NetworkTables interface from SmartDashboard
         self.trackingData = TrackingData();
     
     def IsReadyToShoot(self):
         # TODO
         ''' angle is with in the tolerance level so we are ready to shoot'''
-        if self.trackingData.angle_susan < ANGLE_TOLERANCE or self.trackingData.angle_susan > -ANGLE_TOLERANCE
+        if self.trackingData.angle_susan < ANGLE_TOLERANCE or self.trackingData.angle_susan > -ANGLE_TOLERANCE:
             return True
-        else
+        else:
             return False
     
     def SetAngle(self, angle):
@@ -78,7 +79,7 @@ class Camera(object):
     
         camera_angle = self.camera_angle
         
-        TrackingData.Update()
+        self.trackingData.Update()
     
         if camera_angle is None:
             # TODO: get the angle that the SmartDashboard software wants us to

@@ -38,6 +38,7 @@ def capture_image_from_axis(cam_address,
     
     capture = CaptureFromFile(cam_address)
     rgb = QueryFrame(capture)
+    cv.SaveImage('./rgb.jpg', rgb)
     if SHOW_RGB_IMAGE: ShowImage("RGB Image", rgb)
     
     # Color conversion to HLS space
@@ -300,13 +301,13 @@ def intersection_coordinates_of_two_lines(A, B, C, D):
 if __name__ == '__main__':
     
     if FROM_AXIS:
-        cam_address = "http://10.24.23.11/mjpg/video.mjpg?resolution=640x480&req_fps=30&.mjpg"
+        cam_address = "http://10.24.23.20/mjpg/video.mjpg?resolution=640x480&req_fps=30&.mjpg"
     else:
         cam_address = 0
         
     # Define rectangle coordinates [y_min:y_max, x_min:x_max]
     #rect = [[148,160, 186,237], [179,225, 447,454], [192,298, 541,592]]
-    rect = [[56,64, 150,213], [34,45, 395,467], [144,153, 412,478]]
+    rect = [[74,79 , 120, 164], [68,77 , 357, 397], [171, 178, 458, 495]]
     
     
     # Define min and max values to be filtered from the HLS color image
@@ -317,7 +318,10 @@ if __name__ == '__main__':
     hls = asarray(hls)
     hls_t = asarray(hls_t)
     
-    hls_hist(hls, rect)
+    im_rgb = imread('./rgb.jpg')
+    im_rgb = im_rgb[range(479, 0, -1), :, :]
+    hls_hist(im_rgb, rect)
+    pdb.set_trace()
     rectangle_corners     = find_contours(hls_t_d)
     #rect_labels          = label_rectangles(rectangle_corners)
     corners               = choose_biggest_target(rectangle_corners)

@@ -273,10 +273,12 @@ class MyRobot(wpilib.SimpleRobot):
             # manager in case the user doesn't have the switch
             # flipped when the fire button is pressed
             shooter_z = GetJoystickAxis( SHOOTER_WHEEL_AXIS )
+            #shooter_z = ((shooter_z * -1.0) + 1.0) / 2.0
             shooter_z = ((shooter_z * -1.0) + 1.0) * 50.0
             
             try:
                 if SwitchOn( MANUAL_SHOOTER_WHEEL_ENABLE_SWITCH ):
+                    #wheel.SetVBus( shooter_z )
                     wheel.SetAutoSpeed( shooter_z )
                     left_led_value = shooter_z
             except:

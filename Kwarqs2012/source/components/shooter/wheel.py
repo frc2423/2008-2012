@@ -109,7 +109,7 @@ class Wheel(object):
     SYNCGROUP = 2
     
     # percent tolerance to report convergence
-    PID_TOLERANCE = 5.0
+    PID_TOLERANCE = 15.0
     
     # minimum rate for the encoder for the wheel to declare itself 'ready'
     MIN_ENCODER_READY_RATE = 5.0
@@ -154,7 +154,9 @@ class Wheel(object):
         self.pid_output = WheelPidOutput(self.wheelMotor1, self.wheelMotor2)
         
         self.pid_controller = wpilib.SmartDashboard.SendablePIDController(Wheel.MOTOR_P, Wheel.MOTOR_I, Wheel.MOTOR_D, self.pid_source, self.pid_output)
+        self.pid_controller.SetInputRange( 0.0, 120.0 )
         self.pid_controller.SetTolerance( Wheel.PID_TOLERANCE )
+        
     
         # warning: dont enable the PID controller here
 
@@ -175,7 +177,7 @@ class Wheel(object):
                 
             s_tm = self.is_stable_timer.Get()
             if s_tm > Wheel.STABLE_READY_PERIOD:
-                if self.print_timer( 'is_ready' ):
+                if self.print_timer.should_print( 'is_ready' ):
                     print( "[Wheel PID] Wheel speed is stable (speed: %.3f)" % self.auto_speed ) 
             
         else:

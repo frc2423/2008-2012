@@ -92,6 +92,8 @@ class RobotManager(object):
         # automated system
         if self.auto_distance:
             speed = self.camera.TrackingData.distance
+        elif self.user_speed is not None:
+            speed = self.user_speed
     
         # always maintain the current susan angle when auto is enabled
         if self.auto_susan and not self.susan.IsSet():
@@ -108,10 +110,7 @@ class RobotManager(object):
             # spinning an appropriate speed
             
             # always let the user override
-            if not self.wheel.IsSet():
-                if self.user_speed is not None:
-                    speed = self.user_speed
-                    
+            if not self.wheel.IsSet():                    
                 self.wheel.SetAutoSpeed( speed )
             
         

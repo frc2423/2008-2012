@@ -32,6 +32,9 @@ class SmartDashboard(object):
     def PutBoolean(self, key, value):
         self.data[key] = bool(value)
         
+    def PutDouble(self, key, value):
+        self.data[key] = value
+        
     def PutData(self, key, value):
         self.data[key] = value
         

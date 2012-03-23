@@ -19,16 +19,33 @@ class WheelPidSource(wpilib.PIDSource):
         self._lock = threading.RLock()
         self.encoder = encoder
         self.value = 0.0
+        self.vals = []
+        self.previous = 0.0
         
     def Get(self):
         with self._lock:
             return self.value
+            
+    def Reset(self):
+        with self._lock:
+            self.vals = []
+            self.value = None
         
     def PIDGet(self):
-        value = self.encoder.PIDGet()    
+        
         with self._lock:
-            self.value = value
-        return value
+            
+            self.value = self.encoder.PIDGet()
+        
+            #alpha = 0.98
+            #self.value = value * alpha + self.previous * (1-alpha)
+            #self.previous = value
+        
+            #self.vals.insert(0, self.encoder.PIDGet())
+            #if len(self.vals) > 1:
+            #    self.vals.pop()
+            #self.value = sum( self.vals ) / len(self.vals)
+            return self.value
 
  
 class WheelPidOutput(wpilib.PIDOutput):
@@ -83,6 +100,10 @@ class Wheel(object):
     MOTOR_P = 0.000675
     MOTOR_I = 0.000000050
     MOTOR_D = 0.01
+    
+    #MOTOR_P = 0.0
+    #MOTOR_I = 0.0001
+    #MOTOR_D = 0.0
     
     # sync group
     SYNCGROUP = 2
@@ -142,6 +163,7 @@ class Wheel(object):
         self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
         self.sd.PutData( "Wheel PID", self.pid_controller )
         self.sd.PutDouble( "Wheel speed", 0 )
+        self.sd.PutBoolean( "Speed OK", False )
         
         
     def _calculate_is_ready(self):
@@ -233,6 +255,7 @@ class Wheel(object):
             
         # do this last otherwise the PID control might be enabled with a nonsense setpoint
         if enable_automode:
+            self.pid_source.Reset()
             self.pid_output.Reset()
             self.pid_controller.Enable()
             
@@ -240,7 +263,8 @@ class Wheel(object):
         rate = self.encoder.GetRate()
         self.rate_leds.Set( rate )
         self.sd.PutDouble( "Wheel Speed", rate )
-            
+        self.sd.PutBoolean( "Speed OK", self.pid_controller.OnTarget() )
+        
         # reset vars at the end
         self.auto_speed = None
         self.vBus = None

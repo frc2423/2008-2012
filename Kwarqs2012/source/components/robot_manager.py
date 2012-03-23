@@ -94,6 +94,7 @@ class RobotManager(object):
             speed = self.camera.TrackingData.distance
         elif self.user_speed is not None:
             speed = self.user_speed
+
     
         # always maintain the current susan angle when auto is enabled
         if self.auto_susan and not self.susan.IsSet():

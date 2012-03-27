@@ -23,6 +23,11 @@ class SmartDashboard(object):
         if key in self.data:
             return self.data[key]
         return None
+
+    def GetDouble(self,key):
+        if key in self.data:
+            return self.data[key]
+        return None
         
     def GetInt(self, key):
         if key in self.data:

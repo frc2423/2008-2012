@@ -7,7 +7,18 @@ class Test(object):
     def __init__(self, robot_module, myrobot):
         self.robot_module = robot_module
         self.myrobot = myrobot
+        self.Reset()
+        
+    def Reset(self):
         self.loop_count = 0
+        self.tm = None
+        
+    def IsAutonomous(self, tm):
+    
+        if self.tm is None:
+            self.tm = tm
+    
+        return tm - self.tm < 15.0
         
     def IsOperatorControl(self, tm):
         self.loop_count += 1
@@ -21,9 +32,15 @@ def run_tests( robot_module, myrobot ):
 
     robot_module.wpilib._print_components()
     
+    
     myrobot.enabled = True
+    myrobot.on_IsAutonomous = test.IsAutonomous
     myrobot.on_IsOperatorControl = test.IsOperatorControl
     
+    test.Reset()
+    myrobot.Autonomous()
+    
+    test.Reset()
     myrobot.OperatorControl()
 
 

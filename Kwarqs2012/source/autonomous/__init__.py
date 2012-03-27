@@ -117,11 +117,13 @@ class AutonomousModeManager(object):
         '''Select the active autonomous mode here, and enable it'''
         self.active_mode = self.chooser.GetSelected()
         if self.active_mode is not None:
+            print( "AutonomousModeManager: Enabling %s" % self.active_mode.MODE_NAME )
             self.active_mode.OnEnable()
  
     def OnAutonomousDisable(self):
         '''Disable the active autonomous mode'''
         if self.active_mode is not None:
+            print( "AutonomousModeManager: Disabling %s" % self.active_mode.MODE_NAME )
             self.active_mode.OnDisable()
             
         self.active_mode = None

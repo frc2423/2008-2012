@@ -11,7 +11,7 @@ class MyAutonomousMode(object):
 
     # this name should be descriptive and unique. This will be shown to the user
     # on the SmartDashboard
-    MODE_NAME = "Auto Shooter - Mentor"
+    MODE_NAME = "Auto Shooter"
     DEFAULT = False
 
 

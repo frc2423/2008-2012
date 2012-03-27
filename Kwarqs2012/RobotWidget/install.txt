@@ -1,3 +1,0 @@
-
-dist\RobotWidget.jar is copied to $(SmartDashboard)\extensions\
-img\*.png is copied to $(SmartDashboard)\extensions\img

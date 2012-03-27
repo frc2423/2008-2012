@@ -24,6 +24,7 @@ TOP = wpilib.Joystick.kDefaultTopButton              # 2
 
 DRIVE_X_AXIS        = (1, X)
 DRIVE_Y_AXIS        = (1, Y)
+DRIVE_TRIGGER       = (1, TRIGGER)
 MANUAL_CAMERA_AXIS  = (1, Z)
 
 SUSAN_TURN_AXIS     = (2, X)
@@ -34,7 +35,8 @@ SHOOTER_WHEEL_AXIS  = (2, Z)
 # -> call StickButtonPressed() with this value to get True/False
 
 RAMP_ARM_DOWN_BUTTON = (1,6)
-MANUAL_CAMERA_ENABLE_BUTTON = (1, TOP)
+MANUAL_CAMERA_ENABLE_BUTTON1 = (1, TOP)
+MANUAL_CAMERA_ENABLE_BUTTON2 = (1, 7)
 
 SUSAN_TURN_BUTTON = (2, TOP)
 

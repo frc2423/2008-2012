@@ -19,8 +19,10 @@
 
 try:
     import wpilib
+    import wpilib.SmartDashboard
 except ImportError:
     import fake_wpilib as wpilib
+    import fake_wpilib.SmartDashboard
    
 from autonomous import AutonomousModeManager
 from controls import *
@@ -140,10 +142,13 @@ class MyRobot(wpilib.SimpleRobot):
         wpilib.SimpleRobot.__init__(self)
         
         self.ds = wpilib.DriverStation.GetInstance()
+        self.sd = wpilib.SmartDashboard.SmartDashboard().GetInstance()
         self.print_timer = PrintTimer()
         
-        self.autonomous_manager = AutonomousModeManager(drive, rampArm, 
-                                                        ballHandler, robotManager)
+        self.sd.PutDouble("Target wheel speed", 0.0 )
+        
+        self.autonomous = AutonomousModeManager(drive, rampArm, 
+                                                ballHandler, robotManager)
     
     def Disabled(self):
         
@@ -152,6 +157,9 @@ class MyRobot(wpilib.SimpleRobot):
         while self.IsDisabled():
             if self.ds.IsNewControlData():
                 operatorLeds.InDisabled()
+                #left_leds.Set(24)
+                #right_leds.Set(23)
+                operatorLeds.Update()
                 
             wpilib.Wait(0.01)
 
@@ -189,6 +197,9 @@ class MyRobot(wpilib.SimpleRobot):
             except:
                 if not self.ds.IsFMSAttached():
                     raise
+             
+            
+            self._Update()
              
             wpilib.Wait(0.01)
             
@@ -249,8 +260,15 @@ class MyRobot(wpilib.SimpleRobot):
             dog.Feed()
             
             left_led_value = None
+        
+            y = GetJoystickAxis(DRIVE_Y_AXIS)
+            x = GetJoystickAxis(DRIVE_X_AXIS)
+        
+            if StickButtonOn(DRIVE_TRIGGER):
+                y = y * 0.5
+                x = x * 0.5
             
-            drive.ArcadeDrive(GetJoystickAxis(DRIVE_Y_AXIS), GetJoystickAxis(DRIVE_X_AXIS))
+            drive.ArcadeDrive(y, x)
             
             
             ###############################################
@@ -274,7 +292,9 @@ class MyRobot(wpilib.SimpleRobot):
             # flipped when the fire button is pressed
             shooter_z = GetJoystickAxis( SHOOTER_WHEEL_AXIS )
             #shooter_z = ((shooter_z * -1.0) + 1.0) / 2.0
-            shooter_z = ((shooter_z * -1.0) + 1.0) * 50.0
+            shooter_z = ((shooter_z * -1.0) + 1.0) * 40.0
+            
+            self.sd.PutDouble("Target wheel speed", shooter_z )
             
             try:
                 if SwitchOn( MANUAL_SHOOTER_WHEEL_ENABLE_SWITCH ):
@@ -291,11 +311,11 @@ class MyRobot(wpilib.SimpleRobot):
             ###############################################            
             
             try:
-                if StickButtonOn( MANUAL_CAMERA_ENABLE_BUTTON ):
+                if StickButtonOn( MANUAL_CAMERA_ENABLE_BUTTON1 ) or StickButtonOn( MANUAL_CAMERA_ENABLE_BUTTON2 ):
                 
                     # TODO: not sure what the appropriate angles are for this
                     angle = GetJoystickAxis( MANUAL_CAMERA_AXIS )
-                    angle = ((angle * -1.0) + 1.0) * 90.0
+                    angle = ((angle * -1.0) + 1.0) * 90.0 - 45.0
                 
                     camera.SetAngle( angle )
                 
@@ -310,7 +330,7 @@ class MyRobot(wpilib.SimpleRobot):
            
             try:
                 if StickButtonOn( SUSAN_TURN_BUTTON ):
-                    susan.SetVBus( GetJoystickAxis( SUSAN_TURN_AXIS ) )
+                    susan.SetVBus( GetJoystickAxis( SUSAN_TURN_AXIS ) * 0.6 )
                 
             except:
                 if not self.ds.IsFMSAttached():
@@ -325,16 +345,16 @@ class MyRobot(wpilib.SimpleRobot):
             # Enable automated behaviors if desired
             #
            
-            try:
-                if SwitchOn( AUTO_BALL_HANDLER_SWITCH ):
-                    ballHandler.AutoFeed()
+            #try:
+            #    if SwitchOn( AUTO_BALL_HANDLER_SWITCH ):
+            #        ballHandler.AutoFeed()
             
-                if SwitchOn( CONTINUOUS_BALL_HANDLER_SWITCH ):
-                    ballHandler.ContinuousFeed()
+            #    if SwitchOn( CONTINUOUS_BALL_HANDLER_SWITCH ):
+            #        ballHandler.ContinuousFeed()
                 
-            except:
-                if not self.ds.IsFMSAttached():
-                    raise
+            #except:
+            #    if not self.ds.IsFMSAttached():
+            #        raise
 
             #
             # Always allow manual control
@@ -363,21 +383,21 @@ class MyRobot(wpilib.SimpleRobot):
             # Robot Manager
             ###############################################
            
-            try:
-                if SwitchOn( AUTO_SUSAN_SWITCH ):
-                    robotManager.EnableAutoSusan()     
-            except:
-                if not self.ds.IsFMSAttached():
-                    raise
+            #try:
+            #    if SwitchOn( AUTO_SUSAN_SWITCH ):
+            #        robotManager.EnableAutoSusan()     
+            #except:
+            #    if not self.ds.IsFMSAttached():
+            #        raise
                     
             try:
                 # must always call either EnableAutoDistance
                 # or SetUserWheelSpeed on the robot manager
-                if SwitchOn( AUTO_DISTANCE_SWITCH ):
-                    robotManager.EnableAutoDistance()
-                else:
-                    robotManager.SetUserWheelSpeed( shooter_z )
-                    left_led_value = shooter_z
+                #if SwitchOn( AUTO_DISTANCE_SWITCH ):
+                #    robotManager.EnableAutoDistance()
+                #else:
+                robotManager.SetUserWheelSpeed( shooter_z )
+                left_led_value = shooter_z
             except:
                 if not self.ds.IsFMSAttached():
                     raise

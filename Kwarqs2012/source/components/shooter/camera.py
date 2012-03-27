@@ -121,15 +121,15 @@ class TrackingData(object):
         self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
         
     def GetDistance(self):
-        with self.lock:
+        with self._lock:
             return TrackingData.distance
     
     def GetAngle(self):
-        with self.lock:
+        with self._lock:
             return TrackingData.angle_susan
     
     def IsFound(self):
-        with self.lock:
+        with self._lock:
             return TrackingData.found
          
     def Update(self):
@@ -152,16 +152,12 @@ class TrackingData(object):
             trackingDataTable.EndTransaction()
             
             '''Put tracking data to smartdashboard'''
-            #UNCOMMENT TO MAKE THIS WORK
-            '''
-            sd.table.BeginTransaction()
-                if TrackingData.found:
-                    sd.PutDouble("distance", TrackingData.distance)
-                    sd.PutDouble("angle_susan", TrackingData.angle_susan)
-                    sd.PutBoolean("found", TrackingData.found)
-                else
-                    sd.PutDouble("distance", 0)
-                    sd.PutDouble("angle_susan", 0)
-                    sd.PutBoolean("found", false)
-            sd.table.EndTransaction()
-            '''
+            if self.found:
+                self.sd.PutDouble("CAM: Distance", self.distance )
+                self.sd.PutDouble("CAM: Angle", self.angle_susan )
+                self.sd.PutBoolean("CAM: Found", True)
+            else:
+                self.sd.PutDouble("CAM: Distance", 0)
+                self.sd.PutDouble("CAM: Angle", 0)
+                self.sd.PutBoolean("CAM: Found", False)
+

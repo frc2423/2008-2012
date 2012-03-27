@@ -54,10 +54,10 @@ print( 'Beginning upload.' )
 
 remote_root = '/py'
 
-# verify the directories actually exist
-server.create_remote_directory( '/py' )
-server.delete_remote(           '/py/__pycache__' )
 
+# wipe the whole thing, to ensure that we don't have any cruft lying around
+server.delete_remote(           '/py' )
+server.create_remote_directory( '/py' )
 
 # upload the files
 files = [
@@ -72,6 +72,9 @@ dirs = [
     'autonomous',
     'components'
 ]
+
+# restore boot.py
+server.upload_file( remote_root, 'C:\\WindRiver\\workspace\\robotpy\\py', 'boot.py' )
 
 for file in files:
     server.upload_file( remote_root, local_root, file )

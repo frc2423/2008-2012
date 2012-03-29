@@ -12,7 +12,6 @@ import edu.wpi.first.wpijavacv.WPIPolygon;
 import edu.wpi.first.wpilibj.networking.NetworkTable;
 import java.util.ArrayList;
 
-// Sam's stuff
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -20,7 +19,6 @@ import java.awt.image.BufferedImage;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// TODELETE?
 import edu.wpi.first.smartdashboard.camera.WPICameraExtension;
 
 public class VisionSystem extends WPICameraExtension {
@@ -68,8 +66,6 @@ public class VisionSystem extends WPICameraExtension {
             frame_number = 0;
             valid_frames = 0;
             target_data_valid = false;
-            //x = 0;
-            //y = 0;
             distance = 0;
             angle_susan = 0.0;
             wheel_speed = 0.0;
@@ -111,17 +107,14 @@ public class VisionSystem extends WPICameraExtension {
 
     }
     
-    
-    
     @Override
     public WPIImage processImage(WPIColorImage rawImage) {
         double IMAGE_WIDTH = 640.0;
         double AXIS_CAMERA_VIEW_ANGLE = Math.PI * 38.33 / 180.0;
 
         preProcessedImage = rawImage.getBufferedImage();
-        //WPIBinaryImage blueBin = rawImage.getBlueChannel().getThresholdInverted(0);
-        //WPIBinaryImage greenBin = rawImage.getGreenChannel().getThreshold(250);
-        //WPIBinaryImage redBin = rawImage.getRedChannel().getThresholdInverted(0);
+        
+        // color thresholding on the 3 RGB color planes
         WPIBinaryImage blueBin = rawImage.getBlueChannel().getThresholdInverted(60);
         WPIBinaryImage greenBin = rawImage.getGreenChannel().getThreshold(60);
         WPIBinaryImage redBin = rawImage.getRedChannel().getThresholdInverted(60);
@@ -129,13 +122,17 @@ public class VisionSystem extends WPICameraExtension {
 
         WPIBinaryImage finalBin = blueBin.getAnd(redBin).getAnd(greenBin);
 
+        // morpho maths erosion that takes out all small particles
         finalBin.erode(2);
+        // dilataion of all binary structures to get rid of whoop occlusion
         finalBin.dilate(6);
 
+        // generate contour structures from binay images    
         WPIContour[] contours = finalBin.findContours();
 
         ArrayList<WPIPolygon> polygons = new ArrayList<WPIPolygon>();
 
+        // Filtering by rectangle ratio (height / width)
         for(WPIContour c : contours){
             double ratio = ((double)c.getHeight()) / ((double)c.getWidth());
             //System.err.println(ratio);
@@ -147,18 +144,18 @@ public class VisionSystem extends WPICameraExtension {
 
         ArrayList<WPIPolygon> possiblePolygons = new ArrayList<WPIPolygon>();
 
+        // filtering polygons by convexity
         for(WPIPolygon p : polygons){
             if(p.isConvex() && p.getNumVertices() == 4){
                 possiblePolygons.add(p);
             }else{
                 rawImage.drawPolygon(p, WPIColor.CYAN, 1);
-                
             }
         }
 
         ArrayList<WPIPolygon> insidePolygons = new ArrayList<WPIPolygon>();
         
-        // Filtering the inside polygons
+        // geting rid of internal contours (inside targets)
         for(WPIPolygon p : possiblePolygons){
             for(WPIPolygon q : possiblePolygons){
                 if(p == q) continue;
@@ -169,9 +166,7 @@ public class VisionSystem extends WPICameraExtension {
                 int qCenterY = q.getY() + (q.getHeight()/2);
                 
                 double distance_between_rects = Math.sqrt(Math.pow(pCenterX - qCenterX, 2) + Math.pow(pCenterY - qCenterY, 2));
-               
-                //System.err.println(distance_between_rects);
-                
+            
                 if(distance_between_rects < 50){
                     if (p.getArea() > q.getArea()) {
                         insidePolygons.add(q);
@@ -183,11 +178,10 @@ public class VisionSystem extends WPICameraExtension {
             }
         }
         
-        //System.err.println(possiblePolygons.size());
+        // remove all internal contours
         possiblePolygons.removeAll(insidePolygons);
-        //System.err.println(possiblePolygons.size());
-        //System.err.println(insidePolygons.size());
         
+        // Draw target's centers
         for (WPIPolygon p : possiblePolygons) {
             int pCenterX = (p.getX() + (p.getWidth()/2));
             int pCenterY = (p.getY() + (p.getHeight()/2));
@@ -198,12 +192,15 @@ public class VisionSystem extends WPICameraExtension {
         double maxArea = 0.0;
         WPIPolygon biggest_rectangle = null;
         
+        // searching for the closest rectangle to camera (the one with the biggest area)
         for (WPIPolygon p : possiblePolygons) {
             if (Math.abs(p.getArea()) >= maxArea){
                 maxArea = Math.abs(p.getArea());
                 biggest_rectangle = p;
             }
         }
+        
+        // calculating camera angle to center of target (angle_susan) and distance to target 
         if (biggest_rectangle != null){
             rawImage.drawPolygon(biggest_rectangle, WPIColor.BLUE, 2);
             int pCenterX = (biggest_rectangle.getX() + (biggest_rectangle.getWidth()/2));
@@ -216,15 +213,11 @@ public class VisionSystem extends WPICameraExtension {
             // x coordinate of the center
             double center_x = biggest_rectangle.getX() + (biggest_rectangle.getWidth()/2);
             double  biggest_rectangle_width = biggest_rectangle.getWidth();
-            // x in a relative coordinate system (-1, 1)
-            //x = (2 * (x/rawImage.getWidth())) - 1;
             double angle_susan = (IMAGE_WIDTH / 2.0 - center_x) * AXIS_CAMERA_VIEW_ANGLE / IMAGE_WIDTH;
             double distance = (IMAGE_WIDTH * 22.0) / (2.0 * biggest_rectangle_width * Math.tan(AXIS_CAMERA_VIEW_ANGLE/2.0));
-            //double area = ((double)biggest_rectangleArea) /  ((double)(rawImage.getWidth() * rawImage.getHeight()));
             
-            //System.err.println(distance);
+            System.err.println(distance);
             System.err.println(angle_susan);
-            //System.err.println(trackingData.frame_number);
             
             /*
             if (trackingData.frame_number % 15 == 0)  { 
@@ -271,7 +264,6 @@ public class VisionSystem extends WPICameraExtension {
         }
 
         return rawImage;
-        //return finalBin;
     }
 }
 

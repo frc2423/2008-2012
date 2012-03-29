@@ -21,6 +21,13 @@ import java.util.logging.Logger;
 
 import edu.wpi.first.smartdashboard.camera.WPICameraExtension;
 
+/*
+Code inspired from the SquareTracker writen by Greg Granito
+
+*/
+
+
+
 public class VisionSystem extends WPICameraExtension {
     public static final String NAME = "Camera Square Tracker";
 

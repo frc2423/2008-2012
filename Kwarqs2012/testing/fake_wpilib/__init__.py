@@ -48,12 +48,19 @@
 __all__ = ['fake_time','pid_controller']
 
 import math
+import os
 
 # move these into the global namespace
 from .pid_controller import PIDSource, PIDOutput, PIDController
 from .fake_time import Notifier, Timer, Wait, GetClock
 
 
+
+#################################################
+#
+# Fake WPILib specific code
+#
+#################################################  
 
 
 def initialize_robot():
@@ -64,6 +71,26 @@ def initialize_robot():
 
     import robot
     return robot.run()
+    
+    
+def load_module(calling_file, relative_module_to_load):
+    '''
+        Utility function to be used to load a module that isn't in your python
+        path. Can be useful if you're creating multiple testing robot programs
+        and you don't want to copy modules from your main code to test them
+        individually. 
+    
+        This should be called like so:
+        
+            module = load_module( __file__, '/../../relative/path/to/module.py' )
+    
+    '''
+    
+    import imp
+ 
+    module_filename = os.path.normpath( os.path.dirname(os.path.abspath(calling_file)) + relative_module_to_load )
+    module_name = os.path.basename( os.path.splitext(module_filename)[0] )
+    return imp.load_source( module_name, module_filename )
     
     
 def _print_components():

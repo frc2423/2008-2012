@@ -10,18 +10,9 @@ except ImportError:
     import fake_wpilib as wpilib
     import fake_wpilib.SmartDashboard
 
-    import imp
-    import os
+    OperatorLEDs = fake_wpilib.load_module( __file__, '/../source/operator_leds.py' ).OperatorLEDs
+    RobotWidget = fake_wpilib.load_module( __file__, '/../source/robot_widget.py' ).RobotWidget
     
-    fname = os.path.normpath( os.path.dirname(os.path.abspath(__file__)) + '/../source/operator_leds.py' )
-    operator_leds = imp.load_source( 'operator_leds', fname )
-    OperatorLEDs = operator_leds.OperatorLEDs
-    
-    fname = os.path.normpath( os.path.dirname(os.path.abspath(__file__)) + '/../source/robot_widget.py' )
-    robot_widget = imp.load_source( 'robot_widget', fname )
-    RobotWidget = robot_widget.RobotWidget
-
-
 
 MANUAL_LEDS = False
 

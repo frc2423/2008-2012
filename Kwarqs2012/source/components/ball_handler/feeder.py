@@ -58,31 +58,49 @@ class Feeder(object):
         elif self.last_direction == Feeder.BELT_DOWN:
             return -1
         return 0
+
     
+    def HasEnterBall(self):
+        if self.enter_ball_sensor.IsBallPresent():
+            return True
+        
     def HasTopBall(self):
         '''Returns True if the top ball is present'''
+        
+        '''
         if self.has_top_ball == None:
             self.has_top_ball = self.top_ball_sensor.IsBallPresent()
         elif self.top_ball_sensor.IsBallPresent():
             self.has_top_ball = True
         elif self.low_ball_sensor.IsBallPresent() or not self.mid_ball_sensor.IsBallPresent():
             self.has_top_ball = False
-        return self.has_top_ball
-  
-    
+        '''
+        
+        return self.top_ball_sensor.IsBallPresent()
+
+        
+     def HasMidBall(self):
+        '''Returns True if a ball is in an intermediate state'''
+        return self.mid_ball_sensor.IsBallPresent()
+        
+        
         
     def HasLowBall(self):
         '''Returns True if the bottom ball is present'''
         '''If LowBall sensor and TopBall sensor are false but MidBall sensor is true then has_low_ball needs to stay true'''
+        
+        '''
         if self.has_low_ball == None:
             self.has_low_ball = self.low_ball_sensor.IsBallPresent()
         elif self.low_ball_sensor.IsBallPresent():
             self.has_low_ball = True
         elif self.top_ball_sensor.IsBallPresent() or not self.mid_ball_sensor.IsBallPresent():
             self.has_low_ball = False
-        return self.has_low_ball
-      
-      
+        '''
+        
+        return self.low_ball_sensor.IsBallPresent()
+
+     
     def IsSet(self):
         '''Returns True if someone has called Feed/Stop/Expel since the
            last time that Update() was called'''

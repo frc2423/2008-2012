@@ -63,7 +63,10 @@ wheelEncoder    = (10,11)
 #Analog Channel Inputs
 bodyGyro        = 1
 susanGyro       = 2
-topFeedIRSens   = 5
+topFeedIRSens  = 5
+midFeedIRSens = 4
+lowFeedIRSens = 3
+enterFeedIRSens = 7  
 chambIRSens     = 6
 
 #CAN Bus IDs
@@ -96,7 +99,7 @@ r_driveMotor    = wpilib.Jaguar(r_motor_pwm_ch)
 drive           = wpilib.RobotDrive(l_driveMotor, r_driveMotor)
 
 chamber         = Chamber(chamberCAN, chambIRSens)
-feeder          = Feeder(feeder_pwm_ch, botFeedSwitch, topFeedIRSens)
+feeder          = Feeder(feeder_pwm_ch, lowFeedIRSens, topFeedIRSens, midFeedIRSens, enterFeedIRSens)
 ballHandler     = BallHandler(chamber, feeder, widget)
 
 camera          = Camera(camera_servo_ch, cameraRelay)

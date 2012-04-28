@@ -21,7 +21,6 @@ class BallHandler(object):
         self.last_chamber_full = False
         
         self.feeder_virtual_ball = False
-        self.middle_virtual_ball = False
         
         # state
         self.auto_feed = False
@@ -44,88 +43,12 @@ class BallHandler(object):
         self.chamber.Run()
         
     def Print(self):
-        print("BallHandler: FLO: %s, FV: %s, FTOP: %s, VM: %s, CFUL: %s" % 
+        print("BallHandler: FLO: %s, FV: %s, FTOP: %s, CFUL: %s" % 
             (self.last_feeder_low, self.feeder_virtual_ball, self.last_feeder_top,
-             self.middle_virtual_ball, self.last_chamber_full))
+             self.last_chamber_full))
         print("Voltage: Feeder: %.3f Chamber: %.3f" % (
             self.feeder.top_ball_sensor.irSensor.GetVoltage(),
             self.chamber.ball_sensor.irSensor.GetVoltage() ))
-        
-    #
-    # Internal logic for ball tracking
-    #
-    
-    def _calculate_virtual_balls(self, feeder_top, feeder_low, chamber_full):
-        ''' 
-            Internal function: virtual ball tracking
-        
-            This is important because we need to ensure that
-            when a ball is in the feeder or chamber, that we don't
-            all of a sudden stop if the user lets go of the button,
-            and continue the ball to the top of the robot     
-
-            A ball goes into the 'virtual' state when the sensors
-            can no longer see the ball, but logically it must
-            be there because the belt is going the right way.
-        '''
-    
-        # note that we set the 'True' state last for each case, 
-        # because I'd rather think there was a ball there,
-        # as opposed to ignoring the ball
-        
-        # 1 is up, -1 is down, 0 is stopped
-        UP = 1
-        DOWN = -1
-        
-        feeder_dir = self.feeder.GetDirection() 
-        chamber_dir = self.chamber.GetDirection()
-    
-        # virtual feeder ball
-        
-        if feeder_dir == UP:
-        
-            if feeder_top and not self.last_feeder_top:
-                self.feeder_virtual_ball = False
-
-            if not feeder_low and self.last_feeder_low:
-                self.feeder_virtual_ball = True
-        
-        elif feeder_dir == DOWN:
-            
-            if feeder_low and not self.last_feeder_low:
-                self.feeder_virtual_ball = False
-        
-            if not feeder_top and self.last_feeder_top:
-                self.feeder_virtual_ball = True
-    
-    
-        # virtual middle ball
-    
-        if chamber_dir == UP or feeder_dir >= 0:
-                
-            if chamber_full and not self.last_chamber_full:
-                self.middle_virtual_ball = False
-    
-            if not feeder_top and self.last_feeder_top:
-                self.middle_virtual_ball = True
-        
-        elif chamber_dir == DOWN or feeder_dir <= 0:
-            
-            if feeder_top and not self.last_feeder_top:
-                self.middle_virtual_ball = False
-                
-            if not chamber_full and self.last_chamber_full:
-                self.middle_virtual_ball = True
-        
-        
-        self.last_feeder_top = feeder_top
-        self.last_feeder_low = feeder_low
-        self.last_chamber_full = chamber_full
-    
-        # tell the robot widget where the balls are
-        self.widget.SetAll( chamber_full, self.middle_virtual_ball,
-                            feeder_top, self.feeder_virtual_ball,
-                            feeder_low )
         
         
     def Update(self):
@@ -141,12 +64,11 @@ class BallHandler(object):
         chamber_full = self.chamber.IsFull()
         feeder_top = self.feeder.HasTopBall()
         feeder_low = self.feeder.HasLowBall()
-        
-        # perform ball tracking
-        self._calculate_virtual_balls( feeder_top, feeder_low, chamber_full )
+        feeder_middle  = self.feeder.HasMidBall()
+        feeder_enter = self.feeder.HasEnterBall()
         
         feeder_full = feeder_top and feeder_low
-        has_ball = feeder_top or feeder_low or self.feeder_virtual_ball or self.middle_virtual_ball
+        has_ball = feeder_top or feeder_low or feeder_middle
         
         # automated feeding
     
@@ -156,11 +78,11 @@ class BallHandler(object):
             run_chamber = False
             
             
-            if (continuous_feed or has_ball) and not feeder_full:
+            if (continuous_feed or has_ball or feeder_enter) and not feeder_full:
                 feed = True
             
             
-            if (feeder_top or self.middle_virtual_ball) and not chamber_full:
+            if feeder_top and not chamber_full:
                 feed = True
                 run_chamber = True
             

@@ -22,9 +22,8 @@ class RobotWidget(object):
         self.table = NetworkTable()
         
         self.table['chamber'] = False
-        self.table['middle_virtual'] = False
         self.table['feeder_top'] = False
-        self.table['feeder_virtual'] = False
+        self.table['feeder_mid'] = False
         self.table['feeder_low'] = False
         
         sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
@@ -32,24 +31,21 @@ class RobotWidget(object):
 
         
         
-    def SetAll(self, chamber, middle_virtual, feeder_top, feeder_virtual, feeder_low):
+    def SetAll(self, chamber, feeder_top, feeder_mid, feeder_low):
         self.table['chamber'] = bool(chamber)
-        self.table['middle_virtual'] = bool(middle_virtual)
         self.table['feeder_top'] = bool(feeder_top)
-        self.table['feeder_virtual'] = bool(feeder_virtual)
+        self.table['feeder_mid'] = bool(feeder_mid)
         self.table['feeder_low'] = bool(feeder_low)
         
     def SetChamber(self, value):
         self.table['chamber'] = value
         
-    def SetMiddleVirtual(self, value):
-        self.table['middle_virtual'] = value
         
     def SetFeederTop(self, value):
         self.table['feeder_top'] = value
         
-    def SetFeederVirtual(self, value):
-        self.table['feeder_virtual'] = value
+    def SetFeederMid(self, value):
+        self.table['feeder_mid'] = value
         
     def SetFeederLow(self, value):
         self.table['feeder_low'] = value

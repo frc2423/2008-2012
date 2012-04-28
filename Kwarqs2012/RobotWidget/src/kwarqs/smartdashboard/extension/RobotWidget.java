@@ -71,7 +71,7 @@ public class RobotWidget extends Widget {
                 }
             });
         }
-
+    
         // presumably you could reject the value here... 
         public void valueConfirmed(String key, Object value) {
         }
@@ -109,10 +109,11 @@ public class RobotWidget extends Widget {
         
         // various settings 
         addValue("chamber");
-        addValue("middle_virtual");
         addValue("feeder_top");
-        addValue("feeder_virtual");
-        addValue("feeder_low");
+        addValue("feeder_mid");
+        addValue("feeder_low");        
+        addValue("feeder_entrance");
+
     }
 
     // not sure what this does

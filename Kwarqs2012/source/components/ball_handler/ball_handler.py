@@ -63,9 +63,12 @@ class BallHandler(object):
         # query ball sensors
         chamber_full = self.chamber.IsFull()
         feeder_top = self.feeder.HasTopBall()
-        feeder_low = self.feeder.HasLowBall()
         feeder_middle  = self.feeder.HasMidBall()
+        feeder_low = self.feeder.HasLowBall()
         feeder_enter = self.feeder.HasEnterBall()
+        
+        # setup widget
+        self.widget.SetAll( chamber_full, feeder_top, feeder_middle, feeder_low, feeder_enter )
         
         feeder_full = feeder_top and feeder_low
         has_ball = feeder_top or feeder_low or feeder_middle

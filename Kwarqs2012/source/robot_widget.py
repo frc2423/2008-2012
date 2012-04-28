@@ -25,17 +25,20 @@ class RobotWidget(object):
         self.table['feeder_top'] = False
         self.table['feeder_mid'] = False
         self.table['feeder_low'] = False
+        self.table['feeder_entrance'] = False
         
         sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
         sd.PutData( name, self )
 
         
         
-    def SetAll(self, chamber, feeder_top, feeder_mid, feeder_low):
+    def SetAll(self, chamber, feeder_top, feeder_mid, feeder_low, feeder_entrance):
         self.table['chamber'] = bool(chamber)
         self.table['feeder_top'] = bool(feeder_top)
         self.table['feeder_mid'] = bool(feeder_mid)
         self.table['feeder_low'] = bool(feeder_low)
+        self.table['feeder_entrance'] = bool(feeder_entrance)
+        
         
     def SetChamber(self, value):
         self.table['chamber'] = value
@@ -49,6 +52,9 @@ class RobotWidget(object):
         
     def SetFeederLow(self, value):
         self.table['feeder_low'] = value
+        
+    def SetFeederEntrance(self, value):
+        self.table['feeder_entrance'] = value
     
 
     #

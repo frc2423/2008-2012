@@ -61,8 +61,7 @@ class Feeder(object):
 
     
     def HasEnterBall(self):
-        if self.enter_ball_sensor.IsBallPresent():
-            return True
+        return self.enter_ball_sensor.IsBallPresent()
         
     def HasTopBall(self):
         '''Returns True if the top ball is present'''
@@ -79,7 +78,7 @@ class Feeder(object):
         return self.top_ball_sensor.IsBallPresent()
 
         
-     def HasMidBall(self):
+    def HasMidBall(self):
         '''Returns True if a ball is in an intermediate state'''
         return self.mid_ball_sensor.IsBallPresent()
         

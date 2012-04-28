@@ -30,7 +30,7 @@ class Chamber(object):
     def __init__ ( self, chamberCAN, chambIRSens ):
     
         self.belt_motor = wpilib.CANJaguar(chamberCAN)
-        self.ball_sensor = IRSensor(chambIRSens, 2.0)
+        self.ball_sensor = IRSensor('IR-Cham', chambIRSens, 2.0)
         
         self.direction = None
         self.direction_history = deque()
@@ -68,6 +68,8 @@ class Chamber(object):
         self.direction = Chamber.BELT_OFF
     
     def Update( self ):
+        
+        self.ball_sensor.Update()
         
         direction = self.direction
         if direction is None:

@@ -348,16 +348,16 @@ class MyRobot(wpilib.SimpleRobot):
             # Enable automated behaviors if desired
             #
            
-            #try:
-            #    if SwitchOn( AUTO_BALL_HANDLER_SWITCH ):
-            #        ballHandler.AutoFeed()
+            try:
+                if SwitchOn( AUTO_BALL_HANDLER_SWITCH ):
+                    ballHandler.AutoFeed()
             
-            #    if SwitchOn( CONTINUOUS_BALL_HANDLER_SWITCH ):
-            #        ballHandler.ContinuousFeed()
+                if SwitchOn( CONTINUOUS_BALL_HANDLER_SWITCH ):
+                    ballHandler.ContinuousFeed()
                 
-            #except:
-            #    if not self.ds.IsFMSAttached():
-            #        raise
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
 
             #
             # Always allow manual control

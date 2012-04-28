@@ -26,10 +26,10 @@ class Feeder(object):
         self.belt_motor = wpilib.Jaguar(feederJag)
 
         # sensors
-        self.top_ball_sensor = IRSensor(top_ball_sensor, 1.2)
-        self.low_ball_sensor = IRSensor(low_ball_sensor, 1.2)
-        self.mid_ball_sensor = IRSensor(mid_ball_sensor, 1.2)
-        self.enter_ball_sensor = IRSensor(enter_ball_sensor, 1.2)
+        self.top_ball_sensor = IRSensor('IR-FTop', top_ball_sensor, 1.2)
+        self.low_ball_sensor = IRSensor('IR-FLow', low_ball_sensor, 1.2)
+        self.mid_ball_sensor = IRSensor('IR-FMid', mid_ball_sensor, 1.2)
+        self.enter_ball_sensor = IRSensor('IR-FEnt', enter_ball_sensor, 1.2)
         
         self.direction = None
         self.direction_history = deque()
@@ -107,6 +107,11 @@ class Feeder(object):
     
     
     def Update(self):
+    
+        self.top_ball_sensor.Update()
+        self.mid_ball_sensor.Update()
+        self.low_ball_sensor.Update()
+        self.enter_ball_sensor.Update()
     
         direction = self.direction
     

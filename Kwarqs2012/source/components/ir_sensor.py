@@ -1,8 +1,10 @@
 
 try:
     import wpilib
+    import wpilib.SmartDashboard
 except ImportError:
     import fake_wpilib as wpilib
+    import fake_wpilib.SmartDashboard
     
 
 class IRSensor(object):
@@ -17,7 +19,7 @@ class IRSensor(object):
     #by schematic, refers to sensor reporting ~6cm distance
     #ballSet = 2
     
-    def __init__(self, sensor_port, threshold):
+    def __init__(self, name, sensor_port, threshold):
         '''
             sensor_port     - analog channel number for sensor
             threshold       - Threshold used to determine when the ball 
@@ -27,6 +29,11 @@ class IRSensor(object):
     
         self.irSensor = wpilib.AnalogChannel(sensor_port)
         self.ball_present_threshold = threshold
+        self.name = name
+        
+        self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
+        self.sd.PutDouble( self.name, 0.0 )
+        self.sd.PutDouble( self.name + '-T', self.ball_present_threshold )
         
         self.state = False
             
@@ -39,7 +46,7 @@ class IRSensor(object):
         voltage = self.GetVoltage()
         if voltage < IRSensor.inditThresh:
             self.state = False
-        elif voltage > self.ball_present_threshold:
+        elif voltage > self.sd.GetDouble( self.name + '-T' ):
             self.state = True
         return self.state    
         
@@ -47,3 +54,6 @@ class IRSensor(object):
     def GetVoltage(self):
         '''Used for diagnostic purposes'''
         return self.irSensor.GetVoltage()
+
+    def Update(self):
+        self.sd.PutDouble( self.name, self.irSensor.GetVoltage() )

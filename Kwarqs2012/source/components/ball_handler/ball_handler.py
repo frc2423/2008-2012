@@ -70,8 +70,8 @@ class BallHandler(object):
         # setup widget
         self.widget.SetAll( chamber_full, feeder_top, feeder_middle, feeder_low, feeder_enter )
         
-        feeder_full = feeder_top and feeder_low
-        has_ball = feeder_top or feeder_low or feeder_middle
+        feeder_full = feeder_top and feeder_middle and feeder_low
+        has_ball = feeder_enter or feeder_top or feeder_low or feeder_middle
         
         # automated feeding
     

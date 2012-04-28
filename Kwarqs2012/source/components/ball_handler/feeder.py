@@ -20,19 +20,22 @@ class Feeder(object):
     BELT_DOWN   = 1.0   # expel ball from robot
     BELT_STOP   = 0     # stop feeder belt
     
-    def __init__(self, feederJag, low_ball_sensor, top_ball_sensor):
+    def __init__(self, feederJag, low_ball_sensor, top_ball_sensor, mid_ball_sensor, enter_ball_sensor):
         
         # belt motor
         self.belt_motor = wpilib.Jaguar(feederJag)
 
         # sensors
         self.top_ball_sensor = IRSensor(top_ball_sensor, 1.2)
-        self.low_ball_sensor = wpilib.DigitalInput( low_ball_sensor )
+        self.low_ball_sensor = IRSensor(low_ball_sensor, 1.2)
+        self.mid_ball_sensor = IRSensor(mid_ball_sensor, 1.2)
+        self.enter_ball_sensor = IRSensor(enter_ball_sensor, 1.2)
         
         self.direction = None
         self.direction_history = deque()
         self.last_direction = None
-        
+        self.has_low_ball = None
+        self.has_top_ball = None
     
     def Feed(self):
         '''Pull balls into the robot and up to the shooter'''
@@ -58,14 +61,27 @@ class Feeder(object):
     
     def HasTopBall(self):
         '''Returns True if the top ball is present'''
+        if self.has_top_ball == None:
+            self.has_top_ball = self.top_ball_sensor.IsBallPresent()
+        elif self.top_ball_sensor.IsBallPresent():
+            self.has_top_ball = True
+        elif self.low_ball_sensor.IsBallPresent() or not self.mid_ball_sensor.IsBallPresent():
+            self.has_top_ball = False
+        return self.has_top_ball
+  
     
-        return self.top_ball_sensor.IsBallPresent()
         
     def HasLowBall(self):
         '''Returns True if the bottom ball is present'''
-    
-        return self.low_ball_sensor.Get()
-    
+        '''If LowBall sensor and TopBall sensor are false but MidBall sensor is true then has_low_ball needs to stay true'''
+        if self.has_low_ball == None:
+            self.has_low_ball = self.low_ball_sensor.IsBallPresent()
+        elif self.low_ball_sensor.IsBallPresent():
+            self.has_low_ball = True
+        elif self.top_ball_sensor.IsBallPresent() or not self.mid_ball_sensor.IsBallPresent():
+            self.has_low_ball = False
+        return self.has_low_ball
+      
       
     def IsSet(self):
         '''Returns True if someone has called Feed/Stop/Expel since the

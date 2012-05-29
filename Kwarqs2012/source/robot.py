@@ -116,6 +116,8 @@ robotManager    = RobotManager(ballHandler, camera, wheel, susan, consoleLed)
 drive.SetSafetyEnabled( False )
 
 
+# loop wait time
+control_loop_wait_time = 0.02
 
 
 class MyRobot(wpilib.SimpleRobot):
@@ -158,13 +160,21 @@ class MyRobot(wpilib.SimpleRobot):
         print("MyRobot::Disabled()")
     
         while self.IsDisabled():
+            
             if self.ds.IsNewControlData():
-                operatorLeds.InDisabled()
-                #left_leds.Set(24)
-                #right_leds.Set(23)
-                operatorLeds.Update()
-                
-            wpilib.Wait(0.01)
+                try:
+                    consoleLed.Update()
+                except:
+                    if not self.ds.IsFMSAttached():
+                        raise
+        
+                try:
+                    operatorLeds.InDisabled()
+                except:
+                    if not self.ds.IsFMSAttached():
+                        raise
+            
+            wpilib.Wait( control_loop_wait_time )
 
     def Autonomous(self):
         '''
@@ -204,7 +214,7 @@ class MyRobot(wpilib.SimpleRobot):
             
             self._Update()
              
-            wpilib.Wait(0.01)
+            wpilib.Wait( control_loop_wait_time )
             
         try:
             self.autonomous.OnAutonomousDisable()
@@ -256,6 +266,13 @@ class MyRobot(wpilib.SimpleRobot):
         dog = self.GetWatchdog()
         dog.SetEnabled(True)
         dog.SetExpiration(watchdogTimeout)
+        
+        try:
+            operatorLeds.Reset()
+        except:
+            if not self.ds.IsFMSAttached():
+                raise
+        
         
         # main loop
         while self.IsOperatorControl() and self.IsEnabled():
@@ -445,7 +462,7 @@ class MyRobot(wpilib.SimpleRobot):
             self._Update()
             
             # wait for more user input
-            wpilib.Wait(0.02)
+            wpilib.Wait( control_loop_wait_time )
             
             
     def _Update(self):

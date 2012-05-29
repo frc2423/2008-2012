@@ -31,9 +31,9 @@ class IRSensor(object):
         self.ball_present_threshold = threshold
         self.name = name
         
-        self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
-        self.sd.PutDouble( self.name, 0.0 )
-        self.sd.PutDouble( self.name + '-T', self.ball_present_threshold )
+        #self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
+        #self.sd.PutDouble( self.name, 0.0 )
+        #self.sd.PutDouble( self.name + '-T', self.ball_present_threshold )
         
         self.state = False
             
@@ -46,7 +46,7 @@ class IRSensor(object):
         voltage = self.GetVoltage()
         if voltage < IRSensor.inditThresh:
             self.state = False
-        elif voltage > self.sd.GetDouble( self.name + '-T' ):
+        elif voltage > self.ball_present_threshold:
             self.state = True
         return self.state    
         
@@ -56,4 +56,7 @@ class IRSensor(object):
         return self.irSensor.GetVoltage()
 
     def Update(self):
-        self.sd.PutDouble( self.name, self.irSensor.GetVoltage() )
+        #self.sd.PutDouble( self.name, self.irSensor.GetVoltage() )
+        #self.ball_present_threshold = self.sd.GetDouble( self.name + '-T' )
+        pass
+        

@@ -12,7 +12,7 @@ except ImportError:
     from fake_wpilib.NetworkTables import NetworkTable
     
 ''' constants used to get data from the table '''
-TABLENAME = "TrackingData"
+TABLENAME = "SmartDashboard"
 DISTANCE = "distance"
 SONAR_DISTANCE = "sonar_distance"
 ANGLE_SUSAN = "angle_susan"

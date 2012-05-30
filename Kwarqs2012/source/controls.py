@@ -70,11 +70,11 @@ ds = wpilib.DriverStation.GetInstance()
 eio = ds.GetEnhancedIO()
 
 # configure the switches
-eio.SetDigitalConfig( MANUAL_SHOOTER_WHEEL_ENABLE_SWITCH, wpilib.DriverStationEnhancedIO.kInputPullUp )
-eio.SetDigitalConfig( AUTO_BALL_HANDLER_SWITCH, wpilib.DriverStationEnhancedIO.kInputPullUp )
-eio.SetDigitalConfig( CONTINUOUS_BALL_HANDLER_SWITCH, wpilib.DriverStationEnhancedIO.kInputPullUp )
-eio.SetDigitalConfig( AUTO_SUSAN_SWITCH, wpilib.DriverStationEnhancedIO.kInputPullUp )
-eio.SetDigitalConfig( AUTO_DISTANCE_SWITCH, wpilib.DriverStationEnhancedIO.kInputPullUp )
+eio.SetDigitalConfig( MANUAL_SHOOTER_WHEEL_ENABLE_SWITCH, wpilib.DriverStationEnhancedIO.kInputFloating )
+eio.SetDigitalConfig( AUTO_BALL_HANDLER_SWITCH, wpilib.DriverStationEnhancedIO.kInputFloating )
+eio.SetDigitalConfig( CONTINUOUS_BALL_HANDLER_SWITCH, wpilib.DriverStationEnhancedIO.kInputFloating )
+eio.SetDigitalConfig( AUTO_SUSAN_SWITCH, wpilib.DriverStationEnhancedIO.kInputFloating )
+eio.SetDigitalConfig( AUTO_DISTANCE_SWITCH, wpilib.DriverStationEnhancedIO.kInputFloating )
 
 
 def GetJoystickAxis( tuple ):

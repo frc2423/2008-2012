@@ -76,29 +76,7 @@ public class VisionSystem extends WPICameraExtension {
             i = 0;
         
         }
-    
-        
-     /*public void PutTrackingData(NetworkTable table){
-
-            synchronized(table) {
-            table.beginTransaction();
-      
-            table.putInt("frame_number", this.frame_number);
-            table.putInt("valid_frames", this.valid_frames);
-            //table.putInt("x", this.x);
-            //table.putInt("y", this.y);
-            table.putBoolean("target_data_valid", this.target_data_valid);
-            table.putDouble("angle_susan", this.angle_susan);
-            table.putDouble("distance", this.distance);
-            table.endTransaction();
-            }
-            
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(VisionSystem.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } */
+   
     }
     
     public void init() {
@@ -209,6 +187,7 @@ public class VisionSystem extends WPICameraExtension {
                 biggest_rectangle = p;
             }
         }
+        trackingData.frame_number = trackingData.frame_number +1;
         if (biggest_rectangle != null){
             rawImage.drawPolygon(biggest_rectangle, WPIColor.BLUE, 2);
             int pCenterX = (biggest_rectangle.getX() + (biggest_rectangle.getWidth()/2));
@@ -216,7 +195,7 @@ public class VisionSystem extends WPICameraExtension {
 
             rawImage.drawPoint(new WPIPoint(pCenterX, pCenterY), WPIColor.BLUE, 2);
    
-            trackingData.frame_number = trackingData.frame_number +1;
+            
             
             // x coordinate of the center
             double center_x = biggest_rectangle.getX() + (biggest_rectangle.getWidth()/2);
@@ -242,21 +221,20 @@ public class VisionSystem extends WPICameraExtension {
                 table.endTransaction();
                 }
             }*/
-            //if (trackingData.frame_number % 50 == 0)  {
-                //System.err.println("--------------------------------------");
-                synchronized(table) {
-                table.beginTransaction();
-                table.putBoolean("found", true);
-                table.putDouble("angle_susan", angle_susan);
-                table.putDouble("distance", distance);
-                table.endTransaction();
+            if (trackingData.frame_number % 15 == 0)  {
+                System.err.println(trackingData.frame_number);
+                double test = (int)(Math.random() * 10);
+                NetworkTable robotTable = Robot.getTable();
+                synchronized(robotTable){
+                    robotTable.beginTransaction();
+                    robotTable.putBoolean("found", true);
+                    robotTable.putDouble("distance", distance);
+                    robotTable.putDouble("angle_susan", angle_susan);
+                    robotTable.endTransaction();
                 }
-            
+                
 
-            Robot.getTable().putBoolean("found", true);
-            Robot.getTable().putDouble("distance", distance);
-            Robot.getTable().putDouble("angle_susan", angle_susan);
-            //}
+            }
             rawImage.drawPolygon(biggest_rectangle, targetColor, 3);
             
         } else{
@@ -268,11 +246,25 @@ public class VisionSystem extends WPICameraExtension {
             table.putDouble("distance", 0.0);
             table.endTransaction();
             } */
-            /*
+            /*synchronized(table) {
+            table.beginTransaction();
             table.putBoolean("found", false);
-            Robot.getTable().putBoolean("found", false);
-            Robot.getTable().putDouble("distance", 0.0);
-            Robot.getTable().putDouble("angle_susan", 0.0);*/
+            table.putDouble("distance", 0.0);
+            table.putDouble("angle_susan", 0.0);
+            table.endTransaction();
+           }*/
+            if (trackingData.frame_number % 15 == 0)  {
+                System.err.println(trackingData.frame_number);
+                double test = (int)(Math.random() * 10);
+                NetworkTable robotTable = Robot.getTable();
+                synchronized(robotTable){
+                    robotTable.beginTransaction();
+                    robotTable.putBoolean("found", false);
+                    robotTable.putDouble("distance", 0);
+                    robotTable.putDouble("angle_susan", 0);
+                    robotTable.endTransaction();
+                }
+            }
         }
 
         return rawImage;

@@ -188,6 +188,7 @@ public class VisionSystem extends WPICameraExtension {
             }
         }
         trackingData.frame_number = trackingData.frame_number +1;
+        NetworkTable robotTable = Robot.getTable();
         if (biggest_rectangle != null){
             rawImage.drawPolygon(biggest_rectangle, WPIColor.BLUE, 2);
             int pCenterX = (biggest_rectangle.getX() + (biggest_rectangle.getWidth()/2));
@@ -221,10 +222,10 @@ public class VisionSystem extends WPICameraExtension {
                 table.endTransaction();
                 }
             }*/
+            
             if (trackingData.frame_number % 15 == 0)  {
                 System.err.println(trackingData.frame_number);
                 double test = (int)(Math.random() * 10);
-                NetworkTable robotTable = Robot.getTable();
                 synchronized(robotTable){
                     robotTable.beginTransaction();
                     robotTable.putBoolean("found", true);
@@ -256,7 +257,6 @@ public class VisionSystem extends WPICameraExtension {
             if (trackingData.frame_number % 15 == 0)  {
                 System.err.println(trackingData.frame_number);
                 double test = (int)(Math.random() * 10);
-                NetworkTable robotTable = Robot.getTable();
                 synchronized(robotTable){
                     robotTable.beginTransaction();
                     robotTable.putBoolean("found", false);

@@ -331,11 +331,11 @@ class MyRobot(wpilib.SimpleRobot):
             ###############################################            
             
             try:
-                if StickButtonOn( MANUAL_CAMERA_ENABLE_BUTTON1 ) or StickButtonOn( MANUAL_CAMERA_ENABLE_BUTTON2 ):
+                if StickButtonOn( MANUAL_CAMERA_ENABLE_BUTTON1 ) or StickButtonOn( MANUAL_CAMERA_ENABLE_BUTTON2 ) or StickButtonOn( RAMP_ARM_DOWN_BUTTON ):
                 
                     # TODO: not sure what the appropriate angles are for this
                     angle = GetJoystickAxis( MANUAL_CAMERA_AXIS )
-                    angle = ((angle * -1.0) + 1.0) * 90.0 - 45.0
+                    angle = ((angle * -1.0) + 1.0) * 90.0 - 15.0
                 
                     camera.SetAngle( angle )
                 
@@ -403,12 +403,12 @@ class MyRobot(wpilib.SimpleRobot):
             # Robot Manager
             ###############################################
            
-            #try:
-            #    if SwitchOn( AUTO_SUSAN_SWITCH ):
-            #        robotManager.EnableAutoSusan()     
-            #except:
-            #    if not self.ds.IsFMSAttached():
-            #        raise
+            try:
+                if SwitchOn( AUTO_SUSAN_SWITCH ):
+                    robotManager.EnableAutoSusan()     
+            except:
+                if not self.ds.IsFMSAttached():
+                    raise
                     
             try:
                 # must always call either EnableAutoDistance

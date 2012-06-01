@@ -1,8 +1,10 @@
 
 try:
     import wpilib
+    import wpilib.SmartDashboard
 except ImportError:
     import fake_wpilib as wpilib
+    import fake_wpilib.SmartDashboard
 
 import threading
     
@@ -49,9 +51,9 @@ class Susan(object):
     '''
     
     # these values are probably too high
-    SUSAN_P = 1.0
-    SUSAN_I = 0.0
-    SUSAN_D = 0.0
+    SUSAN_P = 1.21
+    SUSAN_I = 0.001
+    SUSAN_D = 0.001
     SUSAN_CAMERA_MAX = 20
     SUSAN_MAX_SPEED = 1
     ANGLE_TOLERANCE = 5      # the percent tolerance of the angle to be considered ready'''
@@ -71,7 +73,7 @@ class Susan(object):
         self.pid_source = SusanSource()
         self.pid_output = SusanPidOutput(self.susanMotor)
         
-        self.pidControl = wpilib.PIDController(Susan.SUSAN_P, Susan.SUSAN_I, Susan.SUSAN_D, self.pid_source, self.pid_output)
+        self.pidControl = wpilib.SmartDashboard.SendablePIDController(Susan.SUSAN_P, Susan.SUSAN_I, Susan.SUSAN_D, self.pid_source, self.pid_output)
         self.pidControl.SetInputRange(-(Susan.SUSAN_CAMERA_MAX),Susan.SUSAN_CAMERA_MAX)
         self.pidControl.SetOutputRange(-(Susan.SUSAN_MAX_SPEED), Susan.SUSAN_MAX_SPEED)
         self.pidControl.SetTolerance(Susan.ANGLE_TOLERANCE)
@@ -89,6 +91,8 @@ class Susan(object):
         # can immediately set the current mode regardless of the input
         self.autoMode = None
                     
+        self.sd = wpilib.SmartDashboard.SmartDashboard.GetInstance()
+        self.sd.PutData( "Susan PID", self.pidControl )
     
     def SetAutoRelativeAngle(self,angle):
         '''When called, this tells the susan to automatically go to an angle

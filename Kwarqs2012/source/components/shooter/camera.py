@@ -126,7 +126,9 @@ class TrackingData(object):
     
     def GetAngle(self):
         with self._lock:
-            return TrackingData.angle_susan
+            if TrackingData.found:
+                return TrackingData.angle_susan
+            return 0.0
     
     def IsFound(self):
         with self._lock:
